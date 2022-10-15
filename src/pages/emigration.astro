@@ -1,0 +1,102 @@
+---
+import Layout from "../layouts/Layout.astro";
+import FeedbackEmigrationGame from "../components/FeedbackEmigrationGame.svelte";
+import Header from "../components/Header.svelte";
+
+const VERSION = "0.0.1";
+const rulesTitle = `emigration_game_rules_v${VERSION}.pdf`;
+const rulesHREF = `files/${rulesTitle}`;
+const printAndPlayTitle = `emigration_game_print_and_play_v${VERSION}.pdf`;
+const printAndPlayHREF = `files/${printAndPlayTitle}`;
+---
+
+<Header client:idle />
+<Layout title="Emigration Board Game">
+    <div class="font-publicSans">
+        <p class="bg-yellow-100 dark:bg-neutral-600 p-2">
+            Version {VERSION} - Updated October 15, 2022
+        </p>
+        <main class="max-w-screen-lg text-center m-auto p-2">
+            <h1 class="text-4xl sm:text-7xl font-bold uppercase">Emigration</h1>
+            <p class="uppercase tracking-widest">
+                A board game about moving abroad
+            </p>
+            <div
+                class="flex flex-wrap gap-2 justify-center items-center mb-4 opacity-50"
+            >
+                <p>2-6 Players</p>
+                <p>30-60 Minutes</p>
+                <p>Ages 10+</p>
+            </div>
+            <p class="my-4 text-lg">
+                You are preparing to move to another country! Collect documents,
+                make new connections, and manage your money as life happens.
+                When you're all ready, it's time to enter your destination. But
+                can you make it through border control?
+            </p>
+
+            <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-700">
+                <p class="font-bold">Where can I buy the game?</p>
+                <p>
+                    You can't buy the game yet. There's still a lot of work to
+                    do before it could be published. But you can print the game
+                    yourself and give feedback to help with the development.
+                </p>
+            </div>
+
+            <div
+                class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center"
+            >
+                <div class="flex flex-col gap-2 justify-center items-center">
+                    <a
+                        href={printAndPlayHREF}
+                        download={printAndPlayTitle}
+                        class="btn"
+                        ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                            ></path>
+                        </svg>
+                        Print & Play</a
+                    >
+                    <p class="italic">
+                        You'll need a printer, five sheets of paper, scisors,
+                        and about 30 minutes to cut out all the pieces.
+                    </p>
+                </div>
+                <a href={rulesHREF} download={rulesTitle} class="btn"
+                    ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                        ></path>
+                    </svg>
+                    Rules</a
+                >
+            </div>
+
+            <FeedbackEmigrationGame
+                title="Playtester's Feedback"
+                client:visible
+                version={VERSION}
+            />
+        </main>
+    </div>
+</Layout>

@@ -1,0 +1,16 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.svelte";
+---
+
+<Header client:idle />
+<Layout title="T&A Games">
+	<main class="max-w-screen-lg text-center m-auto p-2 font-serif">
+		<div class="flex flex-wrap gap-4 my-4 justify-center items-center">
+		</div>
+		<div class="flex flex-col gap-2 items-center">
+			<a href="/emigration" class="btn font-publicSans"> Emigration</a>
+			<p>A board game about moving abroad.</p>
+		</div>
+	</main>
+</Layout>
