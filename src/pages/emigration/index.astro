@@ -1,0 +1,131 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import FeedbackEmigrationGame from "../../components/FeedbackEmigrationGame.svelte";
+import Header from "../../components/Header.svelte";
+
+const VERSION = "0.0.1";
+const rulesTitle = `emigration_game_rules_v${VERSION}.pdf`;
+const rulesHREF = `files/emigration/v${VERSION}/${rulesTitle}`;
+const printAndPlayTitle = `emigration_game_print_and_play_v${VERSION}.pdf`;
+const printAndPlayHREF = `files/emigration/v${VERSION}/${printAndPlayTitle}`;
+const tokensTitle = `emigration_game_tokens_v${VERSION}.pdf`;
+const tokensHREF = `files/emigration/v${VERSION}/${tokensTitle}`;
+---
+
+<Header client:idle />
+<Layout title="Emigration Board Game">
+    <main class="max-w-screen-lg text-center m-auto px-2 pb-8 font-publicSans">
+        <div class="my-4">
+            <img
+                src="/files/emigration/Emigration Game Logo.png"
+                alt="Emigration"
+                class="max-w-screen-md mx-auto w-full p-4"
+            />
+            <p class="uppercase tracking-widest">
+                A board game about moving abroad
+            </p>
+            <div
+                class="flex flex-wrap gap-2 justify-center items-center mb-4 opacity-50"
+            >
+                <p>2-6 Players</p>
+                <p>20-60 Minutes</p>
+                <p>Ages 12+</p>
+            </div>
+        </div>
+        <p
+            class="my-4 text-4xl uppercase tracking-widest font-bold break-words text-red-500"
+        >
+            Prototype
+        </p>
+        <p class="my-4 text-lg">
+            You're moving to another country! Scramble to collect documents,
+            make valuable connections, and manage your money as life happens.
+            Then pick a border control line and hope the officer lets you in!
+        </p>
+
+        <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800">
+            <p class="font-bold">Where can I buy the game?</p>
+            <p>
+                You can't buy the game yet. But you can print the game yourself
+                and give feedback to help with the development.
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
+            <div class="flex flex-col gap-2 justify-center items-center">
+                <div class="inline-flex gap-2 flex-wrap justify-center">
+                    <a
+                        href={printAndPlayHREF}
+                        download={printAndPlayTitle}
+                        class="btn"
+                        ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                            ></path>
+                        </svg>
+                        Print & Play</a
+                    >
+                    <a href={rulesHREF} download={rulesTitle} class="btn"
+                        ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                            ></path>
+                        </svg>
+                        Rules</a
+                    >
+                </div>
+
+                <div class="inline-flex flex-col gap-2 my-4">
+                    <p class="italic">
+                        To Print & Play, you'll need a printer, 10 sheets of
+                        paper, and some time to cut out all the cards. You'll
+                        also need <span class="font-black"
+                            >One Six-Sided Die</span
+                        >; <span class="font-black">Money Tokens</span> (about 20
+                        per player) and
+                        <span class="font-black">Assurance Tokens</span> (about 10
+                        per player), using another game's pieces, coins, monopoly
+                        money, poker chips, Legos, or candy. (Or <a
+                            class="underline"
+                            href={tokensHREF}
+                            download={tokensTitle}
+                            >click here to download and print Money and
+                            Assurance Tokens</a
+                        >.)
+                    </p>
+                </div>
+
+                <p class="px-4 py-2 w-fit mx-auto mt-2">
+                    Prototype Version {VERSION} - <a
+                        href="/emigration/changelog"
+                        class="underline">View Changelog</a
+                    >
+                </p>
+            </div>
+        </div>
+
+        <FeedbackEmigrationGame
+            title="Playtester's Feedback"
+            client:visible
+            version={VERSION}
+        />
+    </main>
+</Layout>

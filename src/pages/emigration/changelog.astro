@@ -1,0 +1,18 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.svelte";
+import Changelog from "../../components/Changelog.svelte";
+import { changelog } from "../../js/emegration-changelog";
+---
+
+<Header client:idle />
+<Layout title="Emigration Board Game | Changelog">
+    <div
+        class="inline-flex flex-col font-serif mb-4 max-w-screen-sm m-auto p-2 w-full"
+    >
+        <a href="/emigration" class="underline my-4"
+            >&#8592; Emigration: A Board Game About Moving Abroad</a
+        >
+        <Changelog title="Game Changelog" data={changelog} />
+    </div>
+</Layout>
