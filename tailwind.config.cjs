@@ -8,6 +8,9 @@ module.exports = {
 				publicSans: ['Public Sans', 'sans-serif'],
 			}
 		},
+		fontFamily: {
+			serif: ['Tai Heritage Pro', 'serif']
+		}
 	},
 	plugins: [
 		require('@tailwindcss/forms'),

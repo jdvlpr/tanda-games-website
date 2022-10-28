@@ -12,13 +12,17 @@
     let playerNamesInput,
         email,
         autoResponse = false;
+
     $: players =
         playerNamesInput && playerNamesInput.includes(",")
-            ? playerNamesInput.split(",").filter((n) => n !== "" && n !== " ")
+            ? playerNamesInput
+                  .split(",")
+                  .map((n) => n.trim())
+                  .filter((n) => n !== "")
             : null;
     let ageRanges = [
-        "Under 10 years old",
-        "10 to 16 years old",
+        "Under 12 years old",
+        "12 to 16 years old",
         "16 to 24 years old",
         "24 to 40 years old",
         "40 to 60 years old",
@@ -36,7 +40,7 @@
         target="_blank"
         action="https://formsubmit.co/49382fe0e9b3c69623292b950dd77bf7"
         method="POST"
-        class="inline-flex flex-wrap items-start justify-center gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-700"
+        class="inline-flex flex-wrap items-start justify-center gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-800"
     >
         <p class="block mb-4 italic text-center">
             Fill out this form after you've play the game. All responses are optional and private, and will only be used
@@ -82,9 +86,12 @@
                 class="dark:text-neutral-900"
                 type="text"
                 name="names_of_players"
-                placeholder="James, Sue, Andrew..."
+                placeholder="Player 1, Player 2, Player 3, Player 4"
                 bind:value={playerNamesInput}
             />
+            {#if playerNamesInput && !playerNamesInput.includes(",")}
+                <p class="text-sm text-red-400">Separate names of players by comma ( , )</p>
+            {/if}
         </div>
 
         <div class="basis-full" />
@@ -125,6 +132,7 @@
                                 name="{player}'s_final_number_of_assurance_tokens"
                                 class="w-fit dark:text-neutral-900"
                             >
+                                <option value="">Select a number</option>
                                 {#each Array(100) as _, i}
                                     <option value={i}>{i} Assurance {i === 1 ? "Token" : "Tokens"}</option>
                                 {/each}
@@ -136,17 +144,19 @@
         {/if}
 
         <div class="flex flex-col gap-2 flex-1">
-            <label for="favorite-things" class="text-sm">What were your favorite things about this game?</label>
-            <input id="favorite-things" type="text" name="favorite_things" class="dark:text-neutral-900" />
-        </div>
-
-        <div class="basis-full" />
-
-        <div class="flex flex-col gap-2 flex-1">
-            <label for="least-favorite-things" class="text-sm"
-                >What were your least favorite things about this game?</label
-            >
-            <input id="least-favorite-things" type="text" name="least_favorite_things" class="dark:text-neutral-900" />
+            <label for="comments" class="">Comments & Questions</label>
+            <p class="text-sm italic">
+                What didn't make sense? What would you change about the game? What was your strategy, and did it work as
+                you expected? What were your favorite and least favorite things about the game? Did you have enough or
+                too many tokens?
+            </p>
+            <textarea
+                id="comments"
+                placeholder="Comments & Questions"
+                name="comments_and_questions"
+                class="dark:text-neutral-900"
+                rows="8"
+            />
         </div>
 
         <div class="basis-full" />
@@ -178,22 +188,6 @@
                 <input type="hidden" name="_autoresponse" value="Thank you for your feedback!" />
             {/if}
         {/if}
-
-        <div class="basis-full" />
-
-        <div class="flex flex-col gap-2 flex-1">
-            <label for="comments" class="">Other comments or questions</label>
-            <p class="text-sm italic">
-                How clear were the instructions? What would you change about the game? What was your strategy?
-            </p>
-            <textarea
-                id="comments"
-                placeholder="Other Comments"
-                name="other_comments"
-                class="dark:text-neutral-900"
-                rows="4"
-            />
-        </div>
 
         <div class="basis-full" />
 
