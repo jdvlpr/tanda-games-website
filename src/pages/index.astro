@@ -11,11 +11,20 @@ import Header from "../components/Header.svelte";
 				href="/emigration"
 				class="btn font-publicSans cursor-pointer inline-flex flex-wrap gap-4 justify-center items-center"
 			>
-				<img
-					src="/files/emigration/Emigration Game Logo.png"
-					alt="Emigration"
-					class="max-w-[500px] mx-auto w-full"
-				/>
+				<picture>
+					<source
+						srcset="/files/emigration/Emigration-Game-Logo.webp"
+						type="image/webp"
+					/>
+					<source
+						srcset="/files/emigration/Emigration-Game-Logo.png"
+						type="image/png"
+					/>
+					<img
+						src="/files/emigration/Emigration-Game-Logo.png"
+						alt="Emigration Game Logo"
+					/>
+				</picture>
 				<p class="text-lg font-normal">
 					Emigration: A board game about moving abroad
 				</p>

@@ -2,8 +2,9 @@
 import Layout from "../../layouts/Layout.astro";
 import FeedbackEmigrationGame from "../../components/FeedbackEmigrationGame.svelte";
 import Header from "../../components/Header.svelte";
+import { changelog } from "../../js/emegration-changelog";
 
-const VERSION = "0.0.1";
+const VERSION = changelog[0].version;
 const rulesTitle = `emigration_game_rules_v${VERSION}.pdf`;
 const rulesHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${rulesTitle}`;
 const printAndPlayTitle = `emigration_game_print_and_play_v${VERSION}.pdf`;
@@ -16,11 +17,20 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
 <Layout title="Emigration Board Game">
     <main class="max-w-screen-lg text-center m-auto px-2 pb-8 font-publicSans">
         <div class="my-4">
-            <img
-                src="/files/emigration/Emigration Game Logo.png"
-                alt="Emigration"
-                class="max-w-screen-md mx-auto w-full p-4"
-            />
+            <picture>
+                <source
+                    srcset="/files/emigration/Emigration-Game-Logo.webp"
+                    type="image/webp"
+                />
+                <source
+                    srcset="/files/emigration/Emigration-Game-Logo.png"
+                    type="image/png"
+                />
+                <img
+                    src="/files/emigration/Emigration-Game-Logo.png"
+                    alt="Emigration Game Logo"
+                />
+            </picture>
             <p class="uppercase tracking-widest">
                 A board game about moving abroad
             </p>
