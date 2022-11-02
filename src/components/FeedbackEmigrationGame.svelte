@@ -2,6 +2,7 @@
     export let title = "Feedback";
     export let version;
     export let expand = false;
+    export let discordLink;
     let iconDown = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 </svg>`;
@@ -36,6 +37,8 @@
 >
 
 {#if expand}
+    <a href={discordLink} rel="nofollow noopener" target="_blank" class="btn"> Join Discord Server</a>
+
     <form
         target="_blank"
         action="https://formsubmit.co/49382fe0e9b3c69623292b950dd77bf7"

@@ -60,8 +60,20 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
                 <a
                     href="https://store.steampowered.com/app/286160/Tabletop_Simulator/"
                     target="_blank"
-                    class="underline">Tabletop Simulator</a
+                    class="underline cursor-pointer">Tabletop Simulator</a
                 > or print the game yourself and give feedback to help with the development.
+            </p>
+
+            <p class="font-bold mt-4">
+                How can I ask a question or give feedback?
+            </p>
+            <p>
+                Use the feedback form at the bottom of this webpage,
+                <a
+                    href="https://discord.gg/aDV6NY73H2"
+                    target="_blank"
+                    class="underline cursor-pointer">join the Discord Server</a
+                >, or email feedback@tandagames.com.
             </p>
         </div>
 
@@ -144,8 +156,8 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
             </div>
         </div>
 
-        <div class="flex flex-row overflow-scroll snap-x gap-4 pb-4">
-            <picture class="snap-center min-w-[80vw]">
+        <div class="flex flex-row overflow-scroll snap-x gap-2 pb-4">
+            <picture class="snap-start min-w-[80vw]">
                 <source
                     srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-10-37.webp"
                     type="image/webp"
@@ -161,7 +173,7 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
                 />
             </picture>
 
-            <picture class="snap-center min-w-[80vw]">
+            <picture class="snap-end min-w-[80vw]">
                 <source
                     srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-11-26.webp"
                     type="image/webp"
@@ -184,6 +196,7 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
             title="Playtester's Feedback"
             client:visible
             expand={true}
+            discordLink="https://discord.gg/aDV6NY73H2"
             version={VERSION}
         />
     </main>
