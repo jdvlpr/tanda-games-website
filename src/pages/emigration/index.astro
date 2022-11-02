@@ -56,14 +56,26 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
         <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800">
             <p class="font-bold">Where can I buy the game?</p>
             <p>
-                You can't buy the game yet. But you can print the game yourself
-                and give feedback to help with the development.
+                You can't buy the game yet. But you can play the game in
+                <a
+                    href="https://store.steampowered.com/app/286160/Tabletop_Simulator/"
+                    target="_blank"
+                    class="underline">Tabletop Simulator</a
+                > or print the game yourself and give feedback to help with the development.
             </p>
         </div>
 
         <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
             <div class="flex flex-col gap-2 justify-center items-center">
                 <div class="inline-flex gap-2 flex-wrap justify-center">
+                    <a
+                        href="https://steamcommunity.com/sharedfiles/filedetails/?id=2883314859"
+                        rel="nofollow noopener"
+                        target="_blank"
+                        class="btn"
+                    >
+                        Play in Tabletop Simulator</a
+                    >
                     <a
                         href={printAndPlayHREF}
                         download={printAndPlayTitle}
@@ -132,9 +144,46 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
             </div>
         </div>
 
+        <div class="flex flex-row overflow-scroll snap-x gap-4 pb-4">
+            <picture class="snap-center min-w-[80vw]">
+                <source
+                    srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-10-37.webp"
+                    type="image/webp"
+                />
+                <source
+                    srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-10-37.png"
+                    type="image/png"
+                />
+                <img
+                    src="/files/emigration/TTS_Screenshot_2022-11-02_10-10-37.png"
+                    alt="Emigration Game Overview"
+                    class="w-full"
+                />
+            </picture>
+
+            <picture class="snap-center min-w-[80vw]">
+                <source
+                    srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-11-26.webp"
+                    type="image/webp"
+                />
+                <source
+                    srcset="/files/emigration/TTS_Screenshot_2022-11-02_10-11-26.png"
+                    type="image/png"
+                />
+                <img
+                    src="/files/emigration/TTS_Screenshot_2022-11-02_10-11-26.png"
+                    alt="Emigration Game Card Layout"
+                    class="w-full"
+                />
+            </picture>
+        </div>
+
+        <p class="italic mb-4">Images of Emigration in Tabletop Simulator</p>
+
         <FeedbackEmigrationGame
             title="Playtester's Feedback"
             client:visible
+            expand={true}
             version={VERSION}
         />
     </main>
