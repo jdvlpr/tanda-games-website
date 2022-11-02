@@ -37,7 +37,7 @@
 >
 
 {#if expand}
-    <a href={discordLink} rel="nofollow noopener" target="_blank" class="btn"> Join Discord Server</a>
+    <a href={discordLink} rel="nofollow noopener" target="_blank" class="btn mb-2"> Join Discord Server</a>
 
     <form
         target="_blank"
