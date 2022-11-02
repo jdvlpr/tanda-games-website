@@ -3,6 +3,7 @@
     export let version;
     export let expand = false;
     export let discordLink;
+    export let changelog;
     let iconDown = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 </svg>`;
@@ -56,7 +57,9 @@
             <select id="game-length" name="selected_version" class="w-fit dark:text-neutral-900">
                 <option value="" selected>Select a version</option>
                 <option value="I'm not sure">I'm not sure</option>
-                <option value="0.0.1">0.0.1</option>
+                {#each changelog as { version }}
+                    <option value={version}>{version}</option>
+                {/each}
             </select>
         </div>
 
