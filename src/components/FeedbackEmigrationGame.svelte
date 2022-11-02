@@ -165,6 +165,19 @@
         <div class="basis-full" />
 
         <div class="flex flex-col gap-2 flex-1">
+            <label for="name-or-alias" class="text-sm">Your name or alias (Optional - if you want public credit)</label>
+            <input
+                id="name-or-alias"
+                type="text"
+                name="Your Name or Alias"
+                placeholder="Your Name or Alias"
+                class="dark:text-neutral-900"
+            />
+        </div>
+
+        <div class="basis-full" />
+
+        <div class="flex flex-col gap-2 flex-1">
             <label for="email-address" class="text-sm">Your contact email (if you want a reply)</label>
             <input
                 id="email-address"
