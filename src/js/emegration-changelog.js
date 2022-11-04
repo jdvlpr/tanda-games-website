@@ -1,4 +1,13 @@
 export const changelog = [{
+    version: "0.0.3",
+    date: 'November 4, 2022',
+    items: [
+        'Rules: Added more information in the Overview section.',
+        'Rules: Added more detailed explanations of cards.',
+        'Rules: Added a Contents section.',
+        'Rules: Fixed some typos',
+    ]
+}, {
     version: "0.0.2",
     date: 'November 2, 2022',
     items: ['Rules: Changed "Overview" to "Summary" section, and "Objective" to "Overview" section', 'Rules: Added more information to the Overview and Setup sections.', 'Rules: Clarified Winning The Game section, explaining winning competitively or cooperatively.']
