@@ -1,4 +1,15 @@
 export const changelog = [{
+    version: "0.0.4",
+    date: 'November 9, 2022',
+    items: [
+        'Rules: Added more examples.',
+        'Rules: Rearranged some sections.',
+        'Rules: Renamed "Border Crossing" to "Entrance Lane".',
+        'Rules: Modified placement of Entrance Lane Requirement Tokens.',
+        'Cards: Changed Entrance Lanes\' design, added characters.',
+        'Cards: Modified Career Cards',
+    ]
+}, {
     version: "0.0.3",
     date: 'November 4, 2022',
     items: [
