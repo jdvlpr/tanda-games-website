@@ -4,6 +4,7 @@
     export let expand = false;
     export let discordLink;
     export let changelog;
+
     let iconDown = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 </svg>`;
@@ -30,6 +31,14 @@
         "40 to 60 years old",
         "Above 60 years old",
     ];
+
+    let files = [""];
+
+    let showClearFirstFile = false;
+    function onFileChange(index) {
+        if (index !== 0) return;
+        showClearFirstFile = true;
+    }
 </script>
 
 <button
@@ -43,6 +52,7 @@
     <form
         target="_blank"
         action="https://formsubmit.co/99157ff313bd346ac1d729cca203b666"
+        enctype="multipart/form-data"
         method="POST"
         class="inline-flex flex-wrap items-start justify-center gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-800"
     >
@@ -164,6 +174,52 @@
                 class="dark:text-neutral-900"
                 rows="8"
             />
+        </div>
+
+        <div class="basis-full" />
+
+        <div class="flex flex-col gap-2 flex-1 items-start">
+            <p class="text-sm">Attach an image, video, or audio file to help describe your feedback</p>
+            {#each files as file, index}
+                <div class="flex flex-wrap gap-2">
+                    <input
+                        id="file_attachment_{index}"
+                        type="file"
+                        class="w-full"
+                        on:change={() => onFileChange(index)}
+                        name="file_attachment_{index}"
+                        accept="image/*,video/*,audio/*,.pdf"
+                    />
+                    {#if showClearFirstFile && index === 0}
+                        <button
+                            type="button"
+                            class="mb-2 text-sm"
+                            on:click={() => {
+                                document.getElementById(`file_attachment_0`).value = "";
+                                showClearFirstFile = false;
+                            }}>x Clear File</button
+                        >
+                    {/if}
+                    {#if index > 0}
+                        <button
+                            type="button"
+                            class="mb-2 text-sm"
+                            on:click={() => {
+                                document.getElementById(`file_attachment_${index}`).value = "";
+                                files.splice(index, 1);
+                                files = files;
+                            }}>x Remove File</button
+                        >
+                    {/if}
+                </div>
+            {/each}
+            <button
+                type="button"
+                on:click={() => {
+                    files.push("");
+                    files = files;
+                }}>+ Add File</button
+            >
         </div>
 
         <div class="basis-full" />
