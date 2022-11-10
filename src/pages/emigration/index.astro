@@ -1,16 +1,41 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import FeedbackEmigrationGame from "../../components/FeedbackEmigrationGame.svelte";
+import PrintAndPlay from "../../components/PrintAndPlay.svelte";
 import Header from "../../components/Header.svelte";
 import { changelog } from "../../js/emegration-changelog";
 
 const VERSION = changelog[0].version;
-const rulesTitle = `emigration_game_rules_v${VERSION}.pdf`;
-const rulesHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${rulesTitle}`;
-const printAndPlayTitle = `emigration_game_print_and_play_v${VERSION}.pdf`;
-const printAndPlayHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${printAndPlayTitle}`;
-const tokensTitle = `emigration_game_tokens_v${VERSION}.pdf`;
-const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${tokensTitle}`;
+
+const ID = "emigration";
+
+const VARIENTPLACEHOLDER = "%Varient%";
+
+const rulesTitle = `${ID}_game_rules_v${VERSION}.pdf`;
+const rulesHREF = `https://www.tandagames.com/files/${ID}/v${VERSION}/${rulesTitle}`;
+const tokensTitle = `${ID}_game_tokens_v${VERSION}.pdf`;
+const tokensHREF = `https://www.tandagames.com/files/${ID}/v${VERSION}/${tokensTitle}`;
+
+const printAndPlayTitle = `${ID}_game_print_and_play_${VARIENTPLACEHOLDER}_v${VERSION}.pdf`;
+const printAndPlayHREF = `https://www.tandagames.com/files/${ID}/v${VERSION}/${printAndPlayTitle}`;
+
+const variants = [
+    {
+        name: "2 Players",
+        id: "2_players",
+        sheets: 7,
+    },
+    {
+        name: "3 to 4 Players",
+        id: "3_to_4_players",
+        sheets: 8,
+    },
+    {
+        name: "5 to 6 Players",
+        id: "5_to_6_players",
+        sheets: 9,
+    },
+];
 ---
 
 <Header client:idle />
@@ -88,26 +113,6 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
                     >
                         Play in Tabletop Simulator</a
                     >
-                    <a
-                        href={printAndPlayHREF}
-                        download={printAndPlayTitle}
-                        class="btn"
-                        ><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                            ></path>
-                        </svg>
-                        Print & Play</a
-                    >
                     <a href={rulesHREF} download={rulesTitle} class="btn"
                         ><svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -127,25 +132,16 @@ const tokensHREF = `https://www.tandagames.com/files/emigration/v${VERSION}/${to
                     >
                 </div>
 
-                <div class="inline-flex flex-col gap-2 my-4">
-                    <p class="italic">
-                        To Print & Play, you'll need a printer, 10 sheets of
-                        paper, and some time to cut out all the cards. You'll
-                        also need <span class="font-black"
-                            >One Six-Sided Die</span
-                        >; <span class="font-black">Money Tokens</span> (about 20
-                        per player) and
-                        <span class="font-black">Assurance Tokens</span> (about 10
-                        per player), using another game's pieces, coins, monopoly
-                        money, poker chips, Legos, or candy. (Or <a
-                            class="underline"
-                            href={tokensHREF}
-                            download={tokensTitle}
-                            >click here to download and print Money and
-                            Assurance Tokens</a
-                        >.)
-                    </p>
-                </div>
+                <PrintAndPlay
+                    client:visible
+                    variants={variants}
+                    defaultVariant="3_to_4_players"
+                    title={printAndPlayTitle}
+                    link={printAndPlayHREF}
+                    placeholder={VARIENTPLACEHOLDER}
+                    tokensHREF={tokensHREF}
+                    tokensTitle={tokensTitle}
+                />
 
                 <p class="px-4 py-2 w-fit mx-auto mt-2">
                     Prototype Version {VERSION} - <a

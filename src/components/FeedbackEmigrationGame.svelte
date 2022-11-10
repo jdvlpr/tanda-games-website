@@ -42,14 +42,15 @@
 
     <form
         target="_blank"
-        action="https://formsubmit.co/49382fe0e9b3c69623292b950dd77bf7"
+        action="https://formsubmit.co/99157ff313bd346ac1d729cca203b666"
         method="POST"
         class="inline-flex flex-wrap items-start justify-center gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-800"
     >
-        <p class="block mb-4 italic text-center">
-            Fill out this form after you've play the game. All responses are optional and private, and will only be used
-            to help improve the game.
+        <p class="w-full block mb-4 italic text-center">
+            Fill out this form after you've play the game, or if you have a question or comment. All responses are
+            optional.
         </p>
+
         <input type="hidden" name="version" value={version} />
 
         <div class="flex flex-col gap-2">
@@ -168,7 +169,7 @@
         <div class="basis-full" />
 
         <div class="flex flex-col gap-2 flex-1">
-            <label for="name-or-alias" class="text-sm">Your name or alias (Optional - if you want public credit)</label>
+            <label for="name-or-alias" class="text-sm">Your name or alias (if you want public credit)</label>
             <input
                 id="name-or-alias"
                 type="text"
