@@ -1,4 +1,12 @@
 export const changelog = [{
+    version: "0.0.5",
+    date: 'November 13, 2022',
+    items: [
+        'Rules: Rearranged sections & simplified fonts',
+        'Rules: Fixed typos',
+        'Rules: Modified some page\'s layout',
+    ]
+}, {
     version: "0.0.4",
     date: 'November 9, 2022',
     items: [
