@@ -1,7 +1,11 @@
 {
   "name": "tandagames.com",
   "type": "module",
+<<<<<<< HEAD
   "version": "0.3.0",
+=======
+  "version": "0.3.1",
+>>>>>>> 743b0fa (v0.0.6 test)
   "private": true,
   "scripts": {
     "dev": "astro dev",
