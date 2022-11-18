@@ -1,6 +1,4 @@
 export const changelog = [{
-<<<<<<< HEAD
-=======
     version: "0.0.6",
     date: 'November 18, 2022',
     items: [
@@ -8,7 +6,6 @@ export const changelog = [{
         'Rules: Added recommended Life Card packs for 5-6 players',
     ]
 }, {
->>>>>>> 743b0fa (v0.0.6 test)
     version: "0.0.5",
     date: 'November 13, 2022',
     items: [
