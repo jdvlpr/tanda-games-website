@@ -5,40 +5,38 @@ import Header from "../components/Header.svelte";
 
 <Header client:idle />
 <Layout title="T&A Games">
-	<main class="max-w-screen-lg text-center m-auto p-2 font-serif">
-		<div class="flex flex-col gap-2 items-center my-4">
-			<a
-				href="/emigration"
-				class="btn font-publicSans cursor-pointer inline-flex flex-wrap gap-4 justify-center items-center"
-			>
-				<picture>
-					<source
-						srcset="/files/emigration/Emigration-Game-Logo.webp"
-						type="image/webp"
-					/>
-					<source
-						srcset="/files/emigration/Emigration-Game-Logo.png"
-						type="image/png"
-					/>
-					<img
-						src="/files/emigration/Emigration-Game-Logo.png"
-						alt="Emigration Game Logo"
-					/>
-				</picture>
-				<p class="text-lg font-normal">
-					Emigration: A board game about moving abroad
-				</p>
-			</a>
-		</div>
-		<div class="my-4">
-			<p class="text-3xl">About</p>
-			<p class="text-lg">
-				Husband and Wife taking games seriously since 2019.
-			</p>
-		</div>
-		<div class="my-4">
-			<p class="text-3xl">Contact</p>
-			<p class="text-lg">feedback@tandagames.com</p>
-		</div>
-	</main>
+  <main class="max-w-screen-lg text-center m-auto p-2 font-serif">
+    <div class="flex flex-col gap-2 items-center my-4">
+      <a
+        href="/emigration"
+        class="btn font-publicSans cursor-pointer inline-flex flex-wrap gap-4 justify-center items-center"
+      >
+        <picture>
+          <source
+            srcset="/files/emigration/Emigration-Game-Logo.webp"
+            type="image/webp"
+          />
+          <source
+            srcset="/files/emigration/Emigration-Game-Logo.png"
+            type="image/png"
+          />
+          <img
+            src="/files/emigration/Emigration-Game-Logo.png"
+            alt="Emigration Game Logo"
+          />
+        </picture>
+        <p class="text-lg font-normal">
+          Emigration: A board game about moving abroad
+        </p>
+      </a>
+    </div>
+    <div class="my-4">
+      <p class="text-3xl">About</p>
+      <p class="text-lg">Taking games seriously since 2019.</p>
+    </div>
+    <div class="my-4">
+      <p class="text-3xl">Contact</p>
+      <p class="text-lg">feedback@tandagames.com</p>
+    </div>
+  </main>
 </Layout>
