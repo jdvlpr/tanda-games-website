@@ -20,234 +20,223 @@ const printAndPlayTitle = `${ID}-game-print-and-play-${VARIENTPLACEHOLDER}-v${VE
 const printAndPlayHREF = `https://www.tandagames.com/files/${ID}/v${VERSION}/${printAndPlayTitle}`;
 
 const variants = [
-    {
-        name: "2 Players",
-        id: "2-players",
-        sheets: 8,
-    },
-    {
-        name: "3 to 4 Players",
-        id: "3-to-4-players",
-        sheets: 9,
-    },
-    {
-        name: "5 to 6 Players",
-        id: "5-to-6-players",
-        sheets: 10,
-    },
+  {
+    name: "2 Players",
+    id: "2-players",
+    sheets: 8,
+  },
+  {
+    name: "3 to 4 Players",
+    id: "3-to-4-players",
+    sheets: 9,
+  },
+  {
+    name: "5 to 6 Players",
+    id: "5-to-6-players",
+    sheets: 10,
+  },
 ];
 ---
 
 <Header client:idle />
 <Layout title="Emigration Board Game">
-    <main class="max-w-screen-lg text-center m-auto px-2 pb-8 font-publicSans">
-        <div class="my-4">
-            <picture>
-                <source
-                    srcset="/files/emigration/Emigration-Game-Logo.webp"
-                    type="image/webp"
-                />
-                <source
-                    srcset="/files/emigration/Emigration-Game-Logo.png"
-                    type="image/png"
-                />
-                <img
-                    src="/files/emigration/Emigration-Game-Logo.png"
-                    alt="Emigration Game Logo"
-                />
-            </picture>
-            <p class="uppercase tracking-widest">
-                A board game about moving abroad
-            </p>
-            <div
-                class="flex flex-wrap gap-2 justify-center items-center mb-4 opacity-50"
-            >
-                <p>2-6 Players</p>
-                <p>20-60 Minutes</p>
-                <p>Ages 12+</p>
-            </div>
-        </div>
-        <p
-            class="my-4 text-4xl uppercase tracking-widest font-bold break-words text-red-500"
-        >
-            Prototype
-        </p>
-        <p class="my-4 text-lg">
-            You're moving to another country! Scramble to collect documents,
-            make valuable connections, and manage your money as life happens.
-            Then pick a border control line and hope the officer lets you in!
-        </p>
-
-        <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800">
-            <p class="font-bold">Where can I buy the game?</p>
-            <p>
-                You can't buy the game yet. But you can play the game in
-                <a
-                    href="https://store.steampowered.com/app/286160/Tabletop_Simulator/"
-                    target="_blank"
-                    class="underline cursor-pointer">Tabletop Simulator</a
-                > or print the game yourself and give feedback to help with the development.
-            </p>
-
-            <p class="font-bold mt-4">
-                How can I ask a question or give feedback?
-            </p>
-            <p>
-                Use the feedback form at the bottom of this webpage,
-                <a
-                    href="https://discord.gg/aDV6NY73H2"
-                    target="_blank"
-                    class="underline cursor-pointer">join the Discord Server</a
-                >, or email feedback@tandagames.com.
-            </p>
-        </div>
-
-        <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
-            <div class="flex flex-col gap-2 justify-center items-center">
-                <div class="inline-flex gap-2 flex-wrap justify-center">
-                    <a
-                        href="https://steamcommunity.com/sharedfiles/filedetails/?id=2883314859"
-                        rel="nofollow noopener"
-                        target="_blank"
-                        class="btn"
-                    >
-                        Play in Tabletop Simulator</a
-                    >
-                    <a href={rulesHREF} download={rulesTitle} class="btn"
-                        ><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                            ></path>
-                        </svg>
-                        Rules</a
-                    >
-                </div>
-
-                <PrintAndPlay
-                    client:visible
-                    variants={variants}
-                    defaultVariant="3-to-4-players"
-                    title={printAndPlayTitle}
-                    link={printAndPlayHREF}
-                    placeholder={VARIENTPLACEHOLDER}
-                    tokensHREF={tokensHREF}
-                    tokensTitle={tokensTitle}
-                />
-
-                <p class="px-4 py-2 w-fit mx-auto mt-2">
-                    Prototype Version {VERSION} - <a
-                        href="/emigration/changelog"
-                        class="underline">View Changelog</a
-                    >
-                </p>
-
-                <div
-                    class="text-left inline-flex flex-col justify-center items-center gap-4"
-                >
-                    <div class="bg-neutral-100 p-4 dark:bg-neutral-700 w-full">
-                        <h2 class="text-lg font-bold mt-2">
-                            Known Elements Needing Further Analysis
-                        </h2>
-                        <ul class="list-disc ml-8">
-                            <li>
-                                <span class="font-bold">
-                                    Player count effect on the number of
-                                    Assurance Tokens gained.
-                                </span> Is the game weighted towards a certain number
-                                of players?
-                            </li>
-                            <li>
-                                <span class="font-bold"
-                                    >Optimal (or suboptimal) Life Card
-                                    combinations.</span
-                                > What are the best (or worst) Life Cards to use
-                                for different types of game dynamics and number of
-                                players? (For example, what Life Cards&#8212;when
-                                used together&#8212;encourage wealth building, cutthroat
-                                competition, friendly play, or drastic events? Or
-                                what Life Card combinations do not work well together?)
-                            </li>
-                            <li>
-                                <span class="font-bold"
-                                    >Game-breaking strategies.</span
-                                > Are there any strategies which always create predictable
-                                outcomes or ruin the game for other players? (For
-                                example, maybe always discarding Documents and Connections
-                                instead of buying them always gets you more Assurance
-                                Tokens than not.)
-                            </li>
-                        </ul>
-                        <p class="my-2">
-                            If you can help analyze any of these game elements,
-                            or have any other observations, please share your
-                            feedback using the form below, <a
-                                href="https://discord.gg/aDV6NY73H2"
-                                target="_blank"
-                                class="underline cursor-pointer"
-                                >by joining the Discord Server</a
-                            >, or by sending an email to feedback@tandagames.com
-                            (you can include your name or alias if you want to
-                            be pubibly credited with helping develop the game).
-                            Thank you!
-                        </p>
-                        <p class="italic my-2">Updated November 10, 2022</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-row overflow-scroll snap-x gap-2 pb-4">
-            <picture class="snap-start min-w-[80vw]">
-                <source
-                    srcset="/files/emigration/game_screenshot_4_layouts.webp"
-                    type="image/webp"
-                />
-                <source
-                    srcset="/files/emigration/game_screenshot_4_layouts.jpg"
-                    type="image/jpg"
-                />
-                <img
-                    src="/files/emigration/game_screenshot_4_layouts.png"
-                    alt="Emigration Game Overview"
-                    class="w-full"
-                />
-            </picture>
-
-            <picture class="snap-end min-w-[80vw]">
-                <source
-                    srcset="/files/emigration/game_screenshot_1_layout.webp"
-                    type="image/webp"
-                />
-                <source
-                    srcset="/files/emigration/game_screenshot_1_layout.jpg"
-                    type="image/jpg"
-                />
-                <img
-                    src="/files/emigration/game_screenshot_1_layout.jpg"
-                    alt="Emigration Game Card Layout"
-                    class="w-full"
-                />
-            </picture>
-        </div>
-
-        <p class="italic mb-4">Images of Emigration in Tabletop Simulator</p>
-
-        <FeedbackEmigrationGame
-            title="Playtester's Feedback"
-            client:visible
-            expand={true}
-            discordLink="https://discord.gg/aDV6NY73H2"
-            version={VERSION}
-            changelog={changelog}
+  <main class="max-w-screen-md text-center m-auto px-2 pb-8 font-publicSans">
+    <div class="my-4">
+      <picture>
+        <source
+          srcset="/files/emigration/Emigration-Game-Logo.webp"
+          type="image/webp"
         />
-    </main>
+        <source
+          srcset="/files/emigration/Emigration-Game-Logo.png"
+          type="image/png"
+        />
+        <img
+          src="/files/emigration/Emigration-Game-Logo.png"
+          alt="Emigration Game Logo"
+        />
+      </picture>
+      <p class="uppercase tracking-widest">A board game about moving abroad</p>
+      <div
+        class="flex flex-wrap gap-2 justify-center items-center mb-4 opacity-50"
+      >
+        <p>2-6 Players</p>
+        <p>20-60 Minutes</p>
+        <p>Ages 12+</p>
+      </div>
+    </div>
+    <p
+      class="my-4 text-4xl uppercase tracking-widest font-bold break-words text-red-500"
+    >
+      Prototype
+    </p>
+    <p class="my-4 text-lg">
+      You're moving to another country! Scramble to collect documents, make
+      valuable connections, and manage your money as life happens. Then pick a
+      border control line and hope the officer lets you in!
+    </p>
+
+    <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800">
+      <p class="font-bold">Where can I buy the game?</p>
+      <p>
+        You can't buy the game yet. But you can play the game in
+        <a
+          href="https://store.steampowered.com/app/286160/Tabletop_Simulator/"
+          target="_blank"
+          class="underline cursor-pointer">Tabletop Simulator</a
+        > or print the game yourself and give feedback to help with the development.
+      </p>
+
+      <p class="font-bold mt-4">How can I ask a question or give feedback?</p>
+      <p>
+        Use the feedback form at the bottom of this webpage,
+        <a
+          href="https://discord.gg/aDV6NY73H2"
+          target="_blank"
+          class="underline cursor-pointer">join the Discord Server</a
+        >, or email feedback@tandagames.com.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
+      <div class="flex flex-col gap-2 justify-center items-center">
+        <div class="inline-flex gap-2 flex-wrap justify-center">
+          <a
+            href="https://steamcommunity.com/sharedfiles/filedetails/?id=2883314859"
+            rel="nofollow noopener"
+            target="_blank"
+            class="btn"
+          >
+            Play in Tabletop Simulator</a
+          >
+          <a href={rulesHREF} download={rulesTitle} class="btn"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+              ></path>
+            </svg>
+            Rules</a
+          >
+        </div>
+
+        <PrintAndPlay
+          client:visible
+          variants={variants}
+          defaultVariant="3-to-4-players"
+          title={printAndPlayTitle}
+          link={printAndPlayHREF}
+          placeholder={VARIENTPLACEHOLDER}
+          tokensHREF={tokensHREF}
+          tokensTitle={tokensTitle}
+        />
+
+        <p class="px-4 py-2 w-fit mx-auto mt-2">
+          Prototype Version {VERSION} - <a
+            href="/emigration/changelog"
+            class="underline">View Changelog</a
+          >
+        </p>
+
+        <div
+          class="text-left inline-flex flex-col justify-center items-center gap-4"
+        >
+          <div class="bg-neutral-100 p-4 dark:bg-neutral-700 w-full">
+            <h2 class="text-lg font-bold mt-2">
+              Known Elements Needing Further Analysis
+            </h2>
+            <ul class="list-disc ml-8">
+              <li>
+                <span class="font-bold">
+                  Player count effect on the number of Assurance Tokens gained.
+                </span> Is the game weighted towards a certain number of players?
+              </li>
+              <li>
+                <span class="font-bold"
+                  >Optimal (or suboptimal) Life Card combinations.</span
+                > What are the best (or worst) Life Cards to use for different types
+                of game dynamics and number of players? (For example, what Life Cards&#8212;when
+                used together&#8212;encourage wealth building, cutthroat competition,
+                friendly play, or drastic events? Or what Life Card combinations
+                do not work well together?)
+              </li>
+              <li>
+                <span class="font-bold">Game-breaking strategies.</span> Are there
+                any strategies which always create predictable outcomes or ruin the
+                game for other players? (For example, maybe always discarding Documents
+                and Connections instead of buying them always gets you more Assurance
+                Tokens than not.)
+              </li>
+            </ul>
+            <p class="my-2">
+              If you can help analyze any of these game elements, or have any
+              other observations, please share your feedback using the form
+              below, <a
+                href="https://discord.gg/aDV6NY73H2"
+                target="_blank"
+                class="underline cursor-pointer"
+                >by joining the Discord Server</a
+              >, or by sending an email to feedback@tandagames.com (you can
+              include your name or alias if you want to be pubibly credited with
+              helping develop the game). Thank you!
+            </p>
+            <p class="italic my-2">Updated November 10, 2022</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-row overflow-scroll snap-x gap-2 pb-4">
+      <picture class="snap-start min-w-[80vw]">
+        <source
+          srcset="/files/emigration/game_screenshot_4_layouts.webp"
+          type="image/webp"
+        />
+        <source
+          srcset="/files/emigration/game_screenshot_4_layouts.jpg"
+          type="image/jpg"
+        />
+        <img
+          src="/files/emigration/game_screenshot_4_layouts.png"
+          alt="Emigration Game Overview"
+          class="w-full"
+        />
+      </picture>
+
+      <picture class="snap-end min-w-[80vw]">
+        <source
+          srcset="/files/emigration/game_screenshot_1_layout.webp"
+          type="image/webp"
+        />
+        <source
+          srcset="/files/emigration/game_screenshot_1_layout.jpg"
+          type="image/jpg"
+        />
+        <img
+          src="/files/emigration/game_screenshot_1_layout.jpg"
+          alt="Emigration Game Card Layout"
+          class="w-full"
+        />
+      </picture>
+    </div>
+
+    <p class="italic mb-4">Images of Emigration in Tabletop Simulator</p>
+
+    <FeedbackEmigrationGame
+      title="Playtester's Feedback"
+      client:visible
+      expand={true}
+      discordLink="https://discord.gg/aDV6NY73H2"
+      version={VERSION}
+      changelog={changelog}
+    />
+  </main>
 </Layout>

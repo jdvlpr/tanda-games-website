@@ -5,11 +5,13 @@ import Header from "../components/Header.svelte";
 
 <Header client:idle />
 <Layout title="T&A Games">
-  <main class="max-w-screen-lg text-center m-auto p-2 font-serif">
-    <div class="flex flex-col gap-2 items-center my-4">
+  <main class="max-w-screen-md text-center p-2 font-serif flex-auto mx-auto">
+    <p class="text-xl my-4">Taking games seriously since 2019</p>
+
+    <div class="flex flex-col gap-2 items-center my-4 max-w-screen-md mx-auto">
       <a
         href="/emigration"
-        class="btn font-publicSans cursor-pointer inline-flex flex-wrap gap-4 justify-center items-center"
+        class="btn font-publicSans cursor-pointer inline-flex flex-wrap gap-4 justify-center items-center shadow-sm hover:shadow-xl rounded-lg overflow-hidden"
       >
         <picture>
           <source
@@ -30,10 +32,7 @@ import Header from "../components/Header.svelte";
         </p>
       </a>
     </div>
-    <div class="my-4">
-      <p class="text-3xl">About</p>
-      <p class="text-lg">Taking games seriously since 2019.</p>
-    </div>
+
     <div class="my-4">
       <p class="text-3xl">Contact</p>
       <p class="text-lg">feedback@tandagames.com</p>
