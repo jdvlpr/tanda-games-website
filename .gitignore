@@ -1,5 +1,5 @@
 # build output
-# dist/
+dist/
 .output/
 
 # dependencies
@@ -20,3 +20,4 @@ pnpm-debug.log*
 **/.DS_Store
 
 
+.vscode/
