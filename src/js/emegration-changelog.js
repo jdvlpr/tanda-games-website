@@ -1,5 +1,19 @@
 export const changelog = [
   {
+    version: "0.0.8",
+    date: "June 6, 2025",
+    items: [
+      "Fix: Changed document icon on Destination Cards to match Document Card icons.",
+      "Addition: Introduced an Access Fee when taking cards not in your Personal Cards Layout.",
+      "Modified Go To College: Introduced a financial aid luck-based mechanic to potentially decrease the price of going to college.",
+      "Modified Life Card: Social Butterfly changed to 'Take 1 Connection or 3 Money Tokens from another player', from 'Take 1 Connection or 1 Money Token from another player'.",
+      "Modified Life Card: Trousers Fall Down changed to 'Lose 1 Connection. If you have none, lose 3 Money Tokens', from 'Lose 1 Document. If you have none, lose 1 Money Tokens'.",
+      "Modified Life Card: Shredder Accident changed to 'Lose 1 Document. If you have none, lose 3 Money Tokens', from 'Lose 1 Document. If you have none, lose 1 Money Tokens'.",
+      "Modified Life Card: Keep Calm changed to one-time use.",
+      "Rules: Added recommended Life Card packs for 3 players",
+    ],
+  },
+  {
     version: "0.0.7",
     date: "January 5, 2025",
     items: [
