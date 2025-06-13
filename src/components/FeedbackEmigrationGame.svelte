@@ -128,11 +128,25 @@
     
             {#if players}
                 {#each players as player, index}
-                    <div class="w-full flex flex-wrap gap-2 justify-center items-end mb-4">
-                        <p class="text-3xl font-bold mx-auto">{player}</p>
+                    <div class="w-full flex flex-col gap-2 justify-start items-start mb-4">
+                        <p class="text-3xl font-bold">{player}</p>
+                        
                         <div class="basis-full"></div>
     
-                        <div class="flex flex-wrap gap-6 justify-center items-center">
+                        <div class="flex items-center">
+                            <label class="inline-flex items-center cursor-pointer">
+                              <input 
+                              type="checkbox" 
+                              class="h-5 w-5 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 focus:outline-none"
+                              id="{player}-entered-destination"
+                              name="{player}_entered_destination"
+                              >
+                              <span class="ml-2">Entered destination</span>
+                            </label>
+                          </div>
+
+                            
+
                             <div class="flex flex-col gap-2">
                                 <label for="{index}-age" class="text-sm">{player}'s Age</label>
                                 <select id="{index}-age" name="{player}'s_age" class="w-fit ">
@@ -143,15 +157,7 @@
                                 </select>
                             </div>
     
-                            <div class="flex justify-center items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    class=""
-                                    id="{player}-entered-destination"
-                                    name="{player}_entered_destination"
-                                />
-                                <label for="{player}-entered-destination">Entered destination</label>
-                            </div>
+                            
     
                             <div class="flex flex-col gap-2">
                                 <label for="{index}-final-assurance-tokens" class="text-sm"
@@ -168,7 +174,6 @@
                                     {/each}
                                 </select>
                             </div>
-                        </div>
                     </div>
                 {/each}
             {/if}
@@ -238,7 +243,7 @@
             <div class="basis-full"></div>
     
             <div class="flex flex-col gap-2 flex-1">
-                <label for="name-or-alias" class="text-sm">Your name or alias (if you want public credit)</label>
+                <label for="name-or-alias" class="text-sm">Your name (if you want public credit)</label>
                 <input
                     id="name-or-alias"
                     type="text"
