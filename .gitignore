@@ -21,3 +21,6 @@ pnpm-debug.log*
 
 
 .vscode/
+.astro
+pnpm-workspace.yaml
+pnpm-lock.yaml

@@ -41,7 +41,7 @@ const variants = [
 <Header client:idle />
 <Layout title="Emigration Board Game">
   <main
-    class="max-w-screen-md w-full text-center m-auto px-2 pb-8 font-publicSans"
+    class="max-w-screen-md w-full text-left m-auto px-2 pb-8 font-publicSans"
   >
     <div class="my-4">
       <picture>
@@ -58,7 +58,7 @@ const variants = [
           alt="Emigration Game Logo"
         />
       </picture>
-      <p class="uppercase tracking-widest">A board game about moving abroad</p>
+      <p class="uppercase tracking-widest text-center">A board game about moving abroad</p>
       <div
         class="flex flex-wrap gap-2 justify-center items-center mb-4 opacity-50"
       >
@@ -67,18 +67,27 @@ const variants = [
         <p>Ages 12+</p>
       </div>
     </div>
+    
     <p
-      class="my-4 text-4xl uppercase tracking-widest font-bold break-words text-red-500"
+      class="mt-4 text-4xl uppercase tracking-widest font-bold break-words text-red-500 text-center"
     >
       Prototype
     </p>
+
+    <p class="px-4 py-2 w-fit mx-auto mb-2">
+      Version {VERSION} - <a
+        href="/emigration/changelog"
+        class="underline">View Changelog</a
+      >
+    </p>
+
     <p class="my-4 text-lg">
       You're moving to another country! Scramble to collect documents, make
       valuable connections, and manage your money as life happens. Then pick a
       border control line and hope the officer lets you in!
     </p>
 
-    <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800">
+    <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800 rounded-md">
       <p class="font-bold">Where can I buy the game?</p>
       <p>
         You can't buy the game yet. But you can print the game yourself and give
@@ -97,8 +106,7 @@ const variants = [
     </div>
 
     <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
-      <div class="flex flex-col gap-2 justify-center items-center">
-        <div class="inline-flex gap-2 flex-wrap justify-center">
+      <div class="flex flex-col gap-2 justify-center items-start">
           <a href={rulesHREF} download={rulesTitle} class="btn"
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +124,6 @@ const variants = [
             </svg>
             Download the Rulebook</a
           >
-        </div>
 
         <PrintAndPlay
           client:visible
@@ -129,17 +136,12 @@ const variants = [
           tokensTitle={tokensTitle}
         />
 
-        <p class="px-4 py-2 w-fit mx-auto mt-2">
-          Prototype Version {VERSION} - <a
-            href="/emigration/changelog"
-            class="underline">View Changelog</a
-          >
-        </p>
+        
 
         <div
           class="text-left inline-flex flex-col justify-center items-center gap-4"
         >
-          <div class="bg-neutral-100 p-4 dark:bg-neutral-700 w-full">
+          <div class="bg-neutral-100 p-4 dark:bg-neutral-700 w-full rounded-md">
             <h2 class="text-lg font-bold mt-2">
               Known Elements Needing Further Analysis
             </h2>
@@ -185,7 +187,7 @@ const variants = [
     </div>
 
     <div class="flex flex-row overflow-scroll snap-x gap-2 pb-4">
-      <picture class="snap-start min-w-[80vw]">
+      <picture class="snap-start min-w-[80vw] md:min-w-[50vw]">
         <source
           srcset="/files/emigration/game_screenshot_4_layouts.webp"
           type="image/webp"
@@ -195,13 +197,13 @@ const variants = [
           type="image/jpg"
         />
         <img
-          src="/files/emigration/game_screenshot_4_layouts.png"
+          src="/files/emigration/game_screenshot_4_layouts.jpg"
           alt="Emigration Game Overview"
           class="w-full"
         />
       </picture>
 
-      <picture class="snap-end min-w-[80vw]">
+      <picture class="snap-end min-w-[80vw] md:min-w-[50vw]">
         <source
           srcset="/files/emigration/game_screenshot_1_layout.webp"
           type="image/webp"

@@ -1,11 +1,19 @@
 <script>
     import { onMount } from "svelte";
-    import { activeTheme, theme, themes } from "../js/stores";
-    import { setTheme } from "../js/utils";
+    import { theme, themes } from "../js/stores.svelte";
+    import { setTheme } from "../js/utils.svelte";
 
-    export let showText = false;
-    export let edge = "right";
-    let show = false;
+    /**
+     * @typedef {Object} Props
+     * @property {boolean} [showText]
+     * @property {string} [edge]
+     */
+
+    /** @type {Props} */
+    let { showText = false, edge = "right" } = $props();
+    let show = $state(false);
+
+    let activeTheme = $derived( themes.filter((n) => n.id === theme.value)[0]);
 
     onMount(() => {
         // Check if theme is set, or match the system's theme
@@ -14,14 +22,14 @@
         else setTheme(localStorage.theme);
         // Listen for change in color scheme
         window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-            if ($theme === "system") setTheme("system");
+            if (theme.value === "system") setTheme("system");
         });
     });
 </script>
 
 <svelte:window
-    on:click={() => (show = false)}
-    on:keydown={(e) => {
+    onclick={() => (show = false)}
+    onkeydown={(e) => {
         if (e.code === "Escape") show = false;
     }}
 />
@@ -34,15 +42,15 @@
         aria-haspopup="true"
         title="Change Theme [t]"
         class="flex items-center gap-2 p-4"
-        on:click={(e) => {
+        onclick={(e) => {
             e.stopPropagation();
             show = !show;
         }}
     >
-        {#key $theme}
-            {@html $activeTheme.icon}
+        {#key theme.value}
+            {@html activeTheme.icon}
             {#if showText}
-                {$activeTheme.name}
+                {activeTheme.name}
             {/if}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
                 <path
@@ -66,7 +74,7 @@
             To: "transform opacity-0 scale-95"
         -->
         <div
-            class="absolute z-10 mt-2 origin-top-right bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-600 shadow-lg"
+            class="absolute z-10 origin-top-right bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-600 shadow-lg"
             class:-translate-x-[30px]={edge === "right"}
             role="menu"
             aria-orientation="vertical"
@@ -75,17 +83,18 @@
         >
             <div class="py-1 divide-y divide-neutral-200" role="none">
                 <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
-                {#each $themes as { name, id, icon }}
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <p
-                        class="flex items-center gap-x-1 px-4 py-2 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                {#each themes as { name, id, icon }}
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
+                    <button
+                        type="button"
+                        class="flex items-center gap-x-1 px-4 py-2 w-full text-left cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900"
                         role="menuitem"
                         tabindex="0"
-                        on:click={() => setTheme(id)}
+                        onclick={() => setTheme(id)}
                     >
                         {@html icon}
                         {name}
-                    </p>
+                    </button>
                 {/each}
             </div>
         </div>

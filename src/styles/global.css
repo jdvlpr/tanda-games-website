@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-publicSans: "Public Sans", "sans-serif";
+  --font-serif: "Tai Heritage Pro", "serif";
+}
+
+/* Custom .btn component */
+@layer components {
+  .btn {
+    cursor: pointer;
+    border: 2px solid;
+    border-radius: theme("borderRadius.md");
+    width: fit-content;
+    padding: 1rem 2rem;
+    text-transform: uppercase;
+    font-size: theme("fontSize.xl");
+    font-weight: theme("fontWeight.bold");
+    letter-spacing: theme("letterSpacing.wide");
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    &:hover {
+      background-color: theme("colors.orange.100");
+    }
+    @variant dark {
+      &:hover {
+        background-color: theme("colors.gray.800");
+      }
+    }
+  }
+
+  input,
+  textarea,
+  select {
+    border: 2px solid;
+    padding: 0.5rem 1rem;
+    font-size: theme("fontSize.base");
+    font-weight: theme("fontWeight.normal");
+    width: 100%;
+    border-radius: theme("borderRadius.md");
+    @variant dark {
+      color: white;
+    }
+  }
+}
+
+/* Tailwind CSS Forms plugin styles are now included by default in v4 */
