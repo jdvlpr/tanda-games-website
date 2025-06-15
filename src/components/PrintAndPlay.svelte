@@ -12,15 +12,10 @@
     let variant = $state(defaultVariant);
 
     let activeVariant = $derived(variants.filter((n) => n.id === variant)[0]);
-    let activeVariantHref = $state();
-    let activeVariantName = $state();
 
-    $effect(() => {
-        if (activeVariant) {
-            activeVariantHref = link.replace(placeholder, activeVariant.id);
-            activeVariantName = title.replace(placeholder, activeVariant.name);
-        }
-    });
+
+    let activeVariantHref = $derived(link.replace(placeholder, activeVariant.id));
+    let activeVariantName = $derived(title.replace(placeholder, activeVariant.name));
 </script>
 
 <div class="inline-flex flex-col gap-2 my-4 items-start">
@@ -28,7 +23,7 @@
 
     <div class="flex flex-col">
         <label for="variant" class="text-sm">Select a Variant</label>
-        <select id="variant" name="selected_variant" class="w-fit" bind:value={variant}>
+        <select id="variant" name="selected_variant" class="w-fit" bind:value={variant} >
             {#each variants as { name, id }}
                 <option value={id}>{name}</option>
             {/each}
@@ -43,7 +38,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-6 h-6"
+                    class="w-6 h-6 flex-none"
                 >
                     <path
                         stroke-linecap="round"

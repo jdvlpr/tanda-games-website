@@ -67,9 +67,9 @@
             action="https://formsubmit.co/99157ff313bd346ac1d729cca203b666"
             enctype="multipart/form-data"
             method="POST"
-            class="inline-flex flex-wrap items-start justify-center gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-800 rounded-md"
+            class="inline-flex flex-wrap items-start justify-start gap-4 mb-8 text-left p-4 bg-neutral-100  dark:bg-neutral-800 rounded-md"
         >
-            <p class="w-full block mb-4 italic text-center">
+            <p class="w-full mb-4 italic">
                 Fill out this form after you've play the game, or if you have a question or comment. All responses are
                 optional.
             </p>
