@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    version: "0.0.9",
+    date: "July 10, 2026",
+    items: [
+      "Rules: Failing to go to college now results in paying 1 Money and taking a different Required Action, instead of forfeiting your turn.",
+      "Rules: Renamed 'Money Tokens' to 'Money'",
+    ],
+  },
+  {
     version: "0.0.8",
     date: "June 6, 2025",
     items: [
