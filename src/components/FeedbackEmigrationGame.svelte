@@ -160,17 +160,17 @@
                             
     
                             <div class="flex flex-col gap-2">
-                                <label for="{index}-final-assurance-tokens" class="text-sm"
-                                    >Number of assurance tokens at the end of the game</label
+                                <label for="{index}-final-assurance" class="text-sm"
+                                    >Number of Assurance at the end of the game</label
                                 >
                                 <select
-                                    id="{index}-final-assurance-tokens"
-                                    name="{player}'s_final_number_of_assurance_tokens"
+                                    id="{index}-final-assurance"
+                                    name="{player}'s_final_number_of_assurance"
                                     class="w-fit "
                                 >
                                     <option value="">Select a number</option>
                                     {#each Array(100) as _, i}
-                                        <option value={i}>{i} Assurance {i === 1 ? "Token" : "Tokens"}</option>
+                                        <option value={i}>{i} Assurance</option>
                                     {/each}
                                 </select>
                             </div>
