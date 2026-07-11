@@ -127,7 +127,7 @@
             <div class="basis-full"></div>
     
             {#if players}
-                {#each players as player, index}
+                {#each players as player, index (player)}
                     <div class="w-full flex flex-col gap-2 justify-start items-start mb-4">
                         <p class="text-3xl font-bold">{player}</p>
                         

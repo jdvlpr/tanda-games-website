@@ -1,39 +1,39 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import FeedbackEmigrationGame from "../../components/FeedbackEmigrationGame.svelte";
-import PrintAndPlay from "../../components/PrintAndPlay.svelte";
 import Header from "../../components/Header.svelte";
 import { changelog } from "../../js/emegration-changelog";
 
 const VERSION = changelog[0].version;
 
 const ID = "emigration";
+const FILES_PATH = `/files/${ID}/v${VERSION}/`;
 
-const VARIANTPLACEHOLDER = "%Variant%";
-
-const rulesTitle = `${ID}_game_rules_v${VERSION}.pdf`;
-const rulesHREF = `/files/${ID}/v${VERSION}/${rulesTitle}`;
-const tokensTitle = `${ID}_game_tokens_v${VERSION}.pdf`;
-const tokensHREF = `/files/${ID}/v${VERSION}/${tokensTitle}`;
-
-const printAndPlayTitle = `${ID}-game-print-and-play-${VARIANTPLACEHOLDER}-v${VERSION}.pdf`;
-const printAndPlayHREF = `/files/${ID}/v${VERSION}/${printAndPlayTitle}`;
-
-const variants = [
+let printAndPlay = [
   {
-    name: "2 Players",
-    id: "2-players",
-    sheets: 8,
+    name: 'Rulebook',
+    title: `${ID}-game-rulebook-v${VERSION}.pdf`,
+    pages: '20 pages'
   },
   {
-    name: "3 to 4 Players",
-    id: "3-to-4-players",
-    sheets: 9,
+    name: 'Mini Cards',
+    title: `${ID}-game-mini-cards-v${VERSION}.pdf`,
+    pages: '8 pages'
   },
   {
-    name: "5 to 6 Players",
-    id: "5-to-6-players",
-    sheets: 10,
+    name: 'Small Square Cards',
+    title: `${ID}-game-small-square-cards-v${VERSION}.pdf`,
+    pages: '1 page'
+  },
+  {
+    name: 'Medium Chits (optional)',
+    title: `${ID}-game-medium-chits-v${VERSION}.pdf`,
+    pages: '1 page'
+  },
+  {
+    name: 'Small Chits (optional)',
+    title: `${ID}-game-small-chits-v${VERSION}.pdf`,
+    pages: '1 page'
   },
 ];
 ---
@@ -87,7 +87,42 @@ const variants = [
       border control line and hope the officer lets you in!
     </p>
 
-    <div class="my-8 text-left p-4 bg-neutral-100 dark:bg-neutral-800 rounded-md">
+    <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
+      <div class="flex flex-col gap-2 justify-center items-start">
+
+        <div class="inline-flex flex-col gap-2 my-4 items-start">
+      <h2 class="font-bold text-2xl">Print & Play Downloads</h2>
+
+      {printAndPlay.map((item) => (
+          <a href={FILES_PATH + item.title} download={item.title} class="btn"
+                  ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6 flex-none"
+                  >
+                      <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                      />
+                  </svg>
+                  {item.name} - {item.pages}</a
+              >
+      ))}
+
+          <div class="inline-flex flex-col gap-2 my-2 text-left">
+              <p class="">
+                  To Print & Play, you'll need a printer and some time to cut out all
+                  the cards. You'll also need <span class="font-black">One Six-Sided Die</span>.
+                 If you don't print the optional Small and Medium Chits, you'll need Money (about 20 per player) and Assurance Tokens (about 10 per player); you can use a different game's pieces for those. 
+              </p>
+          </div>
+  </div>
+
+  <div class="my-4 text-left p-4 bg-neutral-100 dark:bg-neutral-800 rounded-md">
       <h2 class="text-xl tracking-widest font-thin mb-2">Q&A</h2>
       <p class="font-bold">Where can I buy the game?</p>
       <p>
@@ -105,37 +140,6 @@ const variants = [
         >, or email feedback@tandagames.com.
       </p>
     </div>
-
-    <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
-      <div class="flex flex-col gap-2 justify-center items-start">
-          <a href={rulesHREF} download={rulesTitle} class="btn"
-            ><svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6 flex-none"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-              ></path>
-            </svg>
-            Download the Rulebook</a
-          >
-
-        <PrintAndPlay
-          client:visible
-          variants={variants}
-          defaultVariant="3-to-4-players"
-          title={printAndPlayTitle}
-          link={printAndPlayHREF}
-          placeholder={VARIANTPLACEHOLDER}
-          tokensHREF={tokensHREF}
-          tokensTitle={tokensTitle}
-        />
 
         
 
@@ -186,42 +190,6 @@ const variants = [
         </div>
       </div>
     </div>
-
-    <div class="flex flex-row overflow-scroll snap-x gap-2 pb-4">
-      <picture class="snap-start min-w-[80vw] md:min-w-[50vw]">
-        <source
-          srcset="/files/emigration/game_screenshot_4_layouts.webp"
-          type="image/webp"
-        />
-        <source
-          srcset="/files/emigration/game_screenshot_4_layouts.jpg"
-          type="image/jpg"
-        />
-        <img
-          src="/files/emigration/game_screenshot_4_layouts.jpg"
-          alt="Emigration Game Overview"
-          class="w-full"
-        />
-      </picture>
-
-      <picture class="snap-end min-w-[80vw] md:min-w-[50vw]">
-        <source
-          srcset="/files/emigration/game_screenshot_1_layout.webp"
-          type="image/webp"
-        />
-        <source
-          srcset="/files/emigration/game_screenshot_1_layout.jpg"
-          type="image/jpg"
-        />
-        <img
-          src="/files/emigration/game_screenshot_1_layout.jpg"
-          alt="Emigration Game Card Layout"
-          class="w-full"
-        />
-      </picture>
-    </div>
-
-    <p class="italic mb-4">Images of Emigration in Tabletop Simulator</p>
 
     <FeedbackEmigrationGame
       title="Playtester's Feedback"

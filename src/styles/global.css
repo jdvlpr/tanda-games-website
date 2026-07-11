@@ -15,8 +15,7 @@
     border-radius: theme("borderRadius.md");
     width: fit-content;
     padding: 1rem 2rem;
-    text-transform: uppercase;
-    font-size: theme("fontSize.xl");
+    font-size: theme("fontSize.lg");
     font-weight: theme("fontWeight.bold");
     letter-spacing: theme("letterSpacing.wide");
     display: inline-flex;
