@@ -1556,6 +1556,40 @@ export default class EmigrationEngine {
 
   // ── Life Card Activation Flow ─────────────────────────────────────────
 
+  _getMayKeepChoiceText(card) {
+    switch (card.title) {
+      case "Insider":
+        return {
+          title: "Choose how to resolve Insider",
+          keepText: "Keep Insider for +$1 on future Paydays",
+          immediateText:
+            "Take immediate effect: gain $3 now and discard this card",
+        };
+      case "Stellar Reputation":
+        return {
+          title: "Choose how to resolve Stellar Reputation",
+          keepText:
+            "Keep Stellar Reputation for -$1 Connections cost on future purchases",
+          immediateText:
+            "Take immediate effect: gain $3 now and discard this card",
+        };
+      case "Fancy Clothes":
+        return {
+          title: "Choose how to resolve Fancy Clothes",
+          keepText:
+            "Keep Fancy Clothes for -$1 Documents cost on future purchases",
+          immediateText:
+            "Take immediate effect: gain $3 now and discard this card",
+        };
+      default:
+        return {
+          title: `Choose how to resolve ${card.title}`,
+          keepText: "Keep card for its ongoing effect",
+          immediateText: "Take immediate effect and discard the card",
+        };
+    }
+  }
+
   _resolveLifeCardActivation(player, layoutOwner, card) {
     if (card.keep === "Must Keep") {
       this._resolveLifeCardEffect(player, card, () => {
@@ -1564,12 +1598,13 @@ export default class EmigrationEngine {
         this.advanceTurn();
       });
     } else if (card.keep === "May Keep") {
+      const choiceText = this._getMayKeepChoiceText(card);
       this._setPendingChoice({
         id: "may-keep-choice",
-        title: `${card.title}: Keep for ongoing effect, or take immediate effect?`,
+        title: choiceText.title,
         options: [
-          { text: "Keep card (ongoing effect)", value: "keep" },
-          { text: "Take immediate effect", value: "immediate" },
+          { text: choiceText.keepText, value: "keep" },
+          { text: choiceText.immediateText, value: "immediate" },
         ],
         resolve: (val) => {
           if (val === "keep") {

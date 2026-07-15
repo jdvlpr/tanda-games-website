@@ -42,6 +42,7 @@
   // Game State
   let engine = $state(null);
   let snapshot = $state(null); // reactive copy of engine state
+  let pendingChoice = $state(null);
   let autoplay = $state(null);
   
   // Selection State
@@ -144,13 +145,17 @@
         if (engine) snapshot = engine.getSnapshot();
       },
       onStateChange: () => {
-        if (engine) snapshot = engine.getSnapshot();
+        if (engine) {
+          snapshot = engine.getSnapshot();
+          pendingChoice = engine.pendingChoice ?? null;
+        }
         selectedSlot = null;
         selectedStash = null;
       }
     });
 
     snapshot = engine.getSnapshot();
+    pendingChoice = engine.pendingChoice ?? null;
     isSetup = false;
     testResults = null;
 
@@ -195,7 +200,10 @@
   }
 
   function handleModalResolve(value) {
-    if (engine) engine.resolveChoice(value);
+    if (engine) {
+      pendingChoice = null;
+      engine.resolveChoice(value);
+    }
   }
 
   function runEngineTests() {
@@ -327,14 +335,14 @@
                     <div class="flex gap-1">
                       <button
                         class="px-2 py-0.5 text-[0.65rem] font-bold bg-emi-accent text-black rounded hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                        disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.money < 2 || currentPlayer.stash.connections.length < 1 || engine.pendingChoice}
+                        disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.money < 2 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('ticket')}
                       >
                         Buy
                       </button>
                       <button
                         class="px-2 py-0.5 text-[0.65rem] font-bold bg-white/10 text-white border border-white/20 rounded hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                        disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.stash.connections.length < 1 || engine.pendingChoice}
+                        disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('ticket')}
                       >
                         Steal
@@ -360,14 +368,14 @@
                     <div class="flex gap-1">
                       <button
                         class="px-2 py-0.5 text-[0.65rem] font-bold bg-emi-accent text-black rounded hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                        disabled={snapshot.publicServices.passports <= 0 || currentPlayer.money < 2 || currentPlayer.stash.documents.length < 1 || engine.pendingChoice}
+                        disabled={snapshot.publicServices.passports <= 0 || currentPlayer.money < 2 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('passport')}
                       >
                         Buy
                       </button>
                       <button
                         class="px-2 py-0.5 text-[0.65rem] font-bold bg-white/10 text-white border border-white/20 rounded hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                        disabled={snapshot.publicServices.passports <= 0 || currentPlayer.stash.documents.length < 1 || engine.pendingChoice}
+                        disabled={snapshot.publicServices.passports <= 0 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('passport')}
                       >
                         Steal
@@ -393,7 +401,7 @@
                       {#if snapshot.phase === 'crossing'}
                         <button 
                           class="mt-1 bg-white/10 border border-white/20 text-white py-1 px-2 rounded text-[0.65rem] cursor-pointer hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed font-semibold w-full"
-                          disabled={lane.tokens.length === 0 || engine.pendingChoice}
+                          disabled={lane.tokens.length === 0 || pendingChoice}
                           onclick={() => handleSelectLane(i)}
                         >
                           Select Lane
@@ -429,12 +437,13 @@
             onaction={handleAction}
             onselectlane={handleSelectLane}
             {selectionText}
+            {pendingChoice}
           />
         </div>
       </div>
       
       <Modal 
-        choice={engine.pendingChoice} 
+        choice={pendingChoice} 
         onresolve={handleModalResolve} 
       />
     </div>
