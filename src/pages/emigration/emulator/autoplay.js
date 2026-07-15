@@ -17,71 +17,85 @@ export function createAutoPlayer(engine) {
   function chooseAction() {
     const player = engine.players[engine.currentPlayerIdx];
     const actions = engine.getValidActions(player);
-    const enabled = (type) => actions.find(a => a.type === type)?.enabled;
+    const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
 
     // 1. Activate available Payday cards (salary for everyone)
-    if (enabled('activate')) {
-      const paydayTarget = _findBestActivateTarget(player, 'payday');
+    if (enabled("activate")) {
+      const paydayTarget = _findBestActivateTarget(player, "payday");
       if (paydayTarget) {
-        return { type: 'activate', params: paydayTarget };
+        return { type: "activate", params: paydayTarget };
       }
     }
 
     // 2. Buy cheapest available Documents/Connections (prefer own layout)
-    if (enabled('buy')) {
+    if (enabled("buy")) {
       const buyTarget = _findCheapestBuyTarget(player);
       if (buyTarget) {
-        return { type: 'buy', params: buyTarget };
+        return { type: "buy", params: buyTarget };
       }
     }
 
     // 3. Buy Ticket from pool if have Connection
-    if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 &&
-        player.stash.connections.length >= 1 && player.money >= 2) {
-      return { type: 'buyPool', params: { cardType: 'ticket' } };
+    if (
+      player.stash.tickets < 1 &&
+      engine.publicServices.tickets > 0 &&
+      player.stash.connections.length >= 1 &&
+      player.money >= 2
+    ) {
+      return { type: "buyPool", params: { cardType: "ticket" } };
     }
 
     // 4. Buy Passport from pool if have Document
-    if (player.stash.passports < 1 && engine.publicServices.passports > 0 &&
-        player.stash.documents.length >= 1 && player.money >= 2) {
-      return { type: 'buyPool', params: { cardType: 'passport' } };
+    if (
+      player.stash.passports < 1 &&
+      engine.publicServices.passports > 0 &&
+      player.stash.documents.length >= 1 &&
+      player.money >= 2
+    ) {
+      return { type: "buyPool", params: { cardType: "passport" } };
     }
 
     // 5. Activate Life cards
-    if (enabled('activate')) {
-      const lifeTarget = _findBestActivateTarget(player, 'life');
+    if (enabled("activate")) {
+      const lifeTarget = _findBestActivateTarget(player, "life");
       if (lifeTarget) {
-        return { type: 'activate', params: lifeTarget };
+        return { type: "activate", params: lifeTarget };
       }
     }
 
     // 6. Steal if can't buy
-    if (enabled('steal')) {
-      if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 &&
-          player.stash.connections.length >= 1) {
-        return { type: 'steal', params: { cardType: 'ticket' } };
+    if (enabled("steal")) {
+      if (
+        player.stash.tickets < 1 &&
+        engine.publicServices.tickets > 0 &&
+        player.stash.connections.length >= 1
+      ) {
+        return { type: "steal", params: { cardType: "ticket" } };
       }
-      if (player.stash.passports < 1 && engine.publicServices.passports > 0 &&
-          player.stash.documents.length >= 1) {
-        return { type: 'steal', params: { cardType: 'passport' } };
+      if (
+        player.stash.passports < 1 &&
+        engine.publicServices.passports > 0 &&
+        player.stash.documents.length >= 1
+      ) {
+        return { type: "steal", params: { cardType: "passport" } };
       }
     }
 
     // 7. Apply for College if affordable and have open slots
-    if (enabled('applyCollege')) {
-      return { type: 'applyCollege', params: {} };
+    if (enabled("applyCollege")) {
+      return { type: "applyCollege", params: {} };
     }
 
     // 8. Reclaim if available
-    if (enabled('reclaim')) {
+    if (enabled("reclaim")) {
       const reclaimTarget = _findReclaimTarget(player);
       if (reclaimTarget) {
-        return { type: 'reclaim', params: reclaimTarget };
+        return { type: "reclaim", params: reclaimTarget };
       }
     }
 
     // 9. Discard as last resort
-    if (enabled('discard')) {
+    if (enabled("discard")) {
       return _findDiscardTarget(player);
     }
 
@@ -119,7 +133,10 @@ export function createAutoPlayer(engine) {
     if (candidates.length === 0) return null;
     // Sort: own layout first (fee=0), then by fee
     candidates.sort((a, b) => a.fee - b.fee);
-    return { targetPlayerIdx: candidates[0].targetPlayerIdx, slotIdx: candidates[0].slotIdx };
+    return {
+      targetPlayerIdx: candidates[0].targetPlayerIdx,
+      slotIdx: candidates[0].slotIdx,
+    };
   }
 
   /**
@@ -133,7 +150,7 @@ export function createAutoPlayer(engine) {
       for (let i = 0; i < 14; i++) {
         if (engine.isCardAvailable(p, i)) {
           const card = p.layout[i].card;
-          if (card.type === 'document' || card.type === 'connection') {
+          if (card.type === "document" || card.type === "connection") {
             const cost = engine.getEffectiveCost(player, card);
             if (player.money >= cost + fee) {
               candidates.push({
@@ -156,15 +173,20 @@ export function createAutoPlayer(engine) {
 
     candidates.sort((a, b) => {
       // Prefer whichever type we have fewer of
-      const aPreferred = (a.cardType === 'document' && docs <= conns) ||
-                         (a.cardType === 'connection' && conns <= docs);
-      const bPreferred = (b.cardType === 'document' && docs <= conns) ||
-                         (b.cardType === 'connection' && conns <= docs);
+      const aPreferred =
+        (a.cardType === "document" && docs <= conns) ||
+        (a.cardType === "connection" && conns <= docs);
+      const bPreferred =
+        (b.cardType === "document" && docs <= conns) ||
+        (b.cardType === "connection" && conns <= docs);
       if (aPreferred !== bPreferred) return aPreferred ? -1 : 1;
       return a.totalCost - b.totalCost;
     });
 
-    return { targetPlayerIdx: candidates[0].targetPlayerIdx, slotIdx: candidates[0].slotIdx };
+    return {
+      targetPlayerIdx: candidates[0].targetPlayerIdx,
+      slotIdx: candidates[0].slotIdx,
+    };
   }
 
   /**
@@ -177,10 +199,10 @@ export function createAutoPlayer(engine) {
     for (const p of engine.players) {
       if (p.id === player.id) continue;
       if (player.stash.tickets < 1 && p.stash.tickets > 1) {
-        return { targetPlayerIdx: p.id, cardType: 'ticket' };
+        return { targetPlayerIdx: p.id, cardType: "ticket" };
       }
       if (player.stash.passports < 1 && p.stash.passports > 1) {
-        return { targetPlayerIdx: p.id, cardType: 'passport' };
+        return { targetPlayerIdx: p.id, cardType: "passport" };
       }
     }
     return null;
@@ -192,22 +214,40 @@ export function createAutoPlayer(engine) {
   function _findDiscardTarget(player) {
     // Prefer discarding from own stash (cheapest card)
     if (player.stash.documents.length > 0) {
-      const idx = player.stash.documents.reduce((best, c, i) =>
-        c.cost < player.stash.documents[best].cost ? i : best, 0);
-      return { type: 'discard', params: { source: 'stash', stashType: 'document', stashIdx: idx } };
+      const idx = player.stash.documents.reduce(
+        (best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best),
+        0,
+      );
+      return {
+        type: "discard",
+        params: { source: "stash", stashType: "document", stashIdx: idx },
+      };
     }
     if (player.stash.connections.length > 0) {
-      const idx = player.stash.connections.reduce((best, c, i) =>
-        c.cost < player.stash.connections[best].cost ? i : best, 0);
-      return { type: 'discard', params: { source: 'stash', stashType: 'connection', stashIdx: idx } };
+      const idx = player.stash.connections.reduce(
+        (best, c, i) =>
+          c.cost < player.stash.connections[best].cost ? i : best,
+        0,
+      );
+      return {
+        type: "discard",
+        params: { source: "stash", stashType: "connection", stashIdx: idx },
+      };
     }
 
     // Discard from own layout
     for (let i = 0; i < 14; i++) {
       if (engine.isCardAvailable(player, i)) {
         const card = player.layout[i].card;
-        if (card.type === 'document' || card.type === 'connection') {
-          return { type: 'discard', params: { source: 'layout', targetPlayerIdx: player.id, slotIdx: i } };
+        if (card.type === "document" || card.type === "connection") {
+          return {
+            type: "discard",
+            params: {
+              source: "layout",
+              targetPlayerIdx: player.id,
+              slotIdx: i,
+            },
+          };
         }
       }
     }
@@ -219,14 +259,17 @@ export function createAutoPlayer(engine) {
       for (let i = 0; i < 14; i++) {
         if (engine.isCardAvailable(p, i)) {
           const card = p.layout[i].card;
-          if (card.type === 'document' || card.type === 'connection') {
-            return { type: 'discard', params: { source: 'layout', targetPlayerIdx: p.id, slotIdx: i } };
+          if (card.type === "document" || card.type === "connection") {
+            return {
+              type: "discard",
+              params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i },
+            };
           }
         }
       }
     }
 
-    return { type: 'discard', params: {} };
+    return { type: "discard", params: {} };
   }
 
   /**
@@ -238,53 +281,55 @@ export function createAutoPlayer(engine) {
     const opts = choice.options;
 
     // Strategy-based resolution
-    const id = choice.id || '';
+    const id = choice.id || "";
 
     // Keep Calm: don't use it (save for bad cards)
-    if (id === 'keep-calm-check') {
-      engine.resolveChoice('skip');
+    if (id === "keep-calm-check") {
+      engine.resolveChoice("skip");
       return;
     }
 
     // Persuasion: skip offering it
-    if (id === 'persuasion-offer') {
-      engine.resolveChoice('skip');
+    if (id === "persuasion-offer") {
+      engine.resolveChoice("skip");
       return;
     }
 
     // May Keep: keep if it has a useful ongoing effect
-    if (id === 'may-keep-choice') {
-      engine.resolveChoice('keep');
+    if (id === "may-keep-choice") {
+      engine.resolveChoice("keep");
       return;
     }
 
     // FOMO: skip trading destinations
-    if (id === 'fomo') {
-      engine.resolveChoice('skip');
+    if (id === "fomo") {
+      engine.resolveChoice("skip");
       return;
     }
 
     // Mental Fog: don't discard life cards
-    if (id === 'mental-fog') {
-      engine.resolveChoice('skip');
+    if (id === "mental-fog") {
+      engine.resolveChoice("skip");
       return;
     }
 
     // For money vs. card choices: take money
-    if (opts.some(o => o.value === 'money')) {
-      engine.resolveChoice('money');
+    if (opts.some((o) => o.value === "money")) {
+      engine.resolveChoice("money");
       return;
     }
 
     // Trousers: lose money rather than documents
-    if (id === 'trousers') {
-      engine.resolveChoice('money');
+    if (id === "trousers") {
+      engine.resolveChoice("money");
       return;
     }
 
     // Suspect: lose connection if available
-    if (id === 'suspect-penalty') {
-      engine.resolveChoice(opts.some(o => o.value === 'conn') ? 'conn' : 'doc');
+    if (id === "suspect-penalty") {
+      engine.resolveChoice(
+        opts.some((o) => o.value === "conn") ? "conn" : "doc",
+      );
       return;
     }
 
@@ -296,28 +341,52 @@ export function createAutoPlayer(engine) {
 
   /**
    * Choose a security lane for border crossing.
-   * Prefer lanes with more tokens (more options for later players).
-   * Actually, prefer lanes with lowest token values for best chance.
+   *
+   * Tokens in each lane are face-down and shuffled. As players cross, tokens are revealed
+   * and removed from lanes. This function adapts based on REMAINING tokens (public knowledge)
+   * and calculates success probability for each lane.
+   *
+   * Strategy:
+   * 1. For each lane, examine only the remaining tokens (not already revealed/consumed)
+   * 2. Calculate probability of success: (tokens ≤ assurance) / (remaining tokens)
+   * 3. Pick the lane with highest success probability
+   * 4. On tie, pick lane with lowest average remaining token (most "forgiving")
    */
   function chooseLane() {
-    let bestLane = 0;
-    let bestScore = -Infinity;
+    const player = engine.players[engine.activeCrossingIdx];
+    const assurance = player.assurance;
 
-    for (let i = 0; i < engine.securityLanes.length; i++) {
-      const lane = engine.securityLanes[i];
-      if (lane.tokens.length === 0) continue;
+    // Evaluate each lane based on REMAINING tokens
+    const laneScores = engine.securityLanes
+      .map((lane, laneIdx) => {
+        if (lane.tokens.length === 0) return null;
 
-      // Score: negative of min token value (prefer lowest = easiest to beat)
-      const minToken = Math.min(...lane.tokens);
-      const score = -minToken;
+        const remaining = lane.tokens;
+        const successCount = remaining.filter((t) => t <= assurance).length;
+        const successProb = successCount / remaining.length;
+        const avgToken =
+          remaining.reduce((a, b) => a + b, 0) / remaining.length;
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestLane = i;
+        return {
+          laneIdx,
+          successProb,
+          avgToken,
+          remainingCount: remaining.length,
+        };
+      })
+      .filter((l) => l !== null);
+
+    if (laneScores.length === 0) return 0;
+
+    // Sort by: highest success probability first, then lowest average token
+    laneScores.sort((a, b) => {
+      if (a.successProb !== b.successProb) {
+        return b.successProb - a.successProb; // Higher probability = better
       }
-    }
+      return a.avgToken - b.avgToken; // Lower average token = more forgiving
+    });
 
-    return bestLane;
+    return laneScores[0].laneIdx;
   }
 
   /**
@@ -325,9 +394,9 @@ export function createAutoPlayer(engine) {
    * Returns true if a turn was played, false if game is over or stuck.
    */
   function playTurn() {
-    if (engine.phase === 'game_over') return false;
+    if (engine.phase === "game_over") return false;
 
-    if (engine.phase === 'crossing') {
+    if (engine.phase === "crossing") {
       const laneIdx = chooseLane();
       engine.selectLane(laneIdx);
       return true;
@@ -340,13 +409,13 @@ export function createAutoPlayer(engine) {
       safetyCounter++;
     }
 
-    if (engine.phase !== 'preparation') return engine.phase !== 'game_over';
+    if (engine.phase !== "preparation") return engine.phase !== "game_over";
 
     const player = engine.players[engine.currentPlayerIdx];
 
     // Optional: try to graduate if in college
     if (player.inCollege) {
-      engine.executeOptionalAction('graduate');
+      engine.executeOptionalAction("graduate");
     }
 
     // Required action
@@ -362,7 +431,7 @@ export function createAutoPlayer(engine) {
       safetyCounter++;
     }
 
-    return engine.phase !== 'game_over';
+    return engine.phase !== "game_over";
   }
 
   /**
@@ -375,17 +444,17 @@ export function createAutoPlayer(engine) {
     let turnCount = 0;
     const maxTurns = 5000;
 
-    while (engine.phase !== 'game_over' && turnCount < maxTurns) {
+    while (engine.phase !== "game_over" && turnCount < maxTurns) {
       const played = playTurn();
       turnCount++;
 
       if (onTurnComplete) onTurnComplete(turnCount);
 
-      if (!played && engine.phase !== 'game_over') {
+      if (!played && engine.phase !== "game_over") {
         // Stuck — force phase 2
         engine.triggerPhase2();
         // Resolve crossing
-        while (engine.phase === 'crossing') {
+        while (engine.phase === "crossing") {
           const laneIdx = chooseLane();
           engine.selectLane(laneIdx);
         }
@@ -393,14 +462,14 @@ export function createAutoPlayer(engine) {
       }
 
       if (speed > 0) {
-        await new Promise(resolve => setTimeout(resolve, speed));
+        await new Promise((resolve) => setTimeout(resolve, speed));
       }
     }
 
-    if (engine.phase !== 'game_over' && turnCount >= maxTurns) {
-      engine.log('AI safety: max turns reached, forcing end.', 'error');
+    if (engine.phase !== "game_over" && turnCount >= maxTurns) {
+      engine.log("AI safety: max turns reached, forcing end.", "error");
       engine.triggerPhase2();
-      while (engine.phase === 'crossing') {
+      while (engine.phase === "crossing") {
         engine.selectLane(chooseLane());
       }
     }

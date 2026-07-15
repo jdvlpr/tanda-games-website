@@ -1,5 +1,5 @@
 <script>
-  import EmigrationEngine, { NATIONALITIES, DESTINATIONS, runTests } from './engine.js';
+  import EmigrationEngine, { NATIONALITIES, DESTINATIONS, PACKS_LIST, runTests } from './engine.js';
   import { createAutoPlayer } from './autoplay.js';
   
   import PlayerBoard from './PlayerBoard.svelte';
@@ -9,10 +9,20 @@
   // Props
   let { defaultMode = 'competitive', defaultPlayerCount = 2, showTestRunner = true } = $props();
 
+  // Life pack defaults by player count
+  const PACK_DEFAULTS = {
+    2: ['Friendship', 'News'],
+    3: ['Vacation', 'News', 'Downtown'],
+    4: ['News', 'Sports', 'Downtown', 'Friendship'],
+    5: ['High Society', 'Downtown', 'Emergency', 'Vacation', 'News'],
+    6: ['High Society', 'Downtown', 'Emergency', 'Vacation', 'News', 'Charity'],
+  };
+
   // Setup State
   let isSetup = $state(true);
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
+  let selectedPacks = $state(PACK_DEFAULTS[playerCount]);
   
   // Initialize default players
   let playersSetup = $state(Array.from({ length: 6 }, (_, i) => ({
@@ -23,6 +33,11 @@
 
   // Derived setup slice based on player count
   let activeSetup = $derived(playersSetup.slice(0, playerCount));
+
+  // Auto-update selectedPacks when playerCount changes
+  $effect(() => {
+    selectedPacks = PACK_DEFAULTS[playerCount];
+  });
 
   // Game State
   let engine = $state(null);
@@ -123,6 +138,7 @@
     engine = new EmigrationEngine({
       mode,
       players: activeSetup,
+      selectedPacks,
       onLog: () => {
         // Force reactivity on logs by updating snapshot reference
         if (engine) snapshot = engine.getSnapshot();
@@ -224,13 +240,13 @@
 
         <div class="mb-6">
           <label class="block mb-2 text-slate-400">Player Count:
-            <select class="w-fit" bind:value={playerCount}>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-            </select>
+              <select class="w-fit" bind:value={playerCount}>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+                <option value={6}>6</option>
+              </select>
           </label>
         </div>
 
@@ -251,6 +267,26 @@
               </select>
             </div>
           {/each}
+        </div>
+
+        <div class="mb-8">
+          <label class="block mb-3 text-slate-400 font-bold">Life Card Packs</label>
+          <div class="grid grid-cols-3 gap-2">
+            {#each PACKS_LIST as pack}
+              <button
+                class="p-2.5 rounded-md border text-sm font-semibold transition-all {selectedPacks.includes(pack) ? 'bg-[rgba(85,183,176,0.3)] border-emi-accent text-emi-accent' : 'bg-black/30 border-white/10 text-slate-300 hover:border-white/30'}"
+                onclick={() => {
+                  if (selectedPacks.includes(pack)) {
+                    selectedPacks = selectedPacks.filter(p => p !== pack);
+                  } else {
+                    selectedPacks = [...selectedPacks, pack];
+                  }
+                }}
+              >
+                {pack}
+              </button>
+            {/each}
+          </div>
         </div>
 
         <div class="flex gap-4">
