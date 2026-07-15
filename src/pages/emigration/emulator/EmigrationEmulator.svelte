@@ -95,17 +95,17 @@
   }
 </script>
 
-<div class="emigration-emulator">
+<div class="bg-emi-bg-dark text-slate-50 font-emi-ui min-h-screen p-6 box-border *:box-border">
   {#if isSetup}
-    <div class="setup-screen">
-      <h1>Emigration Emulator</h1>
+    <div class="max-w-[800px] mx-auto">
+      <h1 class="font-emi-heading text-emi-accent text-center mb-10 text-4xl mt-0">Emigration Emulator</h1>
       
       {#if showTestRunner}
-        <button class="btn-test" onclick={runEngineTests}>Run Engine Unit Tests</button>
+        <button class="block mx-auto mb-5 bg-white/5 border border-white/10 text-slate-400 py-2 px-4 rounded-md cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
         {#if testResults}
-          <div class="test-results">
+          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
             {#each testResults as res}
-              <div class="test-row" class:pass={res.pass} class:fail={!res.pass}>
+              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
                 {res.pass ? '✅' : '❌'} {res.description}
               </div>
             {/each}
@@ -113,31 +113,31 @@
         {/if}
       {/if}
 
-      <div class="setup-form">
-        <div class="form-group">
-          <label>Game Mode</label>
-          <div class="mode-toggles">
-            <button class:active={mode === 'competitive'} onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class:active={mode === 'cooperative'} onclick={() => mode = 'cooperative'}>Cooperative</button>
+      <div class="bg-emi-bg-panel p-8 rounded-xl border border-white/10">
+        <div class="mb-6">
+          <label class="block mb-2 text-slate-400">Game Mode</label>
+          <div class="flex gap-3">
+            <button class="flex-1 p-3 bg-black/30 border text-white rounded-md cursor-pointer text-base transition-all duration-200 {mode === 'competitive' ? 'bg-[rgba(85,183,176,0.2)] border-emi-accent text-emi-accent' : 'border-white/10'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class="flex-1 p-3 bg-black/30 border text-white rounded-md cursor-pointer text-base transition-all duration-200 {mode === 'cooperative' ? 'bg-[rgba(85,183,176,0.2)] border-emi-accent text-emi-accent' : 'border-white/10'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Player Count: {playerCount}</label>
-          <input type="range" min="2" max="6" bind:value={playerCount} />
+        <div class="mb-6">
+          <label class="block mb-2 text-slate-400">Player Count: {playerCount}</label>
+          <input class="w-full accent-emi-accent" type="range" min="2" max="6" bind:value={playerCount} />
         </div>
 
-        <div class="players-list">
+        <div class="flex flex-col gap-3 mb-8">
           {#each activeSetup as p, i}
-            <div class="player-setup-row">
-              <input type="text" bind:value={p.name} placeholder="Player Name" />
-              <select bind:value={p.nationality}>
+            <div class="flex gap-3 items-center">
+              <input class="flex-1 bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" type="text" bind:value={p.name} placeholder="Player Name" />
+              <select class="flex-[1.5] bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" bind:value={p.nationality}>
                 {#each NATIONALITIES as nat}
                   <option value={nat.name}>{nat.name} (Fund: ${nat.fund})</option>
                 {/each}
               </select>
-              <span>→</span>
-              <select bind:value={p.destination}>
+              <span class="text-slate-400">→</span>
+              <select class="flex-[1.5] bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" bind:value={p.destination}>
                 {#each DESTINATIONS as dest}
                   <option value={dest.name}>{dest.name}</option>
                 {/each}
@@ -146,23 +146,23 @@
           {/each}
         </div>
 
-        <div class="actions">
-          <button class="btn-primary" onclick={() => startGame(false)}>Start Manual Playtest</button>
-          <button class="btn-secondary" onclick={() => startGame(true)}>Start Automated Playtest</button>
+        <div class="flex gap-4">
+          <button class="flex-1 p-3.5 border-none rounded-lg text-lg font-bold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 bg-emi-accent text-black" onclick={() => startGame(false)}>Start Manual Playtest</button>
+          <button class="flex-1 p-3.5 rounded-lg text-lg font-bold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 bg-white/10 text-white border border-white/20" onclick={() => startGame(true)}>Start Automated Playtest</button>
         </div>
       </div>
     </div>
   {:else if snapshot}
-    <div class="game-screen">
-      <div class="game-header">
-        <h2>Emigration — Phase: {snapshot.phase.toUpperCase()}</h2>
-        <div class="header-controls">
-          <button class="btn-sm" onclick={() => isSetup = true}>Restart / Setup</button>
+    <div>
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="m-0 font-emi-heading text-emi-accent text-2xl">Emigration — Phase: {snapshot.phase.toUpperCase()}</h2>
+        <div>
+          <button class="bg-white/10 border border-white/20 text-white py-1.5 px-3 rounded cursor-pointer transition-colors hover:bg-white/20" onclick={() => isSetup = true}>Restart / Setup</button>
         </div>
       </div>
 
-      <div class="game-layout">
-        <div class="boards-area">
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_350px] gap-6 items-start">
+        <div class="flex flex-col gap-6 max-lg:pb-[45vh]">
           {#each snapshot.players as player}
             <PlayerBoard 
               {engine} 
@@ -175,7 +175,7 @@
           {/each}
         </div>
         
-        <div class="panel-area">
+        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[40vh] max-lg:rounded-t-[20px] max-lg:shadow-[0_-10px_30px_rgba(0,0,0,0.5)] max-lg:bg-emi-bg-dark">
           <ActionPanel 
             {engine}
             currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
@@ -193,235 +193,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  :global(:root) {
-    --emi-bg-dark: #0f172a;
-    --emi-bg-panel: rgba(30, 41, 59, 0.85);
-    --emi-color-document: #67a7cf;
-    --emi-color-connection: #c0656f;
-    --emi-color-payday: #f9c552;
-    --emi-color-life: #d0a3cc;
-    --emi-color-accent: #55b7b0;
-    --emi-text-main: #f8fafc;
-    --emi-text-muted: #94a3b8;
-    --emi-font-ui: 'Public Sans', sans-serif;
-    --emi-font-heading: 'Marvin Round', 'Public Sans', sans-serif;
-    --emi-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  }
-
-  .emigration-emulator {
-    background-color: var(--emi-bg-dark);
-    color: var(--emi-text-main);
-    font-family: var(--emi-font-ui);
-    min-height: 100vh;
-    padding: 24px;
-    box-sizing: border-box;
-  }
-
-  .emigration-emulator * {
-    box-sizing: border-box;
-  }
-
-  /* Setup Screen */
-  .setup-screen {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  h1 {
-    font-family: var(--emi-font-heading);
-    color: var(--emi-color-accent);
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  .setup-form {
-    background: var(--emi-bg-panel);
-    padding: 32px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .form-group {
-    margin-bottom: 24px;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--emi-text-muted);
-  }
-
-  .mode-toggles {
-    display: flex;
-    gap: 12px;
-  }
-
-  .mode-toggles button {
-    flex: 1;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s;
-  }
-
-  .mode-toggles button.active {
-    background: rgba(85, 183, 176, 0.2);
-    border-color: var(--emi-color-accent);
-    color: var(--emi-color-accent);
-  }
-
-  input[type="range"] {
-    width: 100%;
-    accent-color: var(--emi-color-accent);
-  }
-
-  .players-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  .player-setup-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-
-  .player-setup-row input, .player-setup-row select {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 0.9rem;
-  }
-
-  .player-setup-row input { flex: 1; }
-  .player-setup-row select { flex: 1.5; }
-
-  .actions {
-    display: flex;
-    gap: 16px;
-  }
-
-  button.btn-primary, button.btn-secondary {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  button.btn-primary {
-    background: var(--emi-color-accent);
-    color: #000;
-  }
-
-  button.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  button.btn-primary:hover, button.btn-secondary:hover {
-    transform: translateY(-2px);
-  }
-
-  .btn-test {
-    display: block;
-    margin: 0 auto 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--emi-text-muted);
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .test-results {
-    background: #000;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    font-family: var(--emi-font-mono);
-    font-size: 0.8rem;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .test-row.pass { color: #a3e635; }
-  .test-row.fail { color: #ef4444; }
-
-  /* Game Screen */
-  .game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .game-header h2 {
-    margin: 0;
-    font-family: var(--emi-font-heading);
-    color: var(--emi-color-accent);
-  }
-
-  .btn-sm {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .game-layout {
-    display: grid;
-    grid-template-columns: 2fr 350px;
-    gap: 24px;
-    align-items: start;
-  }
-
-  .boards-area {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .panel-area {
-    position: sticky;
-    top: 24px;
-  }
-
-  @media (max-width: 1024px) {
-    .game-layout {
-      grid-template-columns: 1fr;
-    }
-    .panel-area {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: auto;
-      z-index: 100;
-      height: 40vh;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-    }
-    .boards-area {
-      padding-bottom: 45vh;
-    }
-  }
-</style>
