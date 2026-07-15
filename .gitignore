@@ -25,5 +25,6 @@ DS_Store
 
 .vscode/
 .astro
+.astro/
 pnpm-workspace.yaml
 pnpm-lock.yaml
