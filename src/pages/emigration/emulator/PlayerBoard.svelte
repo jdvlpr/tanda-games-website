@@ -74,9 +74,7 @@
         class="grid-card {slot.faceUp ? 'front' : 'back'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'border-color: #55b7b0 !important; box-shadow: 0 0 12px rgba(85, 183, 176, 0.8) !important;' : ''}
       >
-        {#if !slot.faceUp}
-          <div class="font-bold text-slate-400 tracking-widest text-[0.65rem] uppercase">DOWN</div>
-        {:else}
+        {#if slot.faceUp}
           <div class="card-type" style="color: {getCardColor(c.type)}">{c.type}</div>
           <div class="card-title text-white">{c.name || c.title}</div>
           <div class="card-cost">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
@@ -86,61 +84,61 @@
   {/if}
 {/snippet}
 
-<div class={["bg-emi-bg-panel border border-white/10 rounded-xl p-5 mb-6 transition-all duration-300 font-emi-ui text-slate-50 mt-4", isActive && "border-emi-accent/80 shadow-[0_0_20px_rgba(85,183,176,0.65)] bg-emi-bg-panel/90"]}>
+<div class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "/80 shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}>
   <!-- Player Header Info -->
-  <div class="flex justify-between items-center mb-3 pb-3 border-b border-white/10 flex-wrap gap-3">
+  <div class="flex justify-between items-center mb-3 pb-3 flex-wrap gap-3">
     <div class="flex flex-col">
       <div class="flex items-center gap-2">
         {#if isActive}
-          <span class="text-emi-accent animate-pulse">▶</span>
+          <span class=" animate-pulse">▶</span>
         {/if}
-        <span class="text-xl font-bold font-emi-heading">{player.name}</span>
-        <span class="text-xs text-slate-400 font-normal">({player.nationality} → {player.destination})</span>
+        <span class="text-xl font-bold">{player.name}</span>
+        <span class="text-xs">({player.nationality} → {player.destination})</span>
         
         {#if player.inCollege}
-          <span class="text-[0.65rem] font-bold uppercase bg-amber-500 text-black px-1.5 py-0.5 rounded">In College</span>
+          <span class="text-xs font-bold uppercase bg-amber-500 text-black px-1.5 py-0.5 rounded">In College</span>
         {:else if player.payRaises >= 3}
-          <span class="text-[0.65rem] font-bold uppercase bg-emerald-500 text-white px-1.5 py-0.5 rounded">Career Maxed</span>
+          <span class="text-xs font-bold uppercase bg-emerald-500 text-white px-1.5 py-0.5 rounded">Career Maxed</span>
         {/if}
 
         {#if player.crossedSuccessfully === true}
-          <span class="text-[0.65rem] font-bold uppercase bg-emerald-500 text-white px-1.5 py-0.5 rounded">Crossed</span>
+          <span class="text-xs font-bold uppercase bg-emerald-500 text-white px-1.5 py-0.5 rounded">Crossed</span>
         {:else if player.crossedSuccessfully === false}
-          <span class="text-[0.65rem] font-bold uppercase bg-rose-500 text-white px-1.5 py-0.5 rounded">Blocked</span>
+          <span class="text-xs font-bold uppercase bg-rose-500 text-white px-1.5 py-0.5 rounded">Blocked</span>
         {/if}
       </div>
     </div>
     
     <div class="flex gap-2.5 flex-wrap">
-      <div class="flex flex-col items-center bg-black/20 px-3 py-1 rounded-lg border border-white/5 min-w-[70px]">
-        <span class="text-[0.6rem] uppercase text-slate-400 tracking-wider">Money</span>
-        <strong class="text-base font-semibold text-amber-400">${player.money}</strong>
+      <div class="flex flex-col items-center bg-neutral-100 dark:bg-neutral-900 px-3 py-1 rounded-md">
+        <span class="text-xs uppercase  tracking-wider">Money</span>
+        <strong class="text-base font-semibold text-green-700 dark:text-green-300">${player.money}</strong>
       </div>
-      <div class="flex flex-col items-center bg-black/20 px-3 py-1 rounded-lg border border-white/5 min-w-[70px]">
-        <span class="text-[0.6rem] uppercase text-slate-400 tracking-wider">Salary</span>
-        <strong class="text-base font-semibold text-purple-300">${player.salary}</strong>
+      <div class="flex flex-col items-center bg-neutral-100 dark:bg-neutral-900 px-3 py-1 rounded-md">
+        <span class="text-xs uppercase  tracking-wider">Salary</span>
+        <strong class="text-base font-semibold">${player.salary}</strong>
       </div>
-      <div class="flex flex-col items-center bg-black/20 px-3 py-1 rounded-lg border border-white/5 min-w-[70px]">
-        <span class="text-[0.6rem] uppercase text-slate-400 tracking-wider">Fee</span>
-        <strong class="text-base font-semibold text-sky-300">${player.accessFee}</strong>
+      <div class="flex flex-col items-center bg-neutral-100 dark:bg-neutral-900 px-3 py-1 rounded-md">
+        <span class="text-xs uppercase  tracking-wider">Access Fee</span>
+        <strong class="text-base font-semibold text-red-700 dark:text-red-300">${player.accessFee}</strong>
       </div>
-      <div class="flex flex-col items-center bg-black/20 px-3 py-1 rounded-lg border border-white/5 min-w-[70px]">
-        <span class="text-[0.6rem] uppercase text-slate-400 tracking-wider">Assurance</span>
-        <strong class="text-base font-semibold text-emerald-400">{player.assurance}</strong>
+      <div class="flex flex-col items-center bg-neutral-100 dark:bg-neutral-900 px-3 py-1 rounded-md">
+        <span class="text-xs uppercase  tracking-wider">Assurance</span>
+        <strong class="text-base font-semibold  text-red-700 dark:text-red-300">{player.assurance}</strong>
       </div>
     </div>
   </div>
 
   <!-- Requirements Subheader -->
-  <div class="text-[0.7rem] text-slate-400 mb-4 px-3 py-1.5 bg-black/20 rounded-md border border-white/5 flex gap-4 items-center flex-wrap">
-    <span><strong>Nationality Fund:</strong> <span class="text-slate-200">${player.collegeFund}</span></span>
-    <span class="text-white/10">|</span>
-    <span><strong>Destination Rules:</strong> <span class="text-slate-200">{getDestinationInfoText(player.destination)}</span></span>
-    
-    <div class="ml-auto flex gap-1.5 items-center">
-      <span class="text-slate-400 font-bold uppercase tracking-wider text-[0.6rem]">Raises:</span>
-      <div class="w-5 h-5 rounded-full border border-dashed flex items-center justify-center text-[0.55rem] {player.payRaises >= 1 ? 'border-solid border-emi-payday bg-[rgba(249,197,82,0.15)] text-emi-payday font-bold' : 'border-white/20 text-white/30'}">+$1</div>
-      <div class="w-5 h-5 rounded-full border border-dashed flex items-center justify-center text-[0.55rem] {player.payRaises >= 2 ? 'border-solid border-emi-payday bg-[rgba(249,197,82,0.15)] text-emi-payday font-bold' : 'border-white/20 text-white/30'}">+$3</div>
+  <div class="text-sm  mb-4 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-md flex flex-col gap-1 items-start">
+    <p>
+      <strong>College Fund:</strong> <span class="">${player.collegeFund}</span>
+    </p>
+    <p><strong>Destination Rules:</strong> <span class="">{getDestinationInfoText(player.destination)}</span></p>
+    <div class=" flex gap-1 items-center">
+      <span class=""><strong>Raises:</strong></span>
+      <div class="size-6 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >= 1 && 'border-solid bg-green-100 dark:bg-green-900 font-bold'}">+$1</div>
+      <div class="size-8 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >= 2 && 'border-solid bg-green-100 dark:bg-green-900 font-bold'}">+$3</div>
     </div>
   </div>
 
@@ -175,7 +173,7 @@
       </div>
     </div>
   {:else}
-    <div class="text-center py-6 text-sm text-slate-400 font-bold bg-black/15 rounded-lg border border-dashed border-white/5 mb-4">
+    <div class="text-center py-6 text-sm  font-bold bg-black/15 rounded-md border border-dashed border-white/5 mb-4">
       Layout Cleared (Crossing / Game Over Phase)
     </div>
   {/if}
@@ -195,7 +193,7 @@
           onclick={() => handleStashClick('document', i)}
         >
           <span class="truncate pr-1">{doc.name}</span>
-          <span class="text-[0.6rem] text-slate-400 font-bold">${doc.cost || 0}</span>
+          <span class="text-xs  font-bold">${doc.cost || 0}</span>
         </div>
       {/each}
     </div>
@@ -213,7 +211,7 @@
           onclick={() => handleStashClick('connection', i)}
         >
           <span class="truncate pr-1">{conn.name}</span>
-          <span class="text-[0.6rem] text-slate-400 font-bold">${conn.cost || 0}</span>
+          <span class="text-xs  font-bold">${conn.cost || 0}</span>
         </div>
       {/each}
     </div>

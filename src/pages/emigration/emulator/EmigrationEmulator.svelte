@@ -97,11 +97,11 @@
       const slot = targetPlayer?.layout[selectedSlot.slotIdx];
       if (slot && slot.card) {
         const cardName = slot.card.name || slot.card.title || '';
-        let text = `Selected Card: <span class="text-emi-accent font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
+        let text = `Selected Card: <span class=" font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
         if (slot.card.type === 'life') {
           const desc = LIFE_CARD_DESCRIPTIONS[cardName];
           if (desc) {
-            text += `<br/><span class="text-slate-400 font-normal text-xs mt-1.5 block">${desc}</span>`;
+            text += `<br/><span class=" font-normal text-xs mt-1.5 block">${desc}</span>`;
           }
         }
         return text;
@@ -119,15 +119,15 @@
       else if (type === 'lifeCard') {
         const card = targetPlayer?.stash.lifeCards[i];
         cardName = card?.title || "";
-        let text = `Selected Stash Item: <span class="text-emi-accent font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
+        let text = `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
         const desc = LIFE_CARD_DESCRIPTIONS[cardName];
         if (desc) {
-          text += `<br/><span class="text-slate-400 font-normal text-xs mt-1.5 block">${desc}</span>`;
+          text += `<br/><span class=" font-normal text-xs mt-1.5 block">${desc}</span>`;
         }
         return text;
       }
       
-      return `Selected Stash Item: <span class="text-emi-accent font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
+      return `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
     }
     return 'Select an available layout card or stash item, then choose your action.';
   });
@@ -219,43 +219,41 @@
   }
 </script>
 
-<div class="bg-emi-bg-dark text-slate-50 font-emi-ui min-h-screen p-6 box-border *:box-border">
+<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-6 box-border *:box-border">
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
-      <h1 class="font-emi-heading text-emi-accent text-center mb-10 text-4xl mt-0">Emigration Emulator</h1>
+      <h1 class="font-emi-heading  text-center  mb-4 text-4xl">Emigration Emulator</h1>
 
-      <div class="bg-emi-bg-panel p-8 rounded-xl border border-white/10">
-        <div class="mb-6">
-          <label class="block mb-2 text-slate-400">Game Mode</label>
-          <div class="flex gap-3">
-            <button class="flex-1 p-3 bg-black/30 border text-white rounded-md cursor-pointer text-base transition-all duration-200 {mode === 'competitive' ? 'bg-[rgba(85,183,176,0.2)] border-emi-accent text-emi-accent' : 'border-white/10'}" onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class="flex-1 p-3 bg-black/30 border text-white rounded-md cursor-pointer text-base transition-all duration-200 {mode === 'cooperative' ? 'bg-[rgba(85,183,176,0.2)] border-emi-accent text-emi-accent' : 'border-white/10'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+      <div class="bg-neutral-200 dark:bg-neutral-800 p-8 rounded-md flex flex-col gap-5">
+        <div class="flex flex-col gap-2">
+          <p>Game Mode</p>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button class="btn flex-1 {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class=" btn flex-1 {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
           </div>
         </div>
 
-        <div class="mb-6">
-          <label class="block mb-2 text-slate-400">Player Count:
-              <select class="w-fit" bind:value={playerCount}>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-                <option value={4}>4</option>
-                <option value={5}>5</option>
-                <option value={6}>6</option>
-              </select>
-          </label>
-        </div>
+        <label>Player Count:
+            <select class="w-fit" bind:value={playerCount}>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+              <option value={5}>5</option>
+              <option value={6}>6</option>
+            </select>
+        </label>
 
-        <div class="flex flex-col gap-3 mb-8">
+        <div class="flex flex-col gap-2">
           {#each activeSetup as p, i}
             <div class="flex gap-3 items-center">
-              <input class="flex-1 bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" type="text" bind:value={p.name} placeholder="Player Name" />
-              <select class="flex-[1.5] bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" bind:value={p.nationality}>
+              <input class="flex-1" type="text" bind:value={p.name} placeholder="Player Name" />
+              <select class="flex-[1.5]" bind:value={p.nationality}>
                 {#each NATIONALITIES as nat}
-                  <option value={nat.name}>{nat.name} (Fund: ${nat.fund})</option>
+                  <option value={nat.name}>{nat.name} (Starting Money: ${nat.fund})</option>
                 {/each}
               </select>
-              <span class="text-slate-400">→</span>
-              <select class="flex-[1.5] bg-black/30 border border-white/10 text-white p-2.5 rounded-md font-inherit text-sm" bind:value={p.destination}>
+              <span class="">→</span>
+              <select class="flex-[1.5]" bind:value={p.destination}>
                 {#each DESTINATIONS as dest}
                   <option value={dest.name}>{dest.name}</option>
                 {/each}
@@ -264,12 +262,12 @@
           {/each}
         </div>
 
-        <div class="mb-8">
-          <label class="block mb-3 text-slate-400 font-bold">Life Card Packs</label>
-          <div class="grid grid-cols-3 gap-2">
+        <div class="flex flex-col gap-3">
+          <p class="">Life Card Packs</p>
+          <div class="flex flex-wrap gap-2">
             {#each PACKS_LIST as pack}
               <button
-                class="p-2.5 rounded-md border text-sm font-semibold transition-all {selectedPacks.includes(pack) ? 'bg-[rgba(85,183,176,0.3)] border-emi-accent text-emi-accent' : 'bg-black/30 border-white/10 text-slate-300 hover:border-white/30'}"
+                class="btn flex-1 {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => {
                   if (selectedPacks.includes(pack)) {
                     selectedPacks = selectedPacks.filter(p => p !== pack);
@@ -284,14 +282,14 @@
           </div>
         </div>
 
-        <div class="flex gap-4">
-          <button class="flex-1 p-3.5 border-none rounded-lg text-lg font-bold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 bg-emi-accent text-black" onclick={() => startGame(false)}>Start Manual Playtest</button>
-          <button class="flex-1 p-3.5 rounded-lg text-lg font-bold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 bg-white/10 text-white border border-white/20" onclick={() => startGame(true)}>Start Automated Playtest</button>
+        <div class="flex gap-4 mt-8">
+          <button class="flex-1 btn" onclick={() => startGame(false)}>Start Manual Playtest</button>
+          <button class="flex-1 btn" onclick={() => startGame(true)}>Start Automated Playtest</button>
         </div>
       </div>
 
       {#if showTestRunner}
-      <button class="block mx-auto my-5 bg-white/5 border border-white/10 text-slate-400 py-2 px-4 rounded-md cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
+      <button class="my-8 cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
         {#if testResults}
           <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
             {#each testResults as res}
@@ -306,9 +304,9 @@
   {:else if snapshot}
     <div>
       <div class="flex justify-between items-center mb-5">
-        <h2 class="m-0 font-emi-heading text-emi-accent text-2xl">Emigration — Phase: {snapshot.phase.toUpperCase()}</h2>
+        <h2 class="text-2xl tracking-wide">{snapshot.phase.toUpperCase()}</h2>
         <div>
-          <button class="bg-white/10 border border-white/20 text-white py-1.5 px-3 rounded cursor-pointer transition-colors hover:bg-white/20" onclick={() => isSetup = true}>Restart / Setup</button>
+          <button class="btn" onclick={() => isSetup = true}>Restart / Setup</button>
         </div>
       </div>
 
@@ -316,23 +314,27 @@
         <!-- Left Main Column: Public Pool & Player Boards -->
         <div class="flex flex-col gap-2 max-lg:pb-[45vh]">
           <!-- Public Center Pool -->
-          <div class="bg-emi-bg-panel border border-white/10 rounded-xl p-5 backdrop-blur-md">
+          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 backdrop-blur-md">
           <!-- Security Lanes -->
-            <div class="lg:col-span-2 flex flex-col gap-2 bg-black/20 p-3.5 rounded-lg border border-white/5">
-                <div class="font-bold text-[0.8rem] uppercase tracking-wider text-slate-400">Security Lanes (Border Crossing)</div>
-                <div class="flex gap-3 overflow-x-auto pb-1">
+            <div class="lg:col-span-2 flex flex-col gap-2 p-1 rounded-md">
+                <div class="text-sm uppercase tracking-wider ">Security Lanes</div>
+                <div class="flex gap-2 overflow-x-auto pb-1">
                   {#each snapshot.securityLanes as lane, i}
-                    <div class="bg-[#1e293b] border border-white/10 rounded-lg p-2.5 min-w-[125px] flex flex-col items-center text-center flex-1 transition-all">
+                    <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[100px] flex flex-col items-center text-center flex-1 transition-all">
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
-                      <div class="text-[0.65rem] text-slate-400 mb-1">{lane.tokens.length} left</div>
-                      <div class="flex gap-1 justify-center my-1.5">
+                      <div class="text-xs mb-1 flex gap-1">
+                      {#each lane.unshuffledTokens as tokenNumber}
+                      <p class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</p>
+                      {/each}
+                      </div>
+                      <div class="flex gap-1 justify-center">
                         {#each lane.tokens as token}
-                          <div class="w-2.5 h-2.5 rounded-full bg-emi-accent border border-white/40"></div>
+                          <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                         {/each}
                       </div>
                       {#if snapshot.phase === 'crossing'}
                         <button 
-                          class="mt-1 bg-white/10 border border-white/20 text-white py-1 px-2 rounded text-[0.65rem] cursor-pointer hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed font-semibold w-full"
+                          class="btn w-full"
                           disabled={lane.tokens.length === 0 || pendingChoice}
                           onclick={() => handleSelectLane(i)}
                         >
@@ -345,14 +347,14 @@
               </div>
             </div>
             
-            <div class="font-emi-heading text-emi-accent text-base pb-2">Public Services cards</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+            <div class="pb-2 text-sm uppercase tracking-wider ">Public Services cards</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
               <!-- Tickets -->
-              <div class="flex  items-center gap-4 bg-black/20 p-3.5 rounded-lg border border-white/5">
+              <div class="flex  items-center gap-4 bg-neutral-200 dark:bg-neutral-800 p-3.5 rounded-md">
                 <div class="text-left">
                   <div class="font-bold text-sm">Tickets</div>
-                  <div class="text-xs text-slate-400">Cost: $2 Money</div>
-                  <div class="text-[0.7rem] text-slate-400">Req: 1+ Connection</div>
+                  <div class="text-xs ">Cost: $2 Money</div>
+                  <div class="text-xs ">Req: 1+ Connection</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
@@ -362,14 +364,14 @@
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="px-2 py-0.5 text-[0.65rem] font-bold bg-emi-accent text-black rounded hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        class="btn text-sm p-2"
                         disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.money < 2 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('ticket')}
                       >
                         Buy
                       </button>
                       <button
-                        class="px-2 py-0.5 text-[0.65rem] font-bold bg-white/10 text-white border border-white/20 rounded hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        class="btn text-sm p-2"
                         disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('ticket')}
                       >
@@ -381,11 +383,11 @@
               </div>
 
               <!-- Passports -->
-              <div class="flex items-center gap-4 bg-black/20 p-3.5 rounded-lg border border-white/5">
+              <div class="flex items-center gap-4  bg-neutral-200 dark:bg-neutral-800 p-3.5 rounded-md border border-white/5">
                 <div class="text-left">
                   <div class="font-bold text-sm">Passports</div>
-                  <div class="text-xs text-slate-400">Cost: $2 Money</div>
-                  <div class="text-[0.7rem] text-slate-400">Req: 1+ Document</div>
+                  <div class="text-xs ">Cost: $2 Money</div>
+                  <div class="text-xs ">Req: 1+ Document</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
@@ -395,14 +397,14 @@
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="px-2 py-0.5 text-[0.65rem] font-bold bg-emi-accent text-black rounded hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        class="btn text-xs p-2"
                         disabled={snapshot.publicServices.passports <= 0 || currentPlayer.money < 2 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('passport')}
                       >
                         Buy
                       </button>
                       <button
-                        class="px-2 py-0.5 text-[0.65rem] font-bold bg-white/10 text-white border border-white/20 rounded hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        class="btn text-xs p-2"
                         disabled={snapshot.publicServices.passports <= 0 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('passport')}
                       >
@@ -428,7 +430,7 @@
         </div>
         
         <!-- Right Sidebar: Sticky Action Panel -->
-        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[40vh] max-lg:rounded-t-[20px] max-lg:shadow-[0_-10px_30px_rgba(0,0,0,0.5)] max-lg:bg-emi-bg-dark h-[calc(100vh-40px)]">
+        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[40vh] h-[calc(100vh-40px)]">
           <ActionPanel 
             {engine}
             {snapshot}

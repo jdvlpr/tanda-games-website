@@ -7,13 +7,10 @@
   --font-serif: "Tai Heritage Pro", "serif";
 
   /* Emigration Emulator */
-  --color-emi-bg-dark: #0f172a;
-  --color-emi-bg-panel: rgba(30, 41, 59, 0.85);
   --color-emi-document: #e3a780;
   --color-emi-connection: #d990b4;
   --color-emi-payday: #deede2;
   --color-emi-life: #fefefe;
-  --color-emi-accent: #55b7b0;
 
   --font-emi-ui: var(--font-publicSans), sans-serif;
   --font-emi-heading: var(--font-serif), sans-serif;
@@ -34,6 +31,7 @@
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
+    @apply transition-all;
     &:hover {
       background-color: theme("colors.orange.100");
     }

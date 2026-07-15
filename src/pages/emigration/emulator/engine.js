@@ -445,6 +445,7 @@ export default class EmigrationEngine {
   _setupSecurityLanes() {
     this.securityLanes = SECURITY_LANES_DATA.map((lane) => ({
       name: lane.name,
+      unshuffledTokens: lane.tokens,
       tokens: shuffleArray([...lane.tokens]),
     }));
     this.log("Security lanes arranged with shuffled tokens.", "system");
