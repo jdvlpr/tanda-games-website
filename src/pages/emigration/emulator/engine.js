@@ -2161,6 +2161,7 @@ export default class EmigrationEngine {
       players: this.players,
       gameResult: this.gameResult,
       logs: this.logs,
+      activeCrossingIdx: this.activeCrossingIdx,
     }));
   }
 }
