@@ -31,7 +31,7 @@
         <div class="grid grid-cols-2 gap-2">
           {#each actions as action}
             <button 
-              class="bg-white/10 border border-white/10 text-white p-2.5 rounded-md cursor-pointer text-sm font-semibold transition-all duration-200 hover:not(:disabled):bg-white/20 hover:not(:disabled):border-emi-accent disabled:opacity-40 disabled:cursor-not-allowed {action.optional ? 'bg-[rgba(249,197,82,0.1)] border-[rgba(249,197,82,0.3)] text-emi-payday hover:not(:disabled):border-emi-payday' : ''}" 
+              class={["bg-white/10 border border-white/10 text-white p-2.5 rounded-md cursor-pointer text-sm font-semibold transition-all duration-200 hover:not(:disabled):bg-white/20 hover:not(:disabled):border-emi-accent disabled:opacity-40 disabled:cursor-not-allowed", action.optional && "bg-[rgba(249,197,82,0.1)] border-[rgba(249,197,82,0.3)] text-emi-payday hover:not(:disabled):border-emi-payday", !action.enabled && 'hidden' ]}
               disabled={!action.enabled || pendingChoice}
               onclick={() => onaction(action.type)}
             >

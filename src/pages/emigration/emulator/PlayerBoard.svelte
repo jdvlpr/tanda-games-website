@@ -86,7 +86,7 @@
   {/if}
 {/snippet}
 
-<div class="bg-emi-bg-panel border border-white/10 rounded-xl p-5 mb-6 transition-all duration-300 font-emi-ui text-slate-50 {isActive ? 'border-emi-accent/80 shadow-[0_0_20px_rgba(85,183,176,0.15)] bg-emi-bg-panel/90' : ''}">
+<div class={["bg-emi-bg-panel border border-white/10 rounded-xl p-5 mb-6 transition-all duration-300 font-emi-ui text-slate-50", isActive && "border-emi-accent/80 shadow-[0_0_20px_rgba(85,183,176,0.65)] bg-emi-bg-panel/90"]}>
   <!-- Player Header Info -->
   <div class="flex justify-between items-center mb-3 pb-3 border-b border-white/10 flex-wrap gap-3">
     <div class="flex flex-col">
