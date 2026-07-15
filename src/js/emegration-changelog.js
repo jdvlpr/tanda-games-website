@@ -3,7 +3,7 @@ export const changelog = [
     version: "0.1.0",
     date: "July 15, 2026",
     items: [
-      "Completely redesigned larger rulebook, with many renamed components.",
+      "Completely redesigned larger Rulebook, with many renamed components.",
     ],
   },
   {
