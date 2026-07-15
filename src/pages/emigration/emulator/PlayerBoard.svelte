@@ -21,10 +21,10 @@
   // Get color for card type
   function getCardColor(type) {
     switch(type) {
-      case 'document': return '#38bdf8'; // Sky-400
-      case 'connection': return '#f43f5e'; // Rose-500
-      case 'payday': return '#eab308'; // Yellow-500
-      case 'life': return '#a855f7'; // Purple-500
+      case 'document': return '#e3a780';
+      case 'connection': return '#d990b4';
+      case 'payday': return '#deede2';
+      case 'life': return '#fefefe';
       default: return '#fff';
     }
   }

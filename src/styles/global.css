@@ -9,10 +9,10 @@
   /* Emigration Emulator */
   --color-emi-bg-dark: #0f172a;
   --color-emi-bg-panel: rgba(30, 41, 59, 0.85);
-  --color-emi-document: #67a7cf;
-  --color-emi-connection: #c0656f;
-  --color-emi-payday: #f9c552;
-  --color-emi-life: #d0a3cc;
+  --color-emi-document: #e3a780;
+  --color-emi-connection: #d990b4;
+  --color-emi-payday: #deede2;
+  --color-emi-life: #fefefe;
   --color-emi-accent: #55b7b0;
 
   --font-emi-ui: "Public Sans", sans-serif;
