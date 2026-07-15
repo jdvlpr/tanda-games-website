@@ -1,5 +1,12 @@
 export const changelog = [
   {
+    version: "0.1.0",
+    date: "July 15, 2026",
+    items: [
+      "Completely redesigned larger rulebook, with many renamed components.",
+    ],
+  },
+  {
     version: "0.0.10",
     date: "July 11, 2026",
     items: [
