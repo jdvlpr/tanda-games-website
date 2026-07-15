@@ -221,21 +221,8 @@
 
 <div class="bg-emi-bg-dark text-slate-50 font-emi-ui min-h-screen p-6 box-border *:box-border">
   {#if isSetup}
-    <div class="max-w-[800px] mx-auto">
+    <div class="max-w-[750px] mx-auto">
       <h1 class="font-emi-heading text-emi-accent text-center mb-10 text-4xl mt-0">Emigration Emulator</h1>
-      
-      {#if showTestRunner}
-        <button class="block mx-auto mb-5 bg-white/5 border border-white/10 text-slate-400 py-2 px-4 rounded-md cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
-        {#if testResults}
-          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
-            {#each testResults as res}
-              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
-                {res.pass ? '✅' : '❌'} {res.description}
-              </div>
-            {/each}
-          </div>
-        {/if}
-      {/if}
 
       <div class="bg-emi-bg-panel p-8 rounded-xl border border-white/10">
         <div class="mb-6">
@@ -302,6 +289,19 @@
           <button class="flex-1 p-3.5 rounded-lg text-lg font-bold cursor-pointer transition-transform duration-200 hover:-translate-y-0.5 bg-white/10 text-white border border-white/20" onclick={() => startGame(true)}>Start Automated Playtest</button>
         </div>
       </div>
+
+      {#if showTestRunner}
+      <button class="block mx-auto my-5 bg-white/5 border border-white/10 text-slate-400 py-2 px-4 rounded-md cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
+        {#if testResults}
+          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
+            {#each testResults as res}
+              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
+                {res.pass ? '✅' : '❌'} {res.description}
+              </div>
+            {/each}
+          </div>
+        {/if}
+      {/if}
     </div>
   {:else if snapshot}
     <div>
@@ -314,14 +314,42 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start max-w-[1600px] mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
-        <div class="flex flex-col gap-6 max-lg:pb-[45vh]">
+        <div class="flex flex-col gap-2 max-lg:pb-[45vh]">
           <!-- Public Center Pool -->
           <div class="bg-emi-bg-panel border border-white/10 rounded-xl p-5 backdrop-blur-md">
-            <div class="font-emi-heading text-emi-accent text-base border-b border-white/10 pb-2 mb-4">Public Center Pool</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Security Lanes -->
+            <div class="lg:col-span-2 flex flex-col gap-2 bg-black/20 p-3.5 rounded-lg border border-white/5">
+                <div class="font-bold text-[0.8rem] uppercase tracking-wider text-slate-400">Security Lanes (Border Crossing)</div>
+                <div class="flex gap-3 overflow-x-auto pb-1">
+                  {#each snapshot.securityLanes as lane, i}
+                    <div class="bg-[#1e293b] border border-white/10 rounded-lg p-2.5 min-w-[125px] flex flex-col items-center text-center flex-1 transition-all">
+                      <div class="font-bold text-xs leading-snug">{lane.name}</div>
+                      <div class="text-[0.65rem] text-slate-400 mb-1">{lane.tokens.length} left</div>
+                      <div class="flex gap-1 justify-center my-1.5">
+                        {#each lane.tokens as token}
+                          <div class="w-2.5 h-2.5 rounded-full bg-emi-accent border border-white/40"></div>
+                        {/each}
+                      </div>
+                      {#if snapshot.phase === 'crossing'}
+                        <button 
+                          class="mt-1 bg-white/10 border border-white/20 text-white py-1 px-2 rounded text-[0.65rem] cursor-pointer hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed font-semibold w-full"
+                          disabled={lane.tokens.length === 0 || pendingChoice}
+                          onclick={() => handleSelectLane(i)}
+                        >
+                          Select Lane
+                        </button>
+                      {/if}
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            </div>
+            
+            <div class="font-emi-heading text-emi-accent text-base pb-2">Public Services cards</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
               <!-- Tickets -->
-              <div class="flex items-center gap-4 bg-black/20 p-3.5 rounded-lg border border-white/5">
-                <div>
+              <div class="flex  items-center gap-4 bg-black/20 p-3.5 rounded-lg border border-white/5">
+                <div class="text-left">
                   <div class="font-bold text-sm">Tickets</div>
                   <div class="text-xs text-slate-400">Cost: $2 Money</div>
                   <div class="text-[0.7rem] text-slate-400">Req: 1+ Connection</div>
@@ -354,7 +382,7 @@
 
               <!-- Passports -->
               <div class="flex items-center gap-4 bg-black/20 p-3.5 rounded-lg border border-white/5">
-                <div>
+                <div class="text-left">
                   <div class="font-bold text-sm">Passports</div>
                   <div class="text-xs text-slate-400">Cost: $2 Money</div>
                   <div class="text-[0.7rem] text-slate-400">Req: 1+ Document</div>
@@ -384,34 +412,6 @@
                   {/if}
                 </div>
               </div>
-
-              <!-- Security Lanes -->
-              <div class="lg:col-span-2 flex flex-col gap-2 bg-black/20 p-3.5 rounded-lg border border-white/5">
-                <div class="font-bold text-[0.8rem] uppercase tracking-wider text-slate-400">Security Lanes (Border Crossing)</div>
-                <div class="flex gap-3 overflow-x-auto pb-1">
-                  {#each snapshot.securityLanes as lane, i}
-                    <div class="bg-[#1e293b] border border-white/10 rounded-lg p-2.5 min-w-[125px] flex flex-col items-center text-center flex-1 transition-all">
-                      <div class="font-bold text-xs leading-snug">{lane.name}</div>
-                      <div class="text-[0.65rem] text-slate-400 mb-1">{lane.tokens.length} left</div>
-                      <div class="flex gap-1 justify-center my-1.5">
-                        {#each lane.tokens as token}
-                          <div class="w-2.5 h-2.5 rounded-full bg-emi-accent border border-white/40"></div>
-                        {/each}
-                      </div>
-                      {#if snapshot.phase === 'crossing'}
-                        <button 
-                          class="mt-1 bg-white/10 border border-white/20 text-white py-1 px-2 rounded text-[0.65rem] cursor-pointer hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed font-semibold w-full"
-                          disabled={lane.tokens.length === 0 || pendingChoice}
-                          onclick={() => handleSelectLane(i)}
-                        >
-                          Select Lane
-                        </button>
-                      {/if}
-                    </div>
-                  {/each}
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- Player Boards -->

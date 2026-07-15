@@ -86,7 +86,7 @@
   {/if}
 {/snippet}
 
-<div class={["bg-emi-bg-panel border border-white/10 rounded-xl p-5 mb-6 transition-all duration-300 font-emi-ui text-slate-50", isActive && "border-emi-accent/80 shadow-[0_0_20px_rgba(85,183,176,0.65)] bg-emi-bg-panel/90"]}>
+<div class={["bg-emi-bg-panel border border-white/10 rounded-xl p-5 mb-6 transition-all duration-300 font-emi-ui text-slate-50 mt-4", isActive && "border-emi-accent/80 shadow-[0_0_20px_rgba(85,183,176,0.65)] bg-emi-bg-panel/90"]}>
   <!-- Player Header Info -->
   <div class="flex justify-between items-center mb-3 pb-3 border-b border-white/10 flex-wrap gap-3">
     <div class="flex flex-col">
@@ -404,6 +404,7 @@
     padding: 10px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.03);
+    overflow:auto;
   }
 
   .stash-column {
@@ -412,6 +413,7 @@
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     min-height: 80px;
+    min-width: 100px;
   }
 
   .stash-col-title {

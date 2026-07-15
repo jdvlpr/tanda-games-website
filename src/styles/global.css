@@ -15,8 +15,8 @@
   --color-emi-life: #fefefe;
   --color-emi-accent: #55b7b0;
 
-  --font-emi-ui: "Public Sans", sans-serif;
-  --font-emi-heading: "Marvin Round", "Public Sans", sans-serif;
+  --font-emi-ui: var(--font-publicSans), sans-serif;
+  --font-emi-heading: var(--font-serif), sans-serif;
   --font-emi-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
