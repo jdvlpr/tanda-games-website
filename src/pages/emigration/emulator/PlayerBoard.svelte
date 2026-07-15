@@ -9,6 +9,7 @@
 
   function handleLayoutClick(slotIdx) {
     if (!engine || engine.phase !== 'preparation') return;
+    if (!isAvailable(slotIdx)) return;
     if (onCardSelect) onCardSelect({ type: 'layout', playerIdx: player.id, slotIdx });
   }
 
@@ -93,26 +94,26 @@
   <div class="grid grid-cols-1 lg:grid-cols-[minmax(300px,1.5fr)_1fr] gap-6">
     <div>
       <h4 class="mt-0 mb-3 text-sm uppercase text-slate-400 tracking-wide">Layout</h4>
-      <div class="grid grid-cols-4 auto-rows-[80px] gap-2 relative pb-10">
+      <div class="grid grid-cols-4 auto-rows-[80px] gap-2 relative pb-[90px]">
         {#each player.layout as slot, i}
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div 
-            class="w-full h-[110px] rounded-lg relative transition-all duration-200 {getPosClass(i)} {!slot ? 'border border-dashed border-white/10 bg-transparent' : 'bg-[#1e293b] border border-white/20 shadow-[0_4px_6px_rgba(0,0,0,0.3)]'} {slot && !slot.faceUp ? 'bg-[repeating-linear-gradient(45deg,#1e293b,#1e293b_10px,#0f172a_10px,#0f172a_20px)] opacity-60' : ''} {isAvailable(i) ? 'cursor-pointer hover:-translate-y-1 hover:shadow-[0_6px_12px_rgba(0,0,0,0.4)]' : ''} {selectedSlot?.playerIdx === player.id && selectedSlot?.slotIdx === i ? 'outline outline-2 outline-emi-accent outline-offset-2 !z-50' : ''}"
-            style={isAvailable(i) && (!selectedSlot || selectedSlot.slotIdx !== i) ? 'box-shadow: 0 0 10px rgba(255,255,255,0.1)' : ''}
+            class="w-full h-[160px] rounded-xl relative transition-all duration-200 {getPosClass(i)} flex flex-col items-center justify-center {!slot ? 'border-2 border-dashed border-white/10 bg-transparent' : 'bg-[#1e293b] border-2 shadow-lg'} {slot && !slot.faceUp ? 'bg-[repeating-linear-gradient(45deg,#1e293b,#1e293b_15px,#0f172a_15px,#0f172a_30px)] border-[#334155]' : ''} {slot && slot.faceUp && !isAvailable(i) ? 'brightness-[0.5] saturate-[0.7]' : ''} {isAvailable(i) ? 'cursor-pointer hover:-translate-y-2' : ''} {selectedSlot?.playerIdx === player.id && selectedSlot?.slotIdx === i ? 'outline outline-2 outline-white outline-offset-4 !z-50' : ''}"
+            style={slot && slot.faceUp ? `border-color: ${getCardColor(slot.card.type)}; ${isAvailable(i) && (!selectedSlot || selectedSlot.slotIdx !== i) ? `box-shadow: 0 0 20px ${getCardColor(slot.card.type)}66;` : ''}` : ''}
             onclick={() => handleLayoutClick(i)}
           >
             {#if slot}
               {#if slot.faceUp}
-                <div class="p-2 h-full flex flex-col border-t-4 rounded-lg" style="border-top-color: {getCardColor(slot.card.type)}">
-                  <div class="text-[0.6rem] uppercase text-slate-400 mb-1">{slot.card.type}</div>
-                  <div class="text-xs font-semibold leading-tight flex-grow">{slot.card.name || slot.card.title}</div>
+                <div class="p-3 h-full w-full flex flex-col text-center">
+                  <div class="text-[0.65rem] font-bold tracking-wider uppercase mb-2" style="color: {getCardColor(slot.card.type)}">{slot.card.type}</div>
+                  <div class="text-sm font-bold leading-snug flex-grow flex items-center justify-center text-white">{slot.card.name || slot.card.title}</div>
                   {#if slot.card.cost !== undefined}
-                    <div class="text-sm font-bold self-end bg-black/30 px-1.5 py-0.5 rounded">${slot.card.cost}</div>
+                    <div class="text-xs font-bold self-center bg-black/40 px-2 py-1 rounded text-slate-300 mt-2">${slot.card.cost}</div>
                   {/if}
                 </div>
               {:else}
-                <div class="card-back"></div>
+                <div class="font-bold text-slate-400 tracking-widest text-sm uppercase">DOWN</div>
               {/if}
             {/if}
           </div>

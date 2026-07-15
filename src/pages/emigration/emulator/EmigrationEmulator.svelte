@@ -65,10 +65,19 @@
   function handleAction(actionType) {
     if (!engine) return;
 
+    const source = selectedSlot ? 'layout' : (selectedStash ? 'stash' : null);
+    const params = {
+      ...selectedSlot,
+      ...selectedStash,
+      source,
+      targetPlayerIdx: selectedSlot?.playerIdx ?? selectedStash?.playerIdx,
+      stashIdx: selectedStash?.itemIdx,
+    };
+
     if (actionType === 'graduate' || actionType === 'sell') {
-      engine.executeOptionalAction(actionType, { ...selectedStash });
+      engine.executeOptionalAction(actionType, params);
     } else {
-      engine.executeRequiredAction(actionType, { ...selectedSlot, ...selectedStash });
+      engine.executeRequiredAction(actionType, params);
     }
   }
 
