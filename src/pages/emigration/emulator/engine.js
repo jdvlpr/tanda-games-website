@@ -1372,6 +1372,7 @@ export default class EmigrationEngine {
               this._payAccessFee(player, target, fee);
               const [removed] = target.layout.splice(slotIdx, 1, null);
               this.discardPile.push(removed.card);
+              this._onCardDiscarded(player, removed.card);
               this.log(
                 `${player.name} used Keep Calm to discard ${removed.card.title}.`,
                 "action",
@@ -1419,6 +1420,9 @@ export default class EmigrationEngine {
     this._payAccessFee(player, target, fee);
     const [removed] = target.layout.splice(slotIdx, 1, null);
     const card = removed.card;
+
+    // Treat layout removal as a discard event for life-card trigger hooks.
+    this._onCardDiscarded(player, card);
 
     if (card.type === "payday") {
       this.discardPile.push(card);
@@ -2884,6 +2888,79 @@ export function runTests() {
     );
   } catch (e) {
     assert(false, `Security lane error: ${e.message}`);
+  }
+
+  // 9. Life card choice and stash-triggered effects
+  try {
+    const setup = [
+      { name: "A", nationality: "Bosnian", destination: "China" },
+      { name: "B", nationality: "French", destination: "Russia" },
+    ];
+    const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+    const actor = eng.players[1];
+    const salvageOwner = eng.players[0];
+
+    salvageOwner.stash.lifeCards.push({ title: "Salvage", type: "life" });
+    actor.layout[11] = {
+      card: {
+        title: "Nostalgia",
+        pack: "Vacation",
+        keep: "Instant",
+        type: "life",
+      },
+      faceUp: true,
+      index: 11,
+    };
+    actor.money = 10;
+    eng.currentPlayerIdx = 1;
+
+    eng.executeRequiredAction("activate", {
+      targetPlayerIdx: 1,
+      slotIdx: 11,
+    });
+
+    assert(
+      salvageOwner.money === 3,
+      "Salvage triggers when another player activates and discards a life card",
+    );
+
+    // May Keep cards should present a choice and can be kept in stash.
+    const keeper = eng.players[0];
+    keeper.layout[13] = {
+      card: {
+        title: "Stellar Reputation",
+        pack: "Friendship",
+        keep: "May Keep",
+        type: "life",
+      },
+      faceUp: true,
+      index: 13,
+    };
+    eng.currentPlayerIdx = 0;
+    eng.executeRequiredAction("activate", {
+      targetPlayerIdx: 0,
+      slotIdx: 13,
+    });
+    assert(
+      eng.pendingChoice?.id === "may-keep-choice",
+      "May Keep life cards prompt for a keep/immediate choice",
+    );
+    eng.resolveChoice("keep");
+    assert(
+      keeper.stash.lifeCards.some((lc) => lc.title === "Stellar Reputation"),
+      "Choosing keep places the life card in stash",
+    );
+
+    const discountCost = eng.getEffectiveCost(keeper, {
+      cost: 2,
+      type: "connection",
+    });
+    assert(
+      discountCost === 1,
+      "Kept Stellar Reputation reduces connection purchase cost by $1",
+    );
+  } catch (e) {
+    assert(false, `Life card effect error: ${e.message}`);
   }
 
   return results;
