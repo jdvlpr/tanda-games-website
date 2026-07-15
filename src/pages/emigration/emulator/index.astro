@@ -1,0 +1,11 @@
+---
+// src/pages/emulator.astro
+import Header from "../../../components/Header.svelte";
+import Layout from '../../../layouts/Layout.astro';
+import EmigrationEmulator from './EmigrationEmulator.svelte';
+---
+
+<Header client:idle />
+<Layout title="Emigration — Playtest Emulator">
+  <EmigrationEmulator client:load />
+</Layout>

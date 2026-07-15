@@ -5,6 +5,19 @@
 @theme {
   --font-publicSans: "Public Sans", "sans-serif";
   --font-serif: "Tai Heritage Pro", "serif";
+  
+  /* Emigration Emulator */
+  --color-emi-bg-dark: #0f172a;
+  --color-emi-bg-panel: rgba(30, 41, 59, 0.85);
+  --color-emi-document: #67a7cf;
+  --color-emi-connection: #c0656f;
+  --color-emi-payday: #f9c552;
+  --color-emi-life: #d0a3cc;
+  --color-emi-accent: #55b7b0;
+  
+  --font-emi-ui: "Public Sans", sans-serif;
+  --font-emi-heading: "Marvin Round", "Public Sans", sans-serif;
+  --font-emi-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* Custom .btn component */

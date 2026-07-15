@@ -1,0 +1,418 @@
+/**
+ * Emigration — Autoplay AI Module
+ * Provides automated game-playing strategy for playtesting.
+ */
+
+/**
+ * Create an AI player that can play the game automatically.
+ * @param {import('./engine.js').default} engine
+ * @returns {Object} Autoplay controller
+ */
+export function createAutoPlayer(engine) {
+  /**
+   * Choose the best required action for the current player.
+   * Priority: Activate Payday → Buy cheap cards → Buy ticket/passport →
+   *           Steal → College → Discard
+   */
+  function chooseAction() {
+    const player = engine.players[engine.currentPlayerIdx];
+    const actions = engine.getValidActions(player);
+    const enabled = (type) => actions.find(a => a.type === type)?.enabled;
+
+    // 1. Activate available Payday cards (salary for everyone)
+    if (enabled('activate')) {
+      const paydayTarget = _findBestActivateTarget(player, 'payday');
+      if (paydayTarget) {
+        return { type: 'activate', params: paydayTarget };
+      }
+    }
+
+    // 2. Buy cheapest available Documents/Connections (prefer own layout)
+    if (enabled('buy')) {
+      const buyTarget = _findCheapestBuyTarget(player);
+      if (buyTarget) {
+        return { type: 'buy', params: buyTarget };
+      }
+    }
+
+    // 3. Buy Ticket from pool if have Connection
+    if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 &&
+        player.stash.connections.length >= 1 && player.money >= 2) {
+      return { type: 'buyPool', params: { cardType: 'ticket' } };
+    }
+
+    // 4. Buy Passport from pool if have Document
+    if (player.stash.passports < 1 && engine.publicServices.passports > 0 &&
+        player.stash.documents.length >= 1 && player.money >= 2) {
+      return { type: 'buyPool', params: { cardType: 'passport' } };
+    }
+
+    // 5. Activate Life cards
+    if (enabled('activate')) {
+      const lifeTarget = _findBestActivateTarget(player, 'life');
+      if (lifeTarget) {
+        return { type: 'activate', params: lifeTarget };
+      }
+    }
+
+    // 6. Steal if can't buy
+    if (enabled('steal')) {
+      if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 &&
+          player.stash.connections.length >= 1) {
+        return { type: 'steal', params: { cardType: 'ticket' } };
+      }
+      if (player.stash.passports < 1 && engine.publicServices.passports > 0 &&
+          player.stash.documents.length >= 1) {
+        return { type: 'steal', params: { cardType: 'passport' } };
+      }
+    }
+
+    // 7. Apply for College if affordable and have open slots
+    if (enabled('applyCollege')) {
+      return { type: 'applyCollege', params: {} };
+    }
+
+    // 8. Reclaim if available
+    if (enabled('reclaim')) {
+      const reclaimTarget = _findReclaimTarget(player);
+      if (reclaimTarget) {
+        return { type: 'reclaim', params: reclaimTarget };
+      }
+    }
+
+    // 9. Discard as last resort
+    if (enabled('discard')) {
+      return _findDiscardTarget(player);
+    }
+
+    // Fallback: try anything enabled
+    for (const a of actions) {
+      if (!a.optional && a.enabled) {
+        return { type: a.type, params: {} };
+      }
+    }
+
+    return null; // forfeit
+  }
+
+  /**
+   * Find the best card to activate (payday or life).
+   */
+  function _findBestActivateTarget(player, cardType) {
+    // Prefer own layout (no access fee), then cheapest opponent
+    const candidates = [];
+
+    for (const p of engine.players) {
+      const fee = p.id === player.id ? 0 : player.accessFee;
+      if (player.money < fee) continue;
+
+      for (let i = 0; i < 14; i++) {
+        if (engine.isCardAvailable(p, i)) {
+          const card = p.layout[i].card;
+          if (card.type === cardType) {
+            candidates.push({ targetPlayerIdx: p.id, slotIdx: i, fee });
+          }
+        }
+      }
+    }
+
+    if (candidates.length === 0) return null;
+    // Sort: own layout first (fee=0), then by fee
+    candidates.sort((a, b) => a.fee - b.fee);
+    return { targetPlayerIdx: candidates[0].targetPlayerIdx, slotIdx: candidates[0].slotIdx };
+  }
+
+  /**
+   * Find cheapest buyable Document or Connection.
+   */
+  function _findCheapestBuyTarget(player) {
+    const candidates = [];
+
+    for (const p of engine.players) {
+      const fee = p.id === player.id ? 0 : player.accessFee;
+      for (let i = 0; i < 14; i++) {
+        if (engine.isCardAvailable(p, i)) {
+          const card = p.layout[i].card;
+          if (card.type === 'document' || card.type === 'connection') {
+            const cost = engine.getEffectiveCost(player, card);
+            if (player.money >= cost + fee) {
+              candidates.push({
+                targetPlayerIdx: p.id,
+                slotIdx: i,
+                totalCost: cost + fee,
+                cardType: card.type,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    if (candidates.length === 0) return null;
+
+    // Prefer: balance doc/conn ratio, then cheapest
+    const docs = player.stash.documents.length;
+    const conns = player.stash.connections.length;
+
+    candidates.sort((a, b) => {
+      // Prefer whichever type we have fewer of
+      const aPreferred = (a.cardType === 'document' && docs <= conns) ||
+                         (a.cardType === 'connection' && conns <= docs);
+      const bPreferred = (b.cardType === 'document' && docs <= conns) ||
+                         (b.cardType === 'connection' && conns <= docs);
+      if (aPreferred !== bPreferred) return aPreferred ? -1 : 1;
+      return a.totalCost - b.totalCost;
+    });
+
+    return { targetPlayerIdx: candidates[0].targetPlayerIdx, slotIdx: candidates[0].slotIdx };
+  }
+
+  /**
+   * Find a reclaim target.
+   */
+  function _findReclaimTarget(player) {
+    const cost = 2 + player.accessFee;
+    if (player.money < cost) return null;
+
+    for (const p of engine.players) {
+      if (p.id === player.id) continue;
+      if (player.stash.tickets < 1 && p.stash.tickets > 1) {
+        return { targetPlayerIdx: p.id, cardType: 'ticket' };
+      }
+      if (player.stash.passports < 1 && p.stash.passports > 1) {
+        return { targetPlayerIdx: p.id, cardType: 'passport' };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Find the least valuable card to discard.
+   */
+  function _findDiscardTarget(player) {
+    // Prefer discarding from own stash (cheapest card)
+    if (player.stash.documents.length > 0) {
+      const idx = player.stash.documents.reduce((best, c, i) =>
+        c.cost < player.stash.documents[best].cost ? i : best, 0);
+      return { type: 'discard', params: { source: 'stash', stashType: 'document', stashIdx: idx } };
+    }
+    if (player.stash.connections.length > 0) {
+      const idx = player.stash.connections.reduce((best, c, i) =>
+        c.cost < player.stash.connections[best].cost ? i : best, 0);
+      return { type: 'discard', params: { source: 'stash', stashType: 'connection', stashIdx: idx } };
+    }
+
+    // Discard from own layout
+    for (let i = 0; i < 14; i++) {
+      if (engine.isCardAvailable(player, i)) {
+        const card = player.layout[i].card;
+        if (card.type === 'document' || card.type === 'connection') {
+          return { type: 'discard', params: { source: 'layout', targetPlayerIdx: player.id, slotIdx: i } };
+        }
+      }
+    }
+
+    // Discard from opponent layout
+    for (const p of engine.players) {
+      if (p.id === player.id) continue;
+      if (player.money < player.accessFee) continue;
+      for (let i = 0; i < 14; i++) {
+        if (engine.isCardAvailable(p, i)) {
+          const card = p.layout[i].card;
+          if (card.type === 'document' || card.type === 'connection') {
+            return { type: 'discard', params: { source: 'layout', targetPlayerIdx: p.id, slotIdx: i } };
+          }
+        }
+      }
+    }
+
+    return { type: 'discard', params: {} };
+  }
+
+  /**
+   * Resolve a pending choice using AI strategy.
+   */
+  function resolveChoice() {
+    if (!engine.pendingChoice) return;
+    const choice = engine.pendingChoice;
+    const opts = choice.options;
+
+    // Strategy-based resolution
+    const id = choice.id || '';
+
+    // Keep Calm: don't use it (save for bad cards)
+    if (id === 'keep-calm-check') {
+      engine.resolveChoice('skip');
+      return;
+    }
+
+    // Persuasion: skip offering it
+    if (id === 'persuasion-offer') {
+      engine.resolveChoice('skip');
+      return;
+    }
+
+    // May Keep: keep if it has a useful ongoing effect
+    if (id === 'may-keep-choice') {
+      engine.resolveChoice('keep');
+      return;
+    }
+
+    // FOMO: skip trading destinations
+    if (id === 'fomo') {
+      engine.resolveChoice('skip');
+      return;
+    }
+
+    // Mental Fog: don't discard life cards
+    if (id === 'mental-fog') {
+      engine.resolveChoice('skip');
+      return;
+    }
+
+    // For money vs. card choices: take money
+    if (opts.some(o => o.value === 'money')) {
+      engine.resolveChoice('money');
+      return;
+    }
+
+    // Trousers: lose money rather than documents
+    if (id === 'trousers') {
+      engine.resolveChoice('money');
+      return;
+    }
+
+    // Suspect: lose connection if available
+    if (id === 'suspect-penalty') {
+      engine.resolveChoice(opts.some(o => o.value === 'conn') ? 'conn' : 'doc');
+      return;
+    }
+
+    // Default: pick first option
+    if (opts.length > 0) {
+      engine.resolveChoice(opts[0].value);
+    }
+  }
+
+  /**
+   * Choose a security lane for border crossing.
+   * Prefer lanes with more tokens (more options for later players).
+   * Actually, prefer lanes with lowest token values for best chance.
+   */
+  function chooseLane() {
+    let bestLane = 0;
+    let bestScore = -Infinity;
+
+    for (let i = 0; i < engine.securityLanes.length; i++) {
+      const lane = engine.securityLanes[i];
+      if (lane.tokens.length === 0) continue;
+
+      // Score: negative of min token value (prefer lowest = easiest to beat)
+      const minToken = Math.min(...lane.tokens);
+      const score = -minToken;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestLane = i;
+      }
+    }
+
+    return bestLane;
+  }
+
+  /**
+   * Play one complete turn (optional + required actions).
+   * Returns true if a turn was played, false if game is over or stuck.
+   */
+  function playTurn() {
+    if (engine.phase === 'game_over') return false;
+
+    if (engine.phase === 'crossing') {
+      const laneIdx = chooseLane();
+      engine.selectLane(laneIdx);
+      return true;
+    }
+
+    // Resolve any pending choice first
+    let safetyCounter = 0;
+    while (engine.pendingChoice && safetyCounter < 20) {
+      resolveChoice();
+      safetyCounter++;
+    }
+
+    if (engine.phase !== 'preparation') return engine.phase !== 'game_over';
+
+    const player = engine.players[engine.currentPlayerIdx];
+
+    // Optional: try to graduate if in college
+    if (player.inCollege) {
+      engine.executeOptionalAction('graduate');
+    }
+
+    // Required action
+    const action = chooseAction();
+    if (!action) return false;
+
+    engine.executeRequiredAction(action.type, action.params);
+
+    // Resolve any resulting choices
+    safetyCounter = 0;
+    while (engine.pendingChoice && safetyCounter < 20) {
+      resolveChoice();
+      safetyCounter++;
+    }
+
+    return engine.phase !== 'game_over';
+  }
+
+  /**
+   * Play the entire game from current state to completion.
+   * @param {number} [speed=0] - Milliseconds between actions. 0 = instant.
+   * @param {((turn: number) => void)|null} [onTurnComplete] - Callback after each turn
+   * @returns {Promise<Object>} Game result
+   */
+  async function playFullGame(speed = 0, onTurnComplete = null) {
+    let turnCount = 0;
+    const maxTurns = 5000;
+
+    while (engine.phase !== 'game_over' && turnCount < maxTurns) {
+      const played = playTurn();
+      turnCount++;
+
+      if (onTurnComplete) onTurnComplete(turnCount);
+
+      if (!played && engine.phase !== 'game_over') {
+        // Stuck — force phase 2
+        engine.triggerPhase2();
+        // Resolve crossing
+        while (engine.phase === 'crossing') {
+          const laneIdx = chooseLane();
+          engine.selectLane(laneIdx);
+        }
+        break;
+      }
+
+      if (speed > 0) {
+        await new Promise(resolve => setTimeout(resolve, speed));
+      }
+    }
+
+    if (engine.phase !== 'game_over' && turnCount >= maxTurns) {
+      engine.log('AI safety: max turns reached, forcing end.', 'error');
+      engine.triggerPhase2();
+      while (engine.phase === 'crossing') {
+        engine.selectLane(chooseLane());
+      }
+    }
+
+    return engine.gameResult;
+  }
+
+  return {
+    chooseAction,
+    resolveChoice,
+    chooseLane,
+    playTurn,
+    playFullGame,
+  };
+}

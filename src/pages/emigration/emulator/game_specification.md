@@ -1,0 +1,305 @@
+# Emigration — Complete Game Specification & Reference Manual
+
+This document serves as the absolute, standalone source of truth for the board game **Emigration**. It is structured for easy ingestion by both human designers and AI agents to facilitate game development, rules validation, and emulation.
+
+---
+
+## 1. Game Overview & Core Objective
+
+**Emigration** is a game about preparing to move abroad. Players must acquire funds, secure vital documents, build local connections, and purchase tickets and passports. All of this culminates at the border control checkpoints, where players select security lanes to cross into their new homes.
+
+- **Competitive Mode**: Players compete to emigrate successfully. The winner is the player who crosses the border and has the most remaining **Assurance** (tie broken by Money, then by the order in which they crossed). If no one crosses, the player with the most Money wins.
+- **Cooperative Mode**: Players win or lose as a team. Every single player must successfully cross the border. If even one player fails to cross, the entire team loses.
+
+---
+
+## 2. Components & Setup Specifications
+
+### 2.1 Player Count & Card Pool Scaling
+
+The quantities of cards mixed into the active layout deck scale dynamically with the player count:
+
+| Players | Documents / Connections (Each) | Life Card Packs (Sets of 4) | Paydays | Total Deck Size |
+| :-----: | :----------------------------: | :-------------------------: | :-----: | :-------------: |
+|  **2**  |             7 each             |      2 packs (8 cards)      |    8    |    30 cards     |
+|  **3**  |            10 each             |     3 packs (12 cards)      |   12    |    44 cards     |
+|  **4**  |            13 each             |     4 packs (16 cards)      |   16    |    58 cards     |
+|  **5**  |            16 each             |     5 packs (20 cards)      |   20    |    72 cards     |
+|  **6**  |            19 each             |     6 packs (24 cards)      |   24    |    86 cards     |
+
+### 2.2 Standard Setup Procedure
+
+1. **Security Lanes**: Arrange the 5 Security Lane cards side-by-side. Place their matching face-down Assurance tokens underneath them.
+2. **Public Services**: Place a pool of Tickets and Passports in the center of the table. The quantity of each card is equal to the number of players.
+3. **Player Setup**: Each player randomly receives:
+   - 1 **Nationality Card** (starts with the number of Money tokens indicated by the Starting Fund).
+   - 1 **Career Card** (starts at 1 Money salary).
+   - 1 **Destination Card** (if matching the player's Nationality card, redraw).
+   - 1 **Access Fee Card** (starts at 1 Money, hiding the higher fees, with a maximum Access Fee of 5 Money).
+4. **Layout Setup**:
+   - Combine the scaled quantities of Documents, Connections, Paydays, and Life Cards into a single deck and shuffle.
+   - Draw 2 random cards from the deck and remove them from the game face-down (without looking).
+   - Deal 14 cards to each player. Players arrange these in their personal **Layout** (see Section 2.3).
+
+### 2.3 Layout Structure
+
+Each player's personal play area has two zones: the **Layout** (dealt cards in a grid) and the **Stash** (acquired cards).
+
+#### Layout Grid
+
+The 14 dealt cards are arranged in 4 rows, alternating between 4-card and 3-card rows:
+
+```
+Row 1:   [DOWN]  [DOWN]  [DOWN]  [DOWN]      ← 4 cards, face-down
+Row 2:     [ UP ]  [ UP ]  [ UP ]             ← 3 cards, face-up, staggered
+Row 3:   [DOWN]  [DOWN]  [DOWN]  [DOWN]      ← 4 cards, face-down
+Row 4:     [ UP ]  [ UP ]  [ UP ]             ← 3 cards, face-up, staggered
+```
+
+Row 1 is furthest from the player; Row 4 is closest. The 3-card rows are offset horizontally so each card sits between two cards of the adjacent 4-card row, like a pyramid. Each card in a 3-card row **partially covers 2 cards** in the 4-card row directly behind it. Row 3 also slightly overlaps Row 2 from below, covering it.
+
+#### Availability & Uncovering
+
+A card is **available** only if it is **face-up and not covered** by any other card.
+
+At setup, only the **3 Row 4 cards** are available. All other cards are either face-down, covered, or both.
+
+When a card is removed from the layout, the cards it was covering may become uncovered. A card is uncovered only when **all** cards overlapping it have been removed. If a newly uncovered card is face-down, flip it face-up — it is now available.
+
+#### Stash
+
+Adjacent to each player's layout grid, there is a **Stash** area — open space where the player places cards they have acquired (purchased Documents, Connections, Tickets, Passports, and keepable Life Cards). The Stash is organized so that card types are visible to all players. Tickets and Passports in a player's Stash can be targeted by the **Reclaim** action (see Section 4.2).
+
+#### Access Fee Card & Nationality Card
+
+Below/beside the layout, each player also has:
+- Their **Nationality Card** (visible to all players, showing nationality and starting/college fund values).
+- Their **Access Fee Card**, which is a sliding card that reveals increasing fee values (1 through 5 Money). The card is positioned so that only the current fee is visible. When a player's Access Fee increases, they slide the card to reveal the next higher number.
+
+#### Career Card & Pay Raise Slots
+
+Each Career Card has **2 Pay Raise Slots**:
+
+| Slot | Raise Amount | Resulting Salary |
+| :--: | :----------: | :--------------: |
+|  1   |   +1 Money   |     2 Money      |
+|  2   |   +3 Money   |     5 Money      |
+
+- All players start with a base salary of **1 Money**.
+- Graduating from college fills the next open slot, permanently increasing salary.
+- Once both slots are filled, the player's career is **maxed** and they may not apply for college again.
+- Total maximum salary is **5 Money** (1 base + 1 first raise + 3 second raise).
+
+---
+
+## 3. Data Tables
+
+### 3.1 Nationalities
+
+Nationality cards dictate the Starting Fund and College Fund.
+
+| Nationality | Starting Fund (and College Fund) |
+| :---------- | :------------------------------: |
+| Bosnian     |             2 Money              |
+| Chinese     |             6 Money              |
+| Congolese   |             2 Money              |
+| French      |             5 Money              |
+| Russian     |             5 Money              |
+| Senegalese  |             3 Money              |
+| Swiss       |             4 Money              |
+| English     |             5 Money              |
+| American    |             6 Money              |
+
+### 3.2 Destinations
+
+Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border).
+
+- **Format**: `Requirement` \(\rightarrow\) `Assurance Modification`
+
+| Destination                      | Money                                                 | Documents                                            | Connections              |
+| :------------------------------- | :---------------------------------------------------- | :--------------------------------------------------- | :----------------------- |
+| **Bosnia and Herzegovina**       | \(\ge 6 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +6\) |
+| **China**                        | \(\ge 10 \rightarrow +3\) <br> \(< 4 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 4 \rightarrow +5\) |
+| **Democratic Republic of Congo** | \(\ge 6 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +6\) |
+| **France**                       | \(\ge 8 \rightarrow +2\) <br> \(< 3 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
+| **Russia**                       | \(\ge 7 \rightarrow +2\) <br> \(< 2 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
+| **Senegal**                      | \(\ge 7 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +5\) |
+| **Switzerland**                  | \(\ge 7 \rightarrow +2\) <br> \(< 2 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
+| **England**                      | \(\ge 10 \rightarrow +3\) <br> \(< 4 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
+| **United States of America**     | \(\ge 10 \rightarrow +3\) <br> \(< 5 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 4 \rightarrow +5\) |
+
+### 3.3 Security Lanes
+
+Security Lanes have 3 tokens stacked face-down. The tokens in each lane's pool are shuffled during setup, so players do not know their order. When a player selects a lane, the top token is revealed:
+
+|    Lane    | Tokens Pool (Shuffled & Stacked Face-down) |
+| :--------: | :----------------------------------------- |
+| **Lane 1** | [6, 7, 7]                                  |
+| **Lane 2** | [6, 7, 8]                                  |
+| **Lane 3** | [5, 8, 8]                                  |
+| **Lane 4** | [4, 8, 9]                                  |
+| **Lane 5** | [3, 9, 11]                                 |
+
+### 3.4 Documents & Connections Catalogue
+
+All standard Documents and Connections cost either 2, 3, or 4 Money:
+
+| Documents (Cost)                           | Connections (Cost)                                |
+| :----------------------------------------- | :------------------------------------------------ |
+| Write Last Will and Testament (2 Money)    | Coffee with Airport Employee (2 Money)            |
+| Certificate of Excellence (2 Money)        | Cookies for Neighbor from Destination (2 Money)   |
+| Checklist (2 Money)                        | Video Chat with Person from Destination (2 Money) |
+| Copy of Birth Certificate (2 Money)        | Support Group Motivates You (2 Money)             |
+| Notebook (2 Money)                         | Learn Song from Your Destination (2 Money)        |
+| Subscribe to Travel Updates (2 Money)      | Listen to the News (2 Money)                      |
+| Travel Brochure (2 Money)                  | Friend moves to your Destination (2 Money)        |
+| Physical Exam (3 Money)                    | Language Classes (3 Money)                        |
+| Vaccination Record (3 Money)               | Network Fair (3 Money)                            |
+| Personality Test (3 Money)                 | Dinner with a Diplomat (3 Money)                  |
+| Travel Wallet (3 Money)                    | Become World Famous (3 Money)                     |
+| Attend Security Training (3 Money)         | Learn from an Elder (3 Money)                     |
+| Residence Address in Destination (3 Money) | Excellent Teamwork (3 Money)                      |
+| Letter of Recommendation (3 Money)         | Endorsement from Royalty (3 Money)                |
+| Letter of Invitation (4 Money)             | Enter Luxury Travel Club (4 Money)                |
+| Background Check (4 Money)                 | Internship in Your Destination (4 Money)          |
+| Employment Contract (4 Money)              | Get Engaged to a Native (4 Money)                 |
+| International Driving Permit (4 Money)     | Politician Approves You (4 Money)                 |
+| Vehicle Registration Papers (4 Money)      | Attend History Class (4 Money)                    |
+| Pet Passport (4 Money)                     | Travel Concierge (4 Money)                        |
+| Language Phrasebook (4 Money)              | Favorable Cultural Opinion (4 Money)              |
+
+---
+
+## 4. Phase 1: Preparation Mechanics & Actions
+
+### 4.1 Card Availability, Revealing Cards & Access Fees
+
+#### Available Cards
+
+On your turn, you may only take an **available** card. A card is considered available if it meets one of the following criteria:
+
+1. It is a **completely uncovered, face-up card** in any player's Layout (your own or an opponent's).
+2. It is a card in the **Public Services pool** (Tickets and Passports in the center of the table).
+3. It is an **extra Ticket or Passport** in another player's Stash — but only if that player has more than one of that card type (i.e., it must not be the player's only Ticket or only Passport in the Stash).
+
+All other cards (face-down cards, cards covered by other cards, a player's sole Ticket/Passport in Stash) are **not available**.
+
+#### Revealing Cards
+
+After any action that removes a card from a Layout (buying, activating, discarding, etc.), one or more previously covered cards may become uncovered (see the overlap model in Section 2.3). When this happens:
+
+1. **Finish resolving the current action completely** before revealing any cards.
+2. Flip each newly uncovered face-down card **face-up**.
+3. It immediately becomes an **available card**.
+
+#### Access Fees
+
+- Taking a card from **your own** Layout costs **no Access Fee**.
+- Taking an available card from **another player's** Layout requires paying **that player** your current Access Fee (starts at 1 Money).
+- After paying an Access Fee to an opponent, **slide your own Access Fee card to the left**, revealing your new increased Access Fee. The Access Fee increments by 1 Money each time, up to a **maximum of 5 Money**.
+- You **must be able to afford** the Access Fee before taking the card. The total cost is the card's purchase price (paid to the bank) **plus** the Access Fee (paid to the opponent).
+- You do **not** pay an Access Fee for taking a card from the Public Services pool or for taking a card from your own Layout.
+
+### 4.2 Turn Structure
+
+On their turn, a player may perform **any number of Optional Actions BEFORE** resolving exactly **one Required Action**.
+
+#### Exceptions / Forfeit Rule
+
+- If a player **cannot perform any** of the Required Actions, they **forfeit** their turn entirely.
+- A player might be able to do an Optional Action and still not be able to do a Required Action — the turn is still forfeited.
+- If a player **can** do a Required Action, they **must** do one.
+- If **no player** can do a Required Action, every player takes **1 Money from the bank** and the next player takes their turn.
+
+#### Optional Actions (Zero or More, BEFORE the Required Action):
+
+1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance, and fill an open Pay Raise slot with 1 Money (permanently increasing salary). Fail results: player remains in college.
+2. **Sell**: Discard a Document or Connection from your Stash into the discard pile to collect 2 Money from the bank.
+
+#### Required Actions (Must Choose Exactly One):
+
+1. **Activate**: Remove a Payday or Life Card from any player's Layout (must be an available card).
+   - **Payday**: All players collect their current salary from the bank (salary starts at 1 Money, increased by pay raise slots, paused if in college). Put the Payday card in the discard pile.
+   - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
+2. **Buy card**:
+   - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.
+   - **Ticket**: Costs 2 Money. Must have at least 1 Connection in your stash.
+   - **Passport**: Costs 2 Money. Must have at least 1 Document in your stash.
+   - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 1 Assurance.
+3. **Steal** (marked with a skip-turn icon): Take a Ticket (requires at least 1 Connection in your Stash) or Passport (requires at least 1 Document in your Stash) from the Public Services pool **for free**. You **skip your next turn** as a penalty.
+4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** 2 Money plus your Access Fee.
+5. **Discard**: Remove a Document or Connection and collect 2 Money from the bank. This can target a card from your own Stash, your own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent).
+6. **Apply for College**: If you have an open pay raise slot, roll a D6.
+   - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). (College Funds is the same as the Starting Fund of a player's Nationality card). A player must be able to afford minimum tuition in order to take the Apply for College action.
+   - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay 1 Money to the bank and take a different required action.
+
+---
+
+## 5. Life Card Reference Catalogue
+
+Life Cards have three keep types:
+- **Instant**: Resolve the effect immediately, then discard the card.
+- **May Keep**: The player chooses between an immediate effect OR keeping the card for an ongoing effect.
+- **Must Keep**: The card is always kept in the player's Stash. Its immediate effect (if any) resolves, and its ongoing effect persists.
+
+| Pack             | Card Title                   |   Type    | Gameplay Effect                                                                                                                                           |
+| :--------------- | :--------------------------- | :-------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Friendship**   | Stellar Reputation           | May Keep  | Gain 3 Money, OR keep this card and all Connections cost 1 Money less.                                                                                    |
+| **Friendship**   | Rummage Sale                 |  Instant  | Gain 3 Money, OR take 1 discarded Document.                                                                                                               |
+| **Friendship**   | Island Paradise              |  Instant  | Gain 1 Money. Player(s) with the fewest Documents also gain 1 Money.                                                                                      |
+| **Friendship**   | Swap Wallets                 |  Instant  | You may trade all your Money for another player's Money.                                                                                                   |
+| **High Society** | VIP                          |  Instant  | Gain 1 Money for every 2 Money held by the player with the most Money.                                                                                    |
+| **High Society** | Fancy Clothes                | May Keep  | Gain 3 Money, OR keep this card and all Documents cost 1 Money less.                                                                                      |
+| **High Society** | Social Butterfly             |  Instant  | Take 1 Connection OR 3 Money from another player.                                                                                                         |
+| **High Society** | Identical Twin               |  Instant  | Gain 1 Money and take another turn.                                                                                                                       |
+| **Downtown**     | Reward                       |  Instant  | Gain 1 Money and take 1 Money from every other player.                                                                                                    |
+| **Downtown**     | Suspect                      |  Instant  | Lose 1 Money and lose 1 Connection or 1 Document.                                                                                                         |
+| **Downtown**     | Salvage                      | Must Keep | Gain 1 Money, keep this card. Whenever another player discards a card, gain 1 Money.                                                                      |
+| **Downtown**     | Blacklisted                  | Must Keep | Lose 1 Money, keep this card. Whenever you discard a card, lose 1 Money.                                                                                  |
+| **Emergency**    | Trousers Fall Down           |  Instant  | Lose 3 Money, OR lose 1 Document.                                                                                                                         |
+| **Emergency**    | Keep Calm                    | Must Keep | Gain 1 Money and keep this card. You may discard a Life Card instead of taking it, then discard this card.                                                |
+| **Emergency**    | Life Coach                   |  Instant  | Take 1 Assurance token.                                                                                                                                   |
+| **Emergency**    | Shredder Accident            |  Instant  | Lose 1 Document. If you have none, lose 1 Money.                                                                                                          |
+| **Vacation**     | Camping                      |  Instant  | Gain 1 Money. Player(s) with the fewest Connections also gain 1 Money.                                                                                    |
+| **Vacation**     | FOMO                         |  Instant  | Lose 1 Money. You may trade Destinations with another player.                                                                                             |
+| **Vacation**     | Nostalgia                    |  Instant  | Replay any discarded Life Card, OR gain 2 Money.                                                                                                          |
+| **Vacation**     | Lost & Found                 |  Instant  | Take 1 Document or 2 Money from another player.                                                                                                           |
+| **News**         | Pandemic / Economic Stimulus |  Instant  | _First copy activated_: Roll D6; everyone loses Money equal to the roll. <br> _Second copy activated_: Roll D6; everyone gains Money equal to the roll.   |
+| **News**         | Mental Fog                   |  Instant  | Lose 1 Money. You may discard any Life Card.                                                                                                              |
+| **News**         | Insider                      | May Keep  | Gain 3 Money, OR keep this card and on Paydays gain 1 Money.                                                                                              |
+| **Charity**      | Philanthropy                 |  Instant  | Lose 1 Money. Starting with the player to your left, give 1 Money to every other player.                                                                  |
+| **Charity**      | Bailout                      |  Instant  | Gain 1 Money. Player(s) with the least Money also gain 1 Money.                                                                                           |
+| **Charity**      | Share                        |  Instant  | Distribute half your Money (rounded down) to other players.                                                                                               |
+| **Charity**      | Pay Cut                      | Must Keep | Lose 1 Money, keep this card. On Paydays, lose 1 Money.                                                                                                   |
+| **Trade**        | Productivity                 |  Instant  | Gain 1 Money. Decrease your Access Fee by 1 (minimum 0).                                                                                                  |
+| **Trade**        | Tariffs                      |  Instant  | Lose 1 Money. Increase your Access Fee by 1 (maximum 5).                                                                                                  |
+| **Trade**        | Boost                        |  Instant  | Gain half the Money tokens on any player's Nationality card (rounded down).                                                                               |
+| **Trade**        | Persuasion                   | Must Keep | Gain 1 Money and keep this card. When your Layout is targeted, you may offer this card instead. If declined, buyer pays double Access Fee.                |
+| **Sports**       | Underdog                     | Must Keep | Lose 1 Money and keep this card. After you gain a Life Card, lose 1 Money, then pass this card to the player on your left.                                |
+| **Sports**       | Frontrunner                  | Must Keep | Place 1 Money from the bank on this card (max 5). On Paydays, pass this card left. Money stays on this card and is only used for crossing the border.     |
+| **Sports**       | Penalty                      | Must Keep | Lose 1 Money and keep this card. After you gain a Document, pass this card to the player on your left.                                                    |
+| **Sports**       | Star Power                   | Must Keep | Gain 1 Money and keep this card. After any other player gains a Connection, you gain 1 Money, then give them this card.                                   |
+
+---
+
+## 6. Phase 2: Border Crossing Mechanics
+
+### 6.1 Triggering Phase 2
+
+Phase 2 triggers immediately when:
+
+- There are no more face-up cards left in any player's layout, **AND**
+- No Tickets or Passports remain in the center pool.
+
+### 6.2 Crossing Resolution
+
+Each player gets exactly one turn to attempt crossing the border:
+
+1. **Assurance Withdrawal**: The player evaluates their Destination criteria against their ending Money, Documents, and Connections (from Section 3.2). Adjust their Assurance total accordingly.
+2. **Lane Selection**: Choose a Security Lane (1–5) containing tokens. Flip the top token.
+3. **Immigration Check**:
+   - If the player does not have a Ticket and a Passport, they fail automatically.
+   - If the player's Assurance \(\ge\) the token value: The player pays Assurance equal to the token value. They cross successfully.
+   - If Assurance \(<\) token value: They are turned back and fail to emigrate.
+
+---
