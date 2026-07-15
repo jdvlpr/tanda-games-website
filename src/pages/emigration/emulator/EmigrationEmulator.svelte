@@ -223,8 +223,15 @@
         </div>
 
         <div class="mb-6">
-          <label class="block mb-2 text-slate-400">Player Count: {playerCount}</label>
-          <input class="w-full accent-emi-accent" type="range" min="2" max="6" bind:value={playerCount} />
+          <label class="block mb-2 text-slate-400">Player Count:
+            <select class="w-fit" bind:value={playerCount}>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </label>
         </div>
 
         <div class="flex flex-col gap-3 mb-8">
