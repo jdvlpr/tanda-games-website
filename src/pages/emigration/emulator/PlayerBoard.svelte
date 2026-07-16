@@ -268,7 +268,7 @@
 
     <!-- 5. Kept Life -->
     <div class="stash-column">
-      <div class="uppercase tracking-wide text-xs mb-1">Kept Life ({player.stash.lifeCards.length})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Life ({player.stash.lifeCards.length})</div>
       {#each player.stash.lifeCards as lc, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
