@@ -221,23 +221,21 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Friendship",
     keep: "May Keep",
     type: "life",
-    description:
-      "Gain 3 Money, OR keep this card and all Connections cost 1 Money less.",
+    description: "Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.",
   },
   {
     title: "Rummage Sale",
     pack: "Friendship",
     keep: "Instant",
     type: "life",
-    description: "Gain 3 Money, OR take 1 discarded Document.",
+    description: "Gain 3 Money, or take 1 discarded Document.",
   },
   {
     title: "Island Paradise",
     pack: "Friendship",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money. Player(s) with the fewest Documents also gain 1 Money.",
+    description: "Gain 1 Money and player(s) with the fewest Documents gain 1 Money.",
   },
   {
     title: "Swap Wallets",
@@ -251,23 +249,21 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "High Society",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money for every 2 Money held by the player with the most Money.",
+    description: "Gain 1 Money for every 2 Money held by the player with the most Money.",
   },
   {
     title: "Fancy Clothes",
     pack: "High Society",
     keep: "May Keep",
     type: "life",
-    description:
-      "Gain 3 Money, OR keep this card and all Documents cost 1 Money less.",
+    description: "Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.",
   },
   {
     title: "Social Butterfly",
     pack: "High Society",
     keep: "Instant",
     type: "life",
-    description: "Take 1 Connection OR 3 Money from another player.",
+    description: "Take 1 Connection or 3 Money from another player.",
   },
   {
     title: "Identical Twin",
@@ -295,31 +291,28 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Downtown",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Gain 1 Money, keep this card. Whenever another player discards a card, gain 1 Money.",
+    description: "Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.",
   },
   {
     title: "Blacklisted",
     pack: "Downtown",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Lose 1 Money, keep this card. Whenever you discard a card, lose 1 Money.",
+    description: "Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.",
   },
   {
     title: "Trousers Fall Down",
     pack: "Emergency",
     keep: "Instant",
     type: "life",
-    description: "Lose 3 Money, OR lose 1 Document.",
+    description: "Lose 3 Money or lose 1 Document.",
   },
   {
     title: "Keep Calm",
     pack: "Emergency",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Gain 1 Money and keep this card. You may discard a Life Card instead of taking it, then discard this card.",
+    description: "Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.",
   },
   {
     title: "Life Coach",
@@ -340,8 +333,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Vacation",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money. Player(s) with the fewest Connections also gain 1 Money.",
+    description: "Gain 1 Money and player(s) with the fewest Connections gain 1 Money.",
   },
   {
     title: "FOMO",
@@ -355,7 +347,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Vacation",
     keep: "Instant",
     type: "life",
-    description: "Replay any discarded Life Card OR gain 2 Money.",
+    description: "Replay any discarded Life Card or gain 2 Money.",
   },
   {
     title: "Lost & Found",
@@ -369,60 +361,56 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "News",
     keep: "Instant",
     type: "life",
-    description:
-      "First copy: everyone loses a random amount of Money. Second copy: everyone gains a random amount of Money.",
+    description: "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
   },
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
     keep: "Instant",
     type: "life",
-    description:
-      "First copy: everyone loses a random amount of Money. Second copy: everyone gains a random amount of Money.",
+    description: "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
   },
   {
     title: "Mental Fog",
     pack: "News",
     keep: "Instant",
     type: "life",
-    description:
-      "Lose 1 Money and you may discard a Life Card from any player's Layout or Stash.",
+    description: "Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.",
   },
   {
     title: "Insider",
     pack: "News",
     keep: "May Keep",
     type: "life",
-    description: "Gain 3 Money, OR keep this card and on Paydays gain 1 Money.",
+    description: "Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.",
   },
   {
     title: "Philanthropy",
     pack: "Charity",
     keep: "Instant",
     type: "life",
-    description:
-      "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
+    description: "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
   },
   {
     title: "Bailout",
     pack: "Charity",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and 1 Money for player(s) with the least Money.",
+    description: "Gain 1 Money and gain 1 Money for player(s) with the least Money.",
   },
   {
     title: "Share",
     pack: "Charity",
     keep: "Instant",
     type: "life",
-    description: "Distribute half your Money (rounded down) to other players.",
+    description: "Distribute half your Money (round down) to other players.",
   },
   {
     title: "Pay Cut",
     pack: "Charity",
     keep: "Must Keep",
     type: "life",
-    description: "Lose 1 Money, keep this card. On Paydays, lose 1 Money.",
+    description: "Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.",
   },
   {
     title: "Productivity",
@@ -443,50 +431,46 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Trade",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain half the Money tokens of any player's Starting Money (round down).",
+    description: "Gain half the Money tokens of any player’s Starting Money (round down).",
   },
   {
     title: "Persuasion",
     pack: "Trade",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Gain 1 Money and keep this card. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
+    description: "Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
   },
   {
     title: "Underdog",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Lose 1 Money and keep this card. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
+    description: "Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
   },
   {
     title: "Frontrunner",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Keep this card. Place 1 Money from the bank on this card (max 5). On Paydays, pass this left. Money stays on this card and can only be used after Phase 1.",
+    description: "Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
   },
   {
     title: "Penalty",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Lose 1 Money and keep this card. After a Document enters your Stash, pass this card to the player on your left.",
+    description: "Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.",
   },
   {
     title: "Star Power",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description:
-      "Gain 1 Money and keep this card. After a Connection enters any other player's Stash, give them this card.",
+    description: "Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.",
   },
 ]);
+
+
 
 export const LIFE_CARDS_CATALOG = LIFE_CARD_DEFINITIONS.map((card) => ({
   ...card,
