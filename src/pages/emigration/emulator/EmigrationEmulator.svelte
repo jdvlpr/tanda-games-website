@@ -44,7 +44,12 @@
   let snapshot = $state(null); // reactive copy of engine state
   let pendingChoice = $state(null);
   let autoplay = $state(null);
-  
+
+  // Solo vs AI State
+  let vsComputer = $state(false);
+  let aiPlayer = $state(null);
+  let aiThinking = $state(false);
+
   // Selection State
   let selectedSlot = $state(null);
   let selectedStash = $state(null);
@@ -55,6 +60,45 @@
 
   // Derived Values
   let currentPlayer = $derived(snapshot ? snapshot.players[snapshot.currentPlayerIdx] : null);
+
+  // In Solo vs AI mode: is it currently the human player's turn (index 0)?
+  let isHumanTurn = $derived(
+    !vsComputer ||
+    !snapshot ||
+    snapshot.phase === 'game_over' ||
+    (snapshot.phase === 'preparation' && snapshot.currentPlayerIdx === 0) ||
+    (snapshot.phase === 'crossing' && snapshot.activeCrossingIdx === 0)
+  );
+
+  // Drive AI turns whenever snapshot changes in Solo vs AI mode
+  $effect(() => {
+    if (!vsComputer || !snapshot || !aiPlayer || aiThinking) return;
+    if (snapshot.phase === 'game_over') return;
+    if (isHumanTurn) return;
+
+    aiThinking = true;
+    setTimeout(() => {
+      if (!engine || engine.phase === 'game_over') {
+        aiThinking = false;
+        return;
+      }
+      // Resolve any pending choice first (AI turn)
+      let safety = 0;
+      while (engine.pendingChoice && safety < 20) {
+        aiPlayer.resolveChoice();
+        safety++;
+      }
+      // Play one AI turn (handles both preparation and crossing phases)
+      aiPlayer.playTurn();
+      // Resolve any choices that result from the action
+      safety = 0;
+      while (engine.pendingChoice && safety < 20) {
+        aiPlayer.resolveChoice();
+        safety++;
+      }
+      aiThinking = false;
+    }, 600);
+  });
   let selectionText = $derived.by(() => {
     if (!snapshot) return 'Select an available layout card or stash item, then choose your action.';
     if (selectedSlot) {
@@ -100,7 +144,7 @@
   // Tests
   let testResults = $state(null);
 
-  function startGame(isAuto = false) {
+  function startGame(gameType = 'passplay') {
     engine = new EmigrationEngine({
       mode,
       players: activeSetup,
@@ -124,11 +168,22 @@
     isSetup = false;
     testResults = null;
 
-    if (isAuto) {
+    // Reset VS computer state
+    vsComputer = false;
+    aiPlayer = null;
+    aiThinking = false;
+    autoplay = null;
+
+    if (gameType === 'auto') {
+      // AI Simulation: all players AI-controlled, plays at speed
       autoplay = createAutoPlayer(engine);
-      // Run auto test with 100ms delay per step so user can watch
       autoplay.playFullGame(100);
+    } else if (gameType === 'vscomputer') {
+      // Solo vs AI: Player 1 (index 0) is human, all others AI
+      vsComputer = true;
+      aiPlayer = createAutoPlayer(engine);
     }
+    // 'passplay': no AI, full manual play
   }
 
   function handleAction(actionType) {
@@ -247,9 +302,10 @@
           </div>
         </div>
 
-        <div class="flex gap-4 mt-8">
-          <button class="flex-1 btn" onclick={() => startGame(false)}>Start Manual Playtest</button>
-          <button class="flex-1 btn" onclick={() => startGame(true)}>Start Automated Playtest</button>
+        <div class="flex gap-4 mt-8 flex-wrap">
+          <button class="flex-1 btn" onclick={() => startGame('passplay')}>Pass &amp; Play</button>
+          <button class="flex-1 btn" onclick={() => startGame('vscomputer')}>Solo vs Computer</button>
+          <button class="flex-1 btn" onclick={() => startGame('auto')}>Computer vs Computer</button>
         </div>
       </div>
 
@@ -270,8 +326,11 @@
     <div>
       <div class="flex justify-between items-center mb-5">
         <h2 class="text-2xl tracking-wide">{snapshot.phase.toUpperCase()}</h2>
-        <div>
-          <button class="btn" onclick={() => isSetup = true}>Restart / Setup</button>
+        <div class="flex items-center gap-3">
+          {#if vsComputer && aiThinking}
+            <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
+          {/if}
+          <button class="btn" onclick={() => { isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
         </div>
       </div>
 
@@ -404,7 +463,8 @@
             onaction={handleAction}
             onselectlane={handleSelectLane}
             {selectionText}
-            {pendingChoice}
+            pendingChoice={pendingChoice || (vsComputer && !isHumanTurn)}
+            computerTurn={vsComputer && !isHumanTurn}
           />
         </div>
       </div>

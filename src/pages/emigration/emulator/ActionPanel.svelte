@@ -1,5 +1,5 @@
 <script>
-  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice } = $props();
+  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false } = $props();
 
   let logContainer = null;
 
@@ -27,7 +27,12 @@
       </div>
 
       <!-- Action States -->
-      {#if snapshot.phase === 'preparation'}
+      {#if computerTurn}
+        <div class="text-sm font-semibold text-center py-5 px-4 rounded-md text-neutral-500 dark:text-neutral-400">
+          <span class="text-2xl block mb-2">🤖</span>
+          Computer is taking its turn…
+        </div>
+      {:else if snapshot.phase === 'preparation'}
         <div class="grid grid-cols-2 gap-2">
           {#each actions as action}
             <button 
