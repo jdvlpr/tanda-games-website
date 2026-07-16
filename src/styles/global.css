@@ -10,6 +10,8 @@
   --color-emi-document: #e3a780;
   --color-emi-connection: #d990b4;
   --color-emi-payday: #deede2;
+  --color-emi-ticket: #92b0d8;
+  --color-emi-passport: #92b0d8;
   --color-emi-life: #fefefe;
 
   --font-emi-ui: var(--font-publicSans), sans-serif;

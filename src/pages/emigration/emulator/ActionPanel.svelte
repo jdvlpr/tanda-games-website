@@ -15,14 +15,14 @@
   });
 </script>
 
-<div class="bg-neutral-200 dark:bg-neutral-800 rounded-xl p-5 flex flex-col gap-5 h-full max-h-[calc(100vh-200px)] overflow-auto font-emi-ui text-slate-50 border border-white/10 backdrop-blur-md">
+<div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 flex flex-col gap-5 h-full max-h-[calc(100vh-200px)] overflow-auto backdrop-blur-md">
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
-      <h3 class="mt-0 mb-3 text-base font-emi-heading  border-b border-white/10 pb-2">Action Dashboard</h3>
+      <h3 class="text-sm uppercase tracking-wider pb-2">Action Dashboard</h3>
       
       <!-- Selection Hint -->
-      <div class="text-sm font-semibold text-[#c084fc] bg-[#c084fc]/5 border border-[#c084fc]/10 rounded-lg p-3 mb-4 min-h-[44px] flex items-center justify-center text-center">
+      <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-3 mb-4 min-h-[44px] flex items-center justify-center text-center">
         <span>{@html selectionText}</span>
       </div>
 
@@ -31,7 +31,7 @@
         <div class="grid grid-cols-2 gap-2">
           {#each actions as action}
             <button 
-              class={["bg-white/10 border border-white/10 text-white p-2.5 rounded-md cursor-pointer text-sm font-semibold transition-all duration-200 hover:not(:disabled):bg-white/20 hover:not(:disabled): disabled:opacity-40 disabled:cursor-not-allowed", action.optional && "bg-[rgba(249,197,82,0.1)] border-[rgba(249,197,82,0.3)] text-emi-payday hover:not(:disabled):border-emi-payday", !action.enabled && 'hidden' ]}
+              class={["btn text-sm w-full py-2 px-4", action.optional && "", !action.enabled && 'hidden' ]}
               disabled={!action.enabled || pendingChoice}
               onclick={() => onaction(action.type)}
             >
@@ -40,13 +40,13 @@
           {/each}
         </div>
       {:else if snapshot.phase === 'crossing'}
-        <div class="text-sm font-semibold text-center py-5 px-4 bg-sky-950/20 border border-sky-800/30 rounded-lg text-slate-300">
+        <div class="text-sm font-semibold text-center py-5 px-4  rounded-md">
           Border Crossing Phase is active.<br/>
           <span class="text-xs text-sky-400 font-normal mt-1 block">Please click "Select Lane" on one of the Security Lanes in the Public Center Pool.</span>
         </div>
       {:else if snapshot.phase === 'game_over'}
-        <div class="bg-[rgba(85,183,176,0.2)] border  p-4 rounded-lg text-center">
-          <h3 class="mt-0 mb-2 text-base font-emi-heading  border-b border-white/10 pb-2">Game Over</h3>
+        <div class="bg-red-100 dark:bg-red-900 p-4 rounded-md text-center">
+          <h3 class="mt-0 mb-2 pb-2">Game Over</h3>
           <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
         </div>
       {/if}
@@ -54,11 +54,11 @@
 
     <!-- Playtest Logs -->
     <div class="flex-grow flex flex-col min-h-[180px] overflow-hidden">
-      <h3 class="mt-0 mb-3 text-base font-emi-heading  border-b border-white/10 pb-2">Game Playtest Logs</h3>
-      <div class="flex-grow overflow-y-auto bg-black/30 rounded-lg p-3 font-emi-mono text-xs text-left flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-black/10 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-sm" bind:this={logContainer}>
+      <h3 class="text-sm uppercase tracking-wider pb-2">Game Playtest Logs</h3>
+      <div class="flex-grow overflow-y-auto bg-neutral-50 dark:bg-neutral-950 rounded-md p-3 font-emi-mono text-xs text-left flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-black/10 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-sm" bind:this={logContainer}>
         {#each snapshot.logs as log}
-          <div class="leading-snug pb-1 border-b border-white/5 last:border-none {log.type === 'system' ? '' : log.type === 'action' ? 'text-white' : log.type === 'error' ? 'text-emi-connection' : log.type === 'roll' ? 'text-emi-payday' : ''}">
-            <span class=" text-[0.7rem]">[{log.turn}]</span> {log.msg}
+          <div class="leading-snug pb-1 {log.type === 'system' ? '' : log.type === 'action' ? '' : log.type === 'error' ? 'text-red-800 dark:text-red-200' : log.type === 'roll' ? '' : ''}">
+            <span class=" text-xs">[{log.turn}]</span> {log.msg}
           </div>
         {/each}
       </div>

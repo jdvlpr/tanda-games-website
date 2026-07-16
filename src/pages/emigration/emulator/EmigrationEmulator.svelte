@@ -101,7 +101,7 @@
         if (slot.card.type === 'life') {
           const desc = LIFE_CARD_DESCRIPTIONS[cardName];
           if (desc) {
-            text += `<br/><span class=" font-normal text-xs mt-1.5 block">${desc}</span>`;
+            text += `<br/><span class=" font-normal text-sm mt-1.5 block">${desc}</span>`;
           }
         }
         return text;

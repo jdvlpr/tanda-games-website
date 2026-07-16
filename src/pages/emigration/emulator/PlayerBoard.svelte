@@ -59,7 +59,7 @@
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
     <div class="grid-card-slot">
-      <div class="grid-card bg-transparent border border-dashed border-white/10 opacity-30"></div>
+      <div class="grid-card rounded-md bg-transparent cursor-auto! border-none! shadow-none!"></div>
     </div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
@@ -71,20 +71,21 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="grid-card-slot" onclick={() => handleLayoutClick(slotIdx)}>
       <div 
-        class="grid-card {slot.faceUp ? 'front' : 'back'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
-        style={isSelected ? 'border-color: #55b7b0 !important; box-shadow: 0 0 12px rgba(85, 183, 176, 0.8) !important;' : ''}
+        class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-50 dark:bg-neutral-950' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
+        style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
       >
         {#if slot.faceUp}
-          <div class="card-type" style="color: {getCardColor(c.type)}">{c.type}</div>
-          <div class="card-title text-white">{c.name || c.title}</div>
-          <div class="card-cost">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
+          <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
+          <div class="card-type">{c.type}</div>
+          <div class="card-title">{c.name || c.title}</div>
+          <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
         {/if}
       </div>
     </div>
   {/if}
 {/snippet}
 
-<div class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "/80 shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}>
+<div class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}>
   <!-- Player Header Info -->
   <div class="flex justify-between items-center mb-3 pb-3 flex-wrap gap-3">
     <div class="flex flex-col">
@@ -144,7 +145,7 @@
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
   {#if engine && engine.phase === 'preparation'}
-    <div class="layout-grid-wrapper mb-4">
+    <div class="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-md mb-4 pb-18">
       <!-- Row 1 -->
       <div class="layout-row row-1">
         {@render cardSlot(0)}
@@ -179,17 +180,17 @@
   {/if}
 
   <!-- 5-Column Stash Display -->
-  <div class="stash-container">
+  <div class="stash-container p-4 rounded-md bg-neutral-100 dark:bg-neutral-900">
     <!-- 1. Documents -->
     <div class="stash-column">
-      <div class="stash-col-title">Docs ({player.stash.documents.length})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Docs ({player.stash.documents.length})</div>
       {#each player.stash.documents as doc, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'document' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid #38bdf8;" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          style="border-left: 2.5px solid var(--color-emi-document);" 
           onclick={() => handleStashClick('document', i)}
         >
           <span class="truncate pr-1">{doc.name}</span>
@@ -200,14 +201,14 @@
 
     <!-- 2. Connections -->
     <div class="stash-column">
-      <div class="stash-col-title">Conns ({player.stash.connections.length})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Conns ({player.stash.connections.length})</div>
       {#each player.stash.connections as conn, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'connection' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid #f43f5e;" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          style="border-left: 2.5px solid var(--color-emi-connection);" 
           onclick={() => handleStashClick('connection', i)}
         >
           <span class="truncate pr-1">{conn.name}</span>
@@ -218,14 +219,14 @@
 
     <!-- 3. Tickets -->
     <div class="stash-column">
-      <div class="stash-col-title">Tickets ({player.stash.tickets})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Tickets ({player.stash.tickets})</div>
       {#each Array(player.stash.tickets) as _, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'ticket' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid #55b7b0;" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          style="border-left: 2.5px solid var(--color-emi-ticket);" 
           onclick={() => handleStashClick('ticket', i)}
         >
           <span>🎟️ Ticket</span>
@@ -235,14 +236,14 @@
 
     <!-- 4. Passports -->
     <div class="stash-column">
-      <div class="stash-col-title">Passports ({player.stash.passports})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Passports ({player.stash.passports})</div>
       {#each Array(player.stash.passports) as _, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'passport' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid #55b7b0;" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          style="border-left: 2.5px solid var(--color-emi-passport);" 
           onclick={() => handleStashClick('passport', i)}
         >
           <span>🛂 Passport</span>
@@ -252,14 +253,14 @@
 
     <!-- 5. Kept Life -->
     <div class="stash-column">
-      <div class="stash-col-title">Kept Life ({player.stash.lifeCards.length})</div>
+      <div class="uppercase tracking-wide text-xs mb-1">Kept Life ({player.stash.lifeCards.length})</div>
       {#each player.stash.lifeCards as lc, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid #a855f7;" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          style="border-left: 2.5px solid var(--color-emi-life);" 
           onclick={() => handleStashClick('lifeCard', i)}
         >
           <span class="truncate pr-1">{lc.title}</span>
@@ -273,23 +274,13 @@
 </div>
 
 <style>
-  .layout-grid-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px 0;
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 12px;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
 
   .layout-row {
     display: flex;
     justify-content: center;
     position: relative;
     width: 100%;
-    height: 85px; /* Creates vertical overlap */
+    height: 50px; /* Creates vertical overlap */
   }
 
   .row-1 { z-index: 10; }
@@ -307,22 +298,18 @@
   .grid-card {
     width: 100%;
     height: 100%;
-    border-radius: 8px;
-    border: 1px solid #475569;
     display: flex;
     flex-direction: column;
-    padding: 6px;
+    padding: 4px;
     font-size: 11px;
     text-align: center;
     justify-content: space-between;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
     position: relative;
   }
 
   .grid-card.back {
-    background-color: #334155;
     background-image: repeating-linear-gradient(
       45deg,
       transparent,
@@ -335,34 +322,32 @@
     justify-content: center;
     color: #94a3b8;
     cursor: not-allowed;
-  }
-
-  .grid-card.front {
-    background-color: #1e293b;
+    opacity: 0.7;
   }
 
   .grid-card.document {
-    border-left: 3.5px solid #38bdf8;
+    border-color: var(--color-emi-document);
+    border-left: 3.5px solid var(--color-emi-document);
   }
   .grid-card.connection {
-    border-left: 3.5px solid #f43f5e;
+    border-color: var(--color-emi-connection);
+    border-left: 3.5px solid var(--color-emi-connection);
   }
   .grid-card.payday {
-    border-left: 3.5px solid #eab308;
+    border-color: var(--color-emi-payday);
+    border-left: 3.5px solid var(--color-emi-payday);
   }
   .grid-card.life {
-    border-left: 3.5px solid #a855f7;
+    border-color: var(--color-emi-life);
+    border-left: 3.5px solid var(--color-emi-life);
   }
 
   .grid-card.covered {
-    opacity: 0.45;
     cursor: not-allowed;
   }
 
   .grid-card.available {
-    opacity: 1;
-    border-color: #55b7b0;
-    box-shadow: 0 0 8px rgba(85, 183, 176, 0.3);
+    box-shadow: 0 0 5px rgba(85, 183, 176, 0.3);
   }
 
   .grid-card.available:hover {
@@ -386,22 +371,12 @@
     -webkit-box-orient: vertical;
   }
 
-  .grid-card .card-cost {
-    font-size: 9px;
-    color: #94a3b8;
-    font-weight: 600;
-  }
 
   /* Stash styles */
   .stash-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    margin-top: 12px;
-    background: rgba(15, 23, 42, 0.2);
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
     overflow:auto;
   }
 
@@ -414,40 +389,21 @@
     min-width: 100px;
   }
 
-  .stash-col-title {
-    font-size: 9px;
-    font-weight: 700;
-    color: #94a3b8;
-    margin-bottom: 6px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
   .stash-item {
     font-size: 10px;
-    background: #1e293b;
-    border: 1px solid #475569;
-    border-radius: 4px;
-    padding: 3px 5px;
     margin-bottom: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.15s, border-color 0.15s;
   }
 
   .stash-item:hover {
-    background-color: #334155;
     border-color: #55b7b0;
   }
 
   .stash-item.selected {
     outline: 1px solid #55b7b0;
-    background-color: rgba(85, 183, 176, 0.15);
     border-color: #55b7b0;
   }
 </style>
