@@ -219,10 +219,10 @@
   }
 </script>
 
-<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-6 box-border *:box-border">
+<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border">
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
-      <h1 class="font-emi-heading  text-center  mb-4 text-4xl">Emigration Emulator</h1>
+      <h1 class="font-emi-heading  text-center mb-4 text-4xl">Emigration Emulator</h1>
 
       <div class="bg-neutral-200 dark:bg-neutral-800 p-8 rounded-md flex flex-col gap-5">
         <div class="flex flex-col gap-2">
