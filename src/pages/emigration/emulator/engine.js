@@ -215,98 +215,282 @@ export const CONNECTIONS_CATALOG = [
   { name: "Favorable Cultural Opinion", cost: 4, type: "connection" },
 ];
 
-export const LIFE_CARDS_CATALOG = [
-  // Friendship pack
+export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Stellar Reputation",
     pack: "Friendship",
     keep: "May Keep",
     type: "life",
+    description:
+      "Gain 3 Money, OR keep this card and all Connections cost 1 Money less.",
   },
-  { title: "Rummage Sale", pack: "Friendship", keep: "Instant", type: "life" },
+  {
+    title: "Rummage Sale",
+    pack: "Friendship",
+    keep: "Instant",
+    type: "life",
+    description: "Gain 3 Money, OR take 1 discarded Document.",
+  },
   {
     title: "Island Paradise",
     pack: "Friendship",
     keep: "Instant",
     type: "life",
+    description:
+      "Gain 1 Money. Player(s) with the fewest Documents also gain 1 Money.",
   },
-  { title: "Swap Wallets", pack: "Friendship", keep: "Instant", type: "life" },
-  // High Society pack
-  { title: "VIP", pack: "High Society", keep: "Instant", type: "life" },
+  {
+    title: "Swap Wallets",
+    pack: "Friendship",
+    keep: "Instant",
+    type: "life",
+    description: "You may trade all your Money for another player's Money.",
+  },
+  {
+    title: "VIP",
+    pack: "High Society",
+    keep: "Instant",
+    type: "life",
+    description:
+      "Gain 1 Money for every 2 Money held by the player with the most Money.",
+  },
   {
     title: "Fancy Clothes",
     pack: "High Society",
     keep: "May Keep",
     type: "life",
+    description:
+      "Gain 3 Money, OR keep this card and all Documents cost 1 Money less.",
   },
   {
     title: "Social Butterfly",
     pack: "High Society",
     keep: "Instant",
     type: "life",
+    description: "Take 1 Connection OR 3 Money from another player.",
   },
   {
     title: "Identical Twin",
     pack: "High Society",
     keep: "Instant",
     type: "life",
+    description: "Gain 1 Money and take another turn.",
   },
-  // Downtown pack
-  { title: "Reward", pack: "Downtown", keep: "Instant", type: "life" },
-  { title: "Suspect", pack: "Downtown", keep: "Instant", type: "life" },
-  { title: "Salvage", pack: "Downtown", keep: "Must Keep", type: "life" },
-  { title: "Blacklisted", pack: "Downtown", keep: "Must Keep", type: "life" },
-  // Emergency pack
+  {
+    title: "Reward",
+    pack: "Downtown",
+    keep: "Instant",
+    type: "life",
+    description: "Gain 1 Money and take 1 Money from every other player.",
+  },
+  {
+    title: "Suspect",
+    pack: "Downtown",
+    keep: "Instant",
+    type: "life",
+    description: "Lose 1 Money and lose 1 Connection or 1 Document.",
+  },
+  {
+    title: "Salvage",
+    pack: "Downtown",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Gain 1 Money, keep this card. Whenever another player discards a card, gain 1 Money.",
+  },
+  {
+    title: "Blacklisted",
+    pack: "Downtown",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Lose 1 Money, keep this card. Whenever you discard a card, lose 1 Money.",
+  },
   {
     title: "Trousers Fall Down",
     pack: "Emergency",
     keep: "Instant",
     type: "life",
+    description: "Lose 3 Money, OR lose 1 Document.",
   },
-  { title: "Keep Calm", pack: "Emergency", keep: "Must Keep", type: "life" },
-  { title: "Life Coach", pack: "Emergency", keep: "Instant", type: "life" },
+  {
+    title: "Keep Calm",
+    pack: "Emergency",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Gain 1 Money and keep this card. You may discard a Life Card instead of taking it, then discard this card.",
+  },
+  {
+    title: "Life Coach",
+    pack: "Emergency",
+    keep: "Instant",
+    type: "life",
+    description: "Take 1 Assurance.",
+  },
   {
     title: "Shredder Accident",
     pack: "Emergency",
     keep: "Instant",
     type: "life",
+    description: "Lose 1 Document. If you have none, lose 1 Money.",
   },
-  // Vacation pack
-  { title: "Camping", pack: "Vacation", keep: "Instant", type: "life" },
-  { title: "FOMO", pack: "Vacation", keep: "Instant", type: "life" },
-  { title: "Nostalgia", pack: "Vacation", keep: "Instant", type: "life" },
-  { title: "Lost & Found", pack: "Vacation", keep: "Instant", type: "life" },
-  // News pack (two Pandemic cards)
+  {
+    title: "Camping",
+    pack: "Vacation",
+    keep: "Instant",
+    type: "life",
+    description:
+      "Gain 1 Money. Player(s) with the fewest Connections also gain 1 Money.",
+  },
+  {
+    title: "FOMO",
+    pack: "Vacation",
+    keep: "Instant",
+    type: "life",
+    description: "Lose 1 Money and you may trade Destinations with someone.",
+  },
+  {
+    title: "Nostalgia",
+    pack: "Vacation",
+    keep: "Instant",
+    type: "life",
+    description: "Replay any discarded Life Card OR gain 2 Money.",
+  },
+  {
+    title: "Lost & Found",
+    pack: "Vacation",
+    keep: "Instant",
+    type: "life",
+    description: "Take 1 Document or 2 Money from another player.",
+  },
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
     keep: "Instant",
     type: "life",
+    description:
+      "First copy: everyone loses a random amount of Money. Second copy: everyone gains a random amount of Money.",
   },
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
     keep: "Instant",
     type: "life",
+    description:
+      "First copy: everyone loses a random amount of Money. Second copy: everyone gains a random amount of Money.",
   },
-  { title: "Mental Fog", pack: "News", keep: "Instant", type: "life" },
-  { title: "Insider", pack: "News", keep: "May Keep", type: "life" },
-  // Charity pack
-  { title: "Philanthropy", pack: "Charity", keep: "Instant", type: "life" },
-  { title: "Bailout", pack: "Charity", keep: "Instant", type: "life" },
-  { title: "Share", pack: "Charity", keep: "Instant", type: "life" },
-  { title: "Pay Cut", pack: "Charity", keep: "Must Keep", type: "life" },
-  // Trade pack
-  { title: "Productivity", pack: "Trade", keep: "Instant", type: "life" },
-  { title: "Tariffs", pack: "Trade", keep: "Instant", type: "life" },
-  { title: "Boost", pack: "Trade", keep: "Instant", type: "life" },
-  { title: "Persuasion", pack: "Trade", keep: "Must Keep", type: "life" },
-  // Sports pack
-  { title: "Underdog", pack: "Sports", keep: "Must Keep", type: "life" },
-  { title: "Frontrunner", pack: "Sports", keep: "Must Keep", type: "life" },
-  { title: "Penalty", pack: "Sports", keep: "Must Keep", type: "life" },
-  { title: "Star Power", pack: "Sports", keep: "Must Keep", type: "life" },
-];
+  {
+    title: "Mental Fog",
+    pack: "News",
+    keep: "Instant",
+    type: "life",
+    description:
+      "Lose 1 Money and you may discard a Life Card from any player's Layout or Stash.",
+  },
+  {
+    title: "Insider",
+    pack: "News",
+    keep: "May Keep",
+    type: "life",
+    description: "Gain 3 Money, OR keep this card and on Paydays gain 1 Money.",
+  },
+  {
+    title: "Philanthropy",
+    pack: "Charity",
+    keep: "Instant",
+    type: "life",
+    description:
+      "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
+  },
+  {
+    title: "Bailout",
+    pack: "Charity",
+    keep: "Instant",
+    type: "life",
+    description: "Gain 1 Money and 1 Money for player(s) with the least Money.",
+  },
+  {
+    title: "Share",
+    pack: "Charity",
+    keep: "Instant",
+    type: "life",
+    description: "Distribute half your Money (rounded down) to other players.",
+  },
+  {
+    title: "Pay Cut",
+    pack: "Charity",
+    keep: "Must Keep",
+    type: "life",
+    description: "Lose 1 Money, keep this card. On Paydays, lose 1 Money.",
+  },
+  {
+    title: "Productivity",
+    pack: "Trade",
+    keep: "Instant",
+    type: "life",
+    description: "Gain 1 Money and decrease your Access Fee by 1 (minimum 0).",
+  },
+  {
+    title: "Tariffs",
+    pack: "Trade",
+    keep: "Instant",
+    type: "life",
+    description: "Lose 1 Money and increase your Access Fee by 1 (maximum 5).",
+  },
+  {
+    title: "Boost",
+    pack: "Trade",
+    keep: "Instant",
+    type: "life",
+    description:
+      "Gain half the Money tokens of any player's Starting Money (round down).",
+  },
+  {
+    title: "Persuasion",
+    pack: "Trade",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Gain 1 Money and keep this card. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
+  },
+  {
+    title: "Underdog",
+    pack: "Sports",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Lose 1 Money and keep this card. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
+  },
+  {
+    title: "Frontrunner",
+    pack: "Sports",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Keep this card. Place 1 Money from the bank on this card (max 5). On Paydays, pass this left. Money stays on this card and can only be used after Phase 1.",
+  },
+  {
+    title: "Penalty",
+    pack: "Sports",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Lose 1 Money and keep this card. After a Document enters your Stash, pass this card to the player on your left.",
+  },
+  {
+    title: "Star Power",
+    pack: "Sports",
+    keep: "Must Keep",
+    type: "life",
+    description:
+      "Gain 1 Money and keep this card. After a Connection enters any other player's Stash, give them this card.",
+  },
+]);
+
+export const LIFE_CARDS_CATALOG = LIFE_CARD_DEFINITIONS.map((card) => ({
+  ...card,
+}));
 
 export const PACKS_LIST = [
   "Friendship",
@@ -2223,22 +2407,70 @@ export default class EmigrationEngine {
       case "Mental Fog":
         player.money = Math.max(0, player.money - 1);
         this.log(`${player.name} loses $1.`, "action");
-        if (player.stash.lifeCards.length > 0) {
+        const candidates = [];
+        for (const owner of this.players) {
+          owner.stash.lifeCards.forEach((card, idx) => {
+            candidates.push({
+              owner,
+              source: "stash",
+              idx,
+              title: card.title,
+              card,
+            });
+          });
+          for (let i = 0; i < 14; i++) {
+            const slot = owner.layout[i];
+            if (slot && slot.card?.type === "life" && slot.faceUp) {
+              candidates.push({
+                owner,
+                source: "layout",
+                idx: i,
+                title: slot.card.title,
+                slot,
+              });
+            }
+          }
+        }
+        if (candidates.length > 0) {
           this._setPendingChoice({
             id: "mental-fog",
             title: "Mental Fog: discard a kept Life Card? (optional)",
             options: [
               { text: "Skip — don't discard", value: "skip" },
-              ...player.stash.lifeCards.map((c, i) => ({
-                text: `Discard: ${c.title}`,
+              ...candidates.map((candidate, i) => ({
+                text: `${candidate.owner.name} (${candidate.source === "layout" ? "Layout" : "Stash"}): ${candidate.title}`,
                 value: String(i),
               })),
             ],
             resolve: (val) => {
               if (val !== "skip") {
-                const [disc] = player.stash.lifeCards.splice(parseInt(val), 1);
-                this.discardPile.push(disc);
-                this.log(`${player.name} discards ${disc.title}.`, "action");
+                const candidate = candidates[parseInt(val)];
+                if (candidate.source === "stash") {
+                  const [disc] = candidate.owner.stash.lifeCards.splice(
+                    candidate.idx,
+                    1,
+                  );
+                  this.discardPile.push(disc);
+                  this.log(
+                    `${player.name} discards ${disc.title} from ${candidate.owner.name}'s stash.`,
+                    "action",
+                  );
+                } else {
+                  const slot = candidate.owner.layout[candidate.idx];
+                  if (slot) {
+                    const [removed] = candidate.owner.layout.splice(
+                      candidate.idx,
+                      1,
+                      null,
+                    );
+                    this.discardPile.push(removed.card);
+                    this.log(
+                      `${player.name} discards ${removed.card.title} from ${candidate.owner.name}'s layout.`,
+                      "action",
+                    );
+                    this.uncoverLayout(candidate.owner);
+                  }
+                }
               }
               done();
             },
@@ -2342,10 +2574,10 @@ export default class EmigrationEngine {
           "Boost: choose player (gain half their Nationality fund)",
           (targetId) => {
             const target = this.players[targetId];
-            const amt = Math.floor(target.collegeFund / 2);
+            const amt = Math.floor(target.startingFund / 2);
             player.money += amt;
             this.log(
-              `${player.name} gains $${amt} (half of ${target.name}'s fund: $${target.collegeFund}).`,
+              `${player.name} gains $${amt} (half of ${target.name}'s starting money: $${target.startingFund}).`,
               "action",
             );
             done();
@@ -2657,23 +2889,37 @@ export default class EmigrationEngine {
       }
 
       const fee = target.id === player.id ? 0 : player.accessFee;
-      if (player.money < fee) {
-        this.log(`Cannot afford fee ($${fee}).`, "error");
+      if (
+        target.id !== player.id &&
+        target.stash.lifeCards.some((lc) => lc.title === "Persuasion")
+      ) {
+        this._handlePersuasion(player, target, slotIdx, fee, (actualFee) => {
+          this._finishDiscard(player, target, slotIdx, actualFee);
+        });
         return;
       }
 
-      this._payAccessFee(player, target, fee);
-      const [removed] = target.layout.splice(slotIdx, 1, null);
-      this.discardPile.push(removed.card);
-      player.money += 2;
-      this.log(
-        `${player.name} discarded ${removed.card.name} from ${target.name}'s layout, gains $2.`,
-        "action",
-      );
-      this._onCardDiscarded(player, removed.card);
-      this.uncoverLayout(target);
-      this.advanceTurn();
+      this._finishDiscard(player, target, slotIdx, fee);
     }
+  }
+
+  _finishDiscard(player, target, slotIdx, fee) {
+    if (player.money < fee) {
+      this.log(`Cannot afford fee ($${fee}).`, "error");
+      return;
+    }
+
+    this._payAccessFee(player, target, fee);
+    const [removed] = target.layout.splice(slotIdx, 1, null);
+    this.discardPile.push(removed.card);
+    player.money += 2;
+    this.log(
+      `${player.name} discarded ${removed.card.name} from ${target.name}'s layout, gains $2.`,
+      "action",
+    );
+    this._onCardDiscarded(player, removed.card);
+    this.uncoverLayout(target);
+    this.advanceTurn();
   }
 
   // ── Apply for College ─────────────────────────────────────────────────
@@ -2994,6 +3240,45 @@ export function runTests() {
     assert(
       discountCost === 1,
       "Kept Stellar Reputation reduces connection purchase cost by $1",
+    );
+
+    // Mental Fog may discard a kept life card from another player's layout or stash.
+    const fogger = eng.players[0];
+    fogger.layout[11] = {
+      card: {
+        title: "Mental Fog",
+        pack: "News",
+        keep: "Instant",
+        type: "life",
+      },
+      faceUp: true,
+      index: 11,
+    };
+    fogger.stash.lifeCards.push({ title: "Keep Calm", type: "life" });
+    const target = eng.players[1];
+    target.layout[13] = {
+      card: {
+        title: "Insider",
+        pack: "News",
+        keep: "May Keep",
+        type: "life",
+      },
+      faceUp: true,
+      index: 13,
+    };
+    target.stash.lifeCards.push({ title: "Stellar Reputation", type: "life" });
+    eng.currentPlayerIdx = 0;
+    eng.executeRequiredAction("activate", {
+      targetPlayerIdx: 0,
+      slotIdx: 11,
+    });
+    assert(
+      eng.pendingChoice?.options?.some(
+        (opt) =>
+          opt.text.includes("Insider") ||
+          opt.text.includes("Stellar Reputation"),
+      ),
+      "Mental Fog offers cards from another player's layout or stash",
     );
   } catch (e) {
     assert(false, `Life card effect error: ${e.message}`);

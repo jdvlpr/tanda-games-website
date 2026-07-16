@@ -1,5 +1,5 @@
 <script>
-  import EmigrationEngine, { NATIONALITIES, DESTINATIONS, PACKS_LIST, runTests } from './engine.js';
+  import EmigrationEngine, { NATIONALITIES, DESTINATIONS, PACKS_LIST, runTests, LIFE_CARD_DEFINITIONS } from './engine.js';
   import { createAutoPlayer } from './autoplay.js';
   
   import PlayerBoard from './PlayerBoard.svelte';
@@ -49,44 +49,9 @@
   let selectedSlot = $state(null);
   let selectedStash = $state(null);
 
-  // Life Card Descriptions Dictionary
-  const LIFE_CARD_DESCRIPTIONS = {
-    'Stellar Reputation': 'May Keep: Gain 3 Money, OR keep this card and all Connections cost 1 Money less.',
-    'Rummage Sale': 'Instant: Gain 3 Money, OR take 1 discarded Document.',
-    'Island Paradise': 'Instant: Gain 1 Money. Player(s) with the fewest Documents also gain 1 Money.',
-    'Swap Wallets': 'Instant: You may trade all your Money for another player\'s Money.',
-    'VIP': 'Instant: Gain 1 Money for every 2 Money held by the player with the most Money.',
-    'Fancy Clothes': 'May Keep: Gain 3 Money, OR keep this card and all Documents cost 1 Money less.',
-    'Social Butterfly': 'Instant: Take 1 Connection OR 3 Money from another player.',
-    'Identical Twin': 'Instant: Gain 1 Money and take another turn.',
-    'Reward': 'Instant: Gain 1 Money and take 1 Money from every other player.',
-    'Suspect': 'Instant: Lose 1 Money and lose 1 Connection or 1 Document.',
-    'Salvage': 'Must Keep: Gain 1 Money, keep this card. Whenever another player discards a card, gain 1 Money.',
-    'Blacklisted': 'Must Keep: Lose 1 Money, keep this card. Whenever you discard a card, lose 1 Money.',
-    'Trousers Fall Down': 'Instant: Lose 3 Money, OR lose 1 Document.',
-    'Keep Calm': 'Must Keep: Gain 1 Money and keep this card. You may discard a Life Card instead of taking it, then discard this card.',
-    'Life Coach': 'Instant: Take 1 Assurance token.',
-    'Shredder Accident': 'Instant: Lose 1 Document. If you have none, lose 1 Money.',
-    'Camping': 'Instant: Gain 1 Money. Player(s) with the fewest Connections also gain 1 Money.',
-    'FOMO': 'Instant: Lose 1 Money. You may trade Destinations with another player.',
-    'Nostalgia': 'Instant: Replay any discarded Life Card, OR gain 2 Money.',
-    'Lost & Found': 'Instant: Take 1 Document or 2 Money from another player.',
-    'Pandemic / Economic Stimulus': 'Instant: First copy: Roll D6; everyone loses Money equal to roll. Second copy: Roll D6; everyone gains Money equal to roll.',
-    'Mental Fog': 'Instant: Lose 1 Money. You may discard any Life Card.',
-    'Insider': 'May Keep: Gain 3 Money, OR keep this card and on Paydays gain 1 Money.',
-    'Philanthropy': 'Instant: Lose 1 Money. Starting with the player to your left, give 1 Money to every other player.',
-    'Bailout': 'Instant: Gain 1 Money. Player(s) with the least Money also gain 1 Money.',
-    'Share': 'Instant: Distribute half your Money (rounded down) to other players.',
-    'Pay Cut': 'Must Keep: Lose 1 Money, keep this card. On Paydays, lose 1 Money.',
-    'Productivity': 'Instant: Gain 1 Money. Decrease your Access Fee by 1 (minimum 0).',
-    'Tariffs': 'Instant: Lose 1 Money. Increase your Access Fee by 1 (maximum 5).',
-    'Boost': 'Instant: Gain half the Money tokens on any player\'s Nationality card (rounded down).',
-    'Persuasion': 'Must Keep: Gain 1 Money and keep this card. When your Layout is targeted, you may offer this card instead. If declined, buyer pays double Access Fee.',
-    'Underdog': 'Must Keep: Lose 1 Money and keep this card. After you gain a Life Card, lose 1 Money, then pass this card left.',
-    'Frontrunner': 'Must Keep: Place 1 Money from the bank on this card (max 5). On Paydays, pass this card left. Money stays on this card and is only used for crossing.',
-    'Penalty': 'Must Keep: Lose 1 Money and keep this card. After you gain a Document, pass this card left.',
-    'Star Power': 'Must Keep: Gain 1 Money and keep this card. After any other player gains a Connection, you gain 1 Money, then give them this card.'
-  };
+  function getLifeCardDescription(title) {
+    return LIFE_CARD_DEFINITIONS.find((card) => card.title === title)?.description ?? '';
+  }
 
   // Derived Values
   let currentPlayer = $derived(snapshot ? snapshot.players[snapshot.currentPlayerIdx] : null);
@@ -99,7 +64,7 @@
         const cardName = slot.card.name || slot.card.title || '';
         let text = `Selected Card: <span class=" font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
         if (slot.card.type === 'life') {
-          const desc = LIFE_CARD_DESCRIPTIONS[cardName];
+          const desc = getLifeCardDescription(cardName);
           if (desc) {
             text += `<br/><span class=" font-normal text-sm mt-1.5 block">${desc}</span>`;
           }
@@ -120,7 +85,7 @@
         const card = targetPlayer?.stash.lifeCards[i];
         cardName = card?.title || "";
         let text = `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
-        const desc = LIFE_CARD_DESCRIPTIONS[cardName];
+        const desc = getLifeCardDescription(cardName);
         if (desc) {
           text += `<br/><span class=" font-normal text-xs mt-1.5 block">${desc}</span>`;
         }
