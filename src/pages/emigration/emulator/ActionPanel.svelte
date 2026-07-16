@@ -1,11 +1,11 @@
 <script>
-  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false } = $props();
+  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false } = $props();
 
   let logContainer = null;
 
-  // Auto-scroll logs when snapshot updates
+  // Auto-scroll logs when snapshot updates (disabled for AI Simulation mode)
   $effect(() => {
-    if (snapshot && snapshot.logs && logContainer) {
+    if (autoScrollEnabled && snapshot && snapshot.logs && logContainer) {
       setTimeout(() => {
         if (logContainer) {
           logContainer.scrollTop = logContainer.scrollHeight;
@@ -22,8 +22,14 @@
       <h3 class="text-sm uppercase tracking-wider pb-2">Action Dashboard</h3>
       
       <!-- Selection Hint -->
-      <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-3 mb-4 min-h-[44px] flex items-center justify-center text-center">
-        <span>{@html selectionText}</span>
+      <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-3 mb-4 min-h-[44px] flex items-center justify-center text-center gap-2 flex-wrap">
+        <span class="flex-1">{@html selectionText}</span>
+        {#if hasSelection && onclearselection}
+          <button
+            class="btn text-xs py-1 px-2 shrink-0 opacity-70 hover:opacity-100"
+            onclick={onclearselection}
+          >✕ Clear</button>
+        {/if}
       </div>
 
       <!-- Action States -->

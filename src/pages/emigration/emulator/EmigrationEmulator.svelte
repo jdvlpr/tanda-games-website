@@ -61,6 +61,71 @@
   // Derived Values
   let currentPlayer = $derived(snapshot ? snapshot.players[snapshot.currentPlayerIdx] : null);
 
+  /**
+   * Filter the engine's valid actions based on which card (if any) is currently selected.
+   * Per the game spec:
+   *  - Layout payday/life  → only Activate is applicable
+   *  - Layout doc/conn     → only Buy and Discard are applicable (Activate is not)
+   *  - Stash doc/conn      → only Sell (optional) and Discard are applicable
+   *  - Stash ticket/pass   → only Reclaim is applicable (taking from another player's stash)
+   *  - No selection        → return actions unchanged
+   */
+  let filteredActions = $derived.by(() => {
+    if (!snapshot || !engine) return [];
+    const raw = engine.getValidActions(snapshot.players[snapshot.currentPlayerIdx]);
+
+    // Determine what card type is selected, and where it lives
+    let selectionCardType = null;  // 'payday' | 'life' | 'document' | 'connection'
+    let selectionSource = null;    // 'layout' | 'stash-doc' | 'stash-conn' | 'stash-ticket' | 'stash-passport'
+
+    if (selectedSlot) {
+      const targetPlayer = snapshot.players[selectedSlot.playerIdx];
+      const card = targetPlayer?.layout[selectedSlot.slotIdx]?.card;
+      if (card) {
+        selectionCardType = card.type;
+        selectionSource = 'layout';
+      }
+    } else if (selectedStash) {
+      const t = selectedStash.stashType;
+      if (t === 'document')  { selectionCardType = 'document';  selectionSource = 'stash-doc'; }
+      if (t === 'connection'){ selectionCardType = 'connection'; selectionSource = 'stash-conn'; }
+      if (t === 'ticket')    { selectionCardType = 'ticket';     selectionSource = 'stash-ticket'; }
+      if (t === 'passport')  { selectionCardType = 'passport';   selectionSource = 'stash-passport'; }
+    }
+
+    // No selection — disable actions that require a target card
+    if (!selectionSource) {
+      return raw.map(action => {
+        if (['activate', 'buy', 'discard', 'sell', 'reclaim', 'steal'].includes(action.type)) {
+          return { ...action, enabled: false };
+        }
+        return action;
+      });
+    }
+
+    return raw.map(action => {
+      let allowed = true;
+
+      if (selectionSource === 'layout') {
+        if (selectionCardType === 'payday' || selectionCardType === 'life') {
+          // Payday & Life: only Activate
+          allowed = action.type === 'activate';
+        } else if (selectionCardType === 'document' || selectionCardType === 'connection') {
+          // Doc & Conn in layout: Buy or Discard only
+          allowed = action.type === 'buy' || action.type === 'discard';
+        }
+      } else if (selectionSource === 'stash-doc' || selectionSource === 'stash-conn') {
+        // Stash doc/conn: Sell only (Discard is only valid on layout cards)
+        allowed = action.type === 'sell';
+      } else if (selectionSource === 'stash-ticket' || selectionSource === 'stash-passport') {
+        // Stash ticket/passport: only Reclaim (targeting another player's extra ticket/passport)
+        allowed = action.type === 'reclaim';
+      }
+
+      return allowed ? action : { ...action, enabled: false };
+    });
+  });
+
   // In Solo vs AI mode: is it currently the human player's turn (index 0)?
   let isHumanTurn = $derived(
     !vsComputer ||
@@ -459,12 +524,15 @@
             {engine}
             {snapshot}
             currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
-            actions={engine.getValidActions(snapshot.players[snapshot.currentPlayerIdx])}
+            actions={filteredActions}
             onaction={handleAction}
             onselectlane={handleSelectLane}
             {selectionText}
             pendingChoice={pendingChoice || (vsComputer && !isHumanTurn)}
             computerTurn={vsComputer && !isHumanTurn}
+            autoScrollEnabled={!autoplay}
+            hasSelection={!!(selectedSlot || selectedStash)}
+            onclearselection={() => { selectedSlot = null; selectedStash = null; }}
           />
         </div>
       </div>

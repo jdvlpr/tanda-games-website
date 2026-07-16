@@ -579,6 +579,7 @@ export default class EmigrationEngine {
     this.activeCrossingIdx = 0;
     this.gameResult = null;
     this._collegeFailed = false;
+    this._graduateAttempted = false;
     this._identicalTwinExtraTurn = false;
 
     // Choice system
@@ -1000,7 +1001,7 @@ export default class EmigrationEngine {
       type: "graduate",
       label: "Graduate (D6)",
       optional: true,
-      enabled: p.inCollege,
+      enabled: p.inCollege && !this._graduateAttempted,
     });
 
     // Optional: Sell
@@ -1163,6 +1164,7 @@ export default class EmigrationEngine {
     }
 
     this._collegeFailed = false;
+    this._graduateAttempted = false;
 
     // Identical Twin extra turn: don't advance player index
     if (this._identicalTwinExtraTurn) {
@@ -1430,10 +1432,20 @@ export default class EmigrationEngine {
             "action",
           );
         } else {
-          this.log(
-            `${player.name} failed exams (rolled ${roll}). Remains in college.`,
-            "error",
-          );
+          // Failed: pay $1 penalty and cannot attempt again this turn
+          if (player.money > 0) {
+            player.money -= 1;
+            this.log(
+              `${player.name} failed exams (rolled ${roll}). Remains in college. Lost $1.`,
+              "error",
+            );
+          } else {
+            this.log(
+              `${player.name} failed exams (rolled ${roll}). Remains in college. (No money to lose.)`,
+              "error",
+            );
+          }
+          this._graduateAttempted = true;
         }
         this._notify();
         break;
