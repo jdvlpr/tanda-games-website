@@ -1,6 +1,18 @@
 <script>
   let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash } = $props();
 
+  let boardEl = null;
+  let wasActive = false;
+
+  $effect(() => {
+    if (isActive && !wasActive && boardEl) {
+      requestAnimationFrame(() => {
+        boardEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+    wasActive = isActive;
+  });
+
   // Helper to determine if a slot is available
   function isAvailable(slotIdx) {
     if (!engine) return false;
@@ -71,7 +83,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="grid-card-slot" onclick={() => handleLayoutClick(slotIdx)}>
       <div 
-        class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-50 dark:bg-neutral-950' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
+        class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
       >
         {#if slot.faceUp}
@@ -85,7 +97,10 @@
   {/if}
 {/snippet}
 
-<div class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}>
+<div
+  bind:this={boardEl}
+  class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}
+>
   <!-- Player Header Info -->
   <div class="flex justify-between items-center mb-3 pb-3 flex-wrap gap-3">
     <div class="flex flex-col">
