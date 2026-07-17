@@ -3,6 +3,7 @@
 
   let logContainer = null;
 
+  
   // Auto-scroll logs when snapshot updates (disabled for AI Simulation mode)
   $effect(() => {
     if (autoScrollEnabled && snapshot && snapshot.logs && logContainer) {

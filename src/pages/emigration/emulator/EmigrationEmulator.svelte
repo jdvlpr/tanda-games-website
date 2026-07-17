@@ -23,7 +23,7 @@
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
   let selectedPacks = $state(PACK_DEFAULTS[playerCount]);
-  let aiDifficulty = $state('normal');
+  let aiDifficulty = $state('expert');
   
   // Initialize default players
   let playersSetup = $state(Array.from({ length: 6 }, (_, i) => ({
@@ -50,6 +50,7 @@
   let vsComputer = $state(false);
   let aiPlayer = $state(null);
   let aiThinking = $state(false);
+  let gameType = $state('vscomputer');
 
   // Selection State
   let selectedSlot = $state(null);
@@ -239,6 +240,7 @@
     aiPlayer = null;
     aiThinking = false;
     autoplay = null;
+    
 
     if (gameType === 'auto') {
       // AI Simulation: all players AI-controlled, plays at speed
@@ -368,6 +370,33 @@
           </div>
         </div>
 
+        
+        
+
+        <div class="flex flex-col gap-3">
+          <p class="">Game Type</p>
+          <div class="flex gap-2">
+              <button
+                class="btn flex-1 {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                onclick={() => gameType = 'vscomputer'}
+              >
+                Solo vs Computer
+              </button>
+              <button
+                class="btn flex-1 {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                onclick={() => gameType = 'passplay'}
+              >
+                Pass & Play
+              </button>
+              <button
+                class="btn flex-1 {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                onclick={() => gameType = 'auto'}
+              >
+               Computer vs Computer
+              </button>
+          </div>
+        </div>
+
         <div class="flex flex-col gap-3">
           <p class="">AI Difficulty</p>
           <div class="flex gap-2">
@@ -382,10 +411,8 @@
           </div>
         </div>
 
-        <div class="flex gap-4 mt-8 flex-wrap">
-          <button class="flex-1 btn" onclick={() => startGame('passplay')}>Pass &amp; Play</button>
-          <button class="flex-1 btn" onclick={() => startGame('vscomputer')}>Solo vs Computer</button>
-          <button class="flex-1 btn" onclick={() => startGame('auto')}>Computer vs Computer</button>
+        <div class="">
+          <button class="btn text-2xl" onclick={() => startGame(gameType)}>Start</button>
         </div>
       </div>
 

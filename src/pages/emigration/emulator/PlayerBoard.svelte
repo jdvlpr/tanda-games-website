@@ -87,7 +87,7 @@
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
       >
         {#if slot.faceUp}
-          <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
+          <div class="h-2 w-full border cursor-pointer rounded-md" style="background:{getCardColor(c.type)}"></div>
           <div class="card-type">{c.type}</div>
           <div class="card-title">{c.name || c.title}</div>
           <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
