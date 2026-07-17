@@ -23,6 +23,7 @@
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
   let selectedPacks = $state(PACK_DEFAULTS[playerCount]);
+  let aiDifficulty = $state('normal');
   
   // Initialize default players
   let playersSetup = $state(Array.from({ length: 6 }, (_, i) => ({
@@ -115,8 +116,8 @@
           allowed = action.type === 'buy' || action.type === 'discard';
         }
       } else if (selectionSource === 'stash-doc' || selectionSource === 'stash-conn') {
-        // Stash doc/conn: Sell (optional) or Discard (required)
-        allowed = action.type === 'sell' || action.type === 'discard';
+        // Stash doc/conn: Sell only (Discard is only valid on layout cards)
+        allowed = action.type === 'sell';
       } else if (selectionSource === 'stash-ticket' || selectionSource === 'stash-passport') {
         // Stash ticket/passport: only Reclaim (targeting another player's extra ticket/passport)
         allowed = action.type === 'reclaim';
@@ -241,12 +242,12 @@
 
     if (gameType === 'auto') {
       // AI Simulation: all players AI-controlled, plays at speed
-      autoplay = createAutoPlayer(engine);
+      autoplay = createAutoPlayer(engine, aiDifficulty);
       autoplay.playFullGame(100);
     } else if (gameType === 'vscomputer') {
       // Solo vs AI: Player 1 (index 0) is human, all others AI
       vsComputer = true;
-      aiPlayer = createAutoPlayer(engine);
+      aiPlayer = createAutoPlayer(engine, aiDifficulty);
     }
     // 'passplay': no AI, full manual play
   }
@@ -362,6 +363,20 @@
                 }}
               >
                 {pack}
+              </button>
+            {/each}
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <p class="">AI Difficulty</p>
+          <div class="flex gap-2">
+            {#each ['easy', 'normal', 'expert'] as diff}
+              <button
+                class="btn flex-1 {aiDifficulty === diff ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                onclick={() => aiDifficulty = diff}
+              >
+                {diff.charAt(0).toUpperCase() + diff.slice(1)}
               </button>
             {/each}
           </div>

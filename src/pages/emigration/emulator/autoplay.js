@@ -8,16 +8,55 @@
  * @param {import('./engine.js').default} engine
  * @returns {Object} Autoplay controller
  */
-export function createAutoPlayer(engine) {
+export function createAutoPlayer(engine, difficulty = 'normal') {
   /**
    * Choose the best required action for the current player.
-   * Priority: Activate Payday → Buy cheap cards → Buy ticket/passport →
-   *           Steal → College → Discard
+   * Priority: Activate Payday → Buy ticket/passport → Buy cheap cards → ...
    */
   function chooseAction() {
     const player = engine.players[engine.currentPlayerIdx];
     const actions = engine.getValidActions(player);
     const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
+
+    // Difficulty logic: Easy is 100% random choice, Normal is 30% random choice, Expert is 0% random (always uses heuristic)
+    if (difficulty === 'easy' || (difficulty === 'normal' && Math.random() < 0.3)) {
+      const possible = [];
+      if (enabled("activate")) {
+        const pt = _findBestActivateTarget(player, "payday");
+        if (pt) possible.push({ type: "activate", params: pt });
+        const lt = _findBestActivateTarget(player, "life");
+        if (lt) possible.push({ type: "activate", params: lt });
+      }
+      if (enabled("buy")) {
+        const bt = _findCheapestBuyTarget(player);
+        if (bt) possible.push({ type: "buy", params: bt });
+      }
+      if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 && player.stash.connections.length >= 1 && player.money >= 2) {
+        possible.push({ type: "buyPool", params: { cardType: "ticket" } });
+      }
+      if (player.stash.passports < 1 && engine.publicServices.passports > 0 && player.stash.documents.length >= 1 && player.money >= 2) {
+        possible.push({ type: "buyPool", params: { cardType: "passport" } });
+      }
+      if (enabled("reclaim")) {
+        const rt = _findReclaimTarget(player);
+        if (rt) possible.push({ type: "reclaim", params: rt });
+      }
+      if (enabled("steal")) {
+        if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 && player.stash.connections.length >= 1) possible.push({ type: "steal", params: { cardType: "ticket" } });
+        if (player.stash.passports < 1 && engine.publicServices.passports > 0 && player.stash.documents.length >= 1) possible.push({ type: "steal", params: { cardType: "passport" } });
+      }
+      if (enabled("applyCollege")) {
+        possible.push({ type: "applyCollege", params: {} });
+      }
+      if (enabled("discard")) {
+        const dt = _findDiscardTarget(player);
+        if (dt) possible.push(dt);
+      }
+      
+      if (possible.length > 0) {
+        return possible[Math.floor(Math.random() * possible.length)];
+      }
+    }
 
     // 1. Activate available Payday cards (salary for everyone)
     if (enabled("activate")) {
