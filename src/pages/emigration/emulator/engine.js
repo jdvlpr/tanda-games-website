@@ -713,9 +713,13 @@ export default class EmigrationEngine {
       }
 
       this.players.push(player);
+      const availableCards = player.layout
+        .filter((slot, idx) => slot && slot.faceUp && !this.isCardCovered(player, idx))
+        .map(slot => slot.card.name || slot.card.title)
+        .join(", ");
       this.log(
         `${player.name} (${player.nationality} → ${player.destination}) ` +
-          `starts with $${player.money}.`,
+          `starts with $${player.money}. Starting available layout cards: [${availableCards}].`,
         "system",
       );
     });

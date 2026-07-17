@@ -115,8 +115,8 @@
           allowed = action.type === 'buy' || action.type === 'discard';
         }
       } else if (selectionSource === 'stash-doc' || selectionSource === 'stash-conn') {
-        // Stash doc/conn: Sell only (Discard is only valid on layout cards)
-        allowed = action.type === 'sell';
+        // Stash doc/conn: Sell (optional) or Discard (required)
+        allowed = action.type === 'sell' || action.type === 'discard';
       } else if (selectionSource === 'stash-ticket' || selectionSource === 'stash-passport') {
         // Stash ticket/passport: only Reclaim (targeting another player's extra ticket/passport)
         allowed = action.type === 'reclaim';

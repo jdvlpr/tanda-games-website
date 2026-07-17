@@ -27,15 +27,8 @@ export function createAutoPlayer(engine) {
       }
     }
 
-    // 2. Buy cheapest available Documents/Connections (prefer own layout)
-    if (enabled("buy")) {
-      const buyTarget = _findCheapestBuyTarget(player);
-      if (buyTarget) {
-        return { type: "buy", params: buyTarget };
-      }
-    }
-
-    // 3. Buy Ticket from pool if have Connection
+    // 2. Prioritize getting a Ticket and Passport if missing!
+    // Try to Buy from pool
     if (
       player.stash.tickets < 1 &&
       engine.publicServices.tickets > 0 &&
@@ -44,8 +37,6 @@ export function createAutoPlayer(engine) {
     ) {
       return { type: "buyPool", params: { cardType: "ticket" } };
     }
-
-    // 4. Buy Passport from pool if have Document
     if (
       player.stash.passports < 1 &&
       engine.publicServices.passports > 0 &&
@@ -55,15 +46,15 @@ export function createAutoPlayer(engine) {
       return { type: "buyPool", params: { cardType: "passport" } };
     }
 
-    // 5. Activate Life cards
-    if (enabled("activate")) {
-      const lifeTarget = _findBestActivateTarget(player, "life");
-      if (lifeTarget) {
-        return { type: "activate", params: lifeTarget };
+    // Try to Reclaim
+    if (enabled("reclaim")) {
+      const reclaimTarget = _findReclaimTarget(player);
+      if (reclaimTarget) {
+        return { type: "reclaim", params: reclaimTarget };
       }
     }
 
-    // 6. Steal if can't buy
+    // Try to Steal
     if (enabled("steal")) {
       if (
         player.stash.tickets < 1 &&
@@ -81,20 +72,28 @@ export function createAutoPlayer(engine) {
       }
     }
 
-    // 7. Apply for College if affordable and have open slots
+    // 3. Buy cheapest available Documents/Connections (prefer own layout)
+    if (enabled("buy")) {
+      const buyTarget = _findCheapestBuyTarget(player);
+      if (buyTarget) {
+        return { type: "buy", params: buyTarget };
+      }
+    }
+
+    // 4. Activate Life cards
+    if (enabled("activate")) {
+      const lifeTarget = _findBestActivateTarget(player, "life");
+      if (lifeTarget) {
+        return { type: "activate", params: lifeTarget };
+      }
+    }
+
+    // 5. Apply for College if affordable and have open slots
     if (enabled("applyCollege")) {
       return { type: "applyCollege", params: {} };
     }
 
-    // 8. Reclaim if available
-    if (enabled("reclaim")) {
-      const reclaimTarget = _findReclaimTarget(player);
-      if (reclaimTarget) {
-        return { type: "reclaim", params: reclaimTarget };
-      }
-    }
-
-    // 9. Discard as last resort
+    // 6. Discard as last resort
     if (enabled("discard")) {
       return _findDiscardTarget(player);
     }
