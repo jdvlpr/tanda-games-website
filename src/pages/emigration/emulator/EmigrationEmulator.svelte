@@ -1,10 +1,9 @@
 <script>
-  import EmigrationEngine, { NATIONALITIES, DESTINATIONS, PACKS_LIST, runTests, LIFE_CARD_DEFINITIONS } from './engine.js';
-  import { createAutoPlayer } from './autoplay.js';
-  
-  import PlayerBoard from './PlayerBoard.svelte';
   import ActionPanel from './ActionPanel.svelte';
+  import { createAutoPlayer } from './autoplay.js';
+  import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, PACKS_LIST, runTests } from './engine.js';
   import Modal from './Modal.svelte';
+  import PlayerBoard from './PlayerBoard.svelte';
 
   // Props
   let { defaultMode = 'competitive', defaultPlayerCount = 2, showTestRunner = true } = $props();
@@ -164,7 +163,7 @@
         safety++;
       }
       aiThinking = false;
-    }, 600);
+    }, 300);
   });
   let selectionText = $derived.by(() => {
     if (!snapshot) return 'Select an available layout card or stash item, then choose your action.';
@@ -331,22 +330,24 @@
             </select>
         </label>
 
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-6">
           {#each activeSetup as p, i}
-            <div class="flex gap-3 items-center">
-              <input class="flex-1" type="text" bind:value={p.name} placeholder="Player Name" />
-              <select class="flex-[1.5]" bind:value={p.nationality}>
-                {#each NATIONALITIES as nat}
-                  <option value={nat.name}>{nat.name} (Starting Money: ${nat.fund})</option>
-                {/each}
-              </select>
-              <span class="">→</span>
-              <select class="flex-[1.5]" bind:value={p.destination}>
-                {#each DESTINATIONS as dest}
-                  <option value={dest.name}>{dest.name}</option>
-                {/each}
-              </select>
-            </div>
+          <div class="flex flex-col gap-2">
+            <input class="flex-1" type="text" bind:value={p.name} placeholder="Player Name" />
+              <div class="flex gap-3 items-center">
+                <select class="flex-[1.5]" bind:value={p.nationality}>
+                  {#each NATIONALITIES as nat}
+                    <option value={nat.name}>{nat.name} (${nat.fund})</option>
+                  {/each}
+                </select>
+                <span class="">→</span>
+                <select class="flex-[1.5]" bind:value={p.destination}>
+                  {#each DESTINATIONS as dest}
+                    <option value={dest.name}>{dest.name}</option>
+                  {/each}
+                </select>
+              </div>
+          </div>
           {/each}
         </div>
 
@@ -375,7 +376,7 @@
 
         <div class="flex flex-col gap-3">
           <p class="">Game Type</p>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
               <button
                 class="btn flex-1 {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'vscomputer'}
@@ -399,7 +400,7 @@
 
         <div class="flex flex-col gap-3">
           <p class="">AI Difficulty</p>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             {#each ['easy', 'normal', 'expert'] as diff}
               <button
                 class="btn flex-1 {aiDifficulty === diff ? 'bg-green-100 dark:bg-green-900  ' : ''}"
@@ -431,13 +432,13 @@
     </div>
   {:else if snapshot}
     <div>
-      <div class="flex justify-between items-center mb-5">
-        <h2 class="text-2xl tracking-wide">{snapshot.phase.toUpperCase()}</h2>
-        <div class="flex items-center gap-3">
+      <div class="flex flex-wrap gap-2 justify-between items-center mb-5">
+        <h2 class="text-2xl tracking-wide">Phase: {snapshot.phase.charAt(0).toUpperCase() + snapshot.phase.slice(1)}</h2>
+        <div class="flex flex-wrap items-center gap-3">
           {#if vsComputer && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
-          <button class="btn" onclick={() => { isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          <button class="btn text-sm" onclick={() => { isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
         </div>
       </div>
 

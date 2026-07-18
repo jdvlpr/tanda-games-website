@@ -221,7 +221,8 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Friendship",
     keep: "May Keep",
     type: "life",
-    description: "Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.",
+    description:
+      "Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.",
   },
   {
     title: "Rummage Sale",
@@ -235,7 +236,8 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Friendship",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and player(s) with the fewest Documents gain 1 Money.",
+    description:
+      "Gain 1 Money and player(s) with the fewest Documents gain 1 Money.",
   },
   {
     title: "Swap Wallets",
@@ -249,14 +251,16 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "High Society",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money for every 2 Money held by the player with the most Money.",
+    description:
+      "Gain 1 Money for every 2 Money held by the player with the most Money.",
   },
   {
     title: "Fancy Clothes",
     pack: "High Society",
     keep: "May Keep",
     type: "life",
-    description: "Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.",
+    description:
+      "Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.",
   },
   {
     title: "Social Butterfly",
@@ -291,14 +295,16 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Downtown",
     keep: "Must Keep",
     type: "life",
-    description: "Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.",
+    description:
+      "Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.",
   },
   {
     title: "Blacklisted",
     pack: "Downtown",
     keep: "Must Keep",
     type: "life",
-    description: "Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.",
+    description:
+      "Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.",
   },
   {
     title: "Trousers Fall Down",
@@ -312,7 +318,8 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Emergency",
     keep: "Must Keep",
     type: "life",
-    description: "Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.",
+    description:
+      "Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.",
   },
   {
     title: "Life Coach",
@@ -333,7 +340,8 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Vacation",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and player(s) with the fewest Connections gain 1 Money.",
+    description:
+      "Gain 1 Money and player(s) with the fewest Connections gain 1 Money.",
   },
   {
     title: "FOMO",
@@ -361,42 +369,48 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "News",
     keep: "Instant",
     type: "life",
-    description: "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
+    description:
+      "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
   },
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
     keep: "Instant",
     type: "life",
-    description: "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
+    description:
+      "1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.",
   },
   {
     title: "Mental Fog",
     pack: "News",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.",
+    description:
+      "Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.",
   },
   {
     title: "Insider",
     pack: "News",
     keep: "May Keep",
     type: "life",
-    description: "Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.",
+    description:
+      "Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.",
   },
   {
     title: "Philanthropy",
     pack: "Charity",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
+    description:
+      "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
   },
   {
     title: "Bailout",
     pack: "Charity",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and gain 1 Money for player(s) with the least Money.",
+    description:
+      "Gain 1 Money and gain 1 Money for player(s) with the least Money.",
   },
   {
     title: "Share",
@@ -410,7 +424,8 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Charity",
     keep: "Must Keep",
     type: "life",
-    description: "Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.",
+    description:
+      "Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.",
   },
   {
     title: "Productivity",
@@ -431,46 +446,50 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     pack: "Trade",
     keep: "Instant",
     type: "life",
-    description: "Gain half the Money tokens of any player’s Starting Money (round down).",
+    description:
+      "Gain half the Money tokens of any player’s Starting Money (round down).",
   },
   {
     title: "Persuasion",
     pack: "Trade",
     keep: "Must Keep",
     type: "life",
-    description: "Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
+    description:
+      "Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
   },
   {
     title: "Underdog",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description: "Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
+    description:
+      "Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
   },
   {
     title: "Frontrunner",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description: "Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
+    description:
+      "Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
   },
   {
     title: "Penalty",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description: "Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.",
+    description:
+      "Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.",
   },
   {
     title: "Star Power",
     pack: "Sports",
     keep: "Must Keep",
     type: "life",
-    description: "Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.",
+    description:
+      "Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.",
   },
 ]);
-
-
 
 export const LIFE_CARDS_CATALOG = LIFE_CARD_DEFINITIONS.map((card) => ({
   ...card,
@@ -714,8 +733,11 @@ export default class EmigrationEngine {
 
       this.players.push(player);
       const availableCards = player.layout
-        .filter((slot, idx) => slot && slot.faceUp && !this.isCardCovered(player, idx))
-        .map(slot => slot.card.name || slot.card.title)
+        .filter(
+          (slot, idx) =>
+            slot && slot.faceUp && !this.isCardCovered(player, idx),
+        )
+        .map((slot) => slot.card.name || slot.card.title)
         .join(", ");
       this.log(
         `${player.name} (${player.nationality} → ${player.destination}) ` +
@@ -1436,19 +1458,11 @@ export default class EmigrationEngine {
             "action",
           );
         } else {
-          // Failed: pay $1 penalty and cannot attempt again this turn
-          if (player.money > 0) {
-            player.money -= 1;
-            this.log(
-              `${player.name} failed exams (rolled ${roll}). Remains in college. Lost $1.`,
-              "error",
-            );
-          } else {
-            this.log(
-              `${player.name} failed exams (rolled ${roll}). Remains in college. (No money to lose.)`,
-              "error",
-            );
-          }
+          // Failed: remain in college, cannot attempt again this turn (no money penalty per spec)
+          this.log(
+            `${player.name} failed exams (rolled ${roll}). Remains in college.`,
+            "error",
+          );
           this._graduateAttempted = true;
         }
         this._notify();
@@ -2969,7 +2983,17 @@ export default class EmigrationEngine {
           `Must choose a different action.`,
         "error",
       );
-      this._notify();
+      // If no other required action is available, auto-forfeit instead of
+      // leaving the player stuck with an empty action list.
+      if (!this.canPerformAnyRequiredAction(player)) {
+        this.log(
+          `${player.name} has no other available actions. Turn forfeited.`,
+          "system",
+        );
+        this.advanceTurn();
+      } else {
+        this._notify();
+      }
     }
   }
 
@@ -3254,7 +3278,8 @@ export function runTests() {
       faceUp: true,
       index: 11,
     };
-    fogger.stash.lifeCards.push({ title: "Keep Calm", type: "life" });
+    // Note: do NOT put Keep Calm in the fogger's own stash here — that would
+    // trigger the Keep Calm interception prompt before Mental Fog can resolve.
     const target = eng.players[1];
     target.layout[13] = {
       card: {

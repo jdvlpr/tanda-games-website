@@ -146,7 +146,7 @@
   </div>
 
   <!-- Requirements Subheader -->
-  <div class="text-sm  mb-4 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-md flex flex-col gap-1 items-start">
+  <div class="text-sm text-left mb-4 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-md flex flex-col gap-1 items-start">
     <p>
       <strong>College Fund:</strong> <span class="">${player.collegeFund}</span>
     </p>
