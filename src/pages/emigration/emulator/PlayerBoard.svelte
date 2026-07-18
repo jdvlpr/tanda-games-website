@@ -1,4 +1,5 @@
 <script>
+  import { send, receive } from '../../../js/utils.svelte.js';
   let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash } = $props();
 
   let boardEl = null;
@@ -85,6 +86,8 @@
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
+        in:receive={{ key: c.id }}
+        out:send={{ key: c.id }}
       >
         {#if slot.faceUp}
           <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
@@ -207,6 +210,8 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-document);" 
           onclick={() => handleStashClick('document', i)}
+          in:receive={{ key: doc.id }}
+          out:send={{ key: doc.id }}
         >
           <span class="truncate pr-1">{doc.name}</span>
           <span class="text-xs  font-bold">${doc.cost || 0}</span>
@@ -225,6 +230,8 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-connection);" 
           onclick={() => handleStashClick('connection', i)}
+          in:receive={{ key: conn.id }}
+          out:send={{ key: conn.id }}
         >
           <span class="truncate pr-1">{conn.name}</span>
           <span class="text-xs  font-bold">${conn.cost || 0}</span>
@@ -277,6 +284,8 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-life);" 
           onclick={() => handleStashClick('lifeCard', i)}
+          in:receive={{ key: lc.id }}
+          out:send={{ key: lc.id }}
         >
           <span class="truncate pr-1">{lc.title}</span>
           {#if lc.money}

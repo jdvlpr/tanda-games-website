@@ -679,11 +679,12 @@ export default class EmigrationEngine {
       cost: 0,
     }));
 
+    let cardIdCounter = 0;
     const mainDeck = shuffleArray([
-      ...selectedDocs.map((c) => ({ ...c })),
-      ...selectedConns.map((c) => ({ ...c })),
-      ...selectedLifeCards,
-      ...paydays,
+      ...selectedDocs.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
+      ...selectedConns.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
+      ...selectedLifeCards.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
+      ...paydays.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
     ]);
 
     // Remove 2 random cards face-down (§2.2 step 4)
@@ -977,12 +978,7 @@ export default class EmigrationEngine {
       }
     }
 
-    // 5. Discard from own stash (free, earns 2)
-    if (
-      player.stash.documents.length > 0 ||
-      player.stash.connections.length > 0
-    )
-      return true;
+    // 5. Discard from layout
     // Discard from own layout (no access fee)
     for (let i = 0; i < 14; i++) {
       if (this.isCardAvailable(player, i)) {
@@ -1133,24 +1129,21 @@ export default class EmigrationEngine {
     });
 
     // Required: Discard
-    let canDiscard =
-      p.stash.documents.length > 0 || p.stash.connections.length > 0;
-    if (!canDiscard) {
-      for (const op of this.players) {
-        const fee = op.id === p.id ? 0 : p.accessFee;
-        if (p.money >= fee) {
-          for (let i = 0; i < 14; i++) {
-            if (this.isCardAvailable(op, i)) {
-              const t = op.layout[i].card.type;
-              if (t === "document" || t === "connection") {
-                canDiscard = true;
-                break;
-              }
+    let canDiscard = false;
+    for (const op of this.players) {
+      const fee = op.id === p.id ? 0 : p.accessFee;
+      if (p.money >= fee) {
+        for (let i = 0; i < 14; i++) {
+          if (this.isCardAvailable(op, i)) {
+            const t = op.layout[i].card.type;
+            if (t === "document" || t === "connection") {
+              canDiscard = true;
+              break;
             }
           }
         }
-        if (canDiscard) break;
       }
+      if (canDiscard) break;
     }
     actions.push({
       type: "discard",

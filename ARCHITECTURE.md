@@ -37,3 +37,21 @@ Players (human or AI) take their turns by executing actions through the engine:
 - **Optional Actions:** Can be performed before a required action and do _not_ end the turn (e.g., `sell` a card from the stash for $2, `graduate`).
 - **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card, `activate` a card, `discard` a card from a layout).
 - **Stash vs Layout:** Cards in a player's hand are their "Stash". Cards on the board are their "Layout". You `sell` from a Stash (optional), but you `discard` from a Layout (required).
+
+## Layout Structure (DAG)
+
+- The starting layout is a 14-card directed acyclic graph (DAG) arranged in 4 overlapping rows.
+- Cards in Row 1 and Row 3 start face-down. Cards in Row 2 and Row 4 start face-up.
+- A card is "covered" if any card in a higher row overlaps it. The engine tracks this using `isCardCovered()`. A card cannot be targeted by an action if it is covered.
+- When an action removes a card from the layout (e.g. `buy`, `discard`), the `uncoverLayout()` method is called, which flips any newly uncovered face-down cards to face-up.
+
+## Phases
+
+- **Phase 1 (Preparation):** Players take turns acquiring resources, documents, and connections to prepare for the border crossing.
+- **Phase 2 (Crossing):** Triggers instantly when the center pool of tickets/passports is completely empty AND no face-up cards remain in any layout. 
+- In Phase 2, players sequentially pick a security lane. Their `assurance` is calculated, and they cross if `assurance >= token value`.
+
+## UI Animations
+
+- To achieve smooth layout-to-stash and stash-to-discard animations, Svelte's native `crossfade` transition is utilized (`src/js/utils.svelte.ts`).
+- To make `crossfade` work, every card instance initialized in `engine.js` is given a unique `id` during the `_setupPlayersAndDeck` function (e.g., `card-1`, `card-2`). The `key: c.id` is passed into `in:receive` and `out:send` in Svelte.

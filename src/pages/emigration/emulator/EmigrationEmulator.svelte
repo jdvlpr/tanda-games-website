@@ -3,6 +3,7 @@
   import { createAutoPlayer } from './autoplay.js';
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, PACKS_LIST, runTests } from './engine.js';
   import Modal from './Modal.svelte';
+  import { playPaydaySound } from '../../../js/utils.svelte.js';
   import PlayerBoard from './PlayerBoard.svelte';
 
   // Props
@@ -236,9 +237,12 @@
       mode,
       players: activeSetup,
       selectedPacks,
-      onLog: () => {
+      onLog: (entry) => {
         // Force reactivity on logs by updating snapshot reference
         if (engine) snapshot = engine.getSnapshot();
+        if (entry?.msg?.includes("activated Payday")) {
+          playPaydaySound();
+        }
       },
       onStateChange: () => {
         if (engine) {

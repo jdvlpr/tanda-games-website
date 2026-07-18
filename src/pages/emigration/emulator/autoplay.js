@@ -18,7 +18,13 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     const actions = engine.getValidActions(player);
     const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
 
-    // Difficulty logic: Easy is 100% random choice, Normal is 30% random choice, Expert is 0% random (always uses heuristic)
+    // Expert Mode: evaluate all possible valid moves with a heuristic score
+    if (difficulty === "expert") {
+      const bestMove = _getBestHeuristicAction(player, actions);
+      if (bestMove) return { type: bestMove.type, params: bestMove.params };
+    }
+
+    // Difficulty logic: Easy is 100% random choice, Normal is 30% random choice
     if (
       difficulty === "easy" ||
       (difficulty === "normal" && Math.random() < 0.3)
@@ -81,7 +87,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
 
-    // 1. Activate available Payday cards (salary for everyone)
+    // Normal Mode:
+    // 1. Activate available Payday cards (if net positive)
     if (enabled("activate")) {
       const paydayTarget = _findBestActivateTarget(player, "payday");
       if (paydayTarget) {
@@ -89,8 +96,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
 
-    // 2. Prioritize getting a Ticket and Passport if missing!
-    // Try to Buy from pool
+    // 2. Prioritize getting a Ticket and Passport if missing
     if (
       player.stash.tickets < 1 &&
       engine.publicServices.tickets > 0 &&
@@ -108,7 +114,6 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       return { type: "buyPool", params: { cardType: "passport" } };
     }
 
-    // Try to Reclaim
     if (enabled("reclaim")) {
       const reclaimTarget = _findReclaimTarget(player);
       if (reclaimTarget) {
@@ -116,7 +121,6 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
 
-    // Try to Steal
     if (enabled("steal")) {
       if (
         player.stash.tickets < 1 &&
@@ -134,7 +138,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
 
-    // 3. Buy cheapest available Documents/Connections (prefer own layout)
+    // 3. Buy cheapest available Documents/Connections
     if (enabled("buy")) {
       const buyTarget = _findCheapestBuyTarget(player);
       if (buyTarget) {
@@ -150,24 +154,176 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
 
-    // 5. Apply for College if affordable and have open slots
+    // 5. Apply for College
     if (enabled("applyCollege")) {
       return { type: "applyCollege", params: {} };
     }
 
-    // 6. Discard as last resort
+    // 6. Discard
     if (enabled("discard")) {
       return _findDiscardTarget(player);
     }
 
-    // Fallback: try anything enabled
+    // Fallback
     for (const a of actions) {
       if (!a.optional && a.enabled) {
         return { type: a.type, params: {} };
       }
     }
+    return null;
+  }
 
-    return null; // forfeit
+  function _getBestHeuristicAction(player, actions) {
+    const possibleMoves = [];
+    const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
+
+    // Generate ALL possible valid moves
+    if (enabled("activate")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        if (player.money < fee) continue;
+        for (let i = 0; i < 14; i++) {
+          if (engine.isCardAvailable(p, i)) {
+            const card = p.layout[i].card;
+            if (card.type === "payday" || card.type === "life") {
+              possibleMoves.push({ type: "activate", params: { targetPlayerIdx: p.id, slotIdx: i }, card, fee, targetId: p.id });
+            }
+          }
+        }
+      }
+    }
+    if (enabled("buy")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        for (let i = 0; i < 14; i++) {
+          if (engine.isCardAvailable(p, i)) {
+            const card = p.layout[i].card;
+            if (card.type === "document" || card.type === "connection") {
+              const cost = engine.getEffectiveCost(player, card);
+              if (player.money >= cost + fee) {
+                possibleMoves.push({ type: "buy", params: { targetPlayerIdx: p.id, slotIdx: i }, card, cost, fee });
+              }
+            }
+          }
+        }
+      }
+    }
+    if (enabled("buyPool")) {
+      if (player.money >= 2 && player.stash.connections.length >= 1 && engine.publicServices.tickets > 0) {
+        possibleMoves.push({ type: "buyPool", params: { cardType: "ticket" }});
+      }
+      if (player.money >= 2 && player.stash.documents.length >= 1 && engine.publicServices.passports > 0) {
+        possibleMoves.push({ type: "buyPool", params: { cardType: "passport" }});
+      }
+    }
+    if (enabled("reclaim")) {
+      const rt = _findReclaimTarget(player);
+      if (rt) possibleMoves.push({ type: "reclaim", params: rt });
+    }
+    if (enabled("steal")) {
+      if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 && player.stash.connections.length >= 1) {
+        possibleMoves.push({ type: "steal", params: { cardType: "ticket" } });
+      }
+      if (player.stash.passports < 1 && engine.publicServices.passports > 0 && player.stash.documents.length >= 1) {
+        possibleMoves.push({ type: "steal", params: { cardType: "passport" } });
+      }
+    }
+    if (enabled("applyCollege")) {
+      possibleMoves.push({ type: "applyCollege", params: {} });
+    }
+    if (enabled("discard")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        if (player.money < fee) continue;
+        for (let i = 0; i < 14; i++) {
+          if (engine.isCardAvailable(p, i)) {
+            const card = p.layout[i].card;
+            if (card.type === "document" || card.type === "connection") {
+              possibleMoves.push({ type: "discard", params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i }, card, fee, targetId: p.id });
+            }
+          }
+        }
+      }
+    }
+
+    if (possibleMoves.length === 0) return null;
+
+    // Helper to evaluate destination threshold value
+    // DESTINATIONS logic matches `game_specification.md` and `engine.js`
+    const destName = player.destination;
+    let m = player.money;
+    let d = player.stash.documents.length;
+    let c = player.stash.connections.length;
+    let pTickets = player.stash.tickets;
+    let pPassports = player.stash.passports;
+
+    const evaluateScore = (move) => {
+      let score = 0;
+
+      if (move.type === "activate") {
+        if (move.card.type === "payday") {
+          // Payday logic: net gain = my salary - fee. Also opponent gains fee + their salary
+          const netGain = player.salary - move.fee;
+          if (netGain <= 0) return -100; // Never do this if it's a net loss or zero
+          score = netGain * 2; // high value for getting money
+          if (move.targetId !== player.id) {
+             score -= 2; // penalize slightly for helping an opponent
+          }
+        } else {
+          score = 3 - move.fee; // Base value for life cards
+        }
+      } else if (move.type === "buy") {
+        const totalCost = move.cost + move.fee;
+        score = -totalCost; 
+
+        // Value based on prerequisites
+        if (move.card.type === "document") {
+          if (pPassports < 1 && d === 0) score += 15; // Critical for passport
+          else score += 4;
+        } else if (move.card.type === "connection") {
+          if (pTickets < 1 && c === 0) score += 15; // Critical for ticket
+          else score += 4;
+        }
+
+        // Value based on Destination Thresholds (e.g., getting 4 docs for +2 assurance)
+        // Check how close we are to 4 docs or 3/4 conns
+        if (move.card.type === "document" && d === 3) score += 8; // reaching 4 is usually +2 assurance
+        if (move.card.type === "connection" && (c === 2 || c === 3)) score += 6;
+        
+      } else if (move.type === "buyPool") {
+        if (move.params.cardType === "ticket") {
+          score = (pTickets < 1) ? 20 : -10; // Must have 1, extra is useless
+        } else {
+          score = (pPassports < 1) ? 20 : -10;
+        }
+      } else if (move.type === "reclaim") {
+        if (move.params.cardType === "ticket") score = (pTickets < 1) ? 15 : -10;
+        else score = (pPassports < 1) ? 15 : -10;
+      } else if (move.type === "steal") {
+        score = -5; // Missing a turn is bad, but getting the card is good
+        if (move.params.cardType === "ticket" && pTickets < 1) score += 15;
+        if (move.params.cardType === "passport" && pPassports < 1) score += 15;
+      } else if (move.type === "applyCollege") {
+        // High value early game, bad late game
+        const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1;
+        score = isLateGame ? -5 : 5;
+      } else if (move.type === "discard") {
+        score = 2 - move.fee; // We gain $2, pay fee
+        if (move.targetId !== player.id) {
+          score += 3; // Good to destroy opponent's layout cards!
+        } else {
+          score -= 2; // Bad to destroy our own layout (unless necessary)
+        }
+      }
+
+      // Tie-breaker: random noise to prevent infinite loops
+      return score + Math.random() * 0.1;
+    };
+
+    possibleMoves.forEach(m => m._score = evaluateScore(m));
+    possibleMoves.sort((a, b) => b._score - a._score);
+    
+    return possibleMoves[0];
   }
 
   /**
@@ -180,6 +336,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     for (const p of engine.players) {
       const fee = p.id === player.id ? 0 : player.accessFee;
       if (player.money < fee) continue;
+      
+      // Prevent activating opponent's payday if it's a net loss
+      if (cardType === "payday" && p.id !== player.id && player.salary <= fee) continue;
 
       for (let i = 0; i < 14; i++) {
         if (engine.isCardAvailable(p, i)) {
