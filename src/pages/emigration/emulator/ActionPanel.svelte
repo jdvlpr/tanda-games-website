@@ -34,7 +34,12 @@
       </div>
 
       <!-- Action States -->
-      {#if computerTurn}
+      {#if snapshot.phase === 'game_over'}
+        <div class="bg-red-100 dark:bg-red-900 p-4 rounded-md text-center">
+          <h3 class="mt-0 mb-2 pb-2">Game Over</h3>
+          <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
+        </div>
+      {:else if computerTurn}
         <div class="text-sm font-semibold text-center py-5 px-4 rounded-md text-neutral-500 dark:text-neutral-400">
           <span class="text-2xl block mb-2">🤖</span>
           Computer is taking its turn…
@@ -55,11 +60,6 @@
         <div class="text-sm font-semibold text-center py-5 px-4  rounded-md">
           Border Crossing Phase is active.<br/>
           <span class="text-xs text-sky-400 font-normal mt-1 block">Please click "Select Lane" on one of the Security Lanes in the Public Center Pool.</span>
-        </div>
-      {:else if snapshot.phase === 'game_over'}
-        <div class="bg-red-100 dark:bg-red-900 p-4 rounded-md text-center">
-          <h3 class="mt-0 mb-2 pb-2">Game Over</h3>
-          <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
         </div>
       {/if}
     </div>

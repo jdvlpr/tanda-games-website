@@ -2913,53 +2913,34 @@ export default class EmigrationEngine {
     { source, targetPlayerIdx, slotIdx, stashType, stashIdx },
   ) {
     if (source === "stash") {
-      if (targetPlayerIdx !== undefined && targetPlayerIdx !== player.id) {
-        this.log("Cannot discard from another player's stash.", "error");
-        return;
-      }
-      const arr =
-        stashType === "document"
-          ? player.stash.documents
-          : player.stash.connections;
-      if (stashIdx < 0 || stashIdx >= arr.length) {
-        this.log("Invalid index.", "error");
-        return;
-      }
-      const [disc] = arr.splice(stashIdx, 1);
-      this.discardPile.push(disc);
-      player.money += 2;
-      this.log(
-        `${player.name} discarded ${disc.name} from stash, gains $2.`,
-        "action",
-      );
-      this._onCardDiscarded(player, disc);
-      this.advanceTurn();
-    } else {
-      // From layout
-      const target = this.players[targetPlayerIdx];
-      const slot = target.layout[slotIdx];
-      if (!slot || !this.isCardAvailable(target, slotIdx)) {
-        this.log("Card not available.", "error");
-        return;
-      }
-      if (slot.card.type !== "document" && slot.card.type !== "connection") {
-        this.log("Can only discard Document/Connection.", "error");
-        return;
-      }
-
-      const fee = target.id === player.id ? 0 : player.accessFee;
-      if (
-        target.id !== player.id &&
-        target.stash.lifeCards.some((lc) => lc.title === "Persuasion")
-      ) {
-        this._handlePersuasion(player, target, slotIdx, fee, (actualFee) => {
-          this._finishDiscard(player, target, slotIdx, actualFee);
-        });
-        return;
-      }
-
-      this._finishDiscard(player, target, slotIdx, fee);
+      this.log("Cannot discard from stash as a required action. Use Sell instead.", "error");
+      return;
     }
+
+    // From layout
+    const target = this.players[targetPlayerIdx];
+    const slot = target.layout[slotIdx];
+    if (!slot || !this.isCardAvailable(target, slotIdx)) {
+      this.log("Card not available.", "error");
+      return;
+    }
+    if (slot.card.type !== "document" && slot.card.type !== "connection") {
+      this.log("Can only discard Document/Connection.", "error");
+      return;
+    }
+
+    const fee = target.id === player.id ? 0 : player.accessFee;
+    if (
+      target.id !== player.id &&
+      target.stash.lifeCards.some((lc) => lc.title === "Persuasion")
+    ) {
+      this._handlePersuasion(player, target, slotIdx, fee, (actualFee) => {
+        this._finishDiscard(player, target, slotIdx, actualFee);
+      });
+      return;
+    }
+
+    this._finishDiscard(player, target, slotIdx, fee);
   }
 
   _finishDiscard(player, target, slotIdx, fee) {

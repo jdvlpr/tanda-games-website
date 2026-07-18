@@ -273,29 +273,6 @@ export function createAutoPlayer(engine, difficulty = "normal") {
    * Find the least valuable card to discard.
    */
   function _findDiscardTarget(player) {
-    // Prefer discarding from own stash (cheapest card)
-    if (player.stash.documents.length > 0) {
-      const idx = player.stash.documents.reduce(
-        (best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best),
-        0,
-      );
-      return {
-        type: "discard",
-        params: { source: "stash", stashType: "document", stashIdx: idx },
-      };
-    }
-    if (player.stash.connections.length > 0) {
-      const idx = player.stash.connections.reduce(
-        (best, c, i) =>
-          c.cost < player.stash.connections[best].cost ? i : best,
-        0,
-      );
-      return {
-        type: "discard",
-        params: { source: "stash", stashType: "connection", stashIdx: idx },
-      };
-    }
-
     // Discard from own layout
     for (let i = 0; i < 14; i++) {
       if (engine.isCardAvailable(player, i)) {
@@ -477,6 +454,17 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     // Optional: try to graduate if in college
     if (player.inCollege) {
       engine.executeOptionalAction("graduate");
+    }
+
+    // Optional: sell a card from stash if low on money (e.g. to afford access fee or tickets)
+    if (player.money < 2) {
+      if (player.stash.documents.length > 0) {
+        const idx = player.stash.documents.reduce((best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best), 0);
+        engine.executeOptionalAction("sell", { stashType: "document", stashIdx: idx });
+      } else if (player.stash.connections.length > 0) {
+        const idx = player.stash.connections.reduce((best, c, i) => (c.cost < player.stash.connections[best].cost ? i : best), 0);
+        engine.executeOptionalAction("sell", { stashType: "connection", stashIdx: idx });
+      }
     }
 
     // Required action
