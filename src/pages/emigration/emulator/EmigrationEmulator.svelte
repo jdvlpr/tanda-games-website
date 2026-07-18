@@ -127,18 +127,39 @@
     });
   });
 
+  let actualActivePlayerId = $derived(snapshot ? (snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : snapshot.activeCrossingIdx) : 0);
+  let visualActivePlayerId = $state(0);
+  let previousActualPlayerId = $state(0);
+  let isTransitioning = $state(false);
+
+  $effect(() => {
+    if (actualActivePlayerId !== previousActualPlayerId) {
+      const prev = previousActualPlayerId;
+      previousActualPlayerId = actualActivePlayerId;
+      
+      if (vsComputer && prev !== 0 && prev !== null) {
+        isTransitioning = true;
+        setTimeout(() => {
+          visualActivePlayerId = actualActivePlayerId;
+          isTransitioning = false;
+        }, 2500);
+      } else {
+        visualActivePlayerId = actualActivePlayerId;
+      }
+    }
+  });
+
   // In Solo vs AI mode: is it currently the human player's turn (index 0)?
   let isHumanTurn = $derived(
     !vsComputer ||
     !snapshot ||
     snapshot.phase === 'game_over' ||
-    (snapshot.phase === 'preparation' && snapshot.currentPlayerIdx === 0) ||
-    (snapshot.phase === 'crossing' && snapshot.activeCrossingIdx === 0)
+    visualActivePlayerId === 0
   );
 
   // Drive AI turns whenever snapshot changes in Solo vs AI mode
   $effect(() => {
-    if (!vsComputer || !snapshot || !aiPlayer || aiThinking) return;
+    if (!vsComputer || !snapshot || !aiPlayer || aiThinking || isTransitioning) return;
     if (snapshot.phase === 'game_over') return;
     if (isHumanTurn) return;
 
@@ -163,7 +184,7 @@
         safety++;
       }
       aiThinking = false;
-    }, 300);
+    }, 1000);
   });
   let selectionText = $derived.by(() => {
     if (!snapshot) return 'Select an available layout card or stash item, then choose your action.';
@@ -230,6 +251,9 @@
     });
 
     snapshot = engine.getSnapshot();
+    visualActivePlayerId = snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : snapshot.activeCrossingIdx;
+    previousActualPlayerId = visualActivePlayerId;
+    isTransitioning = false;
     pendingChoice = engine.pendingChoice ?? null;
     isSetup = false;
     testResults = null;
@@ -553,7 +577,7 @@
             <PlayerBoard 
               {engine} 
               {player}
-              isActive={(snapshot.phase === 'preparation' && snapshot.currentPlayerIdx === player.id) || (snapshot.phase === 'crossing' && snapshot.activeCrossingIdx === player.id)}
+              isActive={visualActivePlayerId === player.id}
               onCardSelect={handleCardSelect}
               {selectedSlot}
               {selectedStash}
@@ -571,8 +595,8 @@
             onaction={handleAction}
             onselectlane={handleSelectLane}
             {selectionText}
-            pendingChoice={pendingChoice || (vsComputer && !isHumanTurn)}
-            computerTurn={vsComputer && !isHumanTurn}
+            pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
+            computerTurn={vsComputer && visualActivePlayerId !== 0}
             autoScrollEnabled={!autoplay}
             hasSelection={!!(selectedSlot || selectedStash)}
             onclearselection={() => { selectedSlot = null; selectedStash = null; }}
