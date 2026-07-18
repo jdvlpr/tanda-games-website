@@ -1,5 +1,4 @@
 <script>
-  import { send, receive } from '../../../js/utils.svelte.js';
   let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash } = $props();
 
   let boardEl = null;
@@ -71,9 +70,7 @@
 {#snippet cardSlot(slotIdx)}
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
-    <div class="grid-card-slot">
-      <div class="grid-card rounded-md bg-transparent border-none! shadow-none!"></div>
-    </div>
+    <div class="grid-card-slot empty"></div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
     {@const isAvail = isAvailable(slotIdx)}
@@ -86,8 +83,6 @@
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
-        in:receive={{ key: c.id }}
-        out:send={{ key: c.id }}
       >
         {#if slot.faceUp}
           <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
@@ -202,7 +197,7 @@
     <!-- 1. Documents -->
     <div class="stash-column">
       <div class="uppercase tracking-wide text-xs mb-1">Docs ({player.stash.documents.length})</div>
-      {#each player.stash.documents as doc, i}
+      {#each player.stash.documents as doc, i (doc.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'document' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -210,8 +205,6 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-document);" 
           onclick={() => handleStashClick('document', i)}
-          in:receive={{ key: doc.id }}
-          out:send={{ key: doc.id }}
         >
           <span class="truncate pr-1">{doc.name}</span>
           <span class="text-xs  font-bold">${doc.cost || 0}</span>
@@ -222,7 +215,7 @@
     <!-- 2. Connections -->
     <div class="stash-column">
       <div class="uppercase tracking-wide text-xs mb-1">Conns ({player.stash.connections.length})</div>
-      {#each player.stash.connections as conn, i}
+      {#each player.stash.connections as conn, i (conn.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'connection' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -230,8 +223,6 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-connection);" 
           onclick={() => handleStashClick('connection', i)}
-          in:receive={{ key: conn.id }}
-          out:send={{ key: conn.id }}
         >
           <span class="truncate pr-1">{conn.name}</span>
           <span class="text-xs  font-bold">${conn.cost || 0}</span>
@@ -276,7 +267,7 @@
     <!-- 5. Kept Life -->
     <div class="stash-column">
       <div class="uppercase tracking-wide text-xs mb-1">Life ({player.stash.lifeCards.length})</div>
-      {#each player.stash.lifeCards as lc, i}
+      {#each player.stash.lifeCards as lc, i (lc.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -284,8 +275,6 @@
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-life);" 
           onclick={() => handleStashClick('lifeCard', i)}
-          in:receive={{ key: lc.id }}
-          out:send={{ key: lc.id }}
         >
           <span class="truncate pr-1">{lc.title}</span>
           {#if lc.money}
