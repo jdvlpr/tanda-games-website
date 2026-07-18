@@ -142,7 +142,7 @@
         setTimeout(() => {
           visualActivePlayerId = actualActivePlayerId;
           isTransitioning = false;
-        }, 2500);
+        }, 1000);
       } else {
         visualActivePlayerId = actualActivePlayerId;
       }
@@ -607,6 +607,9 @@
       <Modal 
         choice={pendingChoice} 
         onresolve={handleModalResolve} 
+        oncancel={() => {
+          if (engine) engine.cancelPendingChoice();
+        }}
       />
     </div>
   {/if}

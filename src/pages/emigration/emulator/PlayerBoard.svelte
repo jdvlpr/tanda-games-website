@@ -71,7 +71,7 @@
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
     <div class="grid-card-slot">
-      <div class="grid-card rounded-md bg-transparent cursor-auto! border-none! shadow-none!"></div>
+      <div class="grid-card rounded-md bg-transparent border-none! shadow-none!"></div>
     </div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
@@ -87,7 +87,7 @@
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
       >
         {#if slot.faceUp}
-          <div class="h-2 w-full border cursor-pointer rounded-md" style="background:{getCardColor(c.type)}"></div>
+          <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
           <div class="card-type">{c.type}</div>
           <div class="card-title">{c.name || c.title}</div>
           <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
@@ -298,10 +298,10 @@
     height: 50px; /* Creates vertical overlap */
   }
 
-  .row-1 { z-index: 10; }
-  .row-2 { z-index: 20; }
-  .row-3 { z-index: 30; }
-  .row-4 { z-index: 40; }
+  .row-1 { z-index: 100; }
+  .row-2 { z-index: 200; }
+  .row-3 { z-index: 300; }
+  .row-4 { z-index: 400; }
 
   .grid-card-slot {
     width: 90px;

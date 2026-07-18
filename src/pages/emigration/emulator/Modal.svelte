@@ -1,5 +1,5 @@
 <script>
-  let { choice, onresolve } = $props();
+  let { choice, onresolve, oncancel } = $props();
 
   function handleResolve(value) {
     if (onresolve) onresolve(value);
@@ -21,6 +21,14 @@
             {option.text}
           </button>
         {/each}
+        {#if choice.cancellable !== false && oncancel}
+          <button
+            class="btn mt-4 bg-red-900/30 hover:bg-red-900/50 text-red-200 border-red-900"
+            onclick={oncancel}
+          >
+            Cancel Action
+          </button>
+        {/if}
       </div>
     </div>
   </div>

@@ -604,6 +604,7 @@ export default class EmigrationEngine {
     // Choice system
     this.pendingChoice = null;
     this._pendingResolve = null;
+    this._backup = null;
 
     // Safety valve for infinite loops
     this._advanceCount = 0;
@@ -1414,6 +1415,7 @@ export default class EmigrationEngine {
       id: choice.id || `choice-${Date.now()}`,
       title: choice.title,
       options: choice.options,
+      cancellable: choice.cancellable !== false
     };
     this._pendingResolve = choice.resolve;
     this._notify();
@@ -1424,7 +1426,46 @@ export default class EmigrationEngine {
     const resolve = this._pendingResolve;
     this._pendingResolve = null;
     this.pendingChoice = null;
+    this._backup = null; // Clear backup once a choice is resolved
     resolve(value);
+  }
+
+  createBackup() {
+    this._backup = JSON.stringify({
+      phase: this.phase,
+      currentPlayerIdx: this.currentPlayerIdx,
+      players: this.players,
+      publicServices: this.publicServices,
+      securityLanes: this.securityLanes,
+      discardPile: this.discardPile,
+      deck: this.deck,
+      turnNumber: this.turnNumber,
+      consecutiveForfeits: this.consecutiveForfeits,
+      pandemicStimulusCount: this.pandemicStimulusCount,
+      activeCrossingIdx: this.activeCrossingIdx,
+      gameResult: this.gameResult,
+      _collegeFailed: this._collegeFailed,
+      _graduateAttempted: this._graduateAttempted,
+      _identicalTwinExtraTurn: this._identicalTwinExtraTurn,
+      logs: this.logs
+    });
+  }
+
+  restoreBackup() {
+    if (!this._backup) return false;
+    const backup = JSON.parse(this._backup);
+    Object.assign(this, backup);
+    this.pendingChoice = null;
+    this._pendingResolve = null;
+    this._backup = null;
+    this._notify();
+    return true;
+  }
+
+  cancelPendingChoice() {
+    if (this.pendingChoice && this.pendingChoice.cancellable !== false) {
+      this.restoreBackup();
+    }
   }
 
   // ─── Optional Actions ────────────────────────────────────────────────
@@ -1436,6 +1477,7 @@ export default class EmigrationEngine {
    */
   executeOptionalAction(type, params = {}) {
     if (this.phase !== "preparation" || this.pendingChoice) return;
+    this.createBackup();
     const player = this.players[this.currentPlayerIdx];
 
     switch (type) {
@@ -1508,6 +1550,7 @@ export default class EmigrationEngine {
       this.log("Cannot apply for college again this turn.", "error");
       return;
     }
+    this.createBackup();
     const player = this.players[this.currentPlayerIdx];
 
     switch (type) {
@@ -1680,6 +1723,7 @@ export default class EmigrationEngine {
     this._setPendingChoice({
       id: "persuasion-offer",
       title: `${target.name} has Persuasion. Offer it instead of the targeted card?`,
+      cancellable: false,
       options: [
         { text: `Yes — offer Persuasion to ${player.name}`, value: "offer" },
         { text: "No — proceed normally", value: "skip" },
@@ -1693,6 +1737,7 @@ export default class EmigrationEngine {
         this._setPendingChoice({
           id: "persuasion-accept",
           title: `${player.name}: Accept Persuasion, or decline and pay double fee?`,
+          cancellable: false,
           options: [
             {
               text: `Accept Persuasion (pay $${baseFee} fee)`,
