@@ -298,10 +298,10 @@
     height: 50px; /* Creates vertical overlap */
   }
 
-  .row-1 { z-index: 100; }
-  .row-2 { z-index: 200; }
-  .row-3 { z-index: 300; }
-  .row-4 { z-index: 400; }
+  .row-1 { z-index: 10; }
+  .row-2 { z-index: 20; }
+  .row-3 { z-index: 30; }
+  .row-4 { z-index: 40; }
 
   .grid-card-slot {
     width: 90px;
