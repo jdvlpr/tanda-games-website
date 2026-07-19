@@ -9,16 +9,16 @@ This document provides a high-level overview of the Emigration board game emulat
 
 ## Key Files & Components
 
-- **`engine.js`**: The heart of the game. Handles all state mutations, rule enforcement, phase transitions, and turn progressions.
-- **`EmigrationEmulator.svelte`**: The main UI orchestrator. Mounts the engine, listens for state changes, and renders the board.
-- **`autoplay.js`**: The AI logic for "Solo vs Computer" mode. It evaluates the board state and invokes the exact same engine actions that a human player would.
-- **`Modal.svelte`**: Renders the UI for interactive decisions (e.g., choosing targets, keeping cards).
-- **`game_specification.md`**: The authoritative rulebook for the physical board game. The emulator should completely match the logic, rules, and player objectives from the game_specification.md file in order to emulate the game using its authoritative source.
+- **`src/pages/emigration/emulator/game_specification.md`**: The authoritative rulebook for the physical board game. The emulator should completely match the logic, rules, and player objectives from the game_specification.md file in order to emulate the game using its authoritative source.
+- **`src/pages/emigration/emulator/engine.js`**: The heart of the game. Handles all state mutations, rule enforcement, phase transitions, and turn progressions.
+- **`src/pages/emigration/emulator/EmigrationEmulator.svelte`**: The main UI orchestrator. Mounts the engine, listens for state changes, and renders the board.
+- **`src/pages/emigration/emulator/autoplay.js`**: The AI logic for "Solo vs Computer" mode. It evaluates the board state and invokes the exact same engine actions that a human player would.
+- **`src/pages/emigration/emulator/Modal.svelte`**: Renders the UI for interactive decisions (e.g., choosing targets, keeping cards).
 
 ## State Management & UI Reactivity
 
 - The engine uses a callback `onStateChange` which is fired whenever the game state updates (via `this._notify()`).
-- `EmigrationEmulator.svelte` intercepts this callback to create a snapshot clone of the engine state. Svelte's reactivity engine then updates the UI based on this snapshot.
+- `src/pages/emigration/emulator/EmigrationEmulator.svelte` intercepts this callback to create a snapshot clone of the engine state. Svelte's reactivity engine then updates the UI based on this snapshot.
 
 ## The `pendingChoice` Pattern (Interrupts & Modals)
 
@@ -48,10 +48,5 @@ Players (human or AI) take their turns by executing actions through the engine:
 ## Phases
 
 - **Phase 1 (Preparation):** Players take turns acquiring resources, documents, and connections to prepare for the border crossing.
-- **Phase 2 (Crossing):** Triggers instantly when the center pool of tickets/passports is completely empty AND no face-up cards remain in any layout. 
+- **Phase 2 (Crossing):** Triggers instantly when the center pool of tickets/passports is completely empty AND no face-up cards remain in any layout.
 - In Phase 2, players sequentially pick a security lane. Their `assurance` is calculated, and they cross if `assurance >= token value`.
-
-## UI Animations
-
-- To achieve smooth layout-to-stash and stash-to-discard animations, Svelte's native `crossfade` transition is utilized (`src/js/utils.svelte.ts`).
-- To make `crossfade` work, every card instance initialized in `engine.js` is given a unique `id` during the `_setupPlayersAndDeck` function (e.g., `card-1`, `card-2`). The `key: c.id` is passed into `in:receive` and `out:send` in Svelte.
