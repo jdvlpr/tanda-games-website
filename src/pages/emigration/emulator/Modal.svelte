@@ -9,7 +9,7 @@
 {#if choice}
   <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]">
     <div class="bg-neutral-200 dark:bg-neutral-800 p-6 rounded-xl max-w-[500px] w-[90%] shadow-xl">
-      <h2 class="mt-0 mb-5 text-xl font-semibold text-center font-emi-heading">
+      <h2 class="mt-0 mb-5 text-xl font-semibold text-center">
         {choice.title}
       </h2>
       <div class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">

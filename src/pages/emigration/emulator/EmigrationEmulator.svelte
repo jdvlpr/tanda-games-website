@@ -2,9 +2,20 @@
   import ActionPanel from './ActionPanel.svelte';
   import { createAutoPlayer } from './autoplay.js';
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, PACKS_LIST, runTests } from './engine.js';
+  import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
   import { playPaydaySound } from '../../../js/utils.svelte.js';
   import PlayerBoard from './PlayerBoard.svelte';
+
+  // Responsive: track mobile vs desktop
+  let isMobile = $state(false);
+  $effect(() => {
+    const mql = window.matchMedia('(max-width: 1023px)');
+    isMobile = mql.matches;
+    const handler = (e) => { isMobile = e.matches; };
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  });
 
   // Props
   let { defaultMode = 'competitive', defaultPlayerCount = 2, showTestRunner = true } = $props();
@@ -472,7 +483,28 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start max-w-[1600px] mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
-        <div class="flex flex-col gap-2 max-lg:pb-[45vh]">
+        <div class="flex flex-col gap-2">
+          <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
+          {#if isMobile}
+            <div class="sticky top-0 z-[100]">
+              <ActionPanel 
+                {engine}
+                {snapshot}
+                currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
+                actions={filteredActions}
+                onaction={handleAction}
+                onselectlane={handleSelectLane}
+                {selectionText}
+                pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
+                computerTurn={vsComputer && visualActivePlayerId !== 0}
+                autoScrollEnabled={!autoplay}
+                hasSelection={!!(selectedSlot || selectedStash)}
+                onclearselection={() => { selectedSlot = null; selectedStash = null; }}
+                showLog={false}
+              />
+            </div>
+          {/if}
+
           <!-- Public Center Pool -->
           <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 backdrop-blur-md">
           <!-- Security Lanes -->
@@ -589,24 +621,35 @@
           {/each}
         </div>
         
-        <!-- Right Sidebar: Sticky Action Panel -->
-        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[25vh] h-[calc(100vh-40px)]">
-          <ActionPanel 
-            {engine}
-            {snapshot}
-            currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
-            actions={filteredActions}
-            onaction={handleAction}
-            onselectlane={handleSelectLane}
-            {selectionText}
-            pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
-            computerTurn={vsComputer && visualActivePlayerId !== 0}
-            autoScrollEnabled={!autoplay}
-            hasSelection={!!(selectedSlot || selectedStash)}
-            onclearselection={() => { selectedSlot = null; selectedStash = null; }}
-          />
-        </div>
+        <!-- Right Sidebar: Desktop only -->
+        {#if !isMobile}
+          <div class="lg:sticky lg:top-6 h-[calc(100vh-40px)]">
+            <ActionPanel 
+              {engine}
+              {snapshot}
+              currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
+              actions={filteredActions}
+              onaction={handleAction}
+              onselectlane={handleSelectLane}
+              {selectionText}
+              pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
+              computerTurn={vsComputer && visualActivePlayerId !== 0}
+              autoScrollEnabled={!autoplay}
+              hasSelection={!!(selectedSlot || selectedStash)}
+              onclearselection={() => { selectedSlot = null; selectedStash = null; }}
+              showLog={true}
+            />
+          </div>
+        {/if}
       </div>
+
+      <!-- Mobile Floating Log Sheet -->
+      {#if isMobile}
+        <GameLogSheet 
+          logs={snapshot.logs}
+          autoScrollEnabled={!autoplay}
+        />
+      {/if}
       
       <Modal 
         choice={pendingChoice} 
