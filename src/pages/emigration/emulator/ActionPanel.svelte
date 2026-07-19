@@ -40,9 +40,8 @@
           <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
         </div>
       {:else if computerTurn}
-        <div class="text-sm font-semibold text-center py-5 px-4 rounded-md text-neutral-500 dark:text-neutral-400">
-          <span class="text-2xl block mb-2">🤖</span>
-          Computer is taking its turn…
+        <div class="text-sm ">
+          🤖 Computer is taking its turn…
         </div>
       {:else if snapshot.phase === 'preparation'}
         <div class="grid grid-cols-2 gap-2">

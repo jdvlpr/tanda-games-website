@@ -55,13 +55,19 @@
     // Only start drag from the handle area (top 48px of sheet)
     const touchYInSheet = touch.clientY - sheetRect.top;
     if (touchYInSheet > 48) return;
+    // Prevent the page from scrolling as soon as a drag begins
+    e.preventDefault();
     isDragging = true;
     dragStartY = touch.clientY;
     dragCurrentY = 0;
   }
 
+  // Must be registered with { passive: false } so preventDefault() is honoured.
+  // Browsers make touch listeners passive by default; passive listeners silently
+  // ignore preventDefault(), which causes the page to scroll while dragging.
   function handleTouchMove(e) {
     if (!isDragging) return;
+    e.preventDefault(); // stop the page scrolling behind the sheet
     const touch = e.touches[0];
     const delta = touch.clientY - dragStartY;
     dragCurrentY = Math.max(0, delta);
@@ -76,6 +82,15 @@
       dragCurrentY = 0;
     }
   }
+
+  // Attach touchmove as non-passive on the sheet element so we can call
+  // preventDefault() to suppress scroll while the user drags the sheet down.
+  $effect(() => {
+    const el = sheetEl;
+    if (!el) return;
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', handleTouchMove);
+  });
 </script>
 
 <!-- Only shown on mobile (< lg). On desktop, log lives in the sidebar. -->
@@ -132,7 +147,6 @@
              will-change-transform animate-slide-up"
       style="transform: translateY({dragCurrentY}px);"
       ontouchstart={handleTouchStart}
-      ontouchmove={handleTouchMove}
       ontouchend={handleTouchEnd}
     >
       <!-- Drag Handle -->

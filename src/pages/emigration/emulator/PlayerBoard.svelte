@@ -1,11 +1,11 @@
 <script>
-  let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash } = $props();
+  let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash, autoScrollEnabled = true } = $props();
 
   let boardEl = null;
   let wasActive = false;
 
   $effect(() => {
-    if (isActive && !wasActive && boardEl) {
+    if (autoScrollEnabled && isActive && !wasActive && boardEl) {
       requestAnimationFrame(() => {
         boardEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });

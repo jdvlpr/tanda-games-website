@@ -617,6 +617,7 @@
               onCardSelect={handleCardSelect}
               {selectedSlot}
               {selectedStash}
+              autoScrollEnabled={!autoplay}
             />
           {/each}
         </div>
