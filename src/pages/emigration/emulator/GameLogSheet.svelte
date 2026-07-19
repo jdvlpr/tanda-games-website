@@ -159,7 +159,7 @@
         bind:this={logContainer}
         class="flex-1 overflow-y-auto overscroll-contain
                px-4 py-3 font-emi-mono text-[11px]
-               flex flex-col gap-1
+               flex flex-col items-start text-left gap-1
                [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-sm"
       >
         {#each logs as log}
