@@ -16,7 +16,7 @@
   });
 </script>
 
-<div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 flex flex-col gap-5 h-full max-h-[calc(100vh-200px)] overflow-auto backdrop-blur-md">
+<div class="bg-neutral-200 dark:bg-neutral-800 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 h-full max-h-[calc(100vh-200px)] overflow-auto backdrop-blur-md">
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
