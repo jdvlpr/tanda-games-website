@@ -590,7 +590,7 @@
         </div>
         
         <!-- Right Sidebar: Sticky Action Panel -->
-        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[40vh] h-[calc(100vh-40px)]">
+        <div class="lg:sticky lg:top-6 max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:top-auto max-lg:z-[100] max-lg:h-[25vh] h-[calc(100vh-40px)]">
           <ActionPanel 
             {engine}
             {snapshot}
