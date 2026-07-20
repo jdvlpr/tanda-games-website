@@ -1,5 +1,5 @@
 <script>
-  let { logs = [], autoScrollEnabled = true } = $props();
+  let { logs = [], autoScrollEnabled = true, copyTextToClipboard } = $props();
 
   // Sheet state
   let isOpen = $state(false);
@@ -159,6 +159,8 @@
         <h3 class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0">
           Game Log
         </h3>
+      <button class="btn text-xs" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
+
         <button
           class="bg-transparent border-none text-neutral-500 text-base
                  cursor-pointer px-2 py-1 rounded transition-colors
@@ -171,6 +173,7 @@
       <!-- Log Content -->
       <div
         bind:this={logContainer}
+        id="game-log-mobile"
         class="flex-1 overflow-y-auto overscroll-contain
                px-4 py-3 font-emi-mono text-[11px]
                flex flex-col items-start text-left gap-1

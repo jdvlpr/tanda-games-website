@@ -113,21 +113,22 @@ Nationality cards dictate the Starting Fund and College Fund.
 
 ### 3.2 Destinations
 
-Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border).
+Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border). Rewards for resource sets stack, meaning players can earn the reward multiple times if they turn in multiple sets. Penalties for failing to meet minimum requirements apply only once.
 
-- **Format**: `Requirement` \(\rightarrow\) `Assurance Modification`
+- **Format**: `Every [X] Sets` &rarr; `Assurance Reward`
+- **Format**: `< [Minimum Required]` &rarr; `Assurance Penalty`
 
-| Destination                      | Money                                                 | Documents                                            | Connections              |
-| :------------------------------- | :---------------------------------------------------- | :--------------------------------------------------- | :----------------------- |
-| **Bosnia and Herzegovina**       | \(\ge 6 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +6\) |
-| **China**                        | \(\ge 10 \rightarrow +3\) <br> \(< 4 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 4 \rightarrow +5\) |
-| **Democratic Republic of Congo** | \(\ge 6 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +6\) |
-| **France**                       | \(\ge 8 \rightarrow +2\) <br> \(< 3 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
-| **Russia**                       | \(\ge 7 \rightarrow +2\) <br> \(< 2 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
-| **Senegal**                      | \(\ge 7 \rightarrow +2\)                              | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -2\) | \(\ge 3 \rightarrow +5\) |
-| **Switzerland**                  | \(\ge 7 \rightarrow +2\) <br> \(< 2 \rightarrow -1\)  | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
-| **England**                      | \(\ge 10 \rightarrow +3\) <br> \(< 4 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 3 \rightarrow +4\) |
-| **United States of America**     | \(\ge 10 \rightarrow +3\) <br> \(< 5 \rightarrow -2\) | \(\ge 4 \rightarrow +2\) <br> \(< 2 \rightarrow -3\) | \(\ge 4 \rightarrow +5\) |
+| Destination                      | Money                                 | Documents                            | Connections       |
+| :------------------------------- | :------------------------------------ | :----------------------------------- | :---------------- |
+| **Bosnia and Herzegovina**       | Every 6 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +6 |
+| **China**                        | Every 10 &rarr; +3 <br> < 4 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 4 &rarr; +5 |
+| **Democratic Republic of Congo** | Every 6 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +6 |
+| **France**                       | Every 8 &rarr; +2 <br> < 3 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
+| **Russia**                       | Every 7 &rarr; +2 <br> < 2 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
+| **Senegal**                      | Every 7 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +5 |
+| **Switzerland**                  | Every 7 &rarr; +2 <br> < 2 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
+| **England**                      | Every 10 &rarr; +3 <br> < 4 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
+| **United States of America**     | Every 10 &rarr; +3 <br> < 5 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 4 &rarr; +5 |
 
 ### 3.3 Security Lanes
 

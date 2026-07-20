@@ -15,6 +15,40 @@ export function shuffleArray(arr) {
   return arr;
 }
 
+/**
+ * Dynamically calculates Assurance, applying set rewards and minimum penalties
+ * uniformly to any resource that has them defined in the targets object.
+ *
+ * @param {number} m - Actual Money amount
+ * @param {number} d - Actual Documents amount
+ * @param {number} c - Actual Connections amount
+ * @param {Object} targets - The dynamic rules for sets, rewards, and penalties
+ * @returns {number} The calculated score
+ */
+const calculateAssurance = (targets) => (m, d, c) => {
+  let a = 0;
+
+  // Map the variables to their keys so we can process them identically
+  const actuals = { m, d, c };
+
+  for (const [key, amount] of Object.entries(actuals)) {
+    const rules = targets[key];
+    if (!rules) continue;
+
+    // 1. Add reward for every set met
+    if (rules.setSize > 0) {
+      a += Math.floor(amount / rules.setSize) * (rules.reward || 0);
+    }
+
+    // 2. Apply penalty if below minimum required
+    if (rules.minRequired !== undefined && amount < rules.minRequired) {
+      a -= rules.penalty || 0;
+    }
+  }
+
+  return a;
+};
+
 // ─── Constants & Data Tables ─────────────────────────────────────────────────
 
 /** Maps nationality adjective → destination country name. */
@@ -46,116 +80,83 @@ export const DESTINATIONS = [
   {
     name: "Bosnia and Herzegovina",
     nationality: "Bosnian",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 6) a += 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 2;
-      if (c >= 3) a += 6;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 6, reward: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      c: { setSize: 3, reward: 6 },
+    }),
   },
   {
     name: "China",
     nationality: "Chinese",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 10) a += 3;
-      else if (m < 4) a -= 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 4) a += 5;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 4, reward: 5 },
+    }),
   },
   {
     name: "Democratic Republic of Congo",
     nationality: "Congolese",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 6) a += 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 2;
-      if (c >= 3) a += 6;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 6, reward: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      c: { setSize: 3, reward: 6 },
+    }),
   },
   {
     name: "France",
     nationality: "French",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 8) a += 2;
-      else if (m < 3) a -= 1;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 3) a += 4;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 8, reward: 2, minRequired: 3, penalty: 1 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 3, reward: 4 },
+    }),
   },
   {
     name: "Russia",
     nationality: "Russian",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 7) a += 2;
-      else if (m < 2) a -= 1;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 3) a += 4;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 3, reward: 4 },
+    }),
   },
   {
     name: "Senegal",
     nationality: "Senegalese",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 7) a += 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 2;
-      if (c >= 3) a += 5;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 7, reward: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      c: { setSize: 3, reward: 5 },
+    }),
   },
   {
     name: "Switzerland",
     nationality: "Swiss",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 7) a += 2;
-      else if (m < 2) a -= 1;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 3) a += 4;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 3, reward: 4 },
+    }),
   },
   {
     name: "England",
     nationality: "English",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 10) a += 3;
-      else if (m < 4) a -= 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 3) a += 4;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 3, reward: 4 },
+    }),
   },
   {
     name: "United States of America",
     nationality: "American",
-    check: (m, d, c) => {
-      let a = 0;
-      if (m >= 10) a += 3;
-      else if (m < 5) a -= 2;
-      if (d >= 4) a += 2;
-      else if (d < 2) a -= 3;
-      if (c >= 4) a += 5;
-      return a;
-    },
+    check: calculateAssurance({
+      m: { setSize: 10, reward: 3, minRequired: 5, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
+      c: { setSize: 4, reward: 5 },
+    }),
   },
 ];
 
@@ -683,7 +684,10 @@ export default class EmigrationEngine {
     const mainDeck = shuffleArray([
       ...selectedDocs.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
       ...selectedConns.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
-      ...selectedLifeCards.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
+      ...selectedLifeCards.map((c) => ({
+        ...c,
+        id: `card-${cardIdCounter++}`,
+      })),
       ...paydays.map((c) => ({ ...c, id: `card-${cardIdCounter++}` })),
     ]);
 
@@ -1408,7 +1412,7 @@ export default class EmigrationEngine {
       id: choice.id || `choice-${Date.now()}`,
       title: choice.title,
       options: choice.options,
-      cancellable: choice.cancellable !== false
+      cancellable: choice.cancellable !== false,
     };
     this._pendingResolve = choice.resolve;
     this._notify();
@@ -1440,7 +1444,7 @@ export default class EmigrationEngine {
       _collegeFailed: this._collegeFailed,
       _graduateAttempted: this._graduateAttempted,
       _identicalTwinExtraTurn: this._identicalTwinExtraTurn,
-      logs: this.logs
+      logs: this.logs,
     });
   }
 
@@ -2906,7 +2910,10 @@ export default class EmigrationEngine {
     { source, targetPlayerIdx, slotIdx, stashType, stashIdx },
   ) {
     if (source === "stash") {
-      this.log("Cannot discard from stash as a required action. Use Sell instead.", "error");
+      this.log(
+        "Cannot discard from stash as a required action. Use Sell instead.",
+        "error",
+      );
       return;
     }
 

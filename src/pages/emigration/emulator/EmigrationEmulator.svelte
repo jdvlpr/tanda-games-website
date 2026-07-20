@@ -343,6 +343,15 @@
   function handleStealPool(cardType) {
     if (engine) engine.executeRequiredAction('steal', { cardType });
   }
+
+
+  function copyTextToClipboard(elementId) {
+      const paragraphText = document.getElementById(elementId).innerText;    
+      
+      navigator.clipboard.writeText(paragraphText)
+          .then(() => alert("Paragraph text copied!"))
+          .catch(err => console.error("Failed to copy: ", err));
+  }
 </script>
 
 <div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border">
@@ -639,6 +648,7 @@
               hasSelection={!!(selectedSlot || selectedStash)}
               onclearselection={() => { selectedSlot = null; selectedStash = null; }}
               showLog={true}
+              {copyTextToClipboard}
             />
           </div>
         {/if}
@@ -649,6 +659,7 @@
         <GameLogSheet 
           logs={snapshot.logs}
           autoScrollEnabled={!autoplay}
+          {copyTextToClipboard}
         />
       {/if}
       

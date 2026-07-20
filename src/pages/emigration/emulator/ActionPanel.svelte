@@ -1,5 +1,5 @@
 <script>
-  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, showLog = true } = $props();
+  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, showLog = true, copyTextToClipboard } = $props();
 
   let logContainer = null;
 
@@ -67,7 +67,8 @@
     {#if showLog}
     <div class="flex-grow flex flex-col min-h-[180px] overflow-hidden">
       <h3 class="text-sm uppercase tracking-wider pb-2">Game Playtest Logs</h3>
-      <div class="flex-grow overflow-y-auto bg-neutral-50 dark:bg-neutral-950 rounded-md p-3 font-emi-mono text-xs text-left flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-black/10 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-sm" bind:this={logContainer}>
+      <button class="btn text-xs" onclick={() => copyTextToClipboard('game-log')}>Copy</button>
+      <div id="game-log" class="flex-grow overflow-y-auto bg-neutral-50 dark:bg-neutral-950 rounded-md p-3 font-emi-mono text-xs text-left flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-black/10 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-sm" bind:this={logContainer}>
         {#each snapshot.logs as log}
           <div class="leading-snug pb-1 {log.type === 'system' ? '' : log.type === 'action' ? '' : log.type === 'error' ? 'text-red-800 dark:text-red-200' : log.type === 'roll' ? '' : ''}">
             <span class=" text-xs">[{log.turn}]</span> {log.msg}
