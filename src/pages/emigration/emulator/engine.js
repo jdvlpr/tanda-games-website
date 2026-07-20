@@ -77,88 +77,82 @@ export const NATIONALITIES = [
 ];
 
 export const DESTINATIONS = [
-  {
-    name: "Bosnia and Herzegovina",
-    nationality: "Bosnian",
-    check: calculateAssurance({
+  "Bosnia and Herzegovina",
+  "China",
+  "Democratic Republic of Congo",
+  "France",
+  "Russia",
+  "Senegal",
+  "Switzerland",
+  "England",
+  "United States of America",
+].map((name, i) => {
+  const nationalities = [
+    "Bosnian",
+    "Chinese",
+    "Congolese",
+    "French",
+    "Russian",
+    "Senegalese",
+    "Swiss",
+    "English",
+    "American",
+  ];
+  const allTargets = [
+    {
       m: { setSize: 6, reward: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
       c: { setSize: 3, reward: 6 },
-    }),
-  },
-  {
-    name: "China",
-    nationality: "Chinese",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 4, reward: 5 },
-    }),
-  },
-  {
-    name: "Democratic Republic of Congo",
-    nationality: "Congolese",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 6, reward: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
       c: { setSize: 3, reward: 6 },
-    }),
-  },
-  {
-    name: "France",
-    nationality: "French",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 8, reward: 2, minRequired: 3, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
-    }),
-  },
-  {
-    name: "Russia",
-    nationality: "Russian",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
-    }),
-  },
-  {
-    name: "Senegal",
-    nationality: "Senegalese",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 7, reward: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
       c: { setSize: 3, reward: 5 },
-    }),
-  },
-  {
-    name: "Switzerland",
-    nationality: "Swiss",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
-    }),
-  },
-  {
-    name: "England",
-    nationality: "English",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
-    }),
-  },
-  {
-    name: "United States of America",
-    nationality: "American",
-    check: calculateAssurance({
+    },
+    {
       m: { setSize: 10, reward: 3, minRequired: 5, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 4, reward: 5 },
-    }),
-  },
-];
+    },
+  ];
+  const targets = allTargets[i];
+  return {
+    name,
+    nationality: nationalities[i],
+    targets,
+    check: calculateAssurance(targets),
+  };
+});
 
 export const DOCUMENTS_CATALOG = [
   { name: "Write Last Will and Testament", cost: 2, type: "document" },
@@ -1266,6 +1260,7 @@ export default class EmigrationEngine {
     // Evaluate destination criteria for all players
     for (const player of this.players) {
       const dest = DESTINATIONS.find((d) => d.name === player.destination);
+
       // Include Frontrunner money in the money count (Bug #8 fix)
       let totalMoney = player.money;
       const frCard = player.stash.lifeCards.find(
@@ -1275,15 +1270,141 @@ export default class EmigrationEngine {
 
       const docs = player.stash.documents.length;
       const conns = player.stash.connections.length;
-      const mod = dest.check(totalMoney, docs, conns);
+
+      // Calculate and consume resources used for Assurance sets, tracking gains and penalties
+      let consumedMoney = 0,
+        consumedDocs = 0,
+        consumedConns = 0;
+      let mGain = 0,
+        dGain = 0,
+        cGain = 0;
+      let mPen = 0,
+        dPen = 0,
+        cPen = 0;
+
+      if (dest.targets) {
+        // Analyze Money
+        if (dest.targets.m) {
+          if (dest.targets.m.setSize > 0) {
+            const sets = Math.floor(totalMoney / dest.targets.m.setSize);
+            consumedMoney = sets * dest.targets.m.setSize;
+            mGain = sets * (dest.targets.m.reward || 0);
+          }
+          if (
+            dest.targets.m.minRequired !== undefined &&
+            totalMoney < dest.targets.m.minRequired
+          ) {
+            mPen = dest.targets.m.penalty || 0;
+          }
+        }
+        // Analyze Documents
+        if (dest.targets.d) {
+          if (dest.targets.d.setSize > 0) {
+            const sets = Math.floor(docs / dest.targets.d.setSize);
+            consumedDocs = sets * dest.targets.d.setSize;
+            dGain = sets * (dest.targets.d.reward || 0);
+          }
+          if (
+            dest.targets.d.minRequired !== undefined &&
+            docs < dest.targets.d.minRequired
+          ) {
+            dPen = dest.targets.d.penalty || 0;
+          }
+        }
+        // Analyze Connections
+        if (dest.targets.c) {
+          if (dest.targets.c.setSize > 0) {
+            const sets = Math.floor(conns / dest.targets.c.setSize);
+            consumedConns = sets * dest.targets.c.setSize;
+            cGain = sets * (dest.targets.c.reward || 0);
+          }
+          if (
+            dest.targets.c.minRequired !== undefined &&
+            conns < dest.targets.c.minRequired
+          ) {
+            cPen = dest.targets.c.penalty || 0;
+          }
+        }
+      }
+
+      const mod = dest.check
+        ? dest.check(totalMoney, docs, conns)
+        : mGain + dGain + cGain - mPen - dPen - cPen;
       player.assurance += mod;
 
+      // Consume Money
+      if (consumedMoney > 0) {
+        let remainingToPay = consumedMoney;
+        if (player.money >= remainingToPay) {
+          player.money -= remainingToPay;
+        } else {
+          remainingToPay -= player.money;
+          player.money = 0;
+          if (frCard) {
+            frCard.money = Math.max(0, (frCard.money || 0) - remainingToPay);
+          }
+        }
+      }
+
+      // Consume Documents
+      for (let i = 0; i < consumedDocs; i++) {
+        if (player.stash.documents.length > 0) {
+          const doc = player.stash.documents.pop();
+          this.discardPile.push(doc);
+          this._onCardDiscarded(player, doc);
+        }
+      }
+
+      // Consume Connections
+      for (let i = 0; i < consumedConns; i++) {
+        if (player.stash.connections.length > 0) {
+          const conn = player.stash.connections.pop();
+          this.discardPile.push(conn);
+          this._onCardDiscarded(player, conn);
+        }
+      }
+
+      // 1. Log overall status
       this.log(
         `${player.name}: Money=$${totalMoney}, Docs=${docs}, Conns=${conns} → ` +
           `${player.destination} modifier: ${mod >= 0 ? "+" : ""}${mod}. ` +
-          `Assurance: ${player.assurance}`,
+          `Total Assurance: ${player.assurance}`,
         "system",
       );
+
+      // 2. Log specific trade-in gains
+      const gainsLog = [];
+      if (mGain > 0) gainsLog.push(`$${consumedMoney} for +${mGain}`);
+      if (dGain > 0) gainsLog.push(`${consumedDocs} Docs for +${dGain}`);
+      if (cGain > 0) gainsLog.push(`${consumedConns} Conns for +${cGain}`);
+
+      if (gainsLog.length > 0) {
+        this.log(
+          `${player.name} traded in: ${gainsLog.join(", ")} Assurance.`,
+          "system",
+        );
+      } else {
+        this.log(
+          `${player.name} did not meet any requirements to trade for Assurance.`,
+          "system",
+        );
+      }
+
+      // 3. Log specific penalties
+      const penaltiesLog = [];
+      if (mPen > 0)
+        penaltiesLog.push(`-${mPen} (Money < ${dest.targets.m.minRequired})`);
+      if (dPen > 0)
+        penaltiesLog.push(`-${dPen} (Docs < ${dest.targets.d.minRequired})`);
+      if (cPen > 0)
+        penaltiesLog.push(`-${cPen} (Conns < ${dest.targets.c.minRequired})`);
+
+      if (penaltiesLog.length > 0) {
+        this.log(
+          `${player.name} suffered penalties: ${penaltiesLog.join(", ")} Assurance.`,
+          "system",
+        );
+      }
     }
 
     this.log(`${this.players[0].name} selects a security lane...`, "system");

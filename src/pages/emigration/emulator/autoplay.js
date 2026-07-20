@@ -3,6 +3,9 @@
  * Provides automated game-playing strategy for playtesting.
  */
 
+import { DESTINATIONS } from "./engine.js";
+
+
 /**
  * Create an AI player that can play the game automatically.
  * @param {import('./engine.js').default} engine
@@ -248,51 +251,121 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
     if (possibleMoves.length === 0) return null;
 
-    // Helper to evaluate destination threshold value
-    // DESTINATIONS logic matches `game_specification.md` and `engine.js`
-    const destName = player.destination;
+    // Look up destination-specific Assurance rules for this player
+    const dest = DESTINATIONS.find((d) => d.name === player.destination);
+    const destTargets = dest?.targets;
+    const destCheck = dest?.check;
+
+    // Current resource counts
     let m = player.money;
     let d = player.stash.documents.length;
     let c = player.stash.connections.length;
     let pTickets = player.stash.tickets;
     let pPassports = player.stash.passports;
 
+    // Include Frontrunner money (mirrors engine.js Phase 2 calculation)
+    const frCard = player.stash.lifeCards.find((lc) => lc.title === "Frontrunner");
+    const frMoney = frCard?.money || 0;
+    const currentAssurance = destCheck ? destCheck(m + frMoney, d, c) : 0;
+
+    /**
+     * Compute marginal Assurance value for gaining one unit of a resource.
+     * Returns the delta: assurance(current + 1) - assurance(current).
+     */
+    const marginalAssurance = (resourceKey, currentAmount) => {
+      if (!destTargets || !destTargets[resourceKey]) return 0;
+      const rules = destTargets[resourceKey];
+      let before = 0, after = 0;
+
+      // Set reward component
+      if (rules.setSize > 0) {
+        before = Math.floor(currentAmount / rules.setSize) * (rules.reward || 0);
+        after = Math.floor((currentAmount + 1) / rules.setSize) * (rules.reward || 0);
+      }
+
+      // Penalty avoidance component
+      if (rules.minRequired !== undefined) {
+        if (currentAmount < rules.minRequired) before -= (rules.penalty || 0);
+        if ((currentAmount + 1) < rules.minRequired) after -= (rules.penalty || 0);
+      }
+
+      return after - before;
+    };
+
+    /**
+     * Compute the penalty risk if a resource stays at its current amount.
+     * Returns a positive urgency value when below minimum.
+     */
+    const penaltyUrgency = (resourceKey, currentAmount) => {
+      if (!destTargets || !destTargets[resourceKey]) return 0;
+      const rules = destTargets[resourceKey];
+      if (rules.minRequired === undefined) return 0;
+      if (currentAmount < rules.minRequired) {
+        // How far below minimum — higher urgency when further away
+        return (rules.penalty || 0) + (rules.minRequired - currentAmount);
+      }
+      return 0;
+    };
+
+    /**
+     * Compute how many more resources of a type are needed to reach the
+     * next set reward threshold (0 if already exactly on a boundary).
+     */
+    const distToNextSet = (resourceKey, currentAmount) => {
+      if (!destTargets || !destTargets[resourceKey]) return Infinity;
+      const rules = destTargets[resourceKey];
+      if (!rules.setSize || rules.setSize <= 0) return Infinity;
+      return rules.setSize - (currentAmount % rules.setSize);
+    };
+
     const evaluateScore = (move) => {
       let score = 0;
 
       if (move.type === "activate") {
         if (move.card.type === "payday") {
-          // Payday logic: net gain = my salary - fee. Also opponent gains fee + their salary
           const netGain = player.salary - move.fee;
-          if (netGain <= 0) return -100; // Never do this if it's a net loss or zero
-          score = netGain * 2; // high value for getting money
-          if (move.targetId !== player.id) {
-             score -= 2; // penalize slightly for helping an opponent
-          }
+          if (netGain <= 0) return -100;
+          // Value money gain via Assurance impact: simulate having more money
+          const projectedAssurance = destCheck ? destCheck(m + netGain + frMoney, d, c) : 0;
+          const assuranceDelta = projectedAssurance - currentAssurance;
+          score = netGain * 1.5 + assuranceDelta * 3;
+          if (move.targetId !== player.id) score -= 2;
         } else {
-          score = 3 - move.fee; // Base value for life cards
+          score = 3 - move.fee;
         }
       } else if (move.type === "buy") {
         const totalCost = move.cost + move.fee;
-        score = -totalCost; 
+        score = -totalCost;
 
-        // Value based on prerequisites
         if (move.card.type === "document") {
-          if (pPassports < 1 && d === 0) score += 15; // Critical for passport
-          else score += 4;
+          // Assurance-driven value for gaining 1 document
+          const marginal = marginalAssurance("d", d);
+          const urgency = penaltyUrgency("d", d);
+          score += marginal * 4 + urgency * 3;
+          // Extra value if this doc enables buying a passport
+          if (pPassports < 1 && d === 0) score += 15;
+          // Factor in set proximity — closer to completing a set = higher value
+          if (distToNextSet("d", d) === 1) score += 6;
         } else if (move.card.type === "connection") {
-          if (pTickets < 1 && c === 0) score += 15; // Critical for ticket
-          else score += 4;
+          const marginal = marginalAssurance("c", c);
+          const urgency = penaltyUrgency("c", c);
+          score += marginal * 4 + urgency * 3;
+          if (pTickets < 1 && c === 0) score += 15;
+          if (distToNextSet("c", c) === 1) score += 6;
         }
 
-        // Value based on Destination Thresholds (e.g., getting 4 docs for +2 assurance)
-        // Check how close we are to 4 docs or 3/4 conns
-        if (move.card.type === "document" && d === 3) score += 8; // reaching 4 is usually +2 assurance
-        if (move.card.type === "connection" && (c === 2 || c === 3)) score += 6;
-        
+        // Also consider the money cost's Assurance impact (spending money reduces sets)
+        if (destTargets?.m) {
+          const moneyAssuranceNow = destCheck ? destCheck(m + frMoney, d, c) : 0;
+          const moneyAssuranceAfter = destCheck
+            ? destCheck(m - totalCost + frMoney, d + (move.card.type === "document" ? 1 : 0), c + (move.card.type === "connection" ? 1 : 0))
+            : 0;
+          score += (moneyAssuranceAfter - moneyAssuranceNow) * 2;
+        }
+
       } else if (move.type === "buyPool") {
         if (move.params.cardType === "ticket") {
-          score = (pTickets < 1) ? 20 : -10; // Must have 1, extra is useless
+          score = (pTickets < 1) ? 20 : -10;
         } else {
           score = (pPassports < 1) ? 20 : -10;
         }
@@ -300,19 +373,18 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (move.params.cardType === "ticket") score = (pTickets < 1) ? 15 : -10;
         else score = (pPassports < 1) ? 15 : -10;
       } else if (move.type === "steal") {
-        score = -5; // Missing a turn is bad, but getting the card is good
+        score = -5;
         if (move.params.cardType === "ticket" && pTickets < 1) score += 15;
         if (move.params.cardType === "passport" && pPassports < 1) score += 15;
       } else if (move.type === "applyCollege") {
-        // High value early game, bad late game
         const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1;
         score = isLateGame ? -5 : 5;
       } else if (move.type === "discard") {
-        score = 2 - move.fee; // We gain $2, pay fee
+        score = 2 - move.fee;
         if (move.targetId !== player.id) {
-          score += 3; // Good to destroy opponent's layout cards!
+          score += 3;
         } else {
-          score -= 2; // Bad to destroy our own layout (unless necessary)
+          score -= 2;
         }
       }
 

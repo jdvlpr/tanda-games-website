@@ -298,7 +298,7 @@ Phase 2 triggers immediately when:
 
 Each player gets exactly one turn to attempt crossing the border:
 
-1. **Assurance Withdrawal**: The player evaluates their Destination criteria against their ending Money, Documents, and Connections (from Section 3.2). Adjust their Assurance total accordingly.
+1. **Assurance Withdrawal**: The player evaluates their Destination criteria against their ending Money, Documents, and Connections (from Section 3.2). The resources used to form complete sets for these rewards are consumed (Money is returned to the bank; Documents and Connections are placed in the discard pile). Leftover resources that do not complete a set remain with the player. Adjust their Assurance total accordingly.
 2. **Lane Selection**: Choose a Security Lane (1–5) containing tokens. Flip the top token.
 3. **Immigration Check**:
    - If the player does not have a Ticket and a Passport, they fail automatically.
