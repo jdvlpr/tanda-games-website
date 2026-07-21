@@ -74,7 +74,7 @@
             To: "transform opacity-0 scale-95"
         -->
         <div
-            class="absolute z-10 origin-top-right bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-600 shadow-lg"
+            class="absolute z-500 origin-top-right bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-600 shadow-lg"
             class:-translate-x-[30px]={edge === "right"}
             role="menu"
             aria-orientation="vertical"

@@ -97,7 +97,7 @@
 
 <div
   bind:this={boardEl}
-  class={["bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}
+  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive ? "bg-green-100/30 dark:bg-green-900/30 shadow-[0_0_20px_rgba(85,183,176,0.65)]" : "bg-neutral-200 dark:bg-neutral-800 "]}
 >
   <!-- Player Header Info -->
   <div class="flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm">
