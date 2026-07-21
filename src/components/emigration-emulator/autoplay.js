@@ -5,7 +5,6 @@
 
 import { DESTINATIONS } from "./engine.js";
 
-
 /**
  * Create an AI player that can play the game automatically.
  * @param {import('./engine.js').default} engine
@@ -125,19 +124,27 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     }
 
     if (enabled("steal")) {
-      if (
-        player.stash.tickets < 1 &&
-        engine.publicServices.tickets > 0 &&
-        player.stash.connections.length >= 1
-      ) {
-        return { type: "steal", params: { cardType: "ticket" } };
-      }
-      if (
-        player.stash.passports < 1 &&
-        engine.publicServices.passports > 0 &&
-        player.stash.documents.length >= 1
-      ) {
-        return { type: "steal", params: { cardType: "passport" } };
+      const faceUpLeft = engine.players.reduce(
+        (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+        0,
+      );
+      const lateGame = faceUpLeft <= 6;
+      const cantBuy = !enabled("buy") || player.money < 2;
+      if (lateGame || cantBuy) {
+        if (
+          player.stash.tickets < 1 &&
+          engine.publicServices.tickets > 0 &&
+          player.stash.connections.length >= 1
+        ) {
+          return { type: "steal", params: { cardType: "ticket" } };
+        }
+        if (
+          player.stash.passports < 1 &&
+          engine.publicServices.passports > 0 &&
+          player.stash.documents.length >= 1
+        ) {
+          return { type: "steal", params: { cardType: "passport" } };
+        }
       }
     }
 
@@ -189,7 +196,13 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if (card.type === "payday" || card.type === "life") {
-              possibleMoves.push({ type: "activate", params: { targetPlayerIdx: p.id, slotIdx: i }, card, fee, targetId: p.id });
+              possibleMoves.push({
+                type: "activate",
+                params: { targetPlayerIdx: p.id, slotIdx: i },
+                card,
+                fee,
+                targetId: p.id,
+              });
             }
           }
         }
@@ -204,7 +217,13 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             if (card.type === "document" || card.type === "connection") {
               const cost = engine.getEffectiveCost(player, card);
               if (player.money >= cost + fee) {
-                possibleMoves.push({ type: "buy", params: { targetPlayerIdx: p.id, slotIdx: i }, card, cost, fee });
+                possibleMoves.push({
+                  type: "buy",
+                  params: { targetPlayerIdx: p.id, slotIdx: i },
+                  card,
+                  cost,
+                  fee,
+                });
               }
             }
           }
@@ -212,11 +231,22 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       }
     }
     if (enabled("buyPool")) {
-      if (player.money >= 2 && player.stash.connections.length >= 1 && engine.publicServices.tickets > 0) {
-        possibleMoves.push({ type: "buyPool", params: { cardType: "ticket" }});
+      if (
+        player.money >= 2 &&
+        player.stash.connections.length >= 1 &&
+        engine.publicServices.tickets > 0
+      ) {
+        possibleMoves.push({ type: "buyPool", params: { cardType: "ticket" } });
       }
-      if (player.money >= 2 && player.stash.documents.length >= 1 && engine.publicServices.passports > 0) {
-        possibleMoves.push({ type: "buyPool", params: { cardType: "passport" }});
+      if (
+        player.money >= 2 &&
+        player.stash.documents.length >= 1 &&
+        engine.publicServices.passports > 0
+      ) {
+        possibleMoves.push({
+          type: "buyPool",
+          params: { cardType: "passport" },
+        });
       }
     }
     if (enabled("reclaim")) {
@@ -224,10 +254,18 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       if (rt) possibleMoves.push({ type: "reclaim", params: rt });
     }
     if (enabled("steal")) {
-      if (player.stash.tickets < 1 && engine.publicServices.tickets > 0 && player.stash.connections.length >= 1) {
+      if (
+        player.stash.tickets < 1 &&
+        engine.publicServices.tickets > 0 &&
+        player.stash.connections.length >= 1
+      ) {
         possibleMoves.push({ type: "steal", params: { cardType: "ticket" } });
       }
-      if (player.stash.passports < 1 && engine.publicServices.passports > 0 && player.stash.documents.length >= 1) {
+      if (
+        player.stash.passports < 1 &&
+        engine.publicServices.passports > 0 &&
+        player.stash.documents.length >= 1
+      ) {
         possibleMoves.push({ type: "steal", params: { cardType: "passport" } });
       }
     }
@@ -242,7 +280,13 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if (card.type === "document" || card.type === "connection") {
-              possibleMoves.push({ type: "discard", params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i }, card, fee, targetId: p.id });
+              possibleMoves.push({
+                type: "discard",
+                params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i },
+                card,
+                fee,
+                targetId: p.id,
+              });
             }
           }
         }
@@ -267,7 +311,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     let pPassports = player.stash.passports;
 
     // Include Frontrunner money (mirrors engine.js Phase 2 calculation)
-    const frCard = player.stash.lifeCards.find((lc) => lc.title === "Frontrunner");
+    const frCard = player.stash.lifeCards.find(
+      (lc) => lc.title === "Frontrunner",
+    );
     const frMoney = frCard?.money || 0;
     const currentAssurance = destCheck ? destCheck(m + frMoney, d, c) : 0;
 
@@ -275,18 +321,20 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       let score = 0;
       const actuals = { m, d, c };
       if (!destTargets) return 0;
-      
+
       for (const [key, amount] of Object.entries(actuals)) {
         const rules = destTargets[key];
         if (!rules) continue;
-        
+
         if (rules.setSize > 0) {
           score += (amount / rules.setSize) * (rules.reward || 0);
         }
-        
+
         if (rules.minRequired !== undefined) {
           if (amount < rules.minRequired) {
-            score -= ((rules.minRequired - amount) / rules.minRequired) * (rules.penalty || 0);
+            score -=
+              ((rules.minRequired - amount) / rules.minRequired) *
+              (rules.penalty || 0);
           }
         }
       }
@@ -302,7 +350,11 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           if (netGain <= 0) return -100;
           // Value money gain via Assurance impact
           const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
-          const assuranceAfter = getSmoothedAssurance(m + netGain + frMoney, d, c);
+          const assuranceAfter = getSmoothedAssurance(
+            m + netGain + frMoney,
+            d,
+            c,
+          );
           score = netGain * 1.5 + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId !== player.id) score -= 2;
         } else {
@@ -314,38 +366,65 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
         const isDoc = move.card.type === "document";
         const isConn = move.card.type === "connection";
-        
+
         const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
-        const assuranceAfter = getSmoothedAssurance(m - totalCost + frMoney, d + (isDoc ? 1 : 0), c + (isConn ? 1 : 0));
-        
+        const assuranceAfter = getSmoothedAssurance(
+          m - totalCost + frMoney,
+          d + (isDoc ? 1 : 0),
+          c + (isConn ? 1 : 0),
+        );
+
         score += (assuranceAfter - assuranceNow) * 5;
-        
+
+        // Hoarding bonus: reward getting closer to set sizes
+        if (isDoc && destTargets?.d?.setSize > 0) {
+          const setSize = destTargets.d.setSize;
+          if ((d + 1) % setSize === 0) score += 5;
+        }
+        if (isConn && destTargets?.c?.setSize > 0) {
+          const setSize = destTargets.c.setSize;
+          if ((c + 1) % setSize === 0) score += 5;
+        }
+
         // Extra value if this doc enables buying a passport
         if (isDoc && pPassports < 1 && d === 0) score += 15;
         if (isConn && pTickets < 1 && c === 0) score += 15;
       } else if (move.type === "buyPool") {
         // Late game scale
-        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const faceUpLeft = engine.players.reduce(
+          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+          0,
+        );
         const urgency = 15 + Math.max(0, 14 - faceUpLeft) * 1.5;
-        
+
         if (move.params.cardType === "ticket") {
-          score = (pTickets < 1) ? urgency : -10;
+          score = pTickets < 1 ? urgency : -10;
         } else {
-          score = (pPassports < 1) ? urgency : -10;
+          score = pPassports < 1 ? urgency : -10;
         }
       } else if (move.type === "reclaim") {
-        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const faceUpLeft = engine.players.reduce(
+          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+          0,
+        );
         const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
-        if (move.params.cardType === "ticket") score = (pTickets < 1) ? urgency : -10;
-        else score = (pPassports < 1) ? urgency : -10;
+        if (move.params.cardType === "ticket")
+          score = pTickets < 1 ? urgency : -10;
+        else score = pPassports < 1 ? urgency : -10;
       } else if (move.type === "steal") {
         score = -5;
-        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const faceUpLeft = engine.players.reduce(
+          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+          0,
+        );
         const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
         if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
-        if (move.params.cardType === "passport" && pPassports < 1) score += urgency;
+        if (move.params.cardType === "passport" && pPassports < 1)
+          score += urgency;
       } else if (move.type === "applyCollege") {
-        const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1;
+        const isLateGame =
+          engine.publicServices.tickets <= 1 ||
+          engine.publicServices.passports <= 1;
         score = isLateGame ? -5 : 4;
       } else if (move.type === "discard") {
         score = 2 - move.fee;
@@ -360,9 +439,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       return score + Math.random() * 0.1;
     };
 
-    possibleMoves.forEach(m => m._score = evaluateScore(m));
+    possibleMoves.forEach((m) => (m._score = evaluateScore(m)));
     possibleMoves.sort((a, b) => b._score - a._score);
-    
+
     return possibleMoves[0];
   }
 
@@ -376,9 +455,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     for (const p of engine.players) {
       const fee = p.id === player.id ? 0 : player.accessFee;
       if (player.money < fee) continue;
-      
+
       // Prevent activating opponent's payday if it's a net loss
-      if (cardType === "payday" && p.id !== player.id && player.salary <= fee) continue;
+      if (cardType === "payday" && p.id !== player.id && player.salary <= fee)
+        continue;
 
       for (let i = 0; i < 14; i++) {
         if (engine.isCardAvailable(p, i)) {
@@ -432,7 +512,6 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     const conns = player.stash.connections.length;
 
     candidates.sort((a, b) => {
-      // Prefer whichever type we have fewer of
       const aPreferred =
         (a.cardType === "document" && docs <= conns) ||
         (a.cardType === "connection" && conns <= docs);
@@ -440,7 +519,19 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         (b.cardType === "document" && docs <= conns) ||
         (b.cardType === "connection" && conns <= docs);
       if (aPreferred !== bPreferred) return aPreferred ? -1 : 1;
-      return a.totalCost - b.totalCost;
+      if (a.totalCost !== b.totalCost) return a.totalCost - b.totalCost;
+
+      const aAvail =
+        a.targetPlayerIdx !== player.id
+          ? engine.getAvailableLayoutCards(a.targetPlayerIdx).length
+          : 999;
+      const bAvail =
+        b.targetPlayerIdx !== player.id
+          ? engine.getAvailableLayoutCards(b.targetPlayerIdx).length
+          : 999;
+      if (aAvail !== bAvail) return bAvail - aAvail;
+
+      return 0;
     });
 
     return {
@@ -590,7 +681,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
    * 4. On tie, pick lane with lowest average remaining token (most "forgiving")
    */
   function chooseLane() {
-    const playerIdx = engine.crossingOrder ? engine.crossingOrder[engine.activeCrossingIdx] : engine.activeCrossingIdx;
+    const playerIdx = engine.crossingOrder
+      ? engine.crossingOrder[engine.activeCrossingIdx]
+      : engine.activeCrossingIdx;
     const player = engine.players[playerIdx];
     const assurance = player.assurance;
 
@@ -679,7 +772,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
       const trySell = (type, list) => {
         if (list.length > 0) {
-          const idx = list.reduce((best, c, i) => (c.cost < list[best].cost ? i : best), 0);
+          const idx = list.reduce(
+            (best, c, i) => (c.cost < list[best].cost ? i : best),
+            0,
+          );
           const item = list.splice(idx, 1)[0];
           player.money += 2;
 
@@ -701,8 +797,14 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       trySell("connection", player.stash.connections);
 
       if (scoreWithSell > scoreNoSell + 5 && stashTypeToSell) {
-        engine.executeOptionalAction("sell", { stashType: stashTypeToSell, stashIdx: stashIdxToSell });
-        action = { type: bestMoveWithSell.type, params: bestMoveWithSell.params };
+        engine.executeOptionalAction("sell", {
+          stashType: stashTypeToSell,
+          stashIdx: stashIdxToSell,
+        });
+        action = {
+          type: bestMoveWithSell.type,
+          params: bestMoveWithSell.params,
+        };
         didSell = true;
       }
     }
@@ -711,11 +813,25 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       // Fallback normal/easy behavior
       if (difficulty !== "expert" && player.money < 2) {
         if (player.stash.documents.length > 0) {
-          const idx = player.stash.documents.reduce((best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best), 0);
-          engine.executeOptionalAction("sell", { stashType: "document", stashIdx: idx });
+          const idx = player.stash.documents.reduce(
+            (best, c, i) =>
+              c.cost < player.stash.documents[best].cost ? i : best,
+            0,
+          );
+          engine.executeOptionalAction("sell", {
+            stashType: "document",
+            stashIdx: idx,
+          });
         } else if (player.stash.connections.length > 0) {
-          const idx = player.stash.connections.reduce((best, c, i) => (c.cost < player.stash.connections[best].cost ? i : best), 0);
-          engine.executeOptionalAction("sell", { stashType: "connection", stashIdx: idx });
+          const idx = player.stash.connections.reduce(
+            (best, c, i) =>
+              c.cost < player.stash.connections[best].cost ? i : best,
+            0,
+          );
+          engine.executeOptionalAction("sell", {
+            stashType: "connection",
+            stashIdx: idx,
+          });
         }
       }
       action = chooseAction();
