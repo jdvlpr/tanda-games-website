@@ -248,6 +248,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         }
       }
     }
+    if (enabled("forfeit")) {
+      possibleMoves.push({ type: "forfeit", params: {} });
+    }
 
     if (possibleMoves.length === 0) return null;
 

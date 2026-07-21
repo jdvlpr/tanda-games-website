@@ -1151,6 +1151,16 @@ export default class EmigrationEngine {
       enabled: canApply,
     });
 
+    const hasAnyRequired = actions.some(a => !a.optional && a.enabled);
+    if (!hasAnyRequired) {
+      actions.push({
+        type: "forfeit",
+        label: "Forfeit Turn",
+        optional: false,
+        enabled: true,
+      });
+    }
+
     return actions;
   }
 
@@ -1190,19 +1200,7 @@ export default class EmigrationEngine {
       return;
     }
 
-    if (!this.canPerformAnyRequiredAction(next)) {
-      this.consecutiveForfeits++;
-      this.log(`P${next.id}|FORFEIT|CONS:${this.consecutiveForfeits}`, "error");
-      if (this.consecutiveForfeits >= this.players.length) {
-        this.log("ALL_FORFEIT|GAIN:1", "system");
-        this.players.forEach((p) => {
-          p.money += 1;
-        });
-        this.consecutiveForfeits = 0;
-      }
-      this.advanceTurn();
-      return;
-    }
+    // Removed auto-forfeit to allow optional actions before forfeiting
 
     this.consecutiveForfeits = 0;
     this._notify();
@@ -1599,6 +1597,18 @@ export default class EmigrationEngine {
         return this._doDiscard(player, params);
       case "applyCollege":
         return this._doApplyCollege(player);
+      case "forfeit":
+        this.consecutiveForfeits++;
+        this.log(`P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`, "error");
+        if (this.consecutiveForfeits >= this.players.length) {
+          this.log("ALL_FORFEIT|GAIN:1", "system");
+          this.players.forEach((p) => {
+            p.money += 1;
+          });
+          this.consecutiveForfeits = 0;
+        }
+        this.advanceTurn();
+        return;
     }
   }
 
