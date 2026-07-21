@@ -268,54 +268,26 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     const frMoney = frCard?.money || 0;
     const currentAssurance = destCheck ? destCheck(m + frMoney, d, c) : 0;
 
-    /**
-     * Compute marginal Assurance value for gaining one unit of a resource.
-     * Returns the delta: assurance(current + 1) - assurance(current).
-     */
-    const marginalAssurance = (resourceKey, currentAmount) => {
-      if (!destTargets || !destTargets[resourceKey]) return 0;
-      const rules = destTargets[resourceKey];
-      let before = 0, after = 0;
-
-      // Set reward component
-      if (rules.setSize > 0) {
-        before = Math.floor(currentAmount / rules.setSize) * (rules.reward || 0);
-        after = Math.floor((currentAmount + 1) / rules.setSize) * (rules.reward || 0);
+    const getSmoothedAssurance = (m, d, c) => {
+      let score = 0;
+      const actuals = { m, d, c };
+      if (!destTargets) return 0;
+      
+      for (const [key, amount] of Object.entries(actuals)) {
+        const rules = destTargets[key];
+        if (!rules) continue;
+        
+        if (rules.setSize > 0) {
+          score += (amount / rules.setSize) * (rules.reward || 0);
+        }
+        
+        if (rules.minRequired !== undefined) {
+          if (amount < rules.minRequired) {
+            score -= ((rules.minRequired - amount) / rules.minRequired) * (rules.penalty || 0);
+          }
+        }
       }
-
-      // Penalty avoidance component
-      if (rules.minRequired !== undefined) {
-        if (currentAmount < rules.minRequired) before -= (rules.penalty || 0);
-        if ((currentAmount + 1) < rules.minRequired) after -= (rules.penalty || 0);
-      }
-
-      return after - before;
-    };
-
-    /**
-     * Compute the penalty risk if a resource stays at its current amount.
-     * Returns a positive urgency value when below minimum.
-     */
-    const penaltyUrgency = (resourceKey, currentAmount) => {
-      if (!destTargets || !destTargets[resourceKey]) return 0;
-      const rules = destTargets[resourceKey];
-      if (rules.minRequired === undefined) return 0;
-      if (currentAmount < rules.minRequired) {
-        // How far below minimum — higher urgency when further away
-        return (rules.penalty || 0) + (rules.minRequired - currentAmount);
-      }
-      return 0;
-    };
-
-    /**
-     * Compute how many more resources of a type are needed to reach the
-     * next set reward threshold (0 if already exactly on a boundary).
-     */
-    const distToNextSet = (resourceKey, currentAmount) => {
-      if (!destTargets || !destTargets[resourceKey]) return Infinity;
-      const rules = destTargets[resourceKey];
-      if (!rules.setSize || rules.setSize <= 0) return Infinity;
-      return rules.setSize - (currentAmount % rules.setSize);
+      return score;
     };
 
     const evaluateScore = (move) => {
@@ -325,10 +297,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (move.card.type === "payday") {
           const netGain = player.salary - move.fee;
           if (netGain <= 0) return -100;
-          // Value money gain via Assurance impact: simulate having more money
-          const projectedAssurance = destCheck ? destCheck(m + netGain + frMoney, d, c) : 0;
-          const assuranceDelta = projectedAssurance - currentAssurance;
-          score = netGain * 1.5 + assuranceDelta * 3;
+          // Value money gain via Assurance impact
+          const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
+          const assuranceAfter = getSmoothedAssurance(m + netGain + frMoney, d, c);
+          score = netGain * 1.5 + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId !== player.id) score -= 2;
         } else {
           score = 3 - move.fee;
@@ -337,48 +309,41 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         const totalCost = move.cost + move.fee;
         score = -totalCost;
 
-        if (move.card.type === "document") {
-          // Assurance-driven value for gaining 1 document
-          const marginal = marginalAssurance("d", d);
-          const urgency = penaltyUrgency("d", d);
-          score += marginal * 4 + urgency * 3;
-          // Extra value if this doc enables buying a passport
-          if (pPassports < 1 && d === 0) score += 15;
-          // Factor in set proximity — closer to completing a set = higher value
-          if (distToNextSet("d", d) === 1) score += 6;
-        } else if (move.card.type === "connection") {
-          const marginal = marginalAssurance("c", c);
-          const urgency = penaltyUrgency("c", c);
-          score += marginal * 4 + urgency * 3;
-          if (pTickets < 1 && c === 0) score += 15;
-          if (distToNextSet("c", c) === 1) score += 6;
-        }
-
-        // Also consider the money cost's Assurance impact (spending money reduces sets)
-        if (destTargets?.m) {
-          const moneyAssuranceNow = destCheck ? destCheck(m + frMoney, d, c) : 0;
-          const moneyAssuranceAfter = destCheck
-            ? destCheck(m - totalCost + frMoney, d + (move.card.type === "document" ? 1 : 0), c + (move.card.type === "connection" ? 1 : 0))
-            : 0;
-          score += (moneyAssuranceAfter - moneyAssuranceNow) * 2;
-        }
-
+        const isDoc = move.card.type === "document";
+        const isConn = move.card.type === "connection";
+        
+        const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
+        const assuranceAfter = getSmoothedAssurance(m - totalCost + frMoney, d + (isDoc ? 1 : 0), c + (isConn ? 1 : 0));
+        
+        score += (assuranceAfter - assuranceNow) * 5;
+        
+        // Extra value if this doc enables buying a passport
+        if (isDoc && pPassports < 1 && d === 0) score += 15;
+        if (isConn && pTickets < 1 && c === 0) score += 15;
       } else if (move.type === "buyPool") {
+        // Late game scale
+        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const urgency = 15 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        
         if (move.params.cardType === "ticket") {
-          score = (pTickets < 1) ? 20 : -10;
+          score = (pTickets < 1) ? urgency : -10;
         } else {
-          score = (pPassports < 1) ? 20 : -10;
+          score = (pPassports < 1) ? urgency : -10;
         }
       } else if (move.type === "reclaim") {
-        if (move.params.cardType === "ticket") score = (pTickets < 1) ? 15 : -10;
-        else score = (pPassports < 1) ? 15 : -10;
+        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        if (move.params.cardType === "ticket") score = (pTickets < 1) ? urgency : -10;
+        else score = (pPassports < 1) ? urgency : -10;
       } else if (move.type === "steal") {
         score = -5;
-        if (move.params.cardType === "ticket" && pTickets < 1) score += 15;
-        if (move.params.cardType === "passport" && pPassports < 1) score += 15;
+        const faceUpLeft = engine.players.reduce((sum, p) => sum + p.layout.filter(l => l && l.faceUp).length, 0);
+        const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
+        if (move.params.cardType === "passport" && pPassports < 1) score += urgency;
       } else if (move.type === "applyCollege") {
         const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1;
-        score = isLateGame ? -5 : 5;
+        score = isLateGame ? -5 : 4;
       } else if (move.type === "discard") {
         score = 2 - move.fee;
         if (move.targetId !== player.id) {
@@ -622,7 +587,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
    * 4. On tie, pick lane with lowest average remaining token (most "forgiving")
    */
   function chooseLane() {
-    const player = engine.players[engine.activeCrossingIdx];
+    const playerIdx = engine.crossingOrder ? engine.crossingOrder[engine.activeCrossingIdx] : engine.activeCrossingIdx;
+    const player = engine.players[playerIdx];
     const assurance = player.assurance;
 
     // Evaluate each lane based on REMAINING tokens
@@ -688,18 +654,70 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     }
 
     // Optional: sell a card from stash if low on money (e.g. to afford access fee or tickets)
-    if (player.money < 2) {
-      if (player.stash.documents.length > 0) {
-        const idx = player.stash.documents.reduce((best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best), 0);
-        engine.executeOptionalAction("sell", { stashType: "document", stashIdx: idx });
-      } else if (player.stash.connections.length > 0) {
-        const idx = player.stash.connections.reduce((best, c, i) => (c.cost < player.stash.connections[best].cost ? i : best), 0);
-        engine.executeOptionalAction("sell", { stashType: "connection", stashIdx: idx });
+    // Optional: try to graduate if in college
+    if (player.inCollege) {
+      engine.executeOptionalAction("graduate");
+    }
+
+    let action = null;
+    let didSell = false;
+
+    if (difficulty === "expert") {
+      // 1. Evaluate actions WITHOUT selling
+      const actionsNoSell = engine.getValidActions(player);
+      const bestMoveNoSell = _getBestHeuristicAction(player, actionsNoSell);
+      const scoreNoSell = bestMoveNoSell ? bestMoveNoSell._score : -999;
+
+      // 2. Evaluate actions WITH a simulated sell, if possible
+      let scoreWithSell = -999;
+      let stashTypeToSell = null;
+      let stashIdxToSell = -1;
+      let bestMoveWithSell = null;
+
+      const trySell = (type, list) => {
+        if (list.length > 0) {
+          const idx = list.reduce((best, c, i) => (c.cost < list[best].cost ? i : best), 0);
+          const item = list.splice(idx, 1)[0];
+          player.money += 2;
+
+          const simActions = engine.getValidActions(player);
+          const simBest = _getBestHeuristicAction(player, simActions);
+          if (simBest && simBest._score > scoreWithSell) {
+            scoreWithSell = simBest._score;
+            bestMoveWithSell = simBest;
+            stashTypeToSell = type;
+            stashIdxToSell = idx;
+          }
+
+          player.money -= 2;
+          list.splice(idx, 0, item); // restore
+        }
+      };
+
+      trySell("document", player.stash.documents);
+      trySell("connection", player.stash.connections);
+
+      if (scoreWithSell > scoreNoSell + 5 && stashTypeToSell) {
+        engine.executeOptionalAction("sell", { stashType: stashTypeToSell, stashIdx: stashIdxToSell });
+        action = { type: bestMoveWithSell.type, params: bestMoveWithSell.params };
+        didSell = true;
       }
     }
 
-    // Required action
-    const action = chooseAction();
+    if (!didSell) {
+      // Fallback normal/easy behavior
+      if (difficulty !== "expert" && player.money < 2) {
+        if (player.stash.documents.length > 0) {
+          const idx = player.stash.documents.reduce((best, c, i) => (c.cost < player.stash.documents[best].cost ? i : best), 0);
+          engine.executeOptionalAction("sell", { stashType: "document", stashIdx: idx });
+        } else if (player.stash.connections.length > 0) {
+          const idx = player.stash.connections.reduce((best, c, i) => (c.cost < player.stash.connections[best].cost ? i : best), 0);
+          engine.executeOptionalAction("sell", { stashType: "connection", stashIdx: idx });
+        }
+      }
+      action = chooseAction();
+    }
+
     if (!action) return false;
 
     engine.executeRequiredAction(action.type, action.params);

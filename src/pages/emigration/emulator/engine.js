@@ -1228,6 +1228,10 @@ export default class EmigrationEngine {
   triggerPhase2() {
     this.phase = "crossing";
     this.activeCrossingIdx = 0;
+    this.crossingOrder = [];
+    for (let i = 0; i < this.players.length; i++) {
+      this.crossingOrder.push((this.currentPlayerIdx + 1 + i) % this.players.length);
+    }
     this.log("PHASE2_START", "system");
 
     for (const player of this.players) {
@@ -1343,7 +1347,8 @@ export default class EmigrationEngine {
 
   selectLane(laneIdx) {
     if (this.phase !== "crossing") return;
-    const player = this.players[this.activeCrossingIdx];
+    const playerIdx = this.crossingOrder ? this.crossingOrder[this.activeCrossingIdx] : this.activeCrossingIdx;
+    const player = this.players[playerIdx];
     const lane = this.securityLanes[laneIdx];
 
     if (!lane || lane.tokens.length === 0) {
@@ -1482,6 +1487,7 @@ export default class EmigrationEngine {
       consecutiveForfeits: this.consecutiveForfeits,
       pandemicStimulusCount: this.pandemicStimulusCount,
       activeCrossingIdx: this.activeCrossingIdx,
+      crossingOrder: this.crossingOrder,
       gameResult: this.gameResult,
       _collegeFailed: this._collegeFailed,
       _graduateAttempted: this._graduateAttempted,
