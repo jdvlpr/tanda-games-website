@@ -354,7 +354,7 @@
   }
 </script>
 
-<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border">
+<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
       <h1 class="font-emi-heading  text-center mb-4 text-4xl">Emigration Emulator</h1>
@@ -672,4 +672,5 @@
       />
     </div>
   {/if}
+  <p class="italic text-xs">Package Version: {import.meta.env.PACKAGE_VERSION}</p>
 </div>
