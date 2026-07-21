@@ -1209,10 +1209,8 @@ export default class EmigrationEngine {
   // ─── Phase 2 Trigger ─────────────────────────────────────────────────
 
   checkPhase2Trigger() {
-    const poolEmpty =
-      this.publicServices.tickets === 0 && this.publicServices.passports === 0;
-    if (!poolEmpty) return false;
-
+    // Phase 1 ends when every player's layout is completely empty,
+    // regardless of remaining tickets or passports in the public pool.
     for (const p of this.players) {
       for (let i = 0; i < 14; i++) {
         if (p.layout[i] !== null) return false;
