@@ -1230,7 +1230,9 @@ export default class EmigrationEngine {
     this.activeCrossingIdx = 0;
     this.crossingOrder = [];
     for (let i = 0; i < this.players.length; i++) {
-      this.crossingOrder.push((this.currentPlayerIdx + 1 + i) % this.players.length);
+      this.crossingOrder.push(
+        (this.currentPlayerIdx + 1 + i) % this.players.length,
+      );
     }
     this.log("PHASE2_START", "system");
 
@@ -1347,7 +1349,9 @@ export default class EmigrationEngine {
 
   selectLane(laneIdx) {
     if (this.phase !== "crossing") return;
-    const playerIdx = this.crossingOrder ? this.crossingOrder[this.activeCrossingIdx] : this.activeCrossingIdx;
+    const playerIdx = this.crossingOrder
+      ? this.crossingOrder[this.activeCrossingIdx]
+      : this.activeCrossingIdx;
     const player = this.players[playerIdx];
     const lane = this.securityLanes[laneIdx];
 

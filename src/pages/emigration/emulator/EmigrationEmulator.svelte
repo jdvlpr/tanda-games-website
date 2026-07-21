@@ -139,7 +139,7 @@
     });
   });
 
-  let actualActivePlayerId = $derived(snapshot ? (snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : snapshot.activeCrossingIdx) : 0);
+  let actualActivePlayerId = $derived(snapshot ? (snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx)) : 0);
   let visualActivePlayerId = $state(0);
   let previousActualPlayerId = $state(0);
   let isTransitioning = $state(false);
@@ -266,7 +266,7 @@
     });
 
     snapshot = engine.getSnapshot();
-    visualActivePlayerId = snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : snapshot.activeCrossingIdx;
+    visualActivePlayerId = snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
     previousActualPlayerId = visualActivePlayerId;
     isTransitioning = false;
     pendingChoice = engine.pendingChoice ?? null;
