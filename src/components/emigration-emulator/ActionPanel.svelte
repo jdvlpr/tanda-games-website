@@ -1,7 +1,7 @@
 <script>
   let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, showLog = true, copyTextToClipboard } = $props();
 
-  let logContainer = null;
+  let logContainer = $state(null);
 
   
   // Auto-scroll logs when snapshot updates (disabled for AI Simulation mode)

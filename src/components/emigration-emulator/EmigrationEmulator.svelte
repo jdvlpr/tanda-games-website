@@ -4,7 +4,7 @@
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, PACKS_LIST, runTests } from './engine.js';
   import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
-  import { playPaydaySound } from '../../../js/utils.svelte.js';
+  import { playPaydaySound } from '../../js/utils.svelte.js';
   import PlayerBoard from './PlayerBoard.svelte';
 
   // Responsive: track mobile vs desktop
@@ -33,7 +33,7 @@
   let isSetup = $state(true);
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
-  let selectedPacks = $state(PACK_DEFAULTS[playerCount]);
+  let selectedPacks = $derived(PACK_DEFAULTS[playerCount]);
   let aiDifficulty = $state('expert');
   
   // Initialize default players
@@ -45,11 +45,6 @@
 
   // Derived setup slice based on player count
   let activeSetup = $derived(playersSetup.slice(0, playerCount));
-
-  // Auto-update selectedPacks when playerCount changes
-  $effect(() => {
-    selectedPacks = PACK_DEFAULTS[playerCount];
-  });
 
   // Game State
   let engine = $state(null);

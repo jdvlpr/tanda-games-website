@@ -9,16 +9,16 @@ This document provides a high-level overview of the Emigration board game emulat
 
 ## Key Files & Components
 
-- **`src/pages/emigration/emulator/game_specification.md`**: The authoritative rulebook for the physical board game. The emulator should completely match the logic, rules, and player objectives from the game_specification.md file in order to emulate the game using its authoritative source.
-- **`src/pages/emigration/emulator/engine.js`**: The heart of the game. Handles all state mutations, rule enforcement, phase transitions, and turn progressions.
-- **`src/pages/emigration/emulator/EmigrationEmulator.svelte`**: The main UI orchestrator. Mounts the engine, listens for state changes, and renders the board.
-- **`src/pages/emigration/emulator/autoplay.js`**: The AI logic for "Solo vs Computer" mode. It evaluates the board state and invokes the exact same engine actions that a human player would.
-- **`src/pages/emigration/emulator/Modal.svelte`**: Renders the UI for interactive decisions (e.g., choosing targets, keeping cards).
+- **`src/components/emigration-emulator/game_specification.md`**: The authoritative rulebook for the physical board game. The emulator should completely match the logic, rules, and player objectives from the game_specification.md file in order to emulate the game using its authoritative source.
+- **`src/components/emigration-emulator/engine.js`**: The heart of the game. Handles all state mutations, rule enforcement, phase transitions, and turn progressions.
+- **`src/components/emigration-emulator/EmigrationEmulator.svelte`**: The main UI orchestrator. Mounts the engine, listens for state changes, and renders the board.
+- **`src/components/emigration-emulator/autoplay.js`**: The AI logic for "Solo vs Computer" mode. It evaluates the board state and invokes the exact same engine actions that a human player would.
+- **`src/components/emigration-emulator/Modal.svelte`**: Renders the UI for interactive decisions (e.g., choosing targets, keeping cards).
 
 ## State Management & UI Reactivity
 
 - The engine uses a callback `onStateChange` which is fired whenever the game state updates (via `this._notify()`).
-- `src/pages/emigration/emulator/EmigrationEmulator.svelte` intercepts this callback to create a snapshot clone of the engine state. Svelte's reactivity engine then updates the UI based on this snapshot.
+- `src/components/emigration-emulator/EmigrationEmulator.svelte` intercepts this callback to create a snapshot clone of the engine state. Svelte's reactivity engine then updates the UI based on this snapshot.
 
 ## The `pendingChoice` Pattern (Interrupts & Modals)
 

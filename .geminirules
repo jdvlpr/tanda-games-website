@@ -1,15 +1,15 @@
 # Workspace Context
 
 - Project: Emigration Board Game Emulator
-- Core Logic: `src/pages/emigration/emulator/engine.js` (Pure ES6 Module, 0 DOM dependencies)
-- UI: Svelte (`src/pages/emigration/emulator/EmigrationEmulator.svelte`)
-- AI Autoplay: `src/pages/emigration/emulator/autoplay.js`
+- Core Logic: `src/components/emigration-emulator/engine.js` (Pure ES6 Module, 0 DOM dependencies)
+- UI: Svelte (`src/components/emigration-emulator/EmigrationEmulator.svelte`)
+- AI Autoplay: `src/components/emigration-emulator/autoplay.js`
 
 # Critical Architecture Rules
 
 1. Refer to `ARCHITECTURE.md` before making any structural changes or fixing game rules.
-2. The source of truth for the game objectives, setup, rules and how to win is `src/pages/emigration/emulator/game_specification.md`.
-3. The game uses a `pendingChoice` pattern in `src/pages/emigration/emulator/engine.js` for ANY user interrupts (like Modals or decision making). Never mutate state synchronously if a user decision is required mid-action.
+2. The source of truth for the game objectives, setup, rules and how to win is `src/components/emigration-emulator/game_specification.md`.
+3. The game uses a `pendingChoice` pattern in `src/components/emigration-emulator/engine.js` for ANY user interrupts (like Modals or decision making). Never mutate state synchronously if a user decision is required mid-action.
 4. Svelte components must NEVER mutate game state directly. They must only call `engine.executeRequiredAction()`, `engine.executeOptionalAction()`, or `engine.resolveChoice()`.
-5. AI actions in `src/pages/emigration/emulator/autoplay.js` must adhere to the exact constraints according to the rules from the authoritative `game_specification.md` file.
-6. If an architectural change is made, update `ARCHITECTURE.md`, and if the user specifically asks to modify, add, or remove a rule, make sure it gets updated in the emulator as well as in the `src/pages/emigration/emulator/game_specification.md` file.
+5. AI actions in `src/components/emigration-emulator/autoplay.js` must adhere to the exact constraints according to the rules from the authoritative `game_specification.md` file.
+6. If an architectural change is made, update `ARCHITECTURE.md`, and if the user specifically asks to modify, add, or remove a rule, make sure it gets updated in the emulator as well as in the `src/components/emigration-emulator/game_specification.md` file.
