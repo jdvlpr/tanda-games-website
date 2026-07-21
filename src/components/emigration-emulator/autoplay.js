@@ -146,6 +146,34 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           return { type: "steal", params: { cardType: "passport" } };
         }
       }
+
+      // Hoarding: steal an extra ticket/passport to deny opponents and earn reclaim fees later.
+      // Only worth it mid/early game when there are surplus docs in the pool.
+      const midGame = !lateGame;
+      if (midGame) {
+        const otherPlayersNeedTicket = engine.players.some(
+          (p) => p.id !== player.id && p.stash.tickets < 1,
+        );
+        const otherPlayersNeedPassport = engine.players.some(
+          (p) => p.id !== player.id && p.stash.passports < 1,
+        );
+        if (
+          player.stash.tickets >= 1 &&
+          engine.publicServices.tickets > 1 &&
+          player.stash.connections.length >= 1 &&
+          otherPlayersNeedTicket
+        ) {
+          return { type: "steal", params: { cardType: "ticket" } };
+        }
+        if (
+          player.stash.passports >= 1 &&
+          engine.publicServices.passports > 1 &&
+          player.stash.documents.length >= 1 &&
+          otherPlayersNeedPassport
+        ) {
+          return { type: "steal", params: { cardType: "passport" } };
+        }
+      }
     }
 
     // 3. Buy cheapest available Documents/Connections
@@ -267,6 +295,37 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         player.stash.documents.length >= 1
       ) {
         possibleMoves.push({ type: "steal", params: { cardType: "passport" } });
+      }
+      // Hoarding candidates: steal extras to deny opponents and earn reclaim fees
+      const otherPlayersNeedTicket = engine.players.some(
+        (p) => p.id !== player.id && p.stash.tickets < 1,
+      );
+      const otherPlayersNeedPassport = engine.players.some(
+        (p) => p.id !== player.id && p.stash.passports < 1,
+      );
+      if (
+        player.stash.tickets >= 1 &&
+        engine.publicServices.tickets > 1 &&
+        player.stash.connections.length >= 1 &&
+        otherPlayersNeedTicket
+      ) {
+        possibleMoves.push({
+          type: "steal",
+          params: { cardType: "ticket" },
+          isHoardingMove: true,
+        });
+      }
+      if (
+        player.stash.passports >= 1 &&
+        engine.publicServices.passports > 1 &&
+        player.stash.documents.length >= 1 &&
+        otherPlayersNeedPassport
+      ) {
+        possibleMoves.push({
+          type: "steal",
+          params: { cardType: "passport" },
+          isHoardingMove: true,
+        });
       }
     }
     if (enabled("applyCollege")) {
@@ -421,6 +480,18 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
         if (move.params.cardType === "passport" && pPassports < 1)
           score += urgency;
+        // Hoarding steal: score based on number of opponents who still need this doc type.
+        // The skip-turn cost is offset by denying opponents and earning future reclaim fees.
+        if (move.isHoardingMove) {
+          const opponentsDeprived = engine.players.filter(
+            (p) =>
+              p.id !== player.id &&
+              ((move.params.cardType === "ticket" && p.stash.tickets < 1) ||
+                (move.params.cardType === "passport" && p.stash.passports < 1)),
+          ).length;
+          // Each deprived opponent is worth ~3 pts (reclaim fee + strategic value), minus the skip-turn cost.
+          score += opponentsDeprived * 3 - 3;
+        }
       } else if (move.type === "applyCollege") {
         const isLateGame =
           engine.publicServices.tickets <= 1 ||
@@ -429,7 +500,16 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       } else if (move.type === "discard") {
         score = 2 - move.fee;
         if (move.targetId !== player.id) {
-          score += 3;
+          // Bonus for discarding from opponent's layout.
+          // Scale it by how thin their layout is — discarding their last available cards
+          // is more disruptive (delays their access to face-down cards).
+          const targetPlayer = engine.players[move.targetId];
+          const opponentFaceUp = targetPlayer
+            ? targetPlayer.layout.filter((l) => l && l.faceUp).length
+            : 4;
+          // More valuable when opponent has few cards left (each one matters more)
+          const disruptBonus = opponentFaceUp <= 3 ? 5 : 3;
+          score += disruptBonus;
         } else {
           score -= 2;
         }
@@ -549,6 +629,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
     for (const p of engine.players) {
       if (p.id === player.id) continue;
+      // Primary: reclaim if we need one and they have a spare
       if (player.stash.tickets < 1 && p.stash.tickets > 1) {
         return { targetPlayerIdx: p.id, cardType: "ticket" };
       }
@@ -556,6 +637,26 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         return { targetPlayerIdx: p.id, cardType: "passport" };
       }
     }
+
+    // Secondary: hoard by reclaiming extras from an opponent who is hoarding.
+    // Only worthwhile if several other opponents still need that doc type (we earn reclaim fees).
+    const ticketNeeders = engine.players.filter(
+      (p) => p.id !== player.id && p.stash.tickets < 1,
+    ).length;
+    const passportNeeders = engine.players.filter(
+      (p) => p.id !== player.id && p.stash.passports < 1,
+    ).length;
+
+    for (const p of engine.players) {
+      if (p.id === player.id) continue;
+      if (ticketNeeders >= 2 && p.stash.tickets > 1) {
+        return { targetPlayerIdx: p.id, cardType: "ticket" };
+      }
+      if (passportNeeders >= 2 && p.stash.passports > 1) {
+        return { targetPlayerIdx: p.id, cardType: "passport" };
+      }
+    }
+
     return null;
   }
 
