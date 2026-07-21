@@ -159,7 +159,7 @@
         <h3 class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0">
           Game Log
         </h3>
-      <button class="btn text-xs" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
+      <button class="text-xs p-2 cursor-pointer" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
 
         <button
           class="bg-transparent border-none text-neutral-500 text-base
