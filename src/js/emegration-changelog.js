@@ -1,5 +1,12 @@
 export const changelog = [
   {
+    version: "0.1.1",
+    date: "July 22, 2026",
+    items: [
+      "Rule change: The player who Activates a Payday gets their full salary. All other players get 1 Money.",
+    ],
+  },
+  {
     version: "0.1.0",
     date: "July 15, 2026",
     items: [
