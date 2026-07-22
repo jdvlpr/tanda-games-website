@@ -1,7 +1,7 @@
 {
   "name": "tandagames.com",
   "type": "module",
-  "version": "0.3.22",
+  "version": "0.3.23",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -17,5 +17,8 @@
     "svelte": "^5.34.1",
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@iconify/svelte": "^5.2.2"
   }
 }
