@@ -385,16 +385,18 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         const rules = destTargets[key];
         if (!rules) continue;
 
-        if (rules.setSize > 0) {
-          score += (amount / rules.setSize) * (rules.reward || 0);
+        if (rules.minRequired !== undefined && amount < rules.minRequired) {
+          // Full penalty if below minimum required
+          score -= rules.penalty || 0;
+          // Add small progress points towards reaching minRequired
+          score += (amount / rules.minRequired) * ((rules.penalty || 0) * 0.5);
         }
-
-        if (rules.minRequired !== undefined) {
-          if (amount < rules.minRequired) {
-            score -=
-              ((rules.minRequired - amount) / rules.minRequired) *
-              (rules.penalty || 0);
-          }
+        
+        if (rules.setSize > 0) {
+          // Discrete reward for completed sets
+          score += Math.floor(amount / rules.setSize) * (rules.reward || 0);
+          // Smaller continuous reward for partial sets to guide the AI
+          score += ((amount % rules.setSize) / rules.setSize) * ((rules.reward || 0) * 0.5);
         }
       }
       return score;
@@ -407,8 +409,14 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (move.card.type === "payday") {
           // Rule 2: Never activate Payday while in college (salary is $0)
           if (player.inCollege) return -100;
+          
           const netGain = player.salary - move.fee;
-          if (netGain <= 0) return -100;
+          // Calculate opponent's net gain (they get the fee you pay + $1 stipend)
+          const opponentGain = move.targetId === player.id ? 0 : move.fee + 1;
+          const relativeAdvantage = netGain - opponentGain;
+
+          if (netGain <= 0 || relativeAdvantage <= -1) return -100;
+
           // Value money gain via Assurance impact
           const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
           const assuranceAfter = getSmoothedAssurance(
@@ -416,10 +424,12 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             d,
             c,
           );
-          // Rule 3: Exploiting Payday Asymmetry (full salary to activator vs $1 stipend to others).
-          // Favor own-layout paydays (no fee) to build economic lead over opponents.
-          const ownLayoutBonus = move.targetId === player.id ? 4 : -2;
-          score = netGain * 2 + (assuranceAfter - assuranceNow) * 4 + ownLayoutBonus;
+          
+          // Rule 3: Exploiting Payday Asymmetry
+          score = relativeAdvantage * 2 + (assuranceAfter - assuranceNow) * 4;
+          if (move.targetId === player.id) {
+            score += 4; // Bonus for activating own layout (removes a card for free)
+          }
         } else {
           score = 3 - move.fee;
         }
@@ -476,45 +486,80 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           score = pTickets < 1 ? urgency : -10;
         else score = pPassports < 1 ? urgency : -10;
       } else if (move.type === "steal") {
-        score = -5;
+        if (player.money >= 2) {
+          score = -100; // Punish stealing heavily if the AI can afford to buyPool, to avoid wasting a turn.
+        } else {
+          score = -5;
+          const faceUpLeft = engine.players.reduce(
+            (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+            0,
+          );
+          const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+          if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
+          if (move.params.cardType === "passport" && pPassports < 1)
+            score += urgency;
+          // Hoarding steal: score based on number of opponents who still need this doc type.
+          if (move.isHoardingMove) {
+            const opponentsDeprived = engine.players.filter(
+              (p) =>
+                p.id !== player.id &&
+                ((move.params.cardType === "ticket" && p.stash.tickets < 1) ||
+                  (move.params.cardType === "passport" && p.stash.passports < 1)),
+            ).length;
+            score += opponentsDeprived * 3 - 3;
+          }
+        }
+      } else if (move.type === "applyCollege") {
         const faceUpLeft = engine.players.reduce(
           (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
           0,
         );
-        const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
-        if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
-        if (move.params.cardType === "passport" && pPassports < 1)
-          score += urgency;
-        // Hoarding steal: score based on number of opponents who still need this doc type.
-        // The skip-turn cost is offset by denying opponents and earning future reclaim fees.
-        if (move.isHoardingMove) {
-          const opponentsDeprived = engine.players.filter(
-            (p) =>
-              p.id !== player.id &&
-              ((move.params.cardType === "ticket" && p.stash.tickets < 1) ||
-                (move.params.cardType === "passport" && p.stash.passports < 1)),
-          ).length;
-          // Each deprived opponent is worth ~3 pts (reclaim fee + strategic value), minus the skip-turn cost.
-          score += opponentsDeprived * 3 - 3;
+        const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1 || faceUpLeft <= 6;
+        const maxTuition = (player.startingFund || 6) + 6;
+        
+        if (player.money < maxTuition + 2) {
+          score = -100; // Do not apply if it might drain all funds and ruin liquidity
+        } else if (isLateGame) {
+          // Late game: Only apply if we REALLY need the Assurance to cross, and have high money to guarantee passing
+          const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
+          if (assuranceNow < 8 && player.money > maxTuition + 5) {
+             score = 2; // Worth the risk for +2 Assurance upon graduation
+          } else {
+             score = -5; // Too risky/slow for late game otherwise
+          }
+        } else {
+          score = 6; // Early game, high money -> good investment for salary and assurance
         }
-      } else if (move.type === "applyCollege") {
-        const isLateGame =
-          engine.publicServices.tickets <= 1 ||
-          engine.publicServices.passports <= 1;
-        score = isLateGame ? -5 : 4;
       } else if (move.type === "discard") {
         score = 2 - move.fee;
         if (move.targetId !== player.id) {
-          // Bonus for discarding from opponent's layout.
-          // Scale it by how thin their layout is — discarding their last available cards
-          // is more disruptive (delays their access to face-down cards).
           const targetPlayer = engine.players[move.targetId];
           const opponentFaceUp = targetPlayer
             ? targetPlayer.layout.filter((l) => l && l.faceUp).length
             : 4;
-          // More valuable when opponent has few cards left (each one matters more)
+            
+          // Target opponent's set completion requirements
+          const opponentDest = DESTINATIONS.find((dest) => dest.name === targetPlayer.destination);
+          const isDoc = move.card.type === "document";
+          const isConn = move.card.type === "connection";
+          
+          let denialBonus = 0;
+          if (opponentDest && opponentDest.targets) {
+            const oppRules = isDoc ? opponentDest.targets.d : (isConn ? opponentDest.targets.c : null);
+            if (oppRules) {
+              const oppCurrent = isDoc ? targetPlayer.stash.documents.length : targetPlayer.stash.connections.length;
+              if (oppRules.minRequired && oppCurrent < oppRules.minRequired) {
+                denialBonus = 8;
+              } else if (oppRules.setSize > 0 && (oppCurrent + 1) % oppRules.setSize === 0) {
+                denialBonus = 6;
+              } else {
+                denialBonus = 2;
+              }
+            }
+          }
+            
           const disruptBonus = opponentFaceUp <= 3 ? 5 : 3;
-          score += disruptBonus;
+          score += disruptBonus + denialBonus;
         } else {
           score -= 2;
         }
@@ -541,9 +586,12 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       const fee = p.id === player.id ? 0 : player.accessFee;
       if (player.money < fee) continue;
 
-      // Prevent activating opponent's payday if it's a net loss
-      if (cardType === "payday" && p.id !== player.id && player.salary <= fee)
-        continue;
+      // Prevent activating opponent's payday if it's a net relative loss
+      if (cardType === "payday" && p.id !== player.id) {
+        const netGain = player.salary - fee;
+        const opponentGain = fee + 1; // They get your fee + the $1 stipend
+        if (netGain <= 0 || netGain - opponentGain <= -1) continue;
+      }
 
       for (let i = 0; i < 14; i++) {
         if (engine.isCardAvailable(p, i)) {
