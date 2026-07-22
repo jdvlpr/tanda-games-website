@@ -402,10 +402,9 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (!rules) continue;
 
         if (rules.minRequired !== undefined && amount < rules.minRequired) {
-          // Full penalty if below minimum required
-          score -= rules.penalty || 0;
-          // Add small progress points towards reaching minRequired
-          score += (amount / rules.minRequired) * ((rules.penalty || 0) * 0.5);
+          // Linearly interpolate the penalty based on how many we are missing
+          const missing = rules.minRequired - amount;
+          score -= (missing / rules.minRequired) * (rules.penalty || 0);
         }
 
         if (rules.setSize > 0) {
@@ -1014,8 +1013,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     if (!didSell) {
       // Fallback normal/easy behavior
       if (difficulty !== "expert" && player.money < 2) {
-        const canSellDoc = player.stash.documents.length > (player.stash.passports < 1 ? 1 : 0);
-        const canSellConn = player.stash.connections.length > (player.stash.tickets < 1 ? 1 : 0);
+        const canSellDoc = player.stash.documents.length > 1;
+        const canSellConn = player.stash.connections.length > 1;
 
         if (canSellDoc) {
           const idx = player.stash.documents.reduce(
