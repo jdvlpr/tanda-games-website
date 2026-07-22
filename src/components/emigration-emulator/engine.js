@@ -1460,6 +1460,10 @@ export default class EmigrationEngine {
       title: choice.title,
       options: choice.options,
       cancellable: choice.cancellable !== false,
+      // playerIdx: the id of the player who must make this decision.
+      // Defaults to the current acting player. Persuasion uses this
+      // to hand the interrupt to the layout owner (target), not the actor.
+      playerIdx: choice.playerIdx ?? this.currentPlayerIdx,
     };
     this._pendingResolve = choice.resolve;
     this._notify();
@@ -1745,9 +1749,13 @@ export default class EmigrationEngine {
   // ── Persuasion Handler ────────────────────────────────────────────────
 
   _handlePersuasion(player, target, slotIdx, baseFee, callback) {
+    // Step 1: Ask the layout OWNER (target) if they want to offer Persuasion.
+    // playerIdx is set to target.id so the UI / AI loop knows this interrupt
+    // belongs to target, not to the acting player.
     this._setPendingChoice({
       id: "persuasion-offer",
-      title: `${target.name} has Persuasion. Offer it instead of the targeted card?`,
+      playerIdx: target.id,
+      title: `${target.name}: You have Persuasion — offer it to ${player.name} instead of the targeted card?`,
       cancellable: false,
       options: [
         { text: `Yes — offer Persuasion to ${player.name}`, value: "offer" },
@@ -1758,17 +1766,20 @@ export default class EmigrationEngine {
           callback(baseFee);
           return;
         }
+        // Step 2: Ask the ACTING player (player) if they accept.
+        // playerIdx is set to player.id so the UI knows to show this to them.
         this._setPendingChoice({
           id: "persuasion-accept",
-          title: `${player.name}: Accept Persuasion, or decline and pay double fee?`,
+          playerIdx: player.id,
+          title: `${player.name}: Accept Persuasion from ${target.name}, or decline and pay double Access Fee?`,
           cancellable: false,
           options: [
             {
-              text: `Accept Persuasion (pay $${baseFee} fee)`,
+              text: `Accept Persuasion (pay $${baseFee} Access Fee)`,
               value: "accept",
             },
             {
-              text: `Decline (pay $${baseFee * 2} double fee)`,
+              text: `Decline (pay double: $${baseFee * 2} Access Fee) and take the card`,
               value: "decline",
             },
           ],
@@ -3285,5 +3296,166 @@ export function runTests() {
     assert(false, `Crossing order test error: ${e.message}`);
   }
 
+  // ── Persuasion Life Card tests ───────────────────────────────────────────
+  try {
+    const setup = [
+      { name: "A", nationality: "Bosnian", destination: "China" },
+      { name: "B", nationality: "French", destination: "Russia" },
+    ];
+
+    // ─── Scenario: layout owner skips the offer → action proceeds at normal fee
+    {
+      const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      const actor = eng.players[0]; // P0 is the acting player
+      const owner = eng.players[1]; // P1 owns the layout card + Persuasion
+
+      owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
+      owner.layout[11] = {
+        card: { name: "Checklist", cost: 2, type: "document" },
+        faceUp: true,
+        index: 11,
+      };
+      actor.money = 20;
+      eng.currentPlayerIdx = 0;
+
+      eng.executeRequiredAction("discard", {
+        source: "layout",
+        targetPlayerIdx: 1,
+        slotIdx: 11,
+      });
+
+      // Engine should have paused with a persuasion-offer prompt for the OWNER (P1)
+      assert(
+        eng.pendingChoice?.id === "persuasion-offer",
+        "Persuasion: discard from opponent layout triggers persuasion-offer prompt",
+      );
+      assert(
+        eng.pendingChoice?.playerIdx === owner.id,
+        "Persuasion: persuasion-offer is directed at the layout owner (target), not the actor",
+      );
+
+      // Owner skips — action should resolve normally
+      const feeBeforeSkip = actor.accessFee;
+      const actorMoneyBefore = actor.money;
+      const ownerMoneyBefore = owner.money;
+      eng.resolveChoice("skip");
+
+      assert(
+        eng.phase === "preparation",
+        "Persuasion skip: game still in preparation",
+      );
+      assert(
+        actor.money === actorMoneyBefore + 2 - feeBeforeSkip,
+        "Persuasion skip: actor gains $2 from discard minus normal access fee",
+      );
+      assert(
+        owner.money === ownerMoneyBefore + feeBeforeSkip,
+        "Persuasion skip: owner receives normal access fee",
+      );
+    }
+
+    // ─── Scenario: owner offers → actor accepts → Persuasion transferred
+    {
+      const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      const actor = eng.players[0];
+      const owner = eng.players[1];
+
+      owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
+      owner.layout[11] = {
+        card: { name: "Checklist", cost: 2, type: "document" },
+        faceUp: true,
+        index: 11,
+      };
+      actor.money = 20;
+      eng.currentPlayerIdx = 0;
+
+      eng.executeRequiredAction("discard", {
+        source: "layout",
+        targetPlayerIdx: 1,
+        slotIdx: 11,
+      });
+
+      // Owner offers Persuasion
+      const baseFee = actor.accessFee;
+      const ownerMoneyBefore = owner.money;
+      const actorMoneyBefore = actor.money;
+      eng.resolveChoice("offer"); // persuasion-offer → "offer"
+
+      // Now persuasion-accept prompt should be for the ACTOR (P0)
+      assert(
+        eng.pendingChoice?.id === "persuasion-accept",
+        "Persuasion accept: persuasion-accept prompt shown after owner offers",
+      );
+      assert(
+        eng.pendingChoice?.playerIdx === actor.id,
+        "Persuasion accept: persuasion-accept is directed at the acting player",
+      );
+
+      eng.resolveChoice("accept");
+
+      assert(
+        actor.stash.lifeCards.some((lc) => lc.title === "Persuasion"),
+        "Persuasion accept: Persuasion card is in actor's stash",
+      );
+      assert(
+        !owner.stash.lifeCards.some((lc) => lc.title === "Persuasion"),
+        "Persuasion accept: Persuasion card removed from owner's stash",
+      );
+      assert(
+        actor.money === actorMoneyBefore - baseFee,
+        "Persuasion accept: actor pays base access fee",
+      );
+      assert(
+        owner.money === ownerMoneyBefore + baseFee,
+        "Persuasion accept: owner receives base access fee",
+      );
+    }
+
+    // ─── Scenario: owner offers → actor declines → double fee, action continues
+    {
+      const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      const actor = eng.players[0];
+      const owner = eng.players[1];
+
+      owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
+      owner.layout[11] = {
+        card: { name: "Checklist", cost: 2, type: "document" },
+        faceUp: true,
+        index: 11,
+      };
+      actor.money = 20;
+      eng.currentPlayerIdx = 0;
+
+      const baseFee = actor.accessFee;
+      const ownerMoneyBefore = owner.money;
+      const actorMoneyBefore = actor.money;
+
+      eng.executeRequiredAction("discard", {
+        source: "layout",
+        targetPlayerIdx: 1,
+        slotIdx: 11,
+      });
+
+      eng.resolveChoice("offer");   // owner offers
+      eng.resolveChoice("decline"); // actor declines
+
+      assert(
+        actor.money === actorMoneyBefore + 2 - baseFee * 2,
+        "Persuasion decline: actor pays double access fee and still gains $2 from discard",
+      );
+      assert(
+        owner.money === ownerMoneyBefore + baseFee * 2,
+        "Persuasion decline: owner receives double access fee",
+      );
+      assert(
+        owner.stash.lifeCards.some((lc) => lc.title === "Persuasion"),
+        "Persuasion decline: Persuasion card stays with owner (not transferred)",
+      );
+    }
+  } catch (e) {
+    assert(false, `Persuasion life card error: ${e.message}`);
+  }
+
   return results;
 }
+

@@ -723,9 +723,22 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       return;
     }
 
-    // Persuasion: skip offering it
+    // Persuasion: offer it when targeted to force double fee or card trade
     if (id === "persuasion-offer") {
-      engine.resolveChoice("skip");
+      engine.resolveChoice("offer");
+      return;
+    }
+
+    // Persuasion accept: if AI has money for double fee, decline to get the original card; else accept
+    if (id === "persuasion-accept") {
+      const activeP = engine.players[engine.currentPlayerIdx];
+      const baseFee = activeP?.accessFee || 1;
+      const doubleFee = baseFee * 2;
+      if (activeP && activeP.money >= doubleFee) {
+        engine.resolveChoice("decline");
+      } else {
+        engine.resolveChoice("accept");
+      }
       return;
     }
 

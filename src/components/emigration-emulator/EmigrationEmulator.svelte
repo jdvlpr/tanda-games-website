@@ -168,6 +168,12 @@
   $effect(() => {
     if (!vsComputer || !snapshot || !aiPlayer || aiThinking || isTransitioning) return;
     if (snapshot.phase === 'game_over') return;
+    
+    // In vsComputer mode, player 0 is the human player.
+    // If there is a pending choice specifically targeted at the human player (player 0),
+    // we must pause AI turns so the human player can answer via the modal.
+    if (pendingChoice && pendingChoice.playerIdx === 0) return;
+    
     if (isHumanTurn) return;
 
     aiThinking = true;
@@ -176,19 +182,23 @@
         aiThinking = false;
         return;
       }
-      // Resolve any pending choice first (AI turn)
+      // Resolve any pending choice for AI players
       let safety = 0;
       while (engine.pendingChoice && safety < 20) {
+        if (vsComputer && engine.pendingChoice.playerIdx === 0) break;
         aiPlayer.resolveChoice();
         safety++;
       }
-      // Play one AI turn (handles both preparation and crossing phases)
-      aiPlayer.playTurn();
-      // Resolve any choices that result from the action
-      safety = 0;
-      while (engine.pendingChoice && safety < 20) {
-        aiPlayer.resolveChoice();
-        safety++;
+      // Play one AI turn if no choice is pending for the human
+      if (!engine.pendingChoice || (vsComputer && engine.pendingChoice.playerIdx !== 0)) {
+        aiPlayer.playTurn();
+        // Resolve any resulting choices that belong to AI players
+        safety = 0;
+        while (engine.pendingChoice && safety < 20) {
+          if (vsComputer && engine.pendingChoice.playerIdx === 0) break;
+          aiPlayer.resolveChoice();
+          safety++;
+        }
       }
       aiThinking = false;
     }, 1000);

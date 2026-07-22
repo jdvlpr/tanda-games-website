@@ -24,8 +24,8 @@ This document provides a high-level overview of the Emigration board game emulat
 
 When an action requires a user decision (e.g., choosing a player to steal from, or deciding whether to use a Persuasion card), the engine pauses execution and sets a `pendingChoice` object.
 
-1. The engine pauses and calls `this._setPendingChoice({ id, title, options, resolve })`.
-2. The UI detects that `pendingChoice` is not null and displays a `Modal.svelte`.
+1. The engine pauses and calls `this._setPendingChoice({ id, playerIdx, title, options, resolve })` (where `playerIdx` identifies which player must respond, defaulting to `currentPlayerIdx`).
+2. The UI detects that `pendingChoice` is not null and displays a `Modal.svelte` to the designated player.
 3. The user makes a selection (or clicks Cancel, which rolls back the state).
 4. The UI calls `engine.resolveChoice(value)`.
 5. The engine executes the callback and resumes the action logic.
