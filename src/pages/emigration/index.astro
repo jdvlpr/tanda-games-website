@@ -11,11 +11,6 @@ const FILES_PATH = `/files/${ID}/v${VERSION}/`;
 
 let printAndPlay = [
   {
-    name: 'Rulebook',
-    title: `${ID}-game-rulebook-v${VERSION}.pdf`,
-    pages: '20 pages'
-  },
-  {
     name: 'Mini Cards',
     title: `${ID}-game-mini-cards-v${VERSION}.pdf`,
     pages: '8 pages'
@@ -88,31 +83,50 @@ let printAndPlay = [
     </p>
 
     <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
-      <div class="flex flex-col gap-2 justify-center items-start">
+      <div class="flex flex-wrap gap-4 justify-center items-start">
+        <a href={FILES_PATH + `${ID}-game-rulebook-v${VERSION}.pdf`} download={`${ID}-game-rulebook-v${VERSION}.pdf`} class="btn"
+                ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6 flex-none"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                    />
+                </svg>
+                Rulebook - 20 pages</a
+            >
         <a href="/emigration/emulator" class="btn">Play in the Emulator</a>
 
         <div class="inline-flex flex-col gap-2 my-4 items-start">
       <h2 class="font-bold text-2xl">Print & Play Downloads</h2>
 
-      {printAndPlay.map((item) => (
-          <a href={FILES_PATH + item.title} download={item.title} class="btn"
-                  ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6 flex-none"
-                  >
-                      <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                      />
-                  </svg>
-                  {item.name} - {item.pages}</a
-              >
-      ))}
+      <div class="flex flex-col gap-2 items-start">
+        {printAndPlay.map((item) => (
+            <a href={FILES_PATH + item.title} download={item.title} class="btn px-2 py-1 font-normal"
+                    ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6 flex-none"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                        />
+                    </svg>
+                    {item.name} - {item.pages}</a
+                >
+        ))}
+      </div>
 
           <div class="inline-flex flex-col gap-2 my-2 text-left">
               <p class="">
@@ -185,7 +199,7 @@ let printAndPlay = [
               include your name if you want to be publicly credited with
               helping develop the game). Thank you!
             </p>
-            <p class="italic my-2">Updated November 10, 2022</p>
+            <p class="italic my-2">Updated July, 2026</p>
           </div>
         </div>
       </div>
