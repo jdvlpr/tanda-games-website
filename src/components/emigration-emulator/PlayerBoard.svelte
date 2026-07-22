@@ -260,11 +260,12 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-ticket);" 
           onclick={() => handleStashClick('ticket', i)}
         >
-          <span>🎟️ Ticket</span>
+          <Icon icon="game-icons:ticket" class="size-4 shrink-0" />
+          <span>Ticket</span>
         </div>
       {/each}
     </div>
@@ -277,11 +278,12 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-passport);" 
           onclick={() => handleStashClick('passport', i)}
         >
-          <span>🛂 Passport</span>
+          <Icon icon="game-icons:passport" class="size-4 shrink-0" />
+          <span>Passport</span>
         </div>
       {/each}
     </div>

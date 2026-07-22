@@ -1,4 +1,5 @@
 <script>
+  import Icon from '@iconify/svelte';
   import ActionPanel from './ActionPanel.svelte';
   import { createAutoPlayer } from './autoplay.js';
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.js';
@@ -571,7 +572,7 @@
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
-                    <span>🎟️</span>
+                    <Icon icon="game-icons:ticket" class="size-6 shrink-0" />
                     <span>{snapshot.publicServices.tickets}</span>
                   </div>
                   {#if snapshot.phase === 'preparation' && currentPlayer}
@@ -604,7 +605,7 @@
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
-                    <span>🛂</span>
+                    <Icon icon="game-icons:passport" class="size-6 shrink-0" />
                     <span>{snapshot.publicServices.passports}</span>
                   </div>
                   {#if snapshot.phase === 'preparation' && currentPlayer}

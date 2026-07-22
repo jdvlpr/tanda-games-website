@@ -723,6 +723,7 @@ export default class EmigrationEngine {
     const paydays = Array.from({ length: paydaysCount }, () => ({
       name: "Payday",
       type: "payday",
+      icon: "money-stack",
       cost: 0,
     }));
 
