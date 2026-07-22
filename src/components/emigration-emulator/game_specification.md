@@ -221,7 +221,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 #### Required Actions (Must Choose Exactly One):
 
 1. **Activate**: Remove a Payday or Life Card from any player's Layout (must be an available card).
-   - **Payday**: All players collect their current salary from the bank (salary starts at 1 Money, increased by pay raise slots, paused if in college). Put the Payday card in the discard pile.
+   - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at 1 Money, increased by pay raise slots, paused if in college). All other players receive a flat stipend of 1 Money from the bank (paused if in college). Put the Payday card in the discard pile.
    - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
 2. **Buy card**:
    - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.

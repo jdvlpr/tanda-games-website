@@ -1702,7 +1702,7 @@ export default class EmigrationEngine {
     if (card.type === "payday") {
       this.discardPile.push(card);
       this.log(`P${player.id}|ACT:Payday`, "action");
-      this._resolvePayday();
+      this._resolvePayday(player);
       this.uncoverLayout(target);
       this.advanceTurn();
     } else {
@@ -1711,10 +1711,10 @@ export default class EmigrationEngine {
     }
   }
 
-  _resolvePayday() {
+  _resolvePayday(activator) {
     const salaries = this.players.map((p) => {
       if (p.inCollege) return 0;
-      let payout = p.salary;
+      let payout = (activator && p.id === activator.id) ? p.salary : 1;
       if (p.stash.lifeCards.some((lc) => lc.title === "Insider")) payout += 1;
       if (p.stash.lifeCards.some((lc) => lc.title === "Pay Cut"))
         payout = Math.max(0, payout - 1);
@@ -3085,6 +3085,23 @@ export function runTests() {
     assert(salary === 5, "After 2nd raise: salary = $5");
   } catch (e) {
     assert(false, `Pay raise error: ${e.message}`);
+  }
+
+  try {
+    const setup = [
+      { name: "A", nationality: "Bosnian", destination: "China" },
+      { name: "B", nationality: "French", destination: "Russia" },
+    ];
+    const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+    eng.players[0].salary = 3;
+    eng.players[1].salary = 5;
+    const moneyA = eng.players[0].money;
+    const moneyB = eng.players[1].money;
+    eng._resolvePayday(eng.players[0]);
+    assert(eng.players[0].money === moneyA + 3, "Payday activator gets full salary ($3)");
+    assert(eng.players[1].money === moneyB + 1, "Non-activator gets $1 flat stipend (not full salary)");
+  } catch (e) {
+    assert(false, `Payday resolution test error: ${e.message}`);
   }
 
   try {

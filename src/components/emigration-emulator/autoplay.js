@@ -405,6 +405,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
       if (move.type === "activate") {
         if (move.card.type === "payday") {
+          // Rule 2: Never activate Payday while in college (salary is $0)
+          if (player.inCollege) return -100;
           const netGain = player.salary - move.fee;
           if (netGain <= 0) return -100;
           // Value money gain via Assurance impact
@@ -414,8 +416,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             d,
             c,
           );
-          score = netGain * 1.5 + (assuranceAfter - assuranceNow) * 4;
-          if (move.targetId !== player.id) score -= 2;
+          // Rule 3: Exploiting Payday Asymmetry (full salary to activator vs $1 stipend to others).
+          // Favor own-layout paydays (no fee) to build economic lead over opponents.
+          const ownLayoutBonus = move.targetId === player.id ? 4 : -2;
+          score = netGain * 2 + (assuranceAfter - assuranceNow) * 4 + ownLayoutBonus;
         } else {
           score = 3 - move.fee;
         }
@@ -449,12 +453,13 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (isDoc && pPassports < 1 && d === 0) score += 15;
         if (isConn && pTickets < 1 && c === 0) score += 15;
       } else if (move.type === "buyPool") {
-        // Late game scale
+        // Rule 1: Mandatory Ticket/Passport Safety Gate
+        // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
         const faceUpLeft = engine.players.reduce(
           (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
           0,
         );
-        const urgency = 15 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        const urgency = 20 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
 
         if (move.params.cardType === "ticket") {
           score = pTickets < 1 ? urgency : -10;
@@ -466,7 +471,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
           0,
         );
-        const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        const urgency = 18 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         if (move.params.cardType === "ticket")
           score = pTickets < 1 ? urgency : -10;
         else score = pPassports < 1 ? urgency : -10;
@@ -476,7 +481,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
           0,
         );
-        const urgency = 10 + Math.max(0, 14 - faceUpLeft) * 1.5;
+        const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
         if (move.params.cardType === "passport" && pPassports < 1)
           score += urgency;
