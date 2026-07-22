@@ -1,4 +1,5 @@
 <script>
+  import Icon from '@iconify/svelte';
   let { engine, player, isActive, onCardSelect, selectedSlot, selectedStash, autoScrollEnabled = true } = $props();
 
   let boardEl = null;
@@ -87,6 +88,11 @@
         {#if slot.faceUp}
           <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
           <div class="card-type">{c.type}</div>
+          {#if c.icon}
+            <div class="flex items-center justify-center my-0.5">
+              <Icon icon={c.icon.includes(':') ? c.icon : `game-icons:${c.icon}`} class="size-8" />
+            </div>
+          {/if}
           <div class="card-title">{c.name || c.title}</div>
           <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
         {/if}
@@ -212,10 +218,13 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-document);" 
           onclick={() => handleStashClick('document', i)}
         >
+          {#if doc.icon}
+            <Icon icon={doc.icon.includes(':') ? doc.icon : `game-icons:${doc.icon}`} class="size-4 shrink-0" />
+          {/if}
           <span class="truncate pr-1">{doc.name}</span>
           <span class="text-xs  font-bold">${doc.cost || 0}</span>
         </div>
@@ -230,10 +239,13 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-connection);" 
           onclick={() => handleStashClick('connection', i)}
         >
+          {#if conn.icon}
+            <Icon icon={conn.icon.includes(':') ? conn.icon : `game-icons:${conn.icon}`} class="size-4 shrink-0" />
+          {/if}
           <span class="truncate pr-1">{conn.name}</span>
           <span class="text-xs  font-bold">${conn.cost || 0}</span>
         </div>
@@ -282,10 +294,13 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md {isSel ? 'selected' : ''}" 
+          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-life);" 
           onclick={() => handleStashClick('lifeCard', i)}
         >
+          {#if lc.icon}
+            <Icon icon={lc.icon.includes(':') ? lc.icon : `game-icons:${lc.icon}`} class="size-4 shrink-0" />
+          {/if}
           <span class="truncate pr-1">{lc.title}</span>
           {#if lc.money}
             <span class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold">${lc.money}</span>

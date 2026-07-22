@@ -155,65 +155,68 @@ export const DESTINATIONS = [
 });
 
 export const DOCUMENTS_CATALOG = [
-  { name: "Write Last Will and Testament", cost: 2, type: "document" },
-  { name: "Certificate of Excellence", cost: 2, type: "document" },
-  { name: "Checklist", cost: 2, type: "document" },
-  { name: "Copy of Birth Certificate", cost: 2, type: "document" },
-  { name: "Notebook", cost: 2, type: "document" },
-  { name: "Subscribe to Travel Updates", cost: 2, type: "document" },
-  { name: "Travel Brochure", cost: 2, type: "document" },
-  { name: "Physical Exam", cost: 3, type: "document" },
-  { name: "Vaccination Record", cost: 3, type: "document" },
-  { name: "Personality Test", cost: 3, type: "document" },
-  { name: "Travel Wallet", cost: 3, type: "document" },
-  { name: "Attend Security Training", cost: 3, type: "document" },
-  { name: "Residence Address in Destination", cost: 3, type: "document" },
-  { name: "Letter of Recommendation", cost: 3, type: "document" },
-  { name: "Letter of Invitation", cost: 4, type: "document" },
-  { name: "Background Check", cost: 4, type: "document" },
-  { name: "Employment Contract", cost: 4, type: "document" },
-  { name: "International Driving Permit", cost: 4, type: "document" },
-  { name: "Vehicle Registration Papers", cost: 4, type: "document" },
-  { name: "Pet Passport", cost: 4, type: "document" },
-  { name: "Language Phrasebook", cost: 4, type: "document" },
+  { name: "Write Last Will and Testament", cost: 2, icon: "tombstone", type: "document" },
+  { name: "Certificate of Excellence", cost: 2, icon: "diploma", type: "document" },
+  { name: "Checklist", cost: 2, icon: "checklist", type: "document" },
+  { name: "Copy of Birth Certificate", cost: 2, icon: "stork-delivery", type: "document" },
+  { name: "Notebook", cost: 2, icon: "notebook", type: "document" },
+  { name: "Subscribe to Travel Updates", cost: 2, icon: "rss", type: "document" },
+  { name: "Travel Brochure", cost: 2, icon: "open-book", type: "document" },
+  { name: "Physical Exam", cost: 3, icon: "stethoscope", type: "document" },
+  { name: "Vaccination Record", cost: 3, icon: "miracle-medecine", type: "document" },
+  { name: "Personality Test", cost: 3, icon: "skills", type: "document" },
+  { name: "Travel Wallet", cost: 3, icon: "wallet", type: "document" },
+  { name: "Attend Security Training", cost: 3, icon: "padlock", type: "document" },
+  { name: "Residence Address in Destination", cost: 3, icon: "treasure-map", type: "document" },
+  { name: "Letter of Recommendation", cost: 3, icon: "thumb-up", type: "document" },
+  { name: "Letter of Invitation", cost: 4, icon: "envelope", type: "document" },
+  { name: "Background Check", cost: 4, icon: "sherlock-holmes", type: "document" },
+  { name: "Employment Contract", cost: 4, icon: "journey", type: "document" },
+  { name: "International Driving Permit", cost: 4, icon: "steering-wheel", type: "document" },
+  { name: "Vehicle Registration Papers", cost: 4, icon: "race-car", type: "document" },
+  { name: "Pet Passport", cost: 4, icon: "labrador-head", type: "document" },
+  { name: "Language Phrasebook", cost: 4, icon: "book-cover", type: "document" },
 ];
 
 export const CONNECTIONS_CATALOG = [
-  { name: "Coffee with Airport Employee", cost: 2, type: "connection" },
+  { name: "Coffee with Airport Employee", cost: 2, icon: "coffee-mug", type: "connection" },
   {
     name: "Cookies for Neighbor from Destination",
     cost: 2,
+    icon: "cookie",
     type: "connection",
   },
   {
     name: "Video Chat with Person from Destination",
     cost: 2,
+    icon: "video-conference",
     type: "connection",
   },
-  { name: "Support Group Motivates You", cost: 2, type: "connection" },
-  { name: "Learn Song from Your Destination", cost: 2, type: "connection" },
-  { name: "Listen to the News", cost: 2, type: "connection" },
-  { name: "Friend moves to your Destination", cost: 2, type: "connection" },
-  { name: "Language Classes", cost: 3, type: "connection" },
-  { name: "Network Fair", cost: 3, type: "connection" },
-  { name: "Dinner with a Diplomat", cost: 3, type: "connection" },
-  { name: "Become World Famous", cost: 3, type: "connection" },
-  { name: "Learn from an Elder", cost: 3, type: "connection" },
-  { name: "Excellent Teamwork", cost: 3, type: "connection" },
-  { name: "Endorsement from Royalty", cost: 3, type: "connection" },
-  { name: "Enter Luxury Travel Club", cost: 4, type: "connection" },
-  { name: "Internship in Your Destination", cost: 4, type: "connection" },
-  { name: "Get Engaged to a Native", cost: 4, type: "connection" },
-  { name: "Politician Approves You", cost: 4, type: "connection" },
-  { name: "Attend History Class", cost: 4, type: "connection" },
-  { name: "Travel Concierge", cost: 4, type: "connection" },
-  { name: "Favorable Cultural Opinion", cost: 4, type: "connection" },
+  { name: "Support Group Motivates You", cost: 2, icon: "cherish", type: "connection" },
+  { name: "Learn Song from Your Destination", cost: 2, icon: "banjo", type: "connection" },
+  { name: "Listen to the News", cost: 2, icon: "newspaper", type: "connection" },
+  { name: "Friend moves to your Destination", cost: 2, icon: "hiking", type: "connection" },
+  { name: "Language Classes", cost: 3, icon: "conversation", type: "connection" },
+  { name: "Network Fair", cost: 3, icon: "mesh-network", type: "connection" },
+  { name: "Dinner with a Diplomat", cost: 3, icon: "hot-meal", type: "connection" },
+  { name: "Become World Famous", cost: 3, icon: "mona-lisa", type: "connection" },
+  { name: "Learn from an Elder", cost: 3, icon: "wisdom", type: "connection" },
+  { name: "Excellent Teamwork", cost: 3, icon: "team-idea", type: "connection" },
+  { name: "Endorsement from Royalty", cost: 3, icon: "coronation", type: "connection" },
+  { name: "Enter Luxury Travel Club", cost: 4, icon: "winged-scepter", type: "connection" },
+  { name: "Internship in Your Destination", cost: 4, icon: "light-backpack", type: "connection" },
+  { name: "Get Engaged to a Native", cost: 4, icon: "engagement-ring", type: "connection" },
+  { name: "Politician Approves You", cost: 4, icon: "public-speaker", type: "connection" },
+  { name: "Attend History Class", cost: 4, icon: "read", type: "connection" },
+  { name: "Travel Concierge", cost: 4, icon: "top-hat", type: "connection" },
+  { name: "Favorable Cultural Opinion", cost: 4, icon: "vote", type: "connection" },
 ];
 
 export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Stellar Reputation",
     pack: "Friendship",
+    icon: "star-struck",
     keep: "May Keep",
     type: "life",
     description:
@@ -222,6 +225,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Rummage Sale",
     pack: "Friendship",
+    icon: "bunny-slippers",
     keep: "Instant",
     type: "life",
     description: "Gain 3 Money, or take 1 discarded Document.",
@@ -229,6 +233,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Island Paradise",
     pack: "Friendship",
+    icon: "island",
     keep: "Instant",
     type: "life",
     description:
@@ -237,6 +242,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Swap Wallets",
     pack: "Friendship",
+    icon: "cash",
     keep: "Instant",
     type: "life",
     description: "You may trade all your Money for another player's Money.",
@@ -244,6 +250,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "VIP",
     pack: "High Society",
+    icon: "laurel-crown",
     keep: "Instant",
     type: "life",
     description:
@@ -252,6 +259,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Fancy Clothes",
     pack: "High Society",
+    icon: "tie",
     keep: "May Keep",
     type: "life",
     description:
@@ -260,6 +268,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Social Butterfly",
     pack: "High Society",
+    icon: "butterfly",
     keep: "Instant",
     type: "life",
     description: "Take 1 Connection or 3 Money from another player.",
@@ -267,6 +276,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Identical Twin",
     pack: "High Society",
+    icon: "duality",
     keep: "Instant",
     type: "life",
     description: "Gain 1 Money and take another turn.",
@@ -274,6 +284,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Reward",
     pack: "Downtown",
+    icon: "trophy",
     keep: "Instant",
     type: "life",
     description: "Gain 1 Money and take 1 Money from every other player.",
@@ -281,6 +292,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Suspect",
     pack: "Downtown",
+    icon: "crime-scene-tape",
     keep: "Instant",
     type: "life",
     description: "Lose 1 Money and lose 1 Connection or 1 Document.",
@@ -288,6 +300,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Salvage",
     pack: "Downtown",
+    icon: "ancient-ruins",
     keep: "Must Keep",
     type: "life",
     description:
@@ -296,6 +309,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Blacklisted",
     pack: "Downtown",
+    icon: "spy",
     keep: "Must Keep",
     type: "life",
     description:
@@ -304,6 +318,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Trousers Fall Down",
     pack: "Emergency",
+    icon: "trousers",
     keep: "Instant",
     type: "life",
     description: "Lose 3 Money or lose 1 Document.",
@@ -311,6 +326,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Keep Calm",
     pack: "Emergency",
+    icon: "cement-shoes",
     keep: "Must Keep",
     type: "life",
     description:
@@ -319,6 +335,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Life Coach",
     pack: "Emergency",
+    icon: "medallist",
     keep: "Instant",
     type: "life",
     description: "Take 1 Assurance.",
@@ -326,6 +343,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Shredder Accident",
     pack: "Emergency",
+    icon: "trash-can",
     keep: "Instant",
     type: "life",
     description: "Lose 1 Document. If you have none, lose 1 Money.",
@@ -333,6 +351,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Camping",
     pack: "Vacation",
+    icon: "camping-tent",
     keep: "Instant",
     type: "life",
     description:
@@ -341,6 +360,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "FOMO",
     pack: "Vacation",
+    icon: "card-exchange",
     keep: "Instant",
     type: "life",
     description: "Lose 1 Money and you may trade Destinations with someone.",
@@ -348,6 +368,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Nostalgia",
     pack: "Vacation",
+    icon: "backward-time",
     keep: "Instant",
     type: "life",
     description: "Replay any discarded Life Card or gain 2 Money.",
@@ -355,6 +376,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Lost & Found",
     pack: "Vacation",
+    icon: "backpack",
     keep: "Instant",
     type: "life",
     description: "Take 1 Document or 2 Money from another player.",
@@ -362,6 +384,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
+    icon: "parmecia",
     keep: "Instant",
     type: "life",
     description:
@@ -370,6 +393,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Pandemic / Economic Stimulus",
     pack: "News",
+    icon: "parmecia",
     keep: "Instant",
     type: "life",
     description:
@@ -378,6 +402,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Mental Fog",
     pack: "News",
+    icon: "dread",
     keep: "Instant",
     type: "life",
     description:
@@ -386,6 +411,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Insider",
     pack: "News",
+    icon: "read",
     keep: "May Keep",
     type: "life",
     description:
@@ -394,6 +420,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Philanthropy",
     pack: "Charity",
+    icon: "wallet",
     keep: "Instant",
     type: "life",
     description:
@@ -402,6 +429,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Bailout",
     pack: "Charity",
+    icon: "receive-money",
     keep: "Instant",
     type: "life",
     description:
@@ -410,6 +438,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Share",
     pack: "Charity",
+    icon: "present",
     keep: "Instant",
     type: "life",
     description: "Distribute half your Money (round down) to other players.",
@@ -417,6 +446,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Pay Cut",
     pack: "Charity",
+    icon: "smash-arrows",
     keep: "Must Keep",
     type: "life",
     description:
@@ -425,6 +455,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Productivity",
     pack: "Trade",
+    icon: "factory-arm",
     keep: "Instant",
     type: "life",
     description: "Gain 1 Money and decrease your Access Fee by 1 (minimum 0).",
@@ -432,6 +463,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Tariffs",
     pack: "Trade",
+    icon: "bank",
     keep: "Instant",
     type: "life",
     description: "Lose 1 Money and increase your Access Fee by 1 (maximum 5).",
@@ -439,6 +471,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Boost",
     pack: "Trade",
+    icon: "refinery",
     keep: "Instant",
     type: "life",
     description:
@@ -447,6 +480,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Persuasion",
     pack: "Trade",
+    icon: "convince",
     keep: "Must Keep",
     type: "life",
     description:
@@ -455,6 +489,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Underdog",
     pack: "Sports",
+    icon: "giant",
     keep: "Must Keep",
     type: "life",
     description:
@@ -463,6 +498,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Frontrunner",
     pack: "Sports",
+    icon: "laurels-trophy",
     keep: "Must Keep",
     type: "life",
     description:
@@ -471,6 +507,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Penalty",
     pack: "Sports",
+    icon: "whistle",
     keep: "Must Keep",
     type: "life",
     description:
@@ -479,6 +516,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
   {
     title: "Star Power",
     pack: "Sports",
+    icon: "podium-winner",
     keep: "Must Keep",
     type: "life",
     description:

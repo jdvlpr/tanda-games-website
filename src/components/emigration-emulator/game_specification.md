@@ -146,29 +146,29 @@ Security Lanes have 3 tokens stacked face-down. The tokens in each lane's pool a
 
 All standard Documents and Connections cost either 2, 3, or 4 Money:
 
-| Documents (Cost)                           | Connections (Cost)                                |
-| :----------------------------------------- | :------------------------------------------------ |
-| Write Last Will and Testament (2 Money)    | Coffee with Airport Employee (2 Money)            |
-| Certificate of Excellence (2 Money)        | Cookies for Neighbor from Destination (2 Money)   |
-| Checklist (2 Money)                        | Video Chat with Person from Destination (2 Money) |
-| Copy of Birth Certificate (2 Money)        | Support Group Motivates You (2 Money)             |
-| Notebook (2 Money)                         | Learn Song from Your Destination (2 Money)        |
-| Subscribe to Travel Updates (2 Money)      | Listen to the News (2 Money)                      |
-| Travel Brochure (2 Money)                  | Friend moves to your Destination (2 Money)        |
-| Physical Exam (3 Money)                    | Language Classes (3 Money)                        |
-| Vaccination Record (3 Money)               | Network Fair (3 Money)                            |
-| Personality Test (3 Money)                 | Dinner with a Diplomat (3 Money)                  |
-| Travel Wallet (3 Money)                    | Become World Famous (3 Money)                     |
-| Attend Security Training (3 Money)         | Learn from an Elder (3 Money)                     |
-| Residence Address in Destination (3 Money) | Excellent Teamwork (3 Money)                      |
-| Letter of Recommendation (3 Money)         | Endorsement from Royalty (3 Money)                |
-| Letter of Invitation (4 Money)             | Enter Luxury Travel Club (4 Money)                |
-| Background Check (4 Money)                 | Internship in Your Destination (4 Money)          |
-| Employment Contract (4 Money)              | Get Engaged to a Native (4 Money)                 |
-| International Driving Permit (4 Money)     | Politician Approves You (4 Money)                 |
-| Vehicle Registration Papers (4 Money)      | Attend History Class (4 Money)                    |
-| Pet Passport (4 Money)                     | Travel Concierge (4 Money)                        |
-| Language Phrasebook (4 Money)              | Favorable Cultural Opinion (4 Money)              |
+| Documents (Cost)                           | Icon               | Connections (Cost)                                | Icon               |
+| :----------------------------------------- | :----------------- | :------------------------------------------------ | :----------------- |
+| Write Last Will and Testament (2 Money)    | `tombstone`        | Coffee with Airport Employee (2 Money)            | `coffee-mug`       |
+| Certificate of Excellence (2 Money)        | `diploma`          | Cookies for Neighbor from Destination (2 Money)   | `cookie`           |
+| Checklist (2 Money)                        | `checklist`        | Video Chat with Person from Destination (2 Money) | `video-conference` |
+| Copy of Birth Certificate (2 Money)        | `stork-delivery`   | Support Group Motivates You (2 Money)             | `cherish`          |
+| Notebook (2 Money)                         | `notebook`         | Learn Song from Your Destination (2 Money)        | `banjo`            |
+| Subscribe to Travel Updates (2 Money)      | `rss`              | Listen to the News (2 Money)                      | `newspaper`        |
+| Travel Brochure (2 Money)                  | `open-book`        | Friend moves to your Destination (2 Money)        | `hiking`           |
+| Physical Exam (3 Money)                    | `stethoscope`      | Language Classes (3 Money)                        | `conversation`     |
+| Vaccination Record (3 Money)               | `miracle-medecine` | Network Fair (3 Money)                            | `mesh-network`     |
+| Personality Test (3 Money)                 | `skills`           | Dinner with a Diplomat (3 Money)                  | `hot-meal`         |
+| Travel Wallet (3 Money)                    | `wallet`           | Become World Famous (3 Money)                     | `mona-lisa`        |
+| Attend Security Training (3 Money)         | `padlock`          | Learn from an Elder (3 Money)                     | `wisdom`           |
+| Residence Address in Destination (3 Money) | `treasure-map`     | Excellent Teamwork (3 Money)                      | `team-idea`        |
+| Letter of Recommendation (3 Money)         | `thumb-up`         | Endorsement from Royalty (3 Money)                | `coronation`       |
+| Letter of Invitation (4 Money)             | `envelope`         | Enter Luxury Travel Club (4 Money)                | `winged-scepter`   |
+| Background Check (4 Money)                 | `sherlock-holmes`  | Internship in Your Destination (4 Money)          | `light-backpack`   |
+| Employment Contract (4 Money)              | `journey`          | Get Engaged to a Native (4 Money)                 | `engagement-ring`  |
+| International Driving Permit (4 Money)     | `steering-wheel`   | Politician Approves You (4 Money)                 | `public-speaker`   |
+| Vehicle Registration Papers (4 Money)      | `race-car`         | Attend History Class (4 Money)                    | `read`             |
+| Pet Passport (4 Money)                     | `labrador-head`    | Travel Concierge (4 Money)                        | `top-hat`          |
+| Language Phrasebook (4 Money)              | `book-cover`       | Favorable Cultural Opinion (4 Money)              | `vote`             |
 
 ---
 
@@ -245,43 +245,43 @@ Life Cards have three keep types:
 - **May Keep**: The player chooses between an immediate effect OR keeping the card for an ongoing effect.
 - **Must Keep**: The card is always kept in the player's Stash. Its immediate effect (if any) resolves, and its ongoing effect persists.
 
-| Pack             | Card Title                   |   Type    | Gameplay Effect                                                                                                                                                                           |
-| :--------------- | :--------------------------- | :-------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Friendship**   | Stellar Reputation           | May Keep  | Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.                                                                                                      |
-| **Friendship**   | Rummage Sale                 |  Instant  | Gain 3 Money, or take 1 discarded Document.                                                                                                                                               |
-| **Friendship**   | Island Paradise              |  Instant  | Gain 1 Money and player(s) with the fewest Documents gain 1 Money.                                                                                                                        |
-| **Friendship**   | Swap Wallets                 |  Instant  | You may trade all your Money for another player's Money.                                                                                                                                  |
-| **High Society** | VIP                          |  Instant  | Gain 1 Money for every 2 Money held by the player with the most Money.                                                                                                                    |
-| **High Society** | Fancy Clothes                | May Keep  | Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.                                                                                                        |
-| **High Society** | Social Butterfly             |  Instant  | Take 1 Connection or 3 Money from another player.                                                                                                                                         |
-| **High Society** | Identical Twin               |  Instant  | Gain 1 Money and take another turn.                                                                                                                                                       |
-| **Downtown**     | Reward                       |  Instant  | Gain 1 Money and take 1 Money from every other player.                                                                                                                                    |
-| **Downtown**     | Suspect                      |  Instant  | Lose 1 Money and lose 1 Connection or 1 Document.                                                                                                                                         |
-| **Downtown**     | Salvage                      | Must Keep | Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.                                                                                     |
-| **Downtown**     | Blacklisted                  | Must Keep | Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.                                                                                                       |
-| **Emergency**    | Trousers Fall Down           |  Instant  | Lose 3 Money or lose 1 Document.                                                                                                                                                          |
-| **Emergency**    | Keep Calm                    | Must Keep | Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.                                                                  |
-| **Emergency**    | Life Coach                   |  Instant  | Take 1 Assurance.                                                                                                                                                                         |
-| **Emergency**    | Shredder Accident            |  Instant  | Lose 1 Document. If you have none, lose 1 Money.                                                                                                                                          |
-| **Vacation**     | Camping                      |  Instant  | Gain 1 Money and player(s) with the fewest Connections gain 1 Money.                                                                                                                      |
-| **Vacation**     | FOMO                         |  Instant  | Lose 1 Money and you may trade Destinations with someone.                                                                                                                                 |
-| **Vacation**     | Nostalgia                    |  Instant  | Replay any discarded Life Card or gain 2 Money.                                                                                                                                           |
-| **Vacation**     | Lost & Found                 |  Instant  | Take 1 Document or 2 Money from another player.                                                                                                                                           |
-| **News**         | Pandemic / Economic Stimulus |  Instant  | 1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.                                                                                               |
-| **News**         | Mental Fog                   |  Instant  | Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.                                                                                                           |
-| **News**         | Insider                      | May Keep  | Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.                                                                                                                 |
-| **Charity**      | Philanthropy                 |  Instant  | Lose 1 Money and starting with the player to your left, give 1 Money to every other player.                                                                                               |
-| **Charity**      | Bailout                      |  Instant  | Gain 1 Money and gain 1 Money for player(s) with the least Money.                                                                                                                         |
-| **Charity**      | Share                        |  Instant  | Distribute half your Money (round down) to other players.                                                                                                                                 |
-| **Charity**      | Pay Cut                      | Must Keep | Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.                                                                                                                   |
-| **Trade**        | Productivity                 |  Instant  | Gain 1 Money and decrease your Access Fee by 1 (minimum 0).                                                                                                                               |
-| **Trade**        | Tariffs                      |  Instant  | Lose 1 Money and increase your Access Fee by 1 (maximum 5).                                                                                                                               |
-| **Trade**        | Boost                        |  Instant  | Gain half the Money tokens of any player’s Starting Money (round down).                                                                                                                   |
-| **Trade**        | Persuasion                   | Must Keep | Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee. |
-| **Sports**       | Underdog                     | Must Keep | Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.                                 |
-| **Sports**       | Frontrunner                  | Must Keep | Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
-| **Sports**       | Penalty                      | Must Keep | Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.                                                             |
-| **Sports**       | Star Power                   | Must Keep | Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.                                                                   |
+| Pack             | Card Title                   | Icon                 |   Type    | Gameplay Effect                                                                                                                                                                           |
+| :--------------- | :--------------------------- | :------------------- | :-------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Friendship**   | Stellar Reputation           | `star-struck`        | May Keep  | Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.                                                                                                      |
+| **Friendship**   | Rummage Sale                 | `bunny-slippers`     |  Instant  | Gain 3 Money, or take 1 discarded Document.                                                                                                                                               |
+| **Friendship**   | Island Paradise              | `island`             |  Instant  | Gain 1 Money and player(s) with the fewest Documents gain 1 Money.                                                                                                                        |
+| **Friendship**   | Swap Wallets                 | `cash`               |  Instant  | You may trade all your Money for another player's Money.                                                                                                                                  |
+| **High Society** | VIP                          | `laurel-crown`       |  Instant  | Gain 1 Money for every 2 Money held by the player with the most Money.                                                                                                                    |
+| **High Society** | Fancy Clothes                | `tie`                | May Keep  | Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.                                                                                                        |
+| **High Society** | Social Butterfly             | `butterfly`          |  Instant  | Take 1 Connection or 3 Money from another player.                                                                                                                                         |
+| **High Society** | Identical Twin               | `duality`            |  Instant  | Gain 1 Money and take another turn.                                                                                                                                                       |
+| **Downtown**     | Reward                       | `trophy`             |  Instant  | Gain 1 Money and take 1 Money from every other player.                                                                                                                                    |
+| **Downtown**     | Suspect                      | `crime-scene-tape`   |  Instant  | Lose 1 Money and lose 1 Connection or 1 Document.                                                                                                                                         |
+| **Downtown**     | Salvage                      | `ancient-ruins`      | Must Keep | Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.                                                                                     |
+| **Downtown**     | Blacklisted                  | `spy`                | Must Keep | Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.                                                                                                       |
+| **Emergency**    | Trousers Fall Down           | `trousers`           |  Instant  | Lose 3 Money or lose 1 Document.                                                                                                                                                          |
+| **Emergency**    | Keep Calm                    | `cement-shoes`       | Must Keep | Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.                                                                  |
+| **Emergency**    | Life Coach                   | `medallist`          |  Instant  | Take 1 Assurance.                                                                                                                                                                         |
+| **Emergency**    | Shredder Accident            | `trash-can`          |  Instant  | Lose 1 Document. If you have none, lose 1 Money.                                                                                                                                          |
+| **Vacation**     | Camping                      | `camping-tent`       |  Instant  | Gain 1 Money and player(s) with the fewest Connections gain 1 Money.                                                                                                                      |
+| **Vacation**     | FOMO                         | `card-exchange`      |  Instant  | Lose 1 Money and you may trade Destinations with someone.                                                                                                                                 |
+| **Vacation**     | Nostalgia                    | `backward-time`      |  Instant  | Replay any discarded Life Card or gain 2 Money.                                                                                                                                           |
+| **Vacation**     | Lost & Found                 | `backpack`           |  Instant  | Take 1 Document or 2 Money from another player.                                                                                                                                           |
+| **News**         | Pandemic / Economic Stimulus | `parmecia`           |  Instant  | 1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.                                                                                               |
+| **News**         | Mental Fog                   | `dread`              |  Instant  | Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.                                                                                                           |
+| **News**         | Insider                      | `read`               | May Keep  | Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.                                                                                                                 |
+| **Charity**      | Philanthropy                 | `wallet`             |  Instant  | Lose 1 Money and starting with the player to your left, give 1 Money to every other player.                                                                                               |
+| **Charity**      | Bailout                      | `receive-money`      |  Instant  | Gain 1 Money and gain 1 Money for player(s) with the least Money.                                                                                                                         |
+| **Charity**      | Share                        | `present`            |  Instant  | Distribute half your Money (round down) to other players.                                                                                                                                 |
+| **Charity**      | Pay Cut                      | `smash-arrows`       | Must Keep | Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.                                                                                                                   |
+| **Trade**        | Productivity                 | `factory-arm`        |  Instant  | Gain 1 Money and decrease your Access Fee by 1 (minimum 0).                                                                                                                               |
+| **Trade**        | Tariffs                      | `bank`               |  Instant  | Lose 1 Money and increase your Access Fee by 1 (maximum 5).                                                                                                                               |
+| **Trade**        | Boost                        | `refinery`           |  Instant  | Gain half the Money tokens of any player’s Starting Money (round down).                                                                                                                   |
+| **Trade**        | Persuasion                   | `convince`           | Must Keep | Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee. |
+| **Sports**       | Underdog                     | `giant`              | Must Keep | Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.                                 |
+| **Sports**       | Frontrunner                  | `laurels-trophy`     | Must Keep | Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
+| **Sports**       | Penalty                      | `whistle`            | Must Keep | Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.                                                             |
+| **Sports**       | Star Power                   | `podium-winner`      | Must Keep | Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.                                                                   |
 
 ---
 
