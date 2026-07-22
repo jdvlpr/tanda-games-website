@@ -667,5 +667,5 @@
       />
     </div>
   {/if}
-  <p class="italic text-xs">Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+  <p class="italic text-xs">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
 </div>
