@@ -376,8 +376,8 @@
         <div class="flex flex-col gap-2">
           <p>Game Mode</p>
           <div class="flex flex-wrap gap-3 justify-center">
-            <button class="btn flex-1 {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class=" btn flex-1 {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+            <button class="btn-sm {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class=" btn-sm {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
           </div>
         </div>
 
@@ -417,7 +417,7 @@
           <div class="flex flex-wrap gap-2">
             {#each PACKS_LIST as pack}
               <button
-                class="btn flex-1 {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm flex-1 {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => {
                   if (selectedPacks.includes(pack)) {
                     selectedPacks = selectedPacks.filter(p => p !== pack);
@@ -437,21 +437,21 @@
 
         <div class="flex flex-col gap-3">
           <p class="">Game Type</p>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap justify-center gap-2">
               <button
-                class="btn flex-1 {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'vscomputer'}
               >
                 Solo vs Computer
               </button>
               <button
-                class="btn flex-1 {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'passplay'}
               >
                 Pass & Play
               </button>
               <button
-                class="btn flex-1 {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'auto'}
               >
                Computer vs Computer
@@ -461,10 +461,10 @@
 
         <div class="flex flex-col gap-3">
           <p class="">AI Difficulty</p>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap justify-center gap-2">
             {#each ['easy', 'normal', 'expert'] as diff}
               <button
-                class="btn flex-1 {aiDifficulty === diff ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {aiDifficulty === diff ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => aiDifficulty = diff}
               >
                 {diff.charAt(0).toUpperCase() + diff.slice(1)}

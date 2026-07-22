@@ -27,7 +27,7 @@
         <span class="flex-1">{@html selectionText}</span>
         {#if hasSelection && onclearselection}
           <button
-            class="btn text-xs py-1 px-2 shrink-0 opacity-70 hover:opacity-100"
+            class="btn-sm opacity-70 hover:opacity-100"
             onclick={onclearselection}
           >✕ Clear</button>
         {/if}
@@ -47,7 +47,7 @@
         <div class="grid grid-cols-2 gap-2">
           {#each actions as action}
             <button 
-              class={["btn text-sm w-full py-2 px-4", action.optional && "", !action.enabled && 'hidden' ]}
+              class={["btn-sm", action.optional && "", !action.enabled && 'hidden' ]}
               disabled={!action.enabled || pendingChoice}
               onclick={() => onaction(action.type)}
             >
