@@ -452,7 +452,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         }
       } else if (move.type === "buy") {
         const totalCost = move.cost + move.fee;
-        score = -totalCost;
+        // Mild liquidity penalty (Assurance already penalizes money spent)
+        score = -(totalCost * 0.5);
 
         const isDoc = move.card.type === "document";
         const isConn = move.card.type === "connection";
@@ -580,19 +581,19 @@ export function createAutoPlayer(engine, difficulty = "normal") {
                 ? targetPlayer.stash.documents.length
                 : targetPlayer.stash.connections.length;
               if (oppRules.minRequired && oppCurrent < oppRules.minRequired) {
-                denialBonus = 8;
+                denialBonus = 4;
               } else if (
                 oppRules.setSize > 0 &&
                 (oppCurrent + 1) % oppRules.setSize === 0
               ) {
-                denialBonus = 6;
+                denialBonus = 3;
               } else {
-                denialBonus = 2;
+                denialBonus = 1;
               }
             }
           }
 
-          const disruptBonus = opponentFaceUp <= 3 ? 5 : 3;
+          const disruptBonus = opponentFaceUp <= 3 ? 3 : 2;
           score += disruptBonus + denialBonus;
         } else {
           score -= 2;
