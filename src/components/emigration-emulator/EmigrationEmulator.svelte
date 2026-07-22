@@ -1,7 +1,7 @@
 <script>
   import ActionPanel from './ActionPanel.svelte';
   import { createAutoPlayer } from './autoplay.js';
-  import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, PACKS_LIST, runTests } from './engine.js';
+  import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.js';
   import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
   import { playPaydaySound } from '../../js/utils.svelte.js';
@@ -20,28 +20,35 @@
   // Props
   let { defaultMode = 'competitive', defaultPlayerCount = 2, showTestRunner = true } = $props();
 
-  // Life pack defaults by player count
-  const PACK_DEFAULTS = {
-    2: ['Friendship', 'News'],
-    3: ['Vacation', 'News', 'Downtown'],
-    4: ['News', 'Sports', 'Downtown', 'Friendship'],
-    5: ['High Society', 'Downtown', 'Emergency', 'Vacation', 'News'],
-    6: ['High Society', 'Downtown', 'Emergency', 'Vacation', 'News', 'Charity'],
-  };
+  function getRandomPacks(count) {
+    return shuffleArray([...PACKS_LIST]).slice(0, count);
+  }
+
+  function getRandomPlayersSetup() {
+    const shuffledNats = shuffleArray([...NATIONALITIES]);
+    const shuffledDests = shuffleArray([...DESTINATIONS]);
+    return Array.from({ length: 6 }, (_, i) => {
+      const nat = shuffledNats[i % shuffledNats.length].name;
+      const matchingCountry = NATIONALITY_TO_COUNTRY[nat];
+      const validDests = shuffledDests.filter(d => d.name !== matchingCountry);
+      const destObj = validDests[i % validDests.length] || shuffledDests[i % shuffledDests.length];
+      return {
+        name: `Player ${i + 1}`,
+        nationality: nat,
+        destination: destObj.name
+      };
+    });
+  }
 
   // Setup State
   let isSetup = $state(true);
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
-  let selectedPacks = $derived(PACK_DEFAULTS[playerCount]);
+  let selectedPacks = $state(getRandomPacks(defaultPlayerCount));
   let aiDifficulty = $state('expert');
   
-  // Initialize default players
-  let playersSetup = $state(Array.from({ length: 6 }, (_, i) => ({
-    name: `Player ${i + 1}`,
-    nationality: NATIONALITIES[i % NATIONALITIES.length].name,
-    destination: DESTINATIONS[(i + 1) % DESTINATIONS.length].name
-  })));
+  // Initialize default players with randomized nationalities and destinations
+  let playersSetup = $state(getRandomPlayersSetup());
 
   // Derived setup slice based on player count
   let activeSetup = $derived(playersSetup.slice(0, playerCount));
@@ -374,7 +381,7 @@
         </div>
 
         <label>Player Count:
-            <select class="w-fit" bind:value={playerCount}>
+            <select class="w-fit" bind:value={playerCount} onchange={() => selectedPacks = getRandomPacks(playerCount)}>
               <option value={2}>2</option>
               <option value={3}>3</option>
               <option value={4}>4</option>
@@ -491,7 +498,7 @@
           {#if vsComputer && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
-          <button class="btn text-sm" onclick={() => { isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          <button class="btn text-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); selectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
         </div>
       </div>
 
