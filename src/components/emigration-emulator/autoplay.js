@@ -258,7 +258,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         }
       }
     }
-    if (enabled("buyPool")) {
+    if (enabled("buy")) {
       if (
         player.money >= 2 &&
         player.stash.connections.length >= 1 &&
@@ -391,12 +391,14 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           // Add small progress points towards reaching minRequired
           score += (amount / rules.minRequired) * ((rules.penalty || 0) * 0.5);
         }
-        
+
         if (rules.setSize > 0) {
           // Discrete reward for completed sets
           score += Math.floor(amount / rules.setSize) * (rules.reward || 0);
           // Smaller continuous reward for partial sets to guide the AI
-          score += ((amount % rules.setSize) / rules.setSize) * ((rules.reward || 0) * 0.5);
+          score +=
+            ((amount % rules.setSize) / rules.setSize) *
+            ((rules.reward || 0) * 0.5);
         }
       }
       return score;
@@ -409,7 +411,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
         if (move.card.type === "payday") {
           // Rule 2: Never activate Payday while in college (salary is $0)
           if (player.inCollege) return -100;
-          
+
           const netGain = player.salary - move.fee;
           // Calculate opponent's net gain (they get the fee you pay + $1 stipend)
           const opponentGain = move.targetId === player.id ? 0 : move.fee + 1;
@@ -424,7 +426,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             d,
             c,
           );
-          
+
           // Rule 3: Exploiting Payday Asymmetry
           score = relativeAdvantage * 2 + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId === player.id) {
@@ -494,8 +496,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
             0,
           );
-          const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
-          if (move.params.cardType === "ticket" && pTickets < 1) score += urgency;
+          const urgency =
+            15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+          if (move.params.cardType === "ticket" && pTickets < 1)
+            score += urgency;
           if (move.params.cardType === "passport" && pPassports < 1)
             score += urgency;
           // Hoarding steal: score based on number of opponents who still need this doc type.
@@ -504,7 +508,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
               (p) =>
                 p.id !== player.id &&
                 ((move.params.cardType === "ticket" && p.stash.tickets < 1) ||
-                  (move.params.cardType === "passport" && p.stash.passports < 1)),
+                  (move.params.cardType === "passport" &&
+                    p.stash.passports < 1)),
             ).length;
             score += opponentsDeprived * 3 - 3;
           }
@@ -514,18 +519,21 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
           0,
         );
-        const isLateGame = engine.publicServices.tickets <= 1 || engine.publicServices.passports <= 1 || faceUpLeft <= 6;
+        const isLateGame =
+          engine.publicServices.tickets <= 1 ||
+          engine.publicServices.passports <= 1 ||
+          faceUpLeft <= 6;
         const maxTuition = (player.startingFund || 6) + 6;
-        
+
         if (player.money < maxTuition + 2) {
           score = -100; // Do not apply if it might drain all funds and ruin liquidity
         } else if (isLateGame) {
           // Late game: Only apply if we REALLY need the Assurance to cross, and have high money to guarantee passing
           const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
           if (assuranceNow < 8 && player.money > maxTuition + 5) {
-             score = 2; // Worth the risk for +2 Assurance upon graduation
+            score = 2; // Worth the risk for +2 Assurance upon graduation
           } else {
-             score = -5; // Too risky/slow for late game otherwise
+            score = -5; // Too risky/slow for late game otherwise
           }
         } else {
           score = 6; // Early game, high money -> good investment for salary and assurance
@@ -537,27 +545,38 @@ export function createAutoPlayer(engine, difficulty = "normal") {
           const opponentFaceUp = targetPlayer
             ? targetPlayer.layout.filter((l) => l && l.faceUp).length
             : 4;
-            
+
           // Target opponent's set completion requirements
-          const opponentDest = DESTINATIONS.find((dest) => dest.name === targetPlayer.destination);
+          const opponentDest = DESTINATIONS.find(
+            (dest) => dest.name === targetPlayer.destination,
+          );
           const isDoc = move.card.type === "document";
           const isConn = move.card.type === "connection";
-          
+
           let denialBonus = 0;
           if (opponentDest && opponentDest.targets) {
-            const oppRules = isDoc ? opponentDest.targets.d : (isConn ? opponentDest.targets.c : null);
+            const oppRules = isDoc
+              ? opponentDest.targets.d
+              : isConn
+                ? opponentDest.targets.c
+                : null;
             if (oppRules) {
-              const oppCurrent = isDoc ? targetPlayer.stash.documents.length : targetPlayer.stash.connections.length;
+              const oppCurrent = isDoc
+                ? targetPlayer.stash.documents.length
+                : targetPlayer.stash.connections.length;
               if (oppRules.minRequired && oppCurrent < oppRules.minRequired) {
                 denialBonus = 8;
-              } else if (oppRules.setSize > 0 && (oppCurrent + 1) % oppRules.setSize === 0) {
+              } else if (
+                oppRules.setSize > 0 &&
+                (oppCurrent + 1) % oppRules.setSize === 0
+              ) {
                 denialBonus = 6;
               } else {
                 denialBonus = 2;
               }
             }
           }
-            
+
           const disruptBonus = opponentFaceUp <= 3 ? 5 : 3;
           score += disruptBonus + denialBonus;
         } else {
