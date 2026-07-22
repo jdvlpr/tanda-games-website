@@ -90,15 +90,31 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     }
 
     // Normal Mode:
-    // 1. Activate available Payday cards (if net positive)
+    // 1. Prioritize getting a Ticket and Passport if missing
+    if (
+      player.stash.tickets < 1 &&
+      engine.publicServices.tickets > 0 &&
+      player.stash.connections.length >= 1 &&
+      player.money >= 2
+    ) {
+      return { type: "buyPool", params: { cardType: "ticket" } };
+    }
+    if (
+      player.stash.passports < 1 &&
+      engine.publicServices.passports > 0 &&
+      player.stash.documents.length >= 1 &&
+      player.money >= 2
+    ) {
+      return { type: "buyPool", params: { cardType: "passport" } };
+    }
+
+    // 2. Activate available Payday cards (if net positive)
     if (enabled("activate")) {
       const paydayTarget = _findBestActivateTarget(player, "payday");
       if (paydayTarget) {
         return { type: "activate", params: paydayTarget };
       }
     }
-
-    // 2. Prioritize getting a Ticket and Passport if missing
     if (
       player.stash.tickets < 1 &&
       engine.publicServices.tickets > 0 &&
@@ -998,7 +1014,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
     if (!didSell) {
       // Fallback normal/easy behavior
       if (difficulty !== "expert" && player.money < 2) {
-        if (player.stash.documents.length > 0) {
+        const canSellDoc = player.stash.documents.length > (player.stash.passports < 1 ? 1 : 0);
+        const canSellConn = player.stash.connections.length > (player.stash.tickets < 1 ? 1 : 0);
+
+        if (canSellDoc) {
           const idx = player.stash.documents.reduce(
             (best, c, i) =>
               c.cost < player.stash.documents[best].cost ? i : best,
@@ -1008,7 +1027,7 @@ export function createAutoPlayer(engine, difficulty = "normal") {
             stashType: "document",
             stashIdx: idx,
           });
-        } else if (player.stash.connections.length > 0) {
+        } else if (canSellConn) {
           const idx = player.stash.connections.reduce(
             (best, c, i) =>
               c.cost < player.stash.connections[best].cost ? i : best,
