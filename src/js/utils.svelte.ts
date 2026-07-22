@@ -30,45 +30,61 @@ export const setTheme = (value) => {
   theme.value = value;
 };
 
-import { crossfade } from 'svelte/transition';
-import { quintOut } from 'svelte/easing';
+import { crossfade } from "svelte/transition";
+import { quintOut } from "svelte/easing";
 
 export const [send, receive] = crossfade({
-  duration: d => Math.sqrt(d * 200),
+  duration: (d) => Math.sqrt(d * 200),
   fallback(node, params) {
     const style = getComputedStyle(node);
-    const transform = style.transform === 'none' ? '' : style.transform;
+    const transform = style.transform === "none" ? "" : style.transform;
     return {
       duration: 300,
       easing: quintOut,
-      css: t => `
+      css: (t) => `
         transform: ${transform} scale(${t});
         opacity: ${t}
-      `
+      `,
     };
-  }
+  },
 });
 
 export function playPaydaySound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
-    osc.type = 'sine';
-    // Start at a lower frequency and slide up quickly for a "cha-ching" or coin sound
-    osc.frequency.setValueAtTime(1200, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-    
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.3);
-  } catch(e) {
+
+    // 'sine' gives a clean, modern metallic ring.
+    // Change to 'square' if you want a retro, 8-bit arcade feel.
+    osc.type = "sine";
+
+    const t = ctx.currentTime;
+
+    // The "Cha" - First note (B5)
+    osc.frequency.setValueAtTime(988, t);
+
+    // The "Ching" - Instant jump to the second note (E6) after 80ms
+    osc.frequency.setValueAtTime(1319, t + 0.08);
+
+    // Volume envelope
+    gain.gain.setValueAtTime(0, t);
+    // 1. Quick attack to full volume
+    gain.gain.linearRampToValueAtTime(0.2, t + 0.02);
+    // 2. Hold the volume for the duration of the first note
+    gain.gain.setValueAtTime(0.2, t + 0.08);
+    // 3. Smooth, bell-like decay for the second note
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+
+    osc.start(t);
+    osc.stop(t + 0.5);
+  } catch (e) {
     console.error("Audio playback failed", e);
   }
 }

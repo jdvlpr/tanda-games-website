@@ -246,7 +246,7 @@
       onLog: (entry) => {
         // Force reactivity on logs by updating snapshot reference
         if (engine) snapshot = engine.getSnapshot();
-        if (entry?.msg?.includes("activated Payday")) {
+        if (entry?.msg?.includes("SALARIES:")) {
           playPaydaySound();
         }
       },
