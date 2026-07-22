@@ -3007,6 +3007,7 @@ export default class EmigrationEngine {
         gameResult: this.gameResult,
         logs: this.logs,
         activeCrossingIdx: this.activeCrossingIdx,
+        crossingOrder: this.crossingOrder,
       }),
     );
   }
@@ -3247,6 +3248,24 @@ export function runTests() {
     );
   } catch (e) {
     assert(false, `Life card effect error: ${e.message}`);
+  }
+
+  try {
+    const setup = [
+      { name: "A", nationality: "Bosnian", destination: "China" },
+      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "C", nationality: "Chinese", destination: "England" },
+    ];
+    const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+    eng.currentPlayerIdx = 1; // Player 2 (index 1) was last to take turn in Phase 1
+    eng.triggerPhase2();
+    const snap = eng.getSnapshot();
+    assert(
+      snap.crossingOrder && snap.crossingOrder[0] === 2,
+      "Phase 2 crossing order starts with P3 (idx 2) after P2 (idx 1) and is included in snapshot",
+    );
+  } catch (e) {
+    assert(false, `Crossing order test error: ${e.message}`);
   }
 
   return results;

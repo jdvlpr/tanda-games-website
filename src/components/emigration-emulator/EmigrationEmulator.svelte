@@ -67,7 +67,7 @@
   }
 
   // Derived Values
-  let currentPlayer = $derived(snapshot ? snapshot.players[snapshot.currentPlayerIdx] : null);
+  let currentPlayer = $derived(snapshot ? snapshot.players[actualActivePlayerId] : null);
 
   /**
    * Filter the engine's valid actions based on which card (if any) is currently selected.
@@ -494,7 +494,7 @@
               <ActionPanel 
                 {engine}
                 {snapshot}
-                currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
+                {currentPlayer}
                 actions={filteredActions}
                 onaction={handleAction}
                 onselectlane={handleSelectLane}
@@ -632,7 +632,7 @@
             <ActionPanel 
               {engine}
               {snapshot}
-              currentPlayer={snapshot.players[snapshot.currentPlayerIdx]}
+              {currentPlayer}
               actions={filteredActions}
               onaction={handleAction}
               onselectlane={handleSelectLane}

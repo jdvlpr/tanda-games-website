@@ -1,671 +1,582 @@
-[1] INIT|P0|NAT:Bosnian|DEST:China|$2|FACEUP:[4:Blacklisted,5:Favorable Cultural Opinion,6:Travel Concierge,11:Payday,12:Camping,13:Payday]
-[1] INIT|P1|NAT:Chinese|DEST:Democratic Republic of Congo|$6|FACEUP:[4:Video Chat with Person from Destination,5:Pay Cut,6:Salvage,11:Pandemic / Economic Stimulus,12:FOMO,13:Payday]
-[1] INIT|P2|NAT:Congolese|DEST:France|$2|FACEUP:[4:Get Engaged to a Native,5:Background Check,6:Coffee with Airport Employee,11:Payday,12:Philanthropy,13:Insider]
-[1] INIT|P3|NAT:French|DEST:Russia|$5|FACEUP:[4:Travel Brochure,5:Payday,6:Reward,11:Payday,12:Travel Wallet,13:Identical Twin]
-[1] INIT|P4|NAT:Russian|DEST:Senegal|$5|FACEUP:[4:Mental Fog,5:Bailout,6:Letter of Invitation,11:Life Coach,12:Nostalgia,13:Trousers Fall Down]
-[1] INIT|P5|NAT:Senegalese|DEST:Switzerland|$3|FACEUP:[4:Endorsement from Royalty,5:Payday,6:Become World Famous,11:Fancy Clothes,12:Payday,13:Cookies for Neighbor from Destination]
-[1] T1|P0|ACT:Payday
-[1] T1|PAYDAY|SALARIES:[1,1,1,1,1,1]
-[1] T1|P0|REV|S7:Network Fair
-[2] T2|P1|PAY_FEE:1|TO:P5
-[2] T2|P1|BUY:Cookies for Neighbor from Destination|FROM:P5|COST:2
-[2] T2|P5|REV|S10:Share
-[3] T3|P2|PAY_FEE:1|TO:P0
-[3] T3|P2|DISC:Network Fair|FROM:P0|GAIN:2
-[4] T4|P3|BUY:Travel Wallet|FROM:P3|COST:3
-[5] T5|ROLL_D6:4
-[5] T5|P4|COLLEGE_APP|ROLL:4|TUITION:9|RES:FAIL
-[5] T5|P4|ACT:Life Coach
-[5] T5|P4|ACT:Life Coach|GAIN_A:1
-[5] T5|P4|REV|S7:Politician Approves You
-[6] T6|P5|PAY_FEE:1|TO:P4
-[6] T6|P5|BUY:Politician Approves You|FROM:P4|COST:4
-[7] T7|ROLL_D6:1
-[7] T7|P0|COLLEGE_APP|ROLL:1|TUITION:2|RES:PASS
-[8] T8|P1|STEAL:Ticket|SKIP_NEXT
-[9] T9|ROLL_D6:1
-[9] T9|P2|COLLEGE_APP|ROLL:1|TUITION:2|RES:PASS
-[10] T10|P3|STEAL:Passport|SKIP_NEXT
-[11] T11|ROLL_D6:4
-[11] T11|P4|COLLEGE_APP|ROLL:4|TUITION:9|RES:FAIL
-[11] T11|P4|ACT:Nostalgia
-[11] T11|P4|ACT:Nostalgia|GAIN:2
-[11] T11|P4|REV|S8:Language Classes
-[12] T12|P5|STEAL:Ticket|SKIP_NEXT
-[13] T13|ROLL_D6:2
-[13] T13|P0|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
+[1] INIT|P0|NAT:Bosnian|DEST:China|$2|FACEUP:[4:Payday,5:Penalty,6:Payday,11:International Driving Permit,12:Payday,13:Travel Brochure]
+[1] INIT|P1|NAT:Chinese|DEST:Democratic Republic of Congo|$6|FACEUP:[4:Payday,5:Politician Approves You,6:Swap Wallets,11:Mental Fog,12:Letter of Recommendation,13:Rummage Sale]
+[1] INIT|P2|NAT:Congolese|DEST:France|$2|FACEUP:[4:Blacklisted,5:Copy of Birth Certificate,6:Personality Test,11:Vehicle Registration Papers,12:Physical Exam,13:Star Power]
+[1] INIT|P3|NAT:French|DEST:Russia|$5|FACEUP:[4:Notebook,5:Support Group Motivates You,6:Learn Song from Your Destination,11:Salvage,12:Subscribe to Travel Updates,13:Coffee with Airport Employee]
+[1] T1|P0|BUY:Travel Brochure|FROM:P0|COST:2
+[1] T1|P0|REV|S10:Write Last Will and Testament
+[2] T2|P1|PAY_FEE:1|TO:P3
+[2] T2|P1|BUY:Coffee with Airport Employee|FROM:P3|COST:2
+[2] T2|P3|REV|S10:Language Classes
+[3] T3|P2|PAY_FEE:1|TO:P3
+[3] T3|P2|DISC:Subscribe to Travel Updates|FROM:P3|GAIN:2
+[3] T3|P3|REV|S9:Favorable Cultural Opinion
+[4] T4|P3|PAY_FEE:1|TO:P0
+[4] T4|P3|BUY:Write Last Will and Testament|FROM:P0|COST:2
+[5] T5|P0|STEAL:Passport|SKIP_NEXT
+[6] T6|P1|BUY:Letter of Recommendation|FROM:P1|COST:3
+[7] T7|P2|BUY:Physical Exam|FROM:P2|COST:3
+[8] T8|P3|BUY:Language Classes|FROM:P3|COST:3
+[9] T9|P0|SKIP_TURN
+[10] T10|P1|STEAL:Passport|SKIP_NEXT
+[11] T11|P2|STEAL:Passport|SKIP_NEXT
+[12] T12|P3|STEAL:Passport|SKIP_NEXT
 [13] T13|P0|ACT:Payday
-[13] T13|PAYDAY|SALARIES:[2,1,0,1,1,1]
-[13] T13|P0|REV|S10:Payday
+[13] T13|PAYDAY|SALARIES:[1,1,1,1]
+[13] T13|P0|REV|S9:Attend Security Training
 [14] T14|P1|SKIP_TURN
-[15] T15|ROLL_D6:3
-[15] T15|P2|GRAD|ROLL:3|RES:PASS|SALARY_INC:1
-[15] T15|P2|ACT:Payday
-[15] T15|PAYDAY|SALARIES:[2,1,2,1,1,1]
-[15] T15|P2|REV|S7:Payday
+[15] T15|P2|SKIP_TURN
 [16] T16|P3|SKIP_TURN
-[17] T17|P4|BUY:Language Classes|FROM:P4|COST:3
-[18] T18|P5|SKIP_TURN
-[19] T19|P0|ACT:Payday
-[19] T19|PAYDAY|SALARIES:[2,1,2,1,1,1]
-[20] T20|P1|STEAL:Ticket|SKIP_NEXT
-[21] T21|P2|RECLAIM:Ticket|FROM:P1|COST:4
-[22] T22|P3|STEAL:Passport|SKIP_NEXT
-[23] T23|P4|RECLAIM:Passport|FROM:P3|COST:3
-[24] T24|ROLL_D6:4
-[24] T24|P5|COLLEGE_APP|ROLL:4|TUITION:7|RES:FAIL
-[24] T24|P5|ACT:Share
-[24] T24|P5|ACT:Share|DELTA:[1,0,0,0,0,-1]
-[25] T25|ROLL_D6:3
-[25] T25|P0|COLLEGE_APP|ROLL:3|TUITION:4|RES:PASS
-[26] T26|P1|SKIP_TURN
-[27] T27|P2|ACT:Payday
-[27] T27|PAYDAY|SALARIES:[0,1,2,1,1,1]
-[28] T28|P3|SKIP_TURN
-[29] T29|P4|STEAL:Ticket|SKIP_NEXT
-[29] T29|P4|TICKET_PASSPORT_BONUS|GAIN:1A
-[30] T30|ROLL_D6:6
-[30] T30|P5|COLLEGE_APP|ROLL:6|TUITION:9|RES:FAIL
-[30] T30|P5|ACT:Payday
-[30] T30|PAYDAY|SALARIES:[0,1,2,1,1,1]
-[30] T30|P5|REV|S9:Payday
-[31] T31|ROLL_D6:5
-[31] T31|P0|GRAD|ROLL:5|RES:FAIL
-[31] T31|ROLL_D6:5
-[31] T31|P0|GRAD|ROLL:5|RES:FAIL
-[31] T31|P0|ACT:Camping
-[31] T31|P0|ACT:Camping|DELTA:[2,0,1,1,0,0]
-[31] T31|P0|REV|S8:Payday
-[31] T31|P0|REV|S9:Payday
-[32] T32|ROLL_D6:1
-[32] T32|P1|COLLEGE_APP|ROLL:1|TUITION:4|RES:PASS
-[33] T33|ROLL_D6:2
-[33] T33|P2|COLLEGE_APP|ROLL:2|TUITION:3|RES:PASS
-[34] T34|ROLL_D6:6
-[34] T34|P3|COLLEGE_APP|ROLL:6|TUITION:11|RES:PASS
-[35] T35|P4|SKIP_TURN
-[36] T36|ROLL_D6:3
-[36] T36|P5|COLLEGE_APP|ROLL:3|TUITION:4|RES:FAIL
-[36] T36|P5|ACT:Payday
-[36] T36|PAYDAY|SALARIES:[0,0,0,0,1,1]
-[37] T37|ROLL_D6:6
-[37] T37|P0|GRAD|ROLL:6|RES:FAIL
-[37] T37|ROLL_D6:4
-[37] T37|P0|GRAD|ROLL:4|RES:FAIL
-[37] T37|P0|PAY_FEE:1|TO:P5
-[37] T37|P0|BUY:Become World Famous|FROM:P5|COST:3
-[37] T37|P5|REV|S3:Letter of Recommendation
-[38] T38|ROLL_D6:1
-[38] T38|P1|GRAD|ROLL:1|RES:PASS|SALARY_INC:1
-[38] T38|P1|PAY_FEE:2|TO:P5
-[38] T38|P1|BUY:Letter of Recommendation|FROM:P5|COST:3
-[39] T39|ROLL_D6:5
-[39] T39|P2|GRAD|ROLL:5|RES:FAIL
-[39] T39|ROLL_D6:2
-[39] T39|P2|GRAD|ROLL:2|RES:PASS|SALARY_INC:3
-[39] T39|P2|PAY_FEE:3|TO:P0
-[39] T39|P2|ACT:Payday
-[39] T39|PAYDAY|SALARIES:[0,2,5,0,1,1]
-[40] T40|ROLL_D6:6
-[40] T40|P3|GRAD|ROLL:6|RES:FAIL
-[40] T40|ROLL_D6:1
-[40] T40|P3|GRAD|ROLL:1|RES:PASS|SALARY_INC:1
-[40] T40|P3|ACT:Payday
-[40] T40|PAYDAY|SALARIES:[0,2,5,2,1,1]
-[40] T40|P3|REV|S7:Attend History Class
-[40] T40|P3|REV|S8:Support Group Motivates You
-[41] T41|ROLL_D6:6
-[41] T41|P4|COLLEGE_APP|ROLL:6|TUITION:11|RES:FAIL
-[41] T41|P4|ACT:Mental Fog
-[41] T41|P4|ACT:Mental Fog|LOSS:1
-[41] T41|P4|REV|S0:Learn Song from Your Destination
-[42] T42|ROLL_D6:2
-[42] T42|P5|COLLEGE_APP|ROLL:2|TUITION:3|RES:PASS
-[43] T43|ROLL_D6:6
-[43] T43|P0|GRAD|ROLL:6|RES:FAIL
-[43] T43|ROLL_D6:4
-[43] T43|P0|GRAD|ROLL:4|RES:FAIL
-[43] T43|P0|SELL:Become World Famous|GAIN:2
-[43] T43|P0|PAY_FEE:2|TO:P3
-[43] T43|P0|BUY:Support Group Motivates You|FROM:P3|COST:2
-[44] T44|P1|ACT:Payday
-[44] T44|PAYDAY|SALARIES:[0,2,5,2,1,0]
-[44] T44|P1|REV|S10:Notebook
-[45] T45|P2|PAY_FEE:4|TO:P1
-[45] T45|P2|BUY:Notebook|FROM:P1|COST:2
-[46] T46|P3|PAY_FEE:1|TO:P4
-[46] T46|P3|BUY:Learn Song from Your Destination|FROM:P4|COST:2
-[47] T47|ROLL_D6:3
-[47] T47|P4|COLLEGE_APP|ROLL:3|TUITION:5|RES:PASS
-[48] T48|ROLL_D6:6
-[48] T48|P5|GRAD|ROLL:6|RES:FAIL
-[48] T48|ROLL_D6:2
-[48] T48|P5|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
-[48] T48|ROLL_D6:5
-[48] T48|P5|COLLEGE_APP|ROLL:5|TUITION:8|RES:FAIL
-[48] T48|P5|ACT:Fancy Clothes
-[48] T48|P5|KEEP:Fancy Clothes
-[48] T48|P5|REV|S7:Payday
-[48] T48|P5|REV|S8:Social Butterfly
-[49] T49|ROLL_D6:1
-[49] T49|P0|GRAD|ROLL:1|RES:PASS|SALARY_INC:3
-[49] T49|P0|ACT:Payday
-[49] T49|PAYDAY|SALARIES:[5,2,5,2,0,2]
-[50] T50|P1|STEAL:Passport|SKIP_NEXT
-[50] T50|P1|TICKET_PASSPORT_BONUS|GAIN:1A
-[51] T51|P2|STEAL:Passport|SKIP_NEXT
-[51] T51|P2|TICKET_PASSPORT_BONUS|GAIN:1A
-[52] T52|P3|SELL:Learn Song from Your Destination|GAIN:2
-[52] T52|P3|BUY:Attend History Class|FROM:P3|COST:4
-[53] T53|ROLL_D6:5
-[53] T53|P4|GRAD|ROLL:5|RES:FAIL
+[17] T17|P0|PAY_FEE:1|TO:P3
+[17] T17|P0|ACT:Salvage
+[17] T17|P0|ACT:Salvage|GAIN:1|KEEP
+[17] T17|P3|REV|S7:Island Paradise
+[17] T17|P3|REV|S8:Endorsement from Royalty
+[18] T18|P1|STEAL:Ticket|SKIP_NEXT
+[18] T18|P1|TICKET_PASSPORT_BONUS|GAIN:1A
+[19] T19|Player 1 gains $1 from Salvage.
+[19] T19|P2|ACT:Star Power
+[19] T19|P2|ACT:Star Power|GAIN:1|KEEP
+[19] T19|P2|REV|S9:Reward
+[19] T19|P2|REV|S10:Payday
+[20] T20|P3|SELL:Language Classes|GAIN:2
+[20] T20|Player 1 gains $1 from Salvage.
+[20] T20|P3|BUY:Endorsement from Royalty|FROM:P3|COST:3
+[20] T20|P2|STAR_POWER|GAIN:1|PASS_TO:P3
+[21] T21|P0|BUY:Attend Security Training|FROM:P0|COST:3
+[22] T22|P1|SKIP_TURN
+[23] T23|P2|PAY_FEE:2|TO:P3
+[23] T23|P2|DISC:Favorable Cultural Opinion|FROM:P3|GAIN:2
+[23] T23|Player 1 gains $1 from Salvage.
+[24] T24|P3|SELL:Endorsement from Royalty|GAIN:2
+[24] T24|Player 1 gains $1 from Salvage.
+[24] T24|P3|BUY:Learn Song from Your Destination|FROM:P3|COST:2
+[24] T24|P3|REV|S3:Pandemic / Economic Stimulus
+[25] T25|P0|ACT:Payday
+[25] T25|PAYDAY|SALARIES:[1,1,1,1]
+[25] T25|P0|REV|S3:Residence Address in Destination
+[26] T26|P1|PAY_FEE:2|TO:P0
+[26] T26|P1|DISC:Residence Address in Destination|FROM:P0|GAIN:2
+[26] T26|Player 1 gains $1 from Salvage.
+[27] T27|P2|PAY_FEE:3|TO:P0
+[27] T27|P2|DISC:International Driving Permit|FROM:P0|GAIN:2
+[27] T27|Player 1 gains $1 from Salvage.
+[27] T27|P0|REV|S7:Insider
+[27] T27|P0|REV|S8:Payday
+[28] T28|P3|SELL:Learn Song from Your Destination|GAIN:2
+[28] T28|Player 1 gains $1 from Salvage.
+[28] T28|P3|BUY:Support Group Motivates You|FROM:P3|COST:2
+[28] T28|P3|REV|S2:Pandemic / Economic Stimulus
+[29] T29|P0|ACT:Insider
+[29] T29|P0|KEEP:Insider
+[30] T30|Player 1 gains $1 from Salvage.
+[30] T30|P1|ACT:Rummage Sale
+[30] T30|P1|ACT:Rummage Sale|GAIN:3
+[30] T30|P1|REV|S9:Payday
+[30] T30|P1|REV|S10:Listen to the News
+[31] T31|Player 1 gains $1 from Salvage.
+[31] T31|P2|ACT:Reward
+[31] T31|P2|ACT:Reward|DELTA:[-1,-1,4,-1]
+[32] T32|P3|SELL:Support Group Motivates You|GAIN:2
+[32] T32|Player 1 gains $1 from Salvage.
+[32] T32|P3|PAY_FEE:2|TO:P1
+[32] T32|P3|BUY:Listen to the News|FROM:P1|COST:2
+[33] T33|P0|ACT:Payday
+[33] T33|PAYDAY|SALARIES:[2,1,1,1]
+[34] T34|Player 1 gains $1 from Salvage.
+[34] T34|P1|ACT:Mental Fog
+[34] T34|P1|ACT:Mental Fog|LOSS:1
+[34] T34|P1|REV|S7:Payday
+[34] T34|P1|REV|S8:Payday
+[35] T35|Player 1 gains $1 from Salvage.
+[35] T35|P2|ACT:Payday
+[35] T35|PAYDAY|SALARIES:[2,1,1,1]
+[36] T36|P3|STEAL:Ticket|SKIP_NEXT
+[36] T36|P3|TICKET_PASSPORT_BONUS|GAIN:1A
+[37] T37|P0|ACT:Payday
+[37] T37|PAYDAY|SALARIES:[2,1,1,1]
+[37] T37|P0|REV|S0:Underdog
+[38] T38|Player 1 gains $1 from Salvage.
+[38] T38|P1|ACT:Payday
+[38] T38|PAYDAY|SALARIES:[2,1,1,1]
+[39] T39|P2|BUY:Personality Test|FROM:P2|COST:3
+[39] T39|P2|REV|S3:Internship in Your Destination
+[40] T40|P3|SKIP_TURN
+[41] T41|P0|PAY_FEE:2|TO:P2
+[41] T41|P0|BUY:Internship in Your Destination|FROM:P2|COST:4
+[41] T41|P3|STAR_POWER|GAIN:1|PASS_TO:P0
+[42] T42|P1|PAY_FEE:3|TO:P2
+[42] T42|P1|DISC:Vehicle Registration Papers|FROM:P2|GAIN:2
+[42] T42|Player 1 gains $1 from Salvage.
+[42] T42|P2|REV|S7:Travel Wallet
+[42] T42|P2|REV|S8:Payday
+[43] T43|Player 1 gains $1 from Salvage.
+[43] T43|P2|ACT:Payday
+[43] T43|PAYDAY|SALARIES:[2,1,1,1]
+[44] T44|P3|PAY_FEE:3|TO:P2
+[44] T44|P3|DISC:Travel Wallet|FROM:P2|GAIN:2
+[44] T44|Player 1 gains $1 from Salvage.
+[45] T45|P0|BUY_POOL:Ticket|COST:2
+[45] T45|P0|TICKET_PASSPORT_BONUS|GAIN:1A
+[46] T46|P1|PAY_FEE:4|TO:P2
+[46] T46|P1|DISC:Copy of Birth Certificate|FROM:P2|GAIN:2
+[46] T46|Player 1 gains $1 from Salvage.
+[46] T46|P2|REV|S2:Payday
+[47] T47|Player 1 gains $1 from Salvage.
+[47] T47|P2|ACT:Blacklisted
+[47] T47|P2|ACT:Blacklisted|LOSS:1|KEEP
+[47] T47|P2|REV|S0:Stellar Reputation
+[47] T47|P2|REV|S1:Payday
+[48] T48|Player 1 gains $1 from Salvage.
+[48] T48|P3|ACT:Pandemic / Economic Stimulus
+[48] T48|ROLL_D6:4
+[48] T48|P3|ACT:PANDEMIC_STIMULUS|DELTA:[-4,-4,-4,-4]
+[49] T49|ROLL_D6:2
+[49] T49|P0|COLLEGE_APP|ROLL:2|TUITION:3|RES:PASS
+[50] T50|Player 1 gains $1 from Salvage.
+[50] T50|P1|ACT:Payday
+[50] T50|PAYDAY|SALARIES:[0,1,1,1]
+[51] T51|Player 1 gains $1 from Salvage.
+[51] T51|P2|BLACKLISTED|LOSS:1
+[51] T51|P2|ACT:Stellar Reputation
+[51] T51|P2|KEEP:Stellar Reputation
+[52] T52|Player 1 gains $1 from Salvage.
+[52] T52|P3|ACT:Island Paradise
+[52] T52|P3|ACT:Island Paradise|DELTA:[0,1,0,2]
 [53] T53|ROLL_D6:2
-[53] T53|P4|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
-[53] T53|P4|PAY_FEE:2|TO:P0
-[53] T53|P4|DISC:Travel Concierge|FROM:P0|GAIN:2
-[53] T53|P0|REV|S3:Listen to the News
-[54] T54|P5|PAY_FEE:2|TO:P3
-[54] T54|P5|BUY:Travel Brochure|FROM:P3|COST:1
-[54] T54|P3|REV|S0:Internship in Your Destination
-[55] T55|P0|SELL:Support Group Motivates You|GAIN:2
-[55] T55|P0|BUY:Listen to the News|FROM:P0|COST:2
-[56] T56|P1|SKIP_TURN
-[57] T57|P2|SKIP_TURN
-[58] T58|P3|SELL:Attend History Class|GAIN:2
-[58] T58|P3|BUY:Internship in Your Destination|FROM:P3|COST:4
-[59] T59|P4|PAY_FEE:3|TO:P0
-[59] T59|P4|DISC:Favorable Cultural Opinion|FROM:P0|GAIN:2
-[59] T59|P0|REV|S2:Write Last Will and Testament
-[60] T60|P5|ACT:Payday
-[60] T60|PAYDAY|SALARIES:[5,2,5,2,2,2]
-[61] T61|P0|BUY:Write Last Will and Testament|FROM:P0|COST:2
-[62] T62|ROLL_D6:2
-[62] T62|P1|COLLEGE_APP|ROLL:2|TUITION:5|RES:PASS
-[63] T63|P2|ACT:Insider
-[63] T63|P2|KEEP:Insider
-[63] T63|P2|REV|S10:Pet Passport
-[64] T64|P3|STEAL:Ticket|SKIP_NEXT
-[64] T64|P3|TICKET_PASSPORT_BONUS|GAIN:1A
-[65] T65|P4|ACT:Trousers Fall Down
-[65] T65|P4|ACT:Trousers Fall Down|LOSS:3|NO_DOCS
-[65] T65|P4|REV|S9:Payday
-[65] T65|P4|REV|S10:Physical Exam
-[66] T66|P5|SELL:Travel Brochure|GAIN:2
-[66] T66|P5|PAY_FEE:3|TO:P4
-[66] T66|P5|BUY:Physical Exam|FROM:P4|COST:2
-[67] T67|P0|STEAL:Passport|SKIP_NEXT
-[68] T68|ROLL_D6:6
-[68] T68|P1|GRAD|ROLL:6|RES:FAIL
-[68] T68|ROLL_D6:4
-[68] T68|P1|GRAD|ROLL:4|RES:FAIL
-[68] T68|P1|ACT:Pandemic / Economic Stimulus
-[68] T68|ROLL_D6:4
-[68] T68|P1|ACT:PANDEMIC_STIMULUS|DELTA:[-4,-4,-4,-4,-4,-1]
-[68] T68|P1|REV|S7:Attend Security Training
-[69] T69|P2|ACT:Philanthropy
-[69] T69|P2|ACT:Philanthropy|DELTA:[1,1,-6,1,1,1]
-[69] T69|P2|REV|S8:Copy of Birth Certificate
-[69] T69|P2|REV|S9:Vehicle Registration Papers
-[70] T70|P3|SKIP_TURN
-[71] T71|P4|ACT:Payday
-[71] T71|PAYDAY|SALARIES:[5,0,6,2,2,2]
-[72] T72|P5|STEAL:Passport|SKIP_NEXT
-[72] T72|P5|TICKET_PASSPORT_BONUS|GAIN:1A
-[73] T73|P0|SKIP_TURN
-[74] T74|ROLL_D6:3
-[74] T74|P1|GRAD|ROLL:3|RES:PASS|SALARY_INC:3
-[74] T74|P1|PAY_FEE:3|TO:P4
-[74] T74|P1|DISC:Letter of Invitation|FROM:P4|GAIN:2
-[74] T74|P4|REV|S3:Payday
-[75] T75|P2|BUY:Copy of Birth Certificate|FROM:P2|COST:2
-[76] T76|P3|PAY_FEE:2|TO:P1
-[76] T76|P3|DISC:Attend Security Training|FROM:P1|GAIN:2
-[77] T77|P4|ACT:Payday
-[77] T77|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[78] T78|P5|SKIP_TURN
-[79] T79|P0|STEAL:Ticket|SKIP_NEXT
-[79] T79|P0|TICKET_PASSPORT_BONUS|GAIN:1A
-[80] T80|P1|ACT:FOMO
-[80] T80|P1|ACT:FOMO|LOSS:1
-[80] T80|P1|REV|S8:Subscribe to Travel Updates
-[80] T80|P1|REV|S9:Pandemic / Economic Stimulus
-[81] T81|P2|DISC:Get Engaged to a Native|FROM:P2|GAIN:2
-[81] T81|P2|REV|S0:Lost & Found
-[82] T82|P3|ACT:Identical Twin
-[82] T82|P3|ACT:Identical Twin|GAIN:1|EXTRA_TURN
-[82] T82|P3|REV|S9:International Driving Permit
-[82] T82|P3|REV|S10:Shredder Accident
-[82] T82|P3|ACT:Shredder Accident
-[82] T82|P3|ACT:Shredder Accident|DISC:Travel Wallet
-[83] T83|P4|PAY_FEE:4|TO:P3
-[83] T83|P4|DISC:International Driving Permit|FROM:P3|GAIN:2
-[84] T84|P5|ACT:Social Butterfly
-[84] T84|P5|ACT:Social Butterfly|TAKE:MONEY:3|FROM:P0
-[85] T85|P0|SKIP_TURN
-[86] T86|P1|PAY_FEE:4|TO:P5
-[86] T86|P1|DISC:Endorsement from Royalty|FROM:P5|GAIN:2
-[86] T86|P5|REV|S0:VIP
-[87] T87|P2|ACT:Lost & Found
-[87] T87|P2|ACT:Lost & Found|TAKE:MONEY:2|FROM:P0
-[88] T88|P3|ACT:Payday
-[88] T88|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[88] T88|P3|REV|S1:Learn from an Elder
-[89] T89|P4|ACT:Bailout
-[89] T89|P4|ACT:Bailout|DELTA:[0,0,0,0,2,0]
-[89] T89|P4|REV|S1:Friend moves to your Destination
-[89] T89|P4|REV|S2:Keep Calm
-[90] T90|P5|ACT:Payday
-[90] T90|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[90] T90|P5|REV|S1:Excellent Teamwork
-[90] T90|P5|REV|S2:Payday
-[91] T91|P0|PAY_FEE:3|TO:P4
-[91] T91|P0|DISC:Friend moves to your Destination|FROM:P4|GAIN:2
-[92] T92|P1|ACT:Pandemic / Economic Stimulus
-[92] T92|ROLL_D6:6
-[92] T92|P1|ACT:PANDEMIC_STIMULUS|DELTA:[6,6,6,6,6,6]
-[93] T93|P2|PAY_FEE:5|TO:P3
-[93] T93|P2|DISC:Learn from an Elder|FROM:P3|GAIN:2
-[94] T94|P3|PAY_FEE:3|TO:P5
-[94] T94|P3|DISC:Excellent Teamwork|FROM:P5|GAIN:2
-[95] T95|P4|ACT:Keep Calm
-[95] T95|P4|ACT:Keep Calm|GAIN:1|KEEP
-[96] T96|P5|ACT:Payday
-[96] T96|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[97] T97|P0|ACT:Blacklisted
-[97] T97|P0|ACT:Blacklisted|LOSS:1|KEEP
-[97] T97|P0|REV|S0:Employment Contract
-[97] T97|P0|REV|S1:Certificate of Excellence
-[98] T98|P1|ACT:Salvage
-[98] T98|P1|ACT:Salvage|GAIN:1|KEEP
-[98] T98|P1|REV|S3:Payday
-[99] T99|P2|PAY_FEE:5|TO:P0
-[99] T99|P2|DISC:Certificate of Excellence|FROM:P0|GAIN:2
-[99] T99|Player 2 gains $1 from Salvage.
-[100] T100|Player 2 gains $1 from Salvage.
-[100] T100|P3|ACT:Reward
-[100] T100|P3|ACT:Reward|DELTA:[-1,-1,-1,6,-1,-1]
-[100] T100|P3|REV|S2:Personality Test
-[100] T100|P3|REV|S3:Payday
-[101] T101|P4|PAY_FEE:5|TO:P0
-[101] T101|P4|DISC:Employment Contract|FROM:P0|GAIN:2
-[101] T101|Player 2 gains $1 from Salvage.
-[102] T102|Player 2 gains $1 from Salvage.
-[102] T102|P5|ACT:VIP
-[102] T102|P5|ACT:VIP|GAIN:23
-[103] T103|P0|PAY_FEE:4|TO:P3
-[103] T103|P0|DISC:Personality Test|FROM:P3|GAIN:2
-[103] T103|Player 2 gains $1 from Salvage.
-[103] T103|P0|BLACKLISTED|LOSS:1
-[104] T104|P1|ACT:Payday
-[104] T104|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[105] T105|P2|PAY_FEE:5|TO:P1
-[105] T105|P2|DISC:Subscribe to Travel Updates|FROM:P1|GAIN:2
-[105] T105|Player 2 gains $1 from Salvage.
-[106] T106|Player 2 gains $1 from Salvage.
-[106] T106|P3|ACT:Payday
-[106] T106|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[107] T107|P4|PAY_FEE:5|TO:P1
-[107] T107|P4|DISC:Video Chat with Person from Destination|FROM:P1|GAIN:2
-[107] T107|Player 2 gains $1 from Salvage.
-[107] T107|P1|REV|S0:Payday
-[108] T108|P5|PAY_FEE:4|TO:P2
-[108] T108|P5|DISC:Vehicle Registration Papers|FROM:P2|GAIN:2
-[108] T108|Player 2 gains $1 from Salvage.
-[109] T109|P0|PAY_FEE:5|TO:P2
-[109] T109|P0|DISC:Background Check|FROM:P2|GAIN:2
-[109] T109|Player 2 gains $1 from Salvage.
-[109] T109|P0|BLACKLISTED|LOSS:1
-[109] T109|P2|REV|S1:Vaccination Record
-[110] T110|P1|ACT:Payday
-[110] T110|PAYDAY|SALARIES:[5,5,6,2,2,2]
-[111] T111|P2|DISC:Pet Passport|FROM:P2|GAIN:2
-[111] T111|Player 2 gains $1 from Salvage.
-[112] T112|P3|PAY_FEE:4|TO:P2
-[112] T112|P3|DISC:Vaccination Record|FROM:P2|GAIN:2
-[112] T112|Player 2 gains $1 from Salvage.
-[113] T113|P4|PAY_FEE:5|TO:P2
-[113] T113|P4|DISC:Coffee with Airport Employee|FROM:P2|GAIN:2
-[113] T113|Player 2 gains $1 from Salvage.
-[113] T113|P2|REV|S2:Payday
-[113] T113|P2|REV|S3:Payday
-[114] T114|P5|PAY_FEE:5|TO:P1
-[114] T114|Player 2 gains $1 from Salvage.
-[114] T114|P5|ACT:Pay Cut
-[114] T114|P5|ACT:Pay Cut|LOSS:1|KEEP
-[114] T114|P1|REV|S1:Payday
-[114] T114|P1|REV|S2:Payday
-[115] T115|P0|PAY_FEE:5|TO:P1
-[115] T115|Player 2 gains $1 from Salvage.
-[115] T115|P0|BLACKLISTED|LOSS:1
-[115] T115|P0|ACT:Payday
-[115] T115|PAYDAY|SALARIES:[5,5,6,2,2,1]
-[116] T116|P1|ACT:Payday
-[116] T116|PAYDAY|SALARIES:[5,5,6,2,2,1]
-[117] T117|Player 2 gains $1 from Salvage.
-[117] T117|P2|ACT:Payday
-[117] T117|PAYDAY|SALARIES:[5,5,6,2,2,1]
-[118] T118|ROLL_D6:2
-[118] T118|P3|COLLEGE_APP|ROLL:2|TUITION:4|RES:PASS
-[119] T119|ROLL_D6:1
-[119] T119|P4|COLLEGE_APP|ROLL:1|TUITION:3|RES:PASS
-[120] T120|ROLL_D6:3
-[120] T120|P5|COLLEGE_APP|ROLL:3|TUITION:4|RES:PASS
-[121] T121|P0|PAY_FEE:5|TO:P2
-[121] T121|Player 2 gains $1 from Salvage.
-[121] T121|P0|BLACKLISTED|LOSS:1
-[121] T121|P0|ACT:Payday
-[121] T121|PAYDAY|SALARIES:[5,5,6,0,0,0]
-[121] PHASE2_START
-[121] PHASE2|P0|TRADE|$60:+18A|PEN_D:-3A|TOTAL_A:20
-[121] PHASE2|P1|TRADE|$102:+34A|PEN_D:-2A|TOTAL_A:37
-[121] PHASE2|P2|TRADE|$104:+26A|TOTAL_A:31
-[121] PHASE2|P3|TRADE|$42:+12A|PEN_D:-3A|TOTAL_A:12
-[121] PHASE2|P4|TRADE|$21:+6A|PEN_D:-2A|TOTAL_A:8
-[121] PHASE2|P5|TRADE|$42:+12A|PEN_D:-3A|TOTAL_A:12
-[121] PHASE2|P1|SELECT_LANE:Lane 1|TKN:6
-[121] PHASE2|P1|CROSS:PASS|PAID_A:6|REM_A:31
-[121] PHASE2|P2|SELECT_LANE:Lane 1|TKN:7
-[121] PHASE2|P2|CROSS:PASS|PAID_A:7|REM_A:24
-[121] PHASE2|P3|SELECT_LANE:Lane 1|TKN:7
-[121] PHASE2|P3|CROSS:PASS|PAID_A:7|REM_A:5
-[121] PHASE2|P4|SELECT_LANE:Lane 2|TKN:7
-[121] PHASE2|P4|CROSS:PASS|PAID_A:7|REM_A:1
-[121] PHASE2|P5|SELECT_LANE:Lane 2|TKN:6
-[121] PHASE2|P5|CROSS:PASS|PAID_A:6|REM_A:6
-[121] PHASE2|P0|SELECT_LANE:Lane 3|TKN:5
-[121] PHASE2|P0|CROSS:PASS|PAID_A:5|REM_A:15
-[121] GAME_OVER|WINNER: Player 2 (Assurance: 31, Money: $4)
-
-[1] INIT|P0|NAT:Bosnian|DEST:China|$2|FACEUP:[4:Coffee with Airport Employee,5:Shredder Accident,6:Payday,11:Support Group Motivates You,12:Suspect,13:Attend Security Training]
-[1] INIT|P1|NAT:Chinese|DEST:Democratic Republic of Congo|$6|FACEUP:[4:VIP,5:Nostalgia,6:Payday,11:Pandemic / Economic Stimulus,12:Dinner with a Diplomat,13:Pet Passport]
-[1] INIT|P2|NAT:Congolese|DEST:France|$2|FACEUP:[4:Favorable Cultural Opinion,5:Trousers Fall Down,6:Listen to the News,11:Payday,12:Language Classes,13:Excellent Teamwork]
-[1] INIT|P3|NAT:French|DEST:Russia|$5|FACEUP:[4:Payday,5:Letter of Recommendation,6:Identical Twin,11:Subscribe to Travel Updates,12:Payday,13:Travel Concierge]
-[1] INIT|P4|NAT:Russian|DEST:Senegal|$5|FACEUP:[4:Copy of Birth Certificate,5:Payday,6:Pay Cut,11:Internship in Your Destination,12:Enter Luxury Travel Club,13:FOMO]
-[1] INIT|P5|NAT:Senegalese|DEST:Switzerland|$3|FACEUP:[4:Certificate of Excellence,5:Payday,6:Payday,11:Keep Calm,12:Payday,13:Vehicle Registration Papers]
-[1] T1|P0|BUY:Support Group Motivates You|FROM:P0|COST:2
-[1] T1|P0|REV|S7:Become World Famous
-[2] T2|P1|BUY:Dinner with a Diplomat|FROM:P1|COST:3
-[3] T3|P2|PAY_FEE:1|TO:P4
-[3] T3|P2|DISC:Enter Luxury Travel Club|FROM:P4|GAIN:2
-[4] T4|P3|BUY:Subscribe to Travel Updates|FROM:P3|COST:2
-[4] T4|P3|REV|S7:Network Fair
-[5] T5|P4|PAY_FEE:1|TO:P2
-[5] T5|P4|BUY:Excellent Teamwork|FROM:P2|COST:3
-[5] T5|P2|REV|S10:Payday
-[6] T6|P5|PAY_FEE:1|TO:P2
-[6] T6|P5|DISC:Language Classes|FROM:P2|GAIN:2
-[6] T6|P2|REV|S9:Payday
-[7] T7|P0|STEAL:Ticket|SKIP_NEXT
-[8] T8|P1|SELL:Dinner with a Diplomat|GAIN:2
-[8] T8|P1|PAY_FEE:1|TO:P3
-[8] T8|P1|BUY:Network Fair|FROM:P3|COST:3
-[9] T9|P2|PAY_FEE:2|TO:P0
-[9] T9|P2|BUY:Attend Security Training|FROM:P0|COST:3
-[9] T9|P0|REV|S10:Pandemic / Economic Stimulus
-[10] T10|P3|SELL:Subscribe to Travel Updates|GAIN:2
-[10] T10|P3|PAY_FEE:1|TO:P0
-[10] T10|P3|BUY:Become World Famous|FROM:P0|COST:3
-[11] T11|P4|SELL:Excellent Teamwork|GAIN:2
-[11] T11|P4|BUY:Internship in Your Destination|FROM:P4|COST:4
-[11] T11|P4|REV|S7:Payday
-[11] T11|P4|REV|S8:Employment Contract
-[12] T12|P5|BUY:Vehicle Registration Papers|FROM:P5|COST:4
-[12] T12|P5|REV|S10:Language Phrasebook
-[13] T13|P0|SKIP_TURN
-[14] T14|P1|STEAL:Ticket|SKIP_NEXT
-[15] T15|P2|STEAL:Passport|SKIP_NEXT
-[16] T16|P3|STEAL:Ticket|SKIP_NEXT
-[17] T17|P4|STEAL:Ticket|SKIP_NEXT
-[18] T18|P5|STEAL:Passport|SKIP_NEXT
-[19] T19|P0|PAY_FEE:1|TO:P5
-[19] T19|P0|DISC:Language Phrasebook|FROM:P5|GAIN:2
-[20] T20|P1|SKIP_TURN
-[21] T21|P2|SKIP_TURN
-[22] T22|P3|SKIP_TURN
-[23] T23|P4|SKIP_TURN
-[24] T24|P5|SKIP_TURN
-[25] T25|ROLL_D6:3
-[25] T25|P0|COLLEGE_APP|ROLL:3|TUITION:4|RES:PASS
-[26] T26|P1|ACT:Pandemic / Economic Stimulus
-[26] T26|ROLL_D6:5
-[26] T26|P1|ACT:PANDEMIC_STIMULUS|DELTA:[0,-1,0,-2,0,-1]
-[26] T26|P1|REV|S7:Friend moves to your Destination
-[26] T26|P1|REV|S8:Learn Song from Your Destination
-[27] T27|P2|STEAL:Passport|SKIP_NEXT
-[28] T28|P3|ACT:Payday
-[28] T28|PAYDAY|SALARIES:[0,1,1,1,1,1]
-[28] T28|P3|REV|S8:Payday
-[29] T29|P4|ACT:FOMO
-[29] T29|P4|ACT:FOMO|LOSS:1
-[29] T29|P4|REV|S9:Payday
-[29] T29|P4|REV|S10:Learn from an Elder
-[30] T30|P5|ACT:Payday
-[30] T30|PAYDAY|SALARIES:[0,1,1,1,1,1]
-[30] T30|P5|REV|S9:Payday
-[31] T31|ROLL_D6:3
-[31] T31|P0|GRAD|ROLL:3|RES:PASS|SALARY_INC:1
-[31] T31|P0|ACT:Suspect
-[31] T31|P0|ACT:Suspect|LOSS:1
-[31] T31|P0|ACT:Suspect|DISC:Support Group Motivates You
-[31] T31|P0|REV|S8:Mental Fog
-[31] T31|P0|REV|S9:Bailout
-[32] T32|P1|SELL:Network Fair|GAIN:2
-[32] T32|P1|BUY:Pet Passport|FROM:P1|COST:4
-[32] T32|P1|REV|S9:Endorsement from Royalty
-[32] T32|P1|REV|S10:Background Check
-[33] T33|P2|SKIP_TURN
-[34] T34|P3|SELL:Become World Famous|GAIN:2
-[34] T34|P3|RECLAIM:Passport|FROM:P2|COST:4
-[34] T34|P3|TICKET_PASSPORT_BONUS|GAIN:1A
-[35] T35|P4|ACT:Payday
-[35] T35|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[36] T36|P5|SELL:Vehicle Registration Papers|GAIN:2
-[36] T36|P5|PAY_FEE:2|TO:P1
-[36] T36|P5|BUY:Friend moves to your Destination|FROM:P1|COST:2
-[37] T37|ROLL_D6:5
-[37] T37|P0|COLLEGE_APP|ROLL:5|TUITION:7|RES:FAIL
-[37] T37|P0|ACT:Pandemic / Economic Stimulus
-[37] T37|ROLL_D6:3
-[37] T37|P0|ACT:PANDEMIC_STIMULUS|DELTA:[3,3,3,3,3,3]
-[38] T38|P1|SELL:Pet Passport|GAIN:2
-[38] T38|P1|BUY:Background Check|FROM:P1|COST:4
-[39] T39|P2|PAY_FEE:3|TO:P1
-[39] T39|P2|BUY:Learn Song from Your Destination|FROM:P1|COST:2
-[40] T40|ROLL_D6:5
-[40] T40|P3|COLLEGE_APP|ROLL:5|TUITION:10|RES:FAIL
-[40] T40|P3|ACT:Payday
-[40] T40|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[41] T41|P4|BUY:Employment Contract|FROM:P4|COST:4
-[42] T42|P5|STEAL:Ticket|SKIP_NEXT
-[42] T42|P5|TICKET_PASSPORT_BONUS|GAIN:1A
-[43] T43|P0|ACT:Mental Fog
-[43] T43|P0|ACT:Mental Fog|LOSS:1
-[44] T44|P1|STEAL:Passport|SKIP_NEXT
-[44] T44|P1|TICKET_PASSPORT_BONUS|GAIN:1A
-[45] T45|P2|STEAL:Ticket|SKIP_NEXT
-[45] T45|P2|TICKET_PASSPORT_BONUS|GAIN:1A
-[46] T46|P3|ACT:Payday
-[46] T46|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[46] T46|P3|REV|S0:Blacklisted
-[47] T47|P4|STEAL:Passport|SKIP_NEXT
-[47] T47|P4|TICKET_PASSPORT_BONUS|GAIN:1A
-[48] T48|P5|SKIP_TURN
-[49] T49|P0|PAY_FEE:2|TO:P3
-[49] T49|P0|DISC:Travel Concierge|FROM:P3|GAIN:2
-[49] T49|P3|REV|S9:Payday
-[49] T49|P3|REV|S10:Payday
-[50] T50|P1|SKIP_TURN
-[51] T51|P2|SKIP_TURN
-[52] T52|P3|ACT:Blacklisted
-[52] T52|P3|ACT:Blacklisted|LOSS:1|KEEP
-[53] T53|P4|SKIP_TURN
-[54] T54|P5|ACT:Keep Calm
-[54] T54|P5|ACT:Keep Calm|GAIN:1|KEEP
-[54] T54|P5|REV|S7:Camping
-[54] T54|P5|REV|S8:Payday
-[55] T55|P0|ACT:Bailout
-[55] T55|P0|ACT:Bailout|DELTA:[1,0,0,0,1,0]
-[56] T56|P1|PAY_FEE:2|TO:P0
-[56] T56|P1|DISC:Coffee with Airport Employee|FROM:P0|GAIN:2
-[56] T56|P0|REV|S0:Write Last Will and Testament
-[57] T57|P2|PAY_FEE:4|TO:P0
-[57] T57|P2|DISC:Write Last Will and Testament|FROM:P0|GAIN:2
-[58] T58|P3|BLACKLISTED|LOSS:1
-[58] T58|P3|ACT:Payday
-[58] T58|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[59] T59|P4|PAY_FEE:2|TO:P1
-[59] T59|P4|DISC:Endorsement from Royalty|FROM:P1|GAIN:2
-[60] T60|P5|ACT:Camping
-[60] T60|P5|ACT:Camping|DELTA:[1,1,0,1,0,1]
+[53] T53|P0|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
+[53] T53|ROLL_D6:5
+[53] T53|P0|COLLEGE_APP|ROLL:5|TUITION:7|RES:PASS
+[54] T54|Player 1 gains $1 from Salvage.
+[54] T54|P1|ACT:Payday
+[54] T54|PAYDAY|SALARIES:[0,1,1,1]
+[54] T54|P1|REV|S0:Frontrunner
+[55] T55|P2|PAY_FEE:4|TO:P3
+[55] T55|P2|DISC:Notebook|FROM:P3|GAIN:2
+[55] T55|Player 1 gains $1 from Salvage.
+[55] T55|P2|BLACKLISTED|LOSS:1
+[55] T55|P3|REV|S0:Payday
+[55] T55|P3|REV|S1:Network Fair
+[56] T56|Player 1 gains $1 from Salvage.
+[56] T56|P3|ACT:Pandemic / Economic Stimulus
+[56] T56|ROLL_D6:3
+[56] T56|P3|ACT:PANDEMIC_STIMULUS|DELTA:[3,3,3,3]
+[57] T57|ROLL_D6:6
+[57] T57|P0|GRAD|ROLL:6|RES:FAIL
+[57] T57|P0|PAY_FEE:3|TO:P3
+[57] T57|P0|BUY:Network Fair|FROM:P3|COST:3
+[58] T58|Player 1 gains $1 from Salvage.
+[58] T58|P1|ACT:Frontrunner
+[58] T58|P1|ACT:Frontrunner|MONEY_PLACED:1|KEEP
+[59] T59|Player 1 gains $1 from Salvage.
+[59] T59|P2|BLACKLISTED|LOSS:1
+[59] T59|P2|ACT:Payday
+[59] T59|PAYDAY|SALARIES:[0,1,1,1]
+[59] T59|P1|FRONTRUNNER_ADD:1|TOTAL:2
+[59] T59|P1|FRONTRUNNER_PASS|TO:P0
+[60] T60|Player 1 gains $1 from Salvage.
+[60] T60|P3|ACT:Payday
+[60] T60|PAYDAY|SALARIES:[0,1,1,1]
+[60] T60|P0|FRONTRUNNER_ADD:1|TOTAL:3
+[60] T60|P0|FRONTRUNNER_PASS|TO:P3
+[60] T60|P3|FRONTRUNNER_ADD:1|TOTAL:4
+[60] T60|P3|FRONTRUNNER_PASS|TO:P2
+[61] T61|ROLL_D6:1
+[61] T61|P0|GRAD|ROLL:1|RES:PASS|SALARY_INC:3
+[61] T61|P0|PAY_FEE:4|TO:P2
 [61] T61|P0|ACT:Payday
-[61] T61|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[61] T61|P0|REV|S3:Payday
-[62] T62|P1|ACT:VIP
-[62] T62|P1|ACT:VIP|GAIN:9
-[62] T62|P1|REV|S0:Residence Address in Destination
-[63] T63|P2|ACT:Payday
-[63] T63|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[64] T64|P3|PAY_FEE:3|TO:P1
-[64] T64|P3|DISC:Residence Address in Destination|FROM:P1|GAIN:2
-[64] T64|P3|BLACKLISTED|LOSS:1
-[65] T65|P4|ACT:Payday
-[65] T65|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[66] T66|P5|ACT:Payday
-[66] T66|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[67] T67|P0|ACT:Payday
-[67] T67|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[68] T68|P1|ACT:Nostalgia
-[68] T68|P1|ACT:Nostalgia|GAIN:2
-[68] T68|P1|REV|S1:Payday
-[69] T69|P2|ACT:Payday
-[69] T69|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[69] T69|P2|REV|S7:Travel Brochure
-[69] T69|P2|REV|S8:Payday
-[70] T70|P3|BLACKLISTED|LOSS:1
-[70] T70|P3|ACT:Payday
-[70] T70|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[71] T71|P4|PAY_FEE:3|TO:P3
-[71] T71|P4|DISC:Letter of Recommendation|FROM:P3|GAIN:2
-[71] T71|P3|REV|S1:Vaccination Record
-[72] T72|P5|PAY_FEE:3|TO:P3
-[72] T72|P5|DISC:Vaccination Record|FROM:P3|GAIN:2
-[73] T73|P0|PAY_FEE:3|TO:P2
-[73] T73|P0|BUY:Travel Brochure|FROM:P2|COST:2
+[61] T61|PAYDAY|SALARIES:[6,1,1,1]
+[61] T61|P2|FRONTRUNNER_ADD:1|TOTAL:5
+[61] T61|P2|FRONTRUNNER_PASS|TO:P1
+[62] T62|Player 1 gains $1 from Salvage.
+[62] T62|P1|ACT:Payday
+[62] T62|PAYDAY|SALARIES:[6,1,1,1]
+[62] T62|P1|FRONTRUNNER_PASS|TO:P0
+[63] T63|P2|PAY_FEE:5|TO:P1
+[63] T63|P2|BUY:Politician Approves You|FROM:P1|COST:3
+[63] T63|P0|STAR_POWER|GAIN:1|PASS_TO:P2
+[63] T63|P1|REV|S1:Payday
+[64] T64|P3|PAY_FEE:4|TO:P0
+[64] T64|Player 1 gains $1 from Salvage.
+[64] T64|P3|ACT:Underdog
+[64] T64|P3|ACT:Underdog|LOSS:1|KEEP
+[64] T64|P3|UNDERDOG|LOSS:1|PASS_TO:P2
+[65] T65|P0|BUY_POOL:Ticket|COST:2
+[66] T66|Player 1 gains $1 from Salvage.
+[66] T66|P1|ACT:Swap Wallets
+[66] T66|P1|ACT:Swap Wallets|SWAP:P0
+[66] T66|P1|REV|S2:Suspect
+[66] T66|P1|REV|S3:Payday
+[67] T67|P2|RECLAIM:Ticket|FROM:P0|COST:7
+[67] T67|P2|TICKET_PASSPORT_BONUS|GAIN:1A
+[68] T68|P3|PAY_FEE:5|TO:P1
+[68] T68|Player 1 gains $1 from Salvage.
+[68] T68|P3|ACT:Suspect
+[68] T68|P3|ACT:Suspect|LOSS:1
+[68] T68|P3|ACT:Suspect|DISC:Listen to the News
+[68] T68|Player 1 gains $1 from Salvage.
+[69] T69|P0|ACT:Penalty
+[69] T69|P0|ACT:Penalty|LOSS:1|KEEP
+[69] T69|P0|REV|S1:Payday
+[69] T69|P0|REV|S2:Cookies for Neighbor from Destination
+[70] T70|Player 1 gains $1 from Salvage.
+[70] T70|P1|ACT:Payday
+[70] T70|PAYDAY|SALARIES:[6,1,1,1]
+[70] T70|P0|FRONTRUNNER_PASS|TO:P3
+[70] T70|P3|FRONTRUNNER_PASS|TO:P2
+[71] T71|P2|PAY_FEE:5|TO:P0
+[71] T71|P2|DISC:Cookies for Neighbor from Destination|FROM:P0|GAIN:2
+[71] T71|Player 1 gains $1 from Salvage.
+[71] T71|P2|BLACKLISTED|LOSS:1
+[72] T72|ROLL_D6:4
+[72] T72|P3|COLLEGE_APP|ROLL:4|TUITION:9|RES:PASS
+[73] T73|P0|ACT:Payday
+[73] T73|PAYDAY|SALARIES:[6,1,1,0]
+[73] T73|P2|FRONTRUNNER_PASS|TO:P1
+[74] T74|Player 1 gains $1 from Salvage.
 [74] T74|P1|ACT:Payday
-[74] T74|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[74] T74|P1|REV|S2:Life Coach
-[74] T74|P1|REV|S3:Lost & Found
-[75] T75|P2|ACT:Payday
-[75] T75|PAYDAY|SALARIES:[2,1,1,1,1,1]
-[76] T76|P3|BLACKLISTED|LOSS:1
-[76] T76|P3|ACT:Identical Twin
-[76] T76|P3|ACT:Identical Twin|GAIN:1|EXTRA_TURN
-[76] T76|P3|REV|S2:Insider
-[76] T76|P3|REV|S3:Attend History Class
-[76] T76|P3|BLACKLISTED|LOSS:1
-[76] T76|P3|ACT:Insider
-[76] T76|P3|KEEP:Insider
-[77] T77|P4|PAY_FEE:4|TO:P3
-[77] T77|P4|DISC:Attend History Class|FROM:P3|GAIN:2
-[78] T78|P5|ACT:Payday
-[78] T78|PAYDAY|SALARIES:[2,1,1,2,1,1]
-[78] T78|P5|REV|S3:Cookies for Neighbor from Destination
-[79] T79|P0|STEAL:Passport|SKIP_NEXT
-[79] T79|P0|TICKET_PASSPORT_BONUS|GAIN:1A
-[80] T80|P1|ACT:Life Coach
-[80] T80|P1|ACT:Life Coach|GAIN_A:1
-[81] T81|P2|ACT:Payday
-[81] T81|PAYDAY|SALARIES:[2,1,1,2,1,1]
-[82] T82|P3|PAY_FEE:4|TO:P2
-[82] T82|P3|DISC:Favorable Cultural Opinion|FROM:P2|GAIN:2
-[82] T82|P3|BLACKLISTED|LOSS:1
-[82] T82|P2|REV|S0:Social Butterfly
-[83] T83|P4|ACT:Payday
-[83] T83|PAYDAY|SALARIES:[2,1,1,2,1,1]
-[84] T84|P5|PAY_FEE:4|TO:P4
-[84] T84|P5|DISC:Copy of Birth Certificate|FROM:P4|GAIN:2
-[84] T84|P4|REV|S0:Fancy Clothes
-[84] T84|P4|REV|S1:Payday
-[85] T85|P0|SKIP_TURN
-[86] T86|P1|PAY_FEE:3|TO:P2
-[86] T86|P1|DISC:Listen to the News|FROM:P2|GAIN:2
-[86] T86|P2|REV|S3:Travel Wallet
-[87] T87|P2|BUY:Travel Wallet|FROM:P2|COST:3
-[88] T88|P3|PAY_FEE:5|TO:P5
-[88] T88|P3|DISC:Cookies for Neighbor from Destination|FROM:P5|GAIN:2
-[88] T88|P3|BLACKLISTED|LOSS:1
-[89] T89|P4|ACT:Fancy Clothes
-[89] T89|P4|KEEP:Fancy Clothes
-[90] T90|P5|ACT:Payday
-[90] T90|PAYDAY|SALARIES:[2,1,1,2,1,1]
-[91] T91|P0|ACT:Shredder Accident
-[91] T91|P0|ACT:Shredder Accident|DISC:Travel Brochure
-[91] T91|P0|REV|S1:Notebook
-[91] T91|P0|REV|S2:Share
-[92] T92|P1|ACT:Lost & Found
-[92] T92|P1|ACT:Lost & Found|TAKE:MONEY:2|FROM:P0
-[93] T93|P2|ACT:Trousers Fall Down
-[93] T93|P2|ACT:Trousers Fall Down|LOSS:3
-[93] T93|P2|REV|S1:Get Engaged to a Native
-[93] T93|P2|REV|S2:Payday
-[94] T94|P3|PAY_FEE:5|TO:P0
-[94] T94|P3|DISC:Notebook|FROM:P0|GAIN:2
-[94] T94|P3|BLACKLISTED|LOSS:1
-[95] T95|P4|ACT:Payday
-[95] T95|PAYDAY|SALARIES:[2,1,1,2,1,1]
-[96] T96|P5|BUY:Certificate of Excellence|FROM:P5|COST:2
-[96] T96|P5|REV|S0:International Driving Permit
-[97] T97|P0|PAY_FEE:4|TO:P2
-[97] T97|P0|DISC:Get Engaged to a Native|FROM:P2|GAIN:2
-[98] T98|P1|PAY_FEE:4|TO:P5
-[98] T98|P1|DISC:International Driving Permit|FROM:P5|GAIN:2
-[99] T99|P2|ACT:Social Butterfly
-[99] T99|P2|ACT:Social Butterfly|TAKE:MONEY:3|FROM:P0
-[100] T100|P3|PAY_FEE:5|TO:P4
-[100] T100|P3|DISC:Learn from an Elder|FROM:P4|GAIN:2
-[100] T100|P3|BLACKLISTED|LOSS:1
-[101] T101|P4|ACT:Pay Cut
-[101] T101|P4|ACT:Pay Cut|LOSS:1|KEEP
-[101] T101|P4|REV|S2:Reward
-[101] T101|P4|REV|S3:Philanthropy
-[102] T102|P5|ACT:Payday
-[102] T102|PAYDAY|SALARIES:[2,1,1,2,0,1]
-[102] T102|P5|REV|S1:Salvage
-[102] T102|P5|REV|S2:Physical Exam
-[103] T103|P0|ACT:Share
-[103] T103|P0|ACT:Share|DELTA:[-20,4,4,4,4,4]
-[104] T104|P1|ACT:Payday
-[104] T104|PAYDAY|SALARIES:[2,1,1,2,0,1]
-[105] T105|P2|ACT:Payday
-[105] T105|PAYDAY|SALARIES:[2,1,1,2,0,1]
-[106] T106|P3|PAY_FEE:5|TO:P5
-[106] T106|P3|DISC:Physical Exam|FROM:P5|GAIN:2
-[106] T106|P3|BLACKLISTED|LOSS:1
-[107] T107|P4|ACT:Philanthropy
-[107] T107|P4|ACT:Philanthropy|DELTA:[1,1,1,1,-6,1]
-[108] T108|P5|ACT:Salvage
-[108] T108|P5|ACT:Salvage|GAIN:1|KEEP
-[109] T109|P0|PAY_FEE:5|TO:P4
-[109] T109|Player 6 gains $1 from Salvage.
-[109] T109|P0|ACT:Reward
-[109] T109|P0|ACT:Reward|DELTA:[6,-1,-1,-1,-1,-1]
-[109] PHASE2_START
-[109] PHASE2|P0|TRADE|$20:+6A|PEN_D:-3A|TOTAL_A:6
-[109] PHASE2|P1|TRADE|$42:+14A|PEN_D:-2A|TOTAL_A:14
-[109] PHASE2|P2|TRADE|$32:+8A|TOTAL_A:9
-[109] PHASE2|P3|TRADE|$21:+6A|PEN_D:-3A|TOTAL_A:4
-[109] PHASE2|P4|TRADE|$21:+6A|PEN_D:-2A|TOTAL_A:5
-[109] PHASE2|P5|TRADE|$35:+10A|PEN_D:-3A|TOTAL_A:8
-[109] PHASE2|P1|SELECT_LANE:Lane 1|TKN:6
-[109] PHASE2|P1|CROSS:PASS|PAID_A:6|REM_A:8
-[109] PHASE2|P2|SELECT_LANE:Lane 1|TKN:7
-[109] PHASE2|P2|CROSS:PASS|PAID_A:7|REM_A:2
-[109] PHASE2|P3|SELECT_LANE:Lane 4|TKN:9
-[109] PHASE2|P3|CROSS:FAIL_LOW_A
-[109] PHASE2|P4|SELECT_LANE:Lane 4|TKN:8
-[109] PHASE2|P4|CROSS:FAIL_LOW_A
-[109] PHASE2|P5|SELECT_LANE:Lane 4|TKN:4
-[109] PHASE2|P5|CROSS:PASS|PAID_A:4|REM_A:4
-[109] PHASE2|P0|SELECT_LANE:Lane 2|TKN:8
-[109] PHASE2|P0|CROSS:FAIL_LOW_A
-[109] GAME_OVER|WINNER: Player 2 (Assurance: 8, Money: $5)
+[74] T74|PAYDAY|SALARIES:[6,1,1,0]
+[74] T74|P1|FRONTRUNNER_PASS|TO:P0
+[74] PHASE2_START
+[74] PHASE2|P0|TRADE|$50:+15A|TOTAL_A:20
+[74] PHASE2|P1|TRADE|$36:+12A|PEN_D:-2A|TOTAL_A:11
+[74] PHASE2|P2|TRADE|$8:+2A|TOTAL_A:3
+[74] PHASE2|P3|TRADE|PEN_M:-1A|PEN_D:-3A|TOTAL_A:-3
+[74] PHASE2|P2|SELECT_LANE:Lane 5|TKN:3
+[74] PHASE2|P2|CROSS:PASS|PAID_A:3|REM_A:0
+[74] PHASE2|P3|SELECT_LANE:Lane 1|TKN:7
+[74] PHASE2|P3|CROSS:FAIL_LOW_A
+[74] PHASE2|P0|SELECT_LANE:Lane 1|TKN:7
+[74] PHASE2|P0|CROSS:PASS|PAID_A:7|REM_A:13
+[74] PHASE2|P1|SELECT_LANE:Lane 1|TKN:6
+[74] PHASE2|P1|CROSS:PASS|PAID_A:6|REM_A:5
+[74] GAME_OVER|WINNER: Player 1 (Assurance: 13, Money: $2)
+
+[1] INIT|P0|NAT:Bosnian|DEST:China|$2|FACEUP:[4:Vaccination Record,5:Payday,6:VIP,11:Suspect,12:Support Group Motivates You,13:Subscribe to Travel Updates]
+[1] INIT|P1|NAT:Chinese|DEST:Democratic Republic of Congo|$6|FACEUP:[4:Fancy Clothes,5:Payday,6:Become World Famous,11:Payday,12:Favorable Cultural Opinion,13:Salvage]
+[1] INIT|P2|NAT:Congolese|DEST:France|$2|FACEUP:[4:Payday,5:Payday,6:Pet Passport,11:Pandemic / Economic Stimulus,12:Payday,13:Friend moves to your Destination]
+[1] INIT|P3|NAT:French|DEST:Russia|$5|FACEUP:[4:Identical Twin,5:Vehicle Registration Papers,6:Physical Exam,11:Travel Wallet,12:FOMO,13:Social Butterfly]
+[1] INIT|P4|NAT:Russian|DEST:Senegal|$5|FACEUP:[4:Listen to the News,5:Lost & Found,6:Blacklisted,11:Keep Calm,12:Travel Brochure,13:Payday]
+[1] T1|P0|BUY:Support Group Motivates You|FROM:P0|COST:2
+[2] T2|P1|PAY_FEE:1|TO:P2
+[2] T2|P1|BUY:Friend moves to your Destination|FROM:P2|COST:2
+[2] T2|P2|REV|S10:Payday
+[3] T3|P2|PAY_FEE:1|TO:P0
+[3] T3|P2|BUY:Subscribe to Travel Updates|FROM:P0|COST:2
+[3] T3|P0|REV|S9:Payday
+[3] T3|P0|REV|S10:Background Check
+[4] T4|P3|PAY_FEE:1|TO:P4
+[4] T4|P3|BUY:Travel Brochure|FROM:P4|COST:2
+[5] T5|P4|PAY_FEE:1|TO:P3
+[5] T5|P4|BUY:Travel Wallet|FROM:P3|COST:3
+[5] T5|P3|REV|S7:Language Classes
+[6] T6|P0|STEAL:Ticket|SKIP_NEXT
+[7] T7|P1|SELL:Friend moves to your Destination|GAIN:2
+[7] T7|P1|BUY:Favorable Cultural Opinion|FROM:P1|COST:4
+[8] T8|P2|STEAL:Passport|SKIP_NEXT
+[9] T9|P3|SELL:Travel Brochure|GAIN:2
+[9] T9|P3|BUY:Language Classes|FROM:P3|COST:3
+[10] T10|P4|STEAL:Passport|SKIP_NEXT
+[11] T11|P0|SKIP_TURN
+[12] T12|P1|STEAL:Ticket|SKIP_NEXT
+[13] T13|P2|SKIP_TURN
+[14] T14|P3|STEAL:Ticket|SKIP_NEXT
+[15] T15|P4|SKIP_TURN
+[16] T16|P0|ACT:Payday
+[16] T16|PAYDAY|SALARIES:[1,1,1,1,1]
+[17] T17|P1|SKIP_TURN
+[18] T18|P2|ACT:Payday
+[18] T18|PAYDAY|SALARIES:[1,1,1,1,1]
+[18] T18|P2|REV|S9:Trousers Fall Down
+[19] T19|P3|SKIP_TURN
+[20] T20|ROLL_D6:6
+[20] T20|P4|COLLEGE_APP|ROLL:6|TUITION:11|RES:FAIL
+[20] T20|P4|ACT:Keep Calm
+[20] T20|P4|ACT:Keep Calm|GAIN:1|KEEP
+[20] T20|P4|REV|S7:Learn Song from Your Destination
+[20] T20|P4|REV|S8:Politician Approves You
+[21] T21|P0|PAY_FEE:1|TO:P1
+[21] T21|P0|ACT:Salvage
+[21] T21|P0|ACT:Salvage|GAIN:1|KEEP
+[21] T21|P1|REV|S9:Mental Fog
+[21] T21|P1|REV|S10:Notebook
+[22] T22|P1|BUY:Notebook|FROM:P1|COST:2
+[23] T23|ROLL_D6:4
+[23] T23|P2|COLLEGE_APP|ROLL:4|TUITION:6|RES:FAIL
+[23] T23|Player 1 gains $1 from Salvage.
+[23] T23|P2|ACT:Payday
+[23] T23|PAYDAY|SALARIES:[1,1,1,1,1]
+[24] T24|ROLL_D6:6
+[24] T24|P3|COLLEGE_APP|ROLL:6|TUITION:11|RES:FAIL
+[24] T24|Player 1 gains $1 from Salvage.
+[24] T24|P3|ACT:FOMO
+[24] T24|P3|ACT:FOMO|LOSS:1
+[24] T24|P3|REV|S8:Copy of Birth Certificate
+[25] T25|P4|BUY:Learn Song from Your Destination|FROM:P4|COST:2
+[26] T26|P0|BUY:Background Check|FROM:P0|COST:4
+[27] T27|P1|SELL:Notebook|GAIN:2
+[27] T27|Player 1 gains $1 from Salvage.
+[27] T27|P1|PAY_FEE:2|TO:P3
+[27] T27|P1|BUY:Copy of Birth Certificate|FROM:P3|COST:2
+[28] T28|ROLL_D6:3
+[28] T28|P2|COLLEGE_APP|ROLL:3|TUITION:4|RES:FAIL
+[28] T28|Player 1 gains $1 from Salvage.
+[28] T28|P2|ACT:Pandemic / Economic Stimulus
+[28] T28|ROLL_D6:3
+[28] T28|P2|ACT:PANDEMIC_STIMULUS|DELTA:[-3,-1,-1,-3,-3]
+[28] T28|P2|REV|S7:Insider
+[28] T28|P2|REV|S8:Network Fair
+[29] T29|P3|PAY_FEE:2|TO:P2
+[29] T29|P3|DISC:Network Fair|FROM:P2|GAIN:2
+[29] T29|Player 1 gains $1 from Salvage.
+[30] T30|P4|STEAL:Ticket|SKIP_NEXT
+[30] T30|P4|TICKET_PASSPORT_BONUS|GAIN:1A
+[31] T31|P0|STEAL:Passport|SKIP_NEXT
+[31] T31|P0|TICKET_PASSPORT_BONUS|GAIN:1A
+[32] T32|P1|STEAL:Passport|SKIP_NEXT
+[32] T32|P1|TICKET_PASSPORT_BONUS|GAIN:1A
+[33] T33|P2|PAY_FEE:2|TO:P4
+[33] T33|P2|DISC:Politician Approves You|FROM:P4|GAIN:2
+[33] T33|Player 1 gains $1 from Salvage.
+[34] T34|Player 1 gains $1 from Salvage.
+[34] T34|P3|ACT:Social Butterfly
+[34] T34|P3|ACT:Social Butterfly|TAKE:MONEY:3|FROM:P0
+[34] T34|P3|REV|S9:Payday
+[34] T34|P3|REV|S10:Letter of Recommendation
+[35] T35|P4|SKIP_TURN
+[36] T36|P0|SKIP_TURN
+[37] T37|P1|SKIP_TURN
+[38] T38|Player 1 gains $1 from Salvage.
+[38] T38|P2|ACT:Trousers Fall Down
+[38] T38|P2|ACT:Trousers Fall Down|LOSS:3
+[39] T39|P3|BUY:Letter of Recommendation|FROM:P3|COST:3
+[40] T40|P4|BUY:Listen to the News|FROM:P4|COST:2
+[40] T40|P4|REV|S0:Payday
+[41] T41|P0|ACT:VIP
+[41] T41|P0|ACT:VIP|GAIN:1
+[41] T41|P0|REV|S3:Payday
+[42] T42|Player 1 gains $1 from Salvage.
+[42] T42|P1|ACT:Mental Fog
+[42] T42|P1|ACT:Mental Fog|LOSS:1
+[43] T43|Player 1 gains $1 from Salvage.
+[43] T43|P2|ACT:Payday
+[43] T43|PAYDAY|SALARIES:[1,1,1,1,1]
+[44] T44|P3|STEAL:Passport|SKIP_NEXT
+[44] T44|P3|TICKET_PASSPORT_BONUS|GAIN:1A
+[45] T45|Player 1 gains $1 from Salvage.
+[45] T45|P4|ACT:Payday
+[45] T45|PAYDAY|SALARIES:[1,1,1,1,1]
+[45] T45|P4|REV|S9:Language Phrasebook
+[45] T45|P4|REV|S10:Cookies for Neighbor from Destination
+[46] T46|ROLL_D6:3
+[46] T46|P0|COLLEGE_APP|ROLL:3|TUITION:4|RES:PASS
+[47] T47|Player 1 gains $1 from Salvage.
+[47] T47|P1|ACT:Payday
+[47] T47|PAYDAY|SALARIES:[0,1,1,1,1]
+[47] T47|P1|REV|S7:Pandemic / Economic Stimulus
+[47] T47|P1|REV|S8:Payday
+[48] T48|Player 1 gains $1 from Salvage.
+[48] T48|P2|ACT:Insider
+[48] T48|P2|KEEP:Insider
+[49] T49|P3|SKIP_TURN
+[50] T50|P4|BUY:Cookies for Neighbor from Destination|FROM:P4|COST:2
+[51] T51|ROLL_D6:2
+[51] T51|P0|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
+[51] T51|P0|ACT:Payday
+[51] T51|PAYDAY|SALARIES:[2,1,2,1,1]
+[52] T52|P1|PAY_FEE:3|TO:P2
+[52] T52|P1|DISC:Pet Passport|FROM:P2|GAIN:2
+[52] T52|Player 1 gains $1 from Salvage.
+[52] T52|P2|REV|S2:Letter of Invitation
+[52] T52|P2|REV|S3:Attend History Class
+[53] T53|P2|BUY:Attend History Class|FROM:P2|COST:4
+[54] T54|P3|PAY_FEE:3|TO:P2
+[54] T54|P3|DISC:Letter of Invitation|FROM:P2|GAIN:2
+[54] T54|Player 1 gains $1 from Salvage.
+[55] T55|P4|PAY_FEE:2|TO:P1
+[55] T55|P4|DISC:Become World Famous|FROM:P1|GAIN:2
+[55] T55|Player 1 gains $1 from Salvage.
+[55] T55|P1|REV|S3:Payday
+[56] T56|P0|PAY_FEE:2|TO:P4
+[56] T56|P0|BUY:Language Phrasebook|FROM:P4|COST:4
+[57] T57|Player 1 gains $1 from Salvage.
+[57] T57|P1|ACT:Pandemic / Economic Stimulus
+[57] T57|ROLL_D6:2
+[57] T57|P1|ACT:PANDEMIC_STIMULUS|DELTA:[2,2,2,2,2]
+[58] T58|P2|STEAL:Ticket|SKIP_NEXT
+[58] T58|P2|TICKET_PASSPORT_BONUS|GAIN:1A
+[59] T59|Player 1 gains $1 from Salvage.
+[59] T59|P3|ACT:Identical Twin
+[59] T59|P3|ACT:Identical Twin|GAIN:1|EXTRA_TURN
+[59] T59|P3|REV|S0:Coffee with Airport Employee
+[59] T59|Player 1 gains $1 from Salvage.
+[59] T59|P3|ACT:Payday
+[59] T59|PAYDAY|SALARIES:[2,1,2,1,1]
+[60] T60|P4|PAY_FEE:3|TO:P3
+[60] T60|P4|DISC:Physical Exam|FROM:P3|GAIN:2
+[60] T60|Player 1 gains $1 from Salvage.
+[60] T60|P3|REV|S3:Payday
+[61] T61|P0|PAY_FEE:3|TO:P3
+[61] T61|P0|BUY:Coffee with Airport Employee|FROM:P3|COST:2
+[62] T62|P1|PAY_FEE:4|TO:P3
+[62] T62|P1|DISC:Vehicle Registration Papers|FROM:P3|GAIN:2
+[62] T62|Player 1 gains $1 from Salvage.
+[62] T62|P3|REV|S1:Life Coach
+[62] T62|P3|REV|S2:Payday
+[63] T63|P2|SKIP_TURN
+[64] T64|Player 1 gains $1 from Salvage.
+[64] T64|P3|ACT:Life Coach
+[64] T64|P3|ACT:Life Coach|GAIN_A:1
+[65] T65|Player 1 gains $1 from Salvage.
+[65] T65|P4|ACT:Blacklisted
+[65] T65|P4|ACT:Blacklisted|LOSS:1|KEEP
+[65] T65|P4|REV|S3:Nostalgia
+[66] T66|P0|PAY_FEE:4|TO:P4
+[66] T66|P0|ACT:Lost & Found
+[66] T66|P0|ACT:Lost & Found|TAKE:DOC:Letter of Recommendation|FROM:P3
+[66] T66|P4|REV|S1:Payday
+[66] T66|P4|REV|S2:Camping
+[67] T67|Player 1 gains $1 from Salvage.
+[67] T67|P1|ACT:Payday
+[67] T67|PAYDAY|SALARIES:[2,1,2,1,1]
+[68] T68|Player 1 gains $1 from Salvage.
+[68] T68|P2|ACT:Payday
+[68] T68|PAYDAY|SALARIES:[2,1,2,1,1]
+[68] T68|P2|REV|S0:Reward
+[68] T68|P2|REV|S1:Payday
+[69] T69|Player 1 gains $1 from Salvage.
+[69] T69|P3|ACT:Payday
+[69] T69|PAYDAY|SALARIES:[2,1,2,1,1]
+[70] T70|Player 1 gains $1 from Salvage.
+[70] T70|P4|BLACKLISTED|LOSS:1
+[70] T70|P4|ACT:Nostalgia
+[70] T70|P4|ACT:Nostalgia|GAIN:2
+[71] T71|P0|PAY_FEE:5|TO:P2
+[71] T71|P0|ACT:Reward
+[71] T71|P0|ACT:Reward|DELTA:[5,-1,-1,-1,-1]
+[72] T72|Player 1 gains $1 from Salvage.
+[72] T72|P1|ACT:Payday
+[72] T72|PAYDAY|SALARIES:[2,1,2,1,1]
+[73] T73|Player 1 gains $1 from Salvage.
+[73] T73|P2|ACT:Payday
+[73] T73|PAYDAY|SALARIES:[2,1,2,1,1]
+[74] T74|Player 1 gains $1 from Salvage.
+[74] T74|P3|ACT:Payday
+[74] T74|PAYDAY|SALARIES:[2,1,2,1,1]
+[75] T75|Player 1 gains $1 from Salvage.
+[75] T75|P4|BLACKLISTED|LOSS:1
+[75] T75|P4|ACT:Camping
+[75] T75|P4|ACT:Camping|DELTA:[0,1,1,1,1]
+[76] T76|P0|PAY_FEE:5|TO:P1
+[76] T76|P0|ACT:Fancy Clothes
+[76] T76|P0|ACT:Fancy Clothes|GAIN:3
+[76] T76|P1|REV|S0:Payday
+[77] T77|Player 1 gains $1 from Salvage.
+[77] T77|P1|ACT:Payday
+[77] T77|PAYDAY|SALARIES:[2,1,2,1,1]
+[78] T78|P2|PAY_FEE:3|TO:P0
+[78] T78|Player 1 gains $1 from Salvage.
+[78] T78|P2|ACT:Suspect
+[78] T78|P2|ACT:Suspect|LOSS:1
+[78] T78|P2|ACT:Suspect|DISC:Attend History Class
+[78] T78|Player 1 gains $1 from Salvage.
+[78] T78|P0|REV|S7:Get Engaged to a Native
+[78] T78|P0|REV|S8:Shredder Accident
+[79] T79|P3|PAY_FEE:4|TO:P0
+[79] T79|P3|DISC:Get Engaged to a Native|FROM:P0|GAIN:2
+[79] T79|Player 1 gains $1 from Salvage.
+[80] T80|Player 1 gains $1 from Salvage.
+[80] T80|P4|BLACKLISTED|LOSS:1
+[80] T80|P4|ACT:Payday
+[80] T80|PAYDAY|SALARIES:[2,1,2,1,1]
+[81] T81|P0|PAY_FEE:5|TO:P1
+[81] T81|P0|ACT:Payday
+[81] T81|PAYDAY|SALARIES:[2,1,2,1,1]
+[81] T81|P1|REV|S1:Payday
+[81] T81|P1|REV|S2:Internship in Your Destination
+[82] T82|Player 1 gains $1 from Salvage.
+[82] T82|P1|ACT:Payday
+[82] T82|PAYDAY|SALARIES:[2,1,2,1,1]
+[83] T83|P2|PAY_FEE:4|TO:P1
+[83] T83|P2|DISC:Internship in Your Destination|FROM:P1|GAIN:2
+[83] T83|Player 1 gains $1 from Salvage.
+[84] T84|P3|PAY_FEE:5|TO:P0
+[84] T84|Player 1 gains $1 from Salvage.
+[84] T84|P3|ACT:Shredder Accident
+[84] T84|P3|ACT:Shredder Accident|LOSS:1|NO_DOCS
+[85] T85|P4|PAY_FEE:4|TO:P0
+[85] T85|P4|DISC:Vaccination Record|FROM:P0|GAIN:2
+[85] T85|Player 1 gains $1 from Salvage.
+[85] T85|P4|BLACKLISTED|LOSS:1
+[85] T85|P0|REV|S0:Travel Concierge
+[86] T86|P0|BUY:Travel Concierge|FROM:P0|COST:4
+[87] T87|ROLL_D6:3
+[87] T87|P1|COLLEGE_APP|ROLL:3|TUITION:6|RES:PASS
+[88] T88|ROLL_D6:4
+[88] T88|P2|COLLEGE_APP|ROLL:4|TUITION:6|RES:PASS
+[89] T89|ROLL_D6:2
+[89] T89|P3|COLLEGE_APP|ROLL:2|TUITION:4|RES:PASS
+[90] T90|Player 1 gains $1 from Salvage.
+[90] T90|P4|BLACKLISTED|LOSS:1
+[90] T90|P4|ACT:Payday
+[90] T90|PAYDAY|SALARIES:[2,0,0,0,1]
+[91] T91|ROLL_D6:1
+[91] T91|P0|COLLEGE_APP|ROLL:1|TUITION:2|RES:PASS
+[92] T92|ROLL_D6:1
+[92] T92|P1|GRAD|ROLL:1|RES:PASS|SALARY_INC:1
+[92] T92|ROLL_D6:1
+[92] T92|P1|COLLEGE_APP|ROLL:1|TUITION:4|RES:PASS
+[93] T93|ROLL_D6:5
+[93] T93|P2|GRAD|ROLL:5|RES:FAIL
+[93] T93|ROLL_D6:2
+[93] T93|P2|GRAD|ROLL:2|RES:PASS|SALARY_INC:1
+[93] T93|ROLL_D6:5
+[93] T93|P2|COLLEGE_APP|ROLL:5|TUITION:7|RES:PASS
+[94] T94|ROLL_D6:6
+[94] T94|P3|GRAD|ROLL:6|RES:FAIL
+[94] T94|ROLL_D6:1
+[94] T94|P3|GRAD|ROLL:1|RES:PASS|SALARY_INC:1
+[94] T94|ROLL_D6:2
+[94] T94|P3|COLLEGE_APP|ROLL:2|TUITION:4|RES:PASS
+[95] T95|ROLL_D6:3
+[95] T95|P4|COLLEGE_APP|ROLL:3|TUITION:5|RES:PASS
+[96] T96|ROLL_D6:4
+[96] T96|P0|GRAD|ROLL:4|RES:FAIL
+[96] T96|P0|ACT:Payday
+[96] T96|PAYDAY|SALARIES:[0,0,0,0,0]
+[96] T96|P0|REV|S1:Enter Luxury Travel Club
+[96] T96|P0|REV|S2:Residence Address in Destination
+[97] T97|ROLL_D6:5
+[97] T97|P1|GRAD|ROLL:5|RES:FAIL
+[97] T97|ROLL_D6:3
+[97] T97|P1|GRAD|ROLL:3|RES:PASS|SALARY_INC:3
+[97] T97|P1|PAY_FEE:5|TO:P0
+[97] T97|P1|DISC:Enter Luxury Travel Club|FROM:P0|GAIN:2
+[97] T97|Player 1 gains $1 from Salvage.
+[98] T98|ROLL_D6:3
+[98] T98|P2|GRAD|ROLL:3|RES:PASS|SALARY_INC:3
+[98] T98|P2|PAY_FEE:5|TO:P0
+[98] T98|P2|DISC:Residence Address in Destination|FROM:P0|GAIN:2
+[98] T98|Player 1 gains $1 from Salvage.
+[98] PHASE2_START
+[98] PHASE2|P0|TRADE|$60:+18A|TOTAL_A:21
+[98] PHASE2|P1|TRADE|$12:+4A|PEN_D:-2A|TOTAL_A:7
+[98] PHASE2|P2|TRADE|$8:+2A|PEN_D:-3A|TOTAL_A:4
+[98] PHASE2|P3|TRADE|$7:+2A|PEN_D:-3A|TOTAL_A:3
+[98] T98|Player 1 gains $1 from Salvage.
+[98] T98|P4|BLACKLISTED|LOSS:1
+[98] T98|Player 1 gains $1 from Salvage.
+[98] T98|P4|BLACKLISTED|LOSS:1
+[98] T98|Player 1 gains $1 from Salvage.
+[98] T98|P4|BLACKLISTED|LOSS:1
+[98] PHASE2|P4|TRADE|$7:+2A|3C:+5A|PEN_D:-2A|TOTAL_A:6
+[98] PHASE2|P3|SELECT_LANE:Lane 5|TKN:9
+[98] PHASE2|P3|CROSS:FAIL_LOW_A
+[98] PHASE2|P4|SELECT_LANE:Lane 5|TKN:3
+[98] PHASE2|P4|CROSS:PASS|PAID_A:3|REM_A:3
+[98] PHASE2|P0|SELECT_LANE:Lane 1|TKN:6
+[98] PHASE2|P0|CROSS:PASS|PAID_A:6|REM_A:15
+[98] PHASE2|P1|SELECT_LANE:Lane 1|TKN:7
+[98] PHASE2|P1|CROSS:PASS|PAID_A:7|REM_A:0
+[98] PHASE2|P2|SELECT_LANE:Lane 4|TKN:4
+[98] PHASE2|P2|CROSS:PASS|PAID_A:4|REM_A:0
+[98] GAME_OVER|WINNER: Player 1 (Assurance: 15, Money: $5)
