@@ -385,12 +385,33 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
     let pTickets = player.stash.tickets;
     let pPassports = player.stash.passports;
 
+    // Dynamic metrics for player-count and game progress scaling
+    const playerCount = engine.players.length;
+    const totalStartingLayoutCards = playerCount * 14;
+    const totalLayoutCardsRemaining = engine.players.reduce(
+      (sum, p) => sum + p.layout.filter((l) => l !== null).length,
+      0,
+    );
+    const faceUpLeft = engine.players.reduce(
+      (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+      0,
+    );
+    const layoutProgress = Math.max(
+      0,
+      Math.min(1, 1 - totalLayoutCardsRemaining / totalStartingLayoutCards),
+    );
+    const estimatedTurnsRemaining = totalLayoutCardsRemaining / playerCount;
+
     // Include Frontrunner money (mirrors engine.js Phase 2 calculation)
     const frCard = player.stash.lifeCards.find(
       (lc) => lc.title === "Frontrunner",
     );
     const frMoney = frCard?.money || 0;
     const currentAssurance = destCheck ? destCheck(m + frMoney, d, c) : 0;
+
+    const hasTicketAndPassport = pTickets >= 1 && pPassports >= 1;
+    const readinessScore =
+      (hasTicketAndPassport ? 10 : -20) + (currentAssurance - 6);
 
     const getSmoothedAssurance = (m, d, c) => {
       let score = 0;
@@ -427,12 +448,16 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           // Rule 2: Never activate Payday while in college (salary is $0)
           if (player.inCollege) return -100;
 
-          const netGain = player.salary - move.fee;
-          // Calculate opponent's net gain (they get the fee you pay + $1 stipend)
-          const opponentGain = move.targetId === player.id ? 0 : move.fee + 1;
-          const relativeAdvantage = netGain - opponentGain;
+          const mySalary = player.salary;
+          const netGain = mySalary - move.fee;
+          const opponentsCount = Math.max(1, playerCount - 1);
+          const totalOpponentStipends = opponentsCount * 1;
+          const totalOpponentGain =
+            (move.targetId === player.id ? 0 : move.fee) + totalOpponentStipends;
+          const avgOpponentGain = totalOpponentGain / opponentsCount;
+          const relativeAdvantage = netGain - avgOpponentGain;
 
-          if (netGain <= 0 || relativeAdvantage <= -1) return -100;
+          if (netGain <= 0 || relativeAdvantage < 0) return -100;
 
           // Value money gain via Assurance impact
           const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
@@ -443,9 +468,12 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           );
 
           // Rule 3: Exploiting Payday Asymmetry
-          score = relativeAdvantage * 2 + (assuranceAfter - assuranceNow) * 4;
+          score = relativeAdvantage * 3 + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId === player.id) {
             score += 4; // Bonus for activating own layout (removes a card for free)
+          }
+          if (readinessScore < 0 && move.targetId !== player.id) {
+            score -= 5 * layoutProgress; // Preserve layout if not ready for Phase 2
           }
         } else {
           score = 3 - move.fee;
@@ -467,26 +495,38 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
 
         score += (assuranceAfter - assuranceNow) * 5;
 
-        // Hoarding bonus: reward getting closer to set sizes
+        // Penalty avoidance boost: high incentive to clear destination minRequired missing cards
+        if (
+          isDoc &&
+          destTargets?.d?.minRequired !== undefined &&
+          d < destTargets.d.minRequired
+        ) {
+          score += (destTargets.d.penalty || 2) * 4;
+        }
+        if (
+          isConn &&
+          destTargets?.c?.minRequired !== undefined &&
+          c < destTargets.c.minRequired
+        ) {
+          score += (destTargets.c.penalty || 2) * 4;
+        }
+
+        // Hoarding/Set completion bonus: reward completing or progressing sets
         if (isDoc && destTargets?.d?.setSize > 0) {
           const setSize = destTargets.d.setSize;
-          if ((d + 1) % setSize === 0) score += 5;
+          if ((d + 1) % setSize === 0) score += (destTargets.d.reward || 2) * 2;
         }
         if (isConn && destTargets?.c?.setSize > 0) {
           const setSize = destTargets.c.setSize;
-          if ((c + 1) % setSize === 0) score += 5;
+          if ((c + 1) % setSize === 0) score += (destTargets.c.reward || 2) * 2;
         }
 
-        // Extra value if this doc enables buying a passport
+        // Extra value if this doc enables buying a passport/ticket
         if (isDoc && pPassports < 1 && d === 0) score += 15;
         if (isConn && pTickets < 1 && c === 0) score += 15;
       } else if (move.type === "buyPool") {
         // Rule 1: Mandatory Ticket/Passport Safety Gate
         // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
-        const faceUpLeft = engine.players.reduce(
-          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
-          0,
-        );
         const urgency = 20 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         const isTicket = move.params.cardType === "ticket";
         const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
@@ -496,19 +536,22 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
         } else {
           // Hoarding buy: if AI has money ($4+) and opponents still need this doc type, buy to hoard!
           const otherNeed = engine.players.some(
-            (p) => p.id !== player.id && (isTicket ? p.stash.tickets < 1 : p.stash.passports < 1)
+            (p) =>
+              p.id !== player.id &&
+              (isTicket ? p.stash.tickets < 1 : p.stash.passports < 1),
           );
-          if (player.money >= 4 && otherNeed && ((isTicket && engine.publicServices.tickets > 1) || (!isTicket && engine.publicServices.passports > 1))) {
+          if (
+            player.money >= 4 &&
+            otherNeed &&
+            ((isTicket && engine.publicServices.tickets > 1) ||
+              (!isTicket && engine.publicServices.passports > 1))
+          ) {
             score = 8;
           } else {
             score = -10;
           }
         }
       } else if (move.type === "reclaim") {
-        const faceUpLeft = engine.players.reduce(
-          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
-          0,
-        );
         const urgency = 18 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         if (move.params.cardType === "ticket")
           score = pTickets < 1 ? urgency : -10;
@@ -516,10 +559,6 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
       } else if (move.type === "steal") {
         const isTicket = move.params.cardType === "ticket";
         const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
-        const faceUpLeft = engine.players.reduce(
-          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
-          0,
-        );
         const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
 
         if (!hasDoc) {
@@ -540,28 +579,19 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           score = -10;
         }
       } else if (move.type === "applyCollege") {
-        const faceUpLeft = engine.players.reduce(
-          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
-          0,
-        );
-        const isLateGame =
-          engine.publicServices.tickets <= 1 ||
-          engine.publicServices.passports <= 1 ||
-          faceUpLeft <= 6;
         const maxTuition = (player.startingFund || 6) + 6;
+        const reserveNeeded = maxTuition + Math.ceil(8 / playerCount);
 
-        if (player.money < maxTuition + 2) {
-          score = -100; // Do not apply if it might drain all funds and ruin liquidity
-        } else if (isLateGame) {
-          // Late game: Only apply if we REALLY need the Assurance to cross, and have high money to guarantee passing
-          const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
-          if (assuranceNow < 8 && player.money > maxTuition + 5) {
-            score = 2; // Worth the risk for +2 Assurance upon graduation
-          } else {
-            score = -5; // Too risky/slow for late game otherwise
-          }
+        if (player.money < reserveNeeded) {
+          score = -100; // Do not apply if financial risk is high
+        } else if (estimatedTurnsRemaining < 6) {
+          score = -20; // Not enough turns remaining for salary returns to materialize
         } else {
-          score = 6; // Early game, high money -> good investment for salary and assurance
+          // Scale early-game application score by remaining layout progress and player count factor
+          const earlyBonus = (1 - layoutProgress) * 6;
+          const countFactor = 1 + 2 / playerCount;
+          score = earlyBonus * countFactor;
+          if (currentAssurance < 6) score += 2;
         }
       } else if (move.type === "discard") {
         score = 2 - move.fee;
@@ -604,6 +634,11 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
 
           const disruptBonus = opponentFaceUp <= 3 ? 3 : 2;
           score += disruptBonus + denialBonus;
+
+          // Apply layout preservation penalty if self is not ready for Phase 2
+          if (readinessScore < 0) {
+            score -= 12 * layoutProgress;
+          }
         } else {
           score -= 2;
         }
@@ -632,9 +667,12 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
 
       // Prevent activating opponent's payday if it's a net relative loss
       if (cardType === "payday" && p.id !== player.id) {
-        const netGain = player.salary - fee;
-        const opponentGain = fee + 1; // They get your fee + the $1 stipend
-        if (netGain <= 0 || netGain - opponentGain <= -1) continue;
+        const mySalary = player.inCollege ? 0 : player.salary;
+        const netGain = mySalary - fee;
+        const opponentsCount = Math.max(1, engine.players.length - 1);
+        const totalOpponentGain = fee + opponentsCount; // fee + $1 stipend per opponent
+        const avgOpponentGain = totalOpponentGain / opponentsCount;
+        if (netGain <= 0 || netGain - avgOpponentGain < 0) continue;
       }
 
       for (let i = 0; i < 14; i++) {
@@ -927,11 +965,15 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
         const successProb = successCount / remaining.length;
         const avgToken =
           remaining.reduce((a, b) => a + b, 0) / remaining.length;
+        const minToken = Math.min(...remaining);
+        const minDeficit = Math.max(0, minToken - assurance);
 
         return {
           laneIdx,
           successProb,
           avgToken,
+          minToken,
+          minDeficit,
           remainingCount: remaining.length,
         };
       })
@@ -939,12 +981,20 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
 
     if (laneScores.length === 0) return 0;
 
-    // Sort by: highest success probability first, then lowest average token
+    // Sort:
+    // 1. If any lane has positive success probability, sort by successProb desc, then avgToken asc.
+    // 2. If all lanes have 0 success probability (Assurance < min tokens), sort by minDeficit asc (Upside / "Hail Mary" potential), then avgToken asc.
     laneScores.sort((a, b) => {
-      if (a.successProb !== b.successProb) {
-        return b.successProb - a.successProb; // Higher probability = better
+      if (a.successProb > 0 || b.successProb > 0) {
+        if (a.successProb !== b.successProb) {
+          return b.successProb - a.successProb;
+        }
+        return a.avgToken - b.avgToken;
       }
-      return a.avgToken - b.avgToken; // Lower average token = more forgiving
+      if (a.minDeficit !== b.minDeficit) {
+        return a.minDeficit - b.minDeficit;
+      }
+      return a.avgToken - b.avgToken;
     });
 
     return laneScores[0].laneIdx;
