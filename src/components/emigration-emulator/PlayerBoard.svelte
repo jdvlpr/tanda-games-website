@@ -210,9 +210,9 @@
   {/if}
 
   <!-- 5-Column Stash Display -->
-  <div class="stash-container p-4 rounded-md bg-neutral-100 dark:bg-neutral-900">
+  <div class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-md bg-neutral-50 dark:bg-neutral-950">
     <!-- 1. Documents -->
-    <div class="stash-column">
+    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
       <div class="uppercase tracking-wide text-xs mb-1">Docs ({player.stash.documents.length})</div>
       {#each player.stash.documents as doc, i (doc.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'document' && selectedStash.itemIdx === i}
@@ -233,7 +233,7 @@
     </div>
 
     <!-- 2. Connections -->
-    <div class="stash-column">
+    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
       <div class="uppercase tracking-wide text-xs mb-1">Conns ({player.stash.connections.length})</div>
       {#each player.stash.connections as conn, i (conn.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'connection' && selectedStash.itemIdx === i}
@@ -254,7 +254,7 @@
     </div>
 
     <!-- 3. Tickets -->
-    <div class="stash-column">
+    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
       <div class="uppercase tracking-wide text-xs mb-1">Tickets ({player.stash.tickets})</div>
       {#each Array(player.stash.tickets) as _, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'ticket' && selectedStash.itemIdx === i}
@@ -272,7 +272,7 @@
     </div>
 
     <!-- 4. Passports -->
-    <div class="stash-column">
+    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
       <div class="uppercase tracking-wide text-xs mb-1">Passports ({player.stash.passports})</div>
       {#each Array(player.stash.passports) as _, i}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'passport' && selectedStash.itemIdx === i}
@@ -290,7 +290,7 @@
     </div>
 
     <!-- 5. Kept Life -->
-    <div class="stash-column">
+    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
       <div class="uppercase tracking-wide text-xs mb-1">Life ({player.stash.lifeCards.length})</div>
       {#each player.stash.lifeCards as lc, i (lc.id)}
         {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
@@ -424,12 +424,6 @@
 
 
   /* Stash styles */
-  .stash-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    overflow:auto;
-  }
 
   .stash-column {
     background: rgba(0, 0, 0, 0.2);
