@@ -1,0 +1,1 @@
+1. Modal UI Decision Navigation: There's no way so 'step back' during a decision in a popup modal. For example, when a life card let's you choose a player to target, if you select a player and then are faced with a choice of taking money or documents, there's no way to step back in the UI to select a different player, if for example you change your mind mid-decision.

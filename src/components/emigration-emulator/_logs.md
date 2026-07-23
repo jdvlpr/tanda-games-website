@@ -1,3 +1,5 @@
+The following are logs from playtest games in the Emulator. To decipher the log codes, read the related file `_LOG_CHEAT_SHEET.md`. For a list of issues that need addressing, read `_ISSUES.md`.
+
 [1] INIT|P0|NAT:Russian|DEST:Senegal|$5|FACEUP:[4:Excellent Teamwork,5:Vehicle Registration Papers,6:Employment Contract,11:Persuasion,12:Payday,13:Mental Fog]
 [1] INIT|P1|NAT:English|DEST:Russia|$5|FACEUP:[4:Payday,5:Identical Twin,6:Checklist,11:Payday,12:Payday,13:Network Fair]
 [1] INIT|P2|NAT:Bosnian|DEST:Switzerland|$2|FACEUP:[4:Politician Approves You,5:Background Check,6:Dinner with a Diplomat,11:International Driving Permit,12:Certificate of Excellence,13:Learn from an Elder]
@@ -278,3 +280,178 @@
 [90] PHASE2|P4|SELECT_LANE:Lane 5|TKN:9
 [90] PHASE2|P4|CROSS:FAIL_LOW_A
 [90] GAME_OVER|WINNER: Player 1 (Assurance: 2, Money: $0)
+
+[1] INIT|P0|NAT:Bosnian|DEST:Switzerland|$2|FACEUP:[4:Payday,5:Lost & Found,6:Productivity,11:Payday,12:Physical Exam,13:Payday]
+[1] INIT|P1|NAT:Congolese|DEST:Switzerland|$2|FACEUP:[4:Support Group Motivates You,5:Excellent Teamwork,6:Write Last Will and Testament,11:Language Phrasebook,12:Notebook,13:Payday]
+[1] INIT|P2|NAT:Chinese|DEST:France|$6|FACEUP:[4:Checklist,5:Nostalgia,6:Become World Famous,11:Keep Calm,12:Travel Brochure,13:Listen to the News]
+[1] INIT|P3|NAT:English|DEST:Democratic Republic of Congo|$5|FACEUP:[4:Personality Test,5:Tariffs,6:Video Chat with Person from Destination,11:Bailout,12:Philanthropy,13:Learn from an Elder]
+[1] T1|P0|ACT:Payday
+[1] T1|PAYDAY|SALARIES:[1,1,1,1]
+[1] T1|P0|REV|S7:Boost
+[2] T2|P1|BUY:Notebook|FROM:P1|COST:2
+[3] T3|P2|BUY:Travel Brochure|FROM:P2|COST:2
+[4] T4|P3|BUY:Learn from an Elder|FROM:P3|COST:3
+[4] T4|P3|REV|S10:FOMO
+[5] T5|P0|ACT:Payday
+[5] T5|PAYDAY|SALARIES:[1,1,1,1]
+[5] T5|P0|REV|S10:Background Check
+[6] T6|P1|BUY_POOL:Passport|COST:2
+[7] T7|P2|BUY_POOL:Passport|COST:2
+[8] T8|P3|BUY_POOL:Ticket|COST:2
+[9] T9|P0|ACT:Boost
+[9] T9|P0|ACT:Boost|GAIN:3|FROM_NAT_STARTING:P2
+[10] T10|P1|ACT:Payday
+[10] T10|PAYDAY|SALARIES:[1,1,1,1]
+[10] T10|P1|REV|S9:Payday
+[10] T10|P1|REV|S10:Payday
+[11] T11|P2|BUY:Listen to the News|FROM:P2|COST:2
+[11] T11|P2|REV|S9:Life Coach
+[11] T11|P2|REV|S10:Payday
+[12] T12|P3|SELL:Learn from an Elder|GAIN:2
+[12] T12|P3|PAY_FEE:1|TO:P0
+[12] T12|P3|BUY:Physical Exam|FROM:P0|COST:3
+[12] T12|P0|REV|S8:Camping
+[12] T12|P0|REV|S9:Payday
+[13] T13|P0|BUY:Background Check|FROM:P0|COST:4
+[14] T14|P1|ACT:Payday
+[14] T14|PAYDAY|SALARIES:[1,1,1,1]
+[15] T15|P2|BUY_POOL:Ticket|COST:2
+[15] T15|P2|TICKET_PASSPORT_BONUS|GAIN:1A
+[16] T16|P3|BUY_POOL:Passport|COST:2
+[16] T16|P3|TICKET_PASSPORT_BONUS|GAIN:1A
+[17] T17|P0|ACT:Camping
+[17] T17|P0|ACT:Camping|DELTA:[2,1,0,1]
+[18] T18|P1|ACT:Payday
+[18] T18|PAYDAY|SALARIES:[1,1,1,1]
+[19] T19|P2|PAY_FEE:1|TO:P1
+[19] T19|P2|DISC:Language Phrasebook|FROM:P1|GAIN:2
+[19] T19|P1|REV|S7:Persuasion
+[19] T19|P1|REV|S8:Favorable Cultural Opinion
+[20] T20|P3|PAY_FEE:2|TO:P1
+[20] T20|P3|DISC:Write Last Will and Testament|FROM:P1|GAIN:2
+[20] T20|P1|REV|S3:Friend moves to your Destination
+[21] T21|P0|PAY_FEE:1|TO:P1
+[21] T21|P0|BUY:Friend moves to your Destination|FROM:P1|COST:2
+[22] T22|P1|BUY:Favorable Cultural Opinion|FROM:P1|COST:4
+[23] T23|P2|ACT:Payday
+[23] T23|PAYDAY|SALARIES:[1,1,1,1]
+[24] T24|P3|PAY_FEE:3|TO:P1
+[24] T24|P3|DISC:Excellent Teamwork|FROM:P1|GAIN:2
+[24] T24|P1|REV|S2:Payday
+[25] T25|P0|BUY_POOL:Passport|COST:2
+[26] T26|P1|BUY_POOL:Ticket|COST:2
+[26] T26|P1|TICKET_PASSPORT_BONUS|GAIN:1A
+[27] T27|P2|ACT:Keep Calm
+[27] T27|P2|ACT:Keep Calm|GAIN:1|KEEP
+[27] T27|P2|REV|S7:Shredder Accident
+[27] T27|P2|REV|S8:Internship in Your Destination
+[28] T28|P3|ACT:FOMO
+[28] T28|P3|ACT:FOMO|LOSS:1
+[29] T29|P0|BUY_POOL:Ticket|COST:2
+[29] T29|P0|TICKET_PASSPORT_BONUS|GAIN:1A
+[30] T30|P1|ACT:Payday
+[30] T30|PAYDAY|SALARIES:[1,1,1,1]
+[31] T31|P2|ACT:Life Coach
+[31] T31|P2|ACT:Life Coach|GAIN_A:1
+[32] T32|P3|ACT:Bailout
+[32] T32|P3|ACT:Bailout|DELTA:[0,0,0,2]
+[32] T32|P3|REV|S7:Pay Cut
+[33] T33|P0|ACT:Payday
+[33] T33|PAYDAY|SALARIES:[1,1,1,1]
+[34] T34|P1|PAY_FEE:1|TO:P2
+[34] T34|P1|DISC:Internship in Your Destination|FROM:P2|GAIN:2
+[35] T35|P2|ACT:Shredder Accident
+[35] T35|P2|ACT:Shredder Accident|DISC:Travel Brochure
+[36] T36|P3|PAY_FEE:4|TO:P2
+[36] T36|P3|DISC:Checklist|FROM:P2|GAIN:2
+[36] T36|P2|REV|S0:Endorsement from Royalty
+[37] T37|P0|ACT:Productivity
+[37] T37|P0|ACT:Productivity|GAIN:1|FEE_DEC:1
+[37] T37|P0|REV|S3:Payday
+[38] T38|P1|PAY_FEE:2|TO:P2
+[38] T38|P1|DISC:Endorsement from Royalty|FROM:P2|GAIN:2
+[39] T39|P2|ACT:Nostalgia
+[39] T39|P2|ACT:Nostalgia|GAIN:2
+[39] T39|P2|REV|S1:Subscribe to Travel Updates
+[40] T40|P3|ACT:Philanthropy
+[40] T40|P3|ACT:Philanthropy|DELTA:[0,1,1,-3]
+[40] T40|P3|REV|S8:Residence Address in Destination
+[40] T40|P3|REV|S9:Certificate of Excellence
+[41] T41|P0|PAY_FEE:1|TO:P3
+[41] T41|P0|BUY:Certificate of Excellence|FROM:P3|COST:2
+[42] T42|P1|PAY_FEE:3|TO:P2
+[42] T42|P1|DISC:Subscribe to Travel Updates|FROM:P2|GAIN:2
+[43] T43|P2|PAY_FEE:2|TO:P3
+[43] T43|P2|DISC:Residence Address in Destination|FROM:P3|GAIN:2
+[44] T44|P3|ACT:Tariffs
+[44] T44|P3|ACT:Tariffs|LOSS:1|FEE_INC:1
+[45] T45|P0|ACT:Lost & Found
+[45] T45|P0|ACT:Lost & Found|TAKE:MONEY:2|FROM:P2
+[45] T45|P0|REV|S2:Attend History Class
+[46] T46|P1|ACT:Persuasion
+[46] T46|P1|ACT:Persuasion|GAIN:1|KEEP
+[47] T47|P2|PAY_FEE:3|TO:P3
+[47] T47|P2|DISC:Video Chat with Person from Destination|FROM:P3|GAIN:2
+[47] T47|P3|REV|S2:Payday
+[47] T47|P3|REV|S3:Payday
+[48] T48|P3|ACT:Payday
+[48] T48|PAYDAY|SALARIES:[1,1,1,1]
+[49] T49|P0|BUY:Attend History Class|FROM:P0|COST:4
+[50] T50|P1|PAY_FEE:4|TO:P2
+[50] T50|P1|DISC:Become World Famous|FROM:P2|GAIN:2
+[50] T50|P2|REV|S2:Letter of Recommendation
+[50] T50|P2|REV|S3:Payday
+[51] T51|P2|ACT:Payday
+[51] T51|PAYDAY|SALARIES:[1,1,1,1]
+[52] T52|P3|ACT:Payday
+[52] T52|PAYDAY|SALARIES:[1,1,1,1]
+[53] T53|P0|PERSUASION_DECLINED|FEE:4
+[53] ERR|NO_FUNDS_6
+[53] T53|P0|ACT:Payday
+[53] T53|PAYDAY|SALARIES:[1,1,1,1]
+[54] T54|P1|PAY_FEE:5|TO:P2
+[54] T54|P1|DISC:Letter of Recommendation|FROM:P2|GAIN:2
+[55] T55|P2|PERSUASION_DECLINED|FEE:8
+[55] T55|P2|PAY_FEE:8|TO:P1
+[55] T55|P2|DISC:Support Group Motivates You|FROM:P1|GAIN:2
+[55] T55|P1|REV|S0:Get Engaged to a Native
+[55] T55|P1|REV|S1:Payday
+[56] T56|P3|ACT:Pay Cut
+[56] T56|P3|ACT:Pay Cut|LOSS:1|KEEP
+[57] T57|P0|ACT:Payday
+[57] T57|PAYDAY|SALARIES:[1,1,1,0]
+[57] T57|P0|REV|S0:Payday
+[57] T57|P0|REV|S1:Enter Luxury Travel Club
+[58] T58|P1|ACT:Payday
+[58] T58|PAYDAY|SALARIES:[1,1,1,0]
+[59] T59|P2|PAY_FEE:5|TO:P3
+[59] T59|P2|DISC:Personality Test|FROM:P3|GAIN:2
+[59] T59|P3|REV|S0:Employment Contract
+[59] T59|P3|REV|S1:Share
+[60] T60|P3|PAY_FEE:5|TO:P0
+[60] T60|P3|DISC:Enter Luxury Travel Club|FROM:P0|GAIN:2
+[61] T61|P0|PERSUASION_DECLINED|FEE:4
+[61] T61|P0|PAY_FEE:4|TO:P1
+[61] T61|P0|BUY:Get Engaged to a Native|FROM:P1|COST:4
+[62] T62|P1|PAY_FEE:5|TO:P3
+[62] T62|P1|DISC:Employment Contract|FROM:P3|GAIN:2
+[63] T63|ROLL_D6:1
+[63] T63|P2|COLLEGE_APP|ROLL:1|TUITION:4|RES:PASS
+[64] T64|P3|ACT:Share
+[64] T64|P3|ACT:Share|DELTA:[3,2,2,-7]
+[65] T65|P0|ACT:Payday
+[65] T65|PAYDAY|SALARIES:[1,1,0,0]
+[65] PHASE2_START
+[65] PHASE2|P0|TRADE|$7:+2A|3C:+4A|TOTAL_A:7
+[65] PHASE2|P1|TRADE|$21:+6A|PEN_D:-3A|TOTAL_A:4
+[65] PHASE2|P2|TRADE|$16:+4A|PEN_D:-3A|TOTAL_A:3
+[65] PHASE2|P3|TRADE|$6:+2A|PEN_D:-2A|TOTAL_A:1
+[65] PHASE2|P1|SELECT_LANE:Lane 4|TKN:9
+[65] PHASE2|P1|CROSS:FAIL_LOW_A
+[65] PHASE2|P2|SELECT_LANE:Lane 5|TKN:11
+[65] PHASE2|P2|CROSS:FAIL_LOW_A
+[65] PHASE2|P3|SELECT_LANE:Lane 4|TKN:8
+[65] PHASE2|P3|CROSS:FAIL_LOW_A
+[65] PHASE2|P0|SELECT_LANE:Lane 4|TKN:4
+[65] PHASE2|P0|CROSS:PASS|PAID_A:4|REM_A:3
+[65] GAME_OVER|WINNER: Me (Assurance: 3, Money: $1)
