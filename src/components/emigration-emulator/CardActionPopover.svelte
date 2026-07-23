@@ -34,34 +34,43 @@
     `top:${position.top}px;left:${position.left}px;transform:${position.below ? 'translateX(-50%)' : 'translate(-50%,-100%)'};`
   );
 
-  // ── Global listeners: Escape, scroll-away, outside-click ──────────────────
+  // ── Global listeners: Escape, window resize/scroll, outside-click/touch ───────
   $effect(() => {
-    const onKey    = (e) => { if (e.key === 'Escape') onclose?.(); };
-    const onScroll = ()  => onclose?.();
+    const onKey = (e) => { if (e.key === 'Escape') onclose?.(); };
+    
+    // Only close on window scroll (not bubbling/capturing element scrolls on touch devices)
+    const onWindowScroll = (e) => {
+      if (e.target === window || e.target === document || e.target === document.body) {
+        onclose?.();
+      }
+    };
 
     window.addEventListener('keydown', onKey);
-    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('scroll', onWindowScroll);
+    window.addEventListener('resize', onWindowScroll);
 
-    // Defer outside-click so the opening click doesn't immediately close it.
-    // Crucially: if the click lands on another selectable card (.grid-card or
-    // .stash-item), DON'T close — the card's own onclick has already updated
-    // the selection and we want the popover to snap to the new card instead.
+    // Defer outside-click/touch handler so the opening tap doesn't immediately close it.
     let outsideHandler = null;
     const t = setTimeout(() => {
       outsideHandler = (e) => {
         if (!popoverEl || popoverEl.contains(e.target)) return;
-        // Let card / stash-item clicks through — they update the selection themselves
+        // Let card / stash-item clicks through — they update selection themselves
         if (e.target.closest?.('.grid-card') || e.target.closest?.('.stash-item')) return;
         onclose?.();
       };
+      window.addEventListener('pointerdown', outsideHandler);
       window.addEventListener('click', outsideHandler);
-    }, 0);
+    }, 50);
 
     return () => {
       clearTimeout(t);
       window.removeEventListener('keydown', onKey);
-      window.removeEventListener('scroll', onScroll, true);
-      if (outsideHandler) window.removeEventListener('click', outsideHandler);
+      window.removeEventListener('scroll', onWindowScroll);
+      window.removeEventListener('resize', onWindowScroll);
+      if (outsideHandler) {
+        window.removeEventListener('pointerdown', outsideHandler);
+        window.removeEventListener('click', outsideHandler);
+      }
     };
   });
 </script>

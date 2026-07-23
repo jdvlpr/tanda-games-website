@@ -71,7 +71,7 @@
 {#snippet cardSlot(slotIdx)}
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
-    <div class="w-[90px] h-[110px] mx-2 relative pointer-events-none empty"></div>
+    <div class="w-[66px] sm:w-[90px] shrink-0 h-[110px] mx-1 sm:mx-2 relative pointer-events-none empty"></div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
     {@const isAvail = isAvailable(slotIdx)}
@@ -80,7 +80,7 @@
     
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="w-[90px] h-[110px] mx-2 relative pointer-events-none">
+    <div class="w-[66px] sm:w-[90px] shrink-0 h-[110px] mx-1 sm:mx-2 relative pointer-events-none">
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
@@ -94,7 +94,7 @@
               <Icon icon={c.icon.includes(':') ? c.icon : `game-icons:${c.icon}`} class="size-8" />
             </div>
           {/if}
-          <div class="card-title">{c.name || c.title}</div>
+          <div class="card-title text-xs">{c.name || c.title}</div>
           <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
         {/if}
       </div>
@@ -104,7 +104,7 @@
 
 <div
   bind:this={boardEl}
-  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4 max-lg:scroll-mt-[8rem]", isActive ? "shadow-[0_0_20px_rgba(85,183,176,0.65)]" : "bg-neutral-200 dark:bg-neutral-800 "]}
+  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4 max-lg:scroll-mt-[8rem] bg-neutral-200 dark:bg-neutral-800", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}
 >
   <!-- Player Header Info -->
   <div class="flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm">
@@ -175,7 +175,7 @@
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
   {#if engine && engine.phase === 'preparation'}
-    <div class="bg-neutral-100 dark:bg-neutral-900 p-4 rounded-md mb-4 pb-18">
+    <div class="bg-neutral-100 dark:bg-neutral-900 p-2 sm:p-4 rounded-md mb-4 pb-18 min-h-[320px] max-sm:overflow-x-auto">
       <!-- Row 1 -->
       <div class="layout-row row-1">
         {@render cardSlot(0)}
@@ -407,10 +407,12 @@
     box-shadow: 0 0 5px rgba(85, 183, 176, 0.3);
   }
 
-  .grid-card.available:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 16px rgba(85, 183, 176, 0.5);
-    z-index: 50;
+  @media (hover: hover) {
+    .grid-card.available:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 16px rgba(85, 183, 176, 0.5);
+      z-index: 50;
+    }
   }
 
   .grid-card .card-type {
