@@ -163,7 +163,7 @@
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
   {#if engine && engine.phase === 'preparation'}
-    <div class="bg-neutral-100 dark:bg-neutral-900 p-2 sm:p-4 rounded-md mb-4 pb-18 min-h-[320px] max-sm:overflow-x-auto">
+    <div class="bg-neutral-100 dark:bg-neutral-900 p-2 sm:p-4 rounded-md mb-4 pb-18 sm:min-h-[290px] max-sm:overflow-x-auto">
       <!-- Row 1 -->
       <div class="layout-row row-1">
         {@render cardSlot(0)}
