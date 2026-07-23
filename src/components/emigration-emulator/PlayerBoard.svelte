@@ -31,17 +31,6 @@
     if (onCardSelect) onCardSelect({ type: 'stash', playerIdx: player.id, stashType: type, itemIdx, anchorEl: e.currentTarget });
   }
 
-  // Get color for card type
-  function getCardColor(type) {
-    switch(type) {
-      case 'document': return '#e3a780';
-      case 'connection': return '#d990b4';
-      case 'payday': return '#deede2';
-      case 'life': return '#fefefe';
-      default: return '#fff';
-    }
-  }
-
   function getDestinationInfoText(destName) {
     switch (destName) {
       case "Bosnia and Herzegovina":
@@ -87,15 +76,14 @@
         onclick={(e) => handleLayoutClick(e, slotIdx)}
       >
         {#if slot.faceUp}
-          <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
-          <div class="card-type">{c.type}</div>
+          <p class="text-xs capitalize truncate">{c.type}</p>
           {#if c.icon}
             <div class="flex items-center justify-center my-0.5">
               <Icon icon={c.icon.includes(':') ? c.icon : `game-icons:${c.icon}`} class="size-8" />
             </div>
           {/if}
-          <div class="card-title text-xs">{c.name || c.title}</div>
-          <div class="text-sm">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
+          <div class="text-xs line-clamp-2 break-normal">{c.name || c.title}</div>
+          <div class="text-xs font-bold">{c.cost !== undefined ? `$${c.cost}` : ''}</div>
         {/if}
       </div>
     </div>
@@ -414,22 +402,6 @@
       z-index: 50;
     }
   }
-
-  .grid-card .card-type {
-    font-size: 8px;
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-
-  .grid-card .card-title {
-    font-weight: 700;
-    line-height: 1.25;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-
 
   /* Stash styles */
 

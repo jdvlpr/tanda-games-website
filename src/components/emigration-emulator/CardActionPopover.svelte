@@ -15,6 +15,7 @@
   const POPOVER_W = 192; // ~w-48
   const GAP = 8;
 
+
   let position = $derived.by(() => {
     if (!anchorRect) return { top: 0, left: 0, below: true };
 
@@ -30,49 +31,66 @@
     return { top, left, below };
   });
 
+
   let posStyle = $derived(
     `top:${position.top}px;left:${position.left}px;transform:${position.below ? 'translateX(-50%)' : 'translate(-50%,-100%)'};`
   );
 
   // ── Global listeners: Escape, window resize/scroll, outside-click/touch ───────
-  $effect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onclose?.(); };
-    
-    // Only close on window scroll (not bubbling/capturing element scrolls on touch devices)
-    const onWindowScroll = (e) => {
-      if (e.target === window || e.target === document || e.target === document.body) {
+$effect(() => {
+  const onKey = (e) => { if (e.key === 'Escape') onclose?.(); };
+  
+  // Capture initial scroll position when the effect runs (popover opens)
+  const SCROLL_THRESHOLD = 10;
+  const initialScrollY = window.scrollY;
+  const initialScrollX = window.scrollX;
+
+  // Scroll handler with pixel threshold
+  const onWindowScroll = (e) => {
+    if (e.target === window || e.target === document || e.target === document.body) {
+      const deltaY = Math.abs(window.scrollY - initialScrollY);
+      const deltaX = Math.abs(window.scrollX - initialScrollX);
+
+      if (deltaY > SCROLL_THRESHOLD || deltaX > SCROLL_THRESHOLD) {
         onclose?.();
       }
+    }
+  };
+
+  // Dedicated resize handler (closes immediately without threshold)
+  const onWindowResize = () => {
+    onclose?.();
+  };
+
+  window.addEventListener('keydown', onKey);
+  window.addEventListener('scroll', onWindowScroll, { passive: true });
+  window.addEventListener('resize', onWindowResize, { passive: true });
+
+  // Defer outside-click/touch handler so the opening tap doesn't immediately close it.
+  let outsideHandler = null;
+  const t = setTimeout(() => {
+    outsideHandler = (e) => {
+      if (!popoverEl || popoverEl.contains(e.target)) return;
+      // Let card / stash-item clicks through — they update selection themselves
+      if (e.target.closest?.('.grid-card') || e.target.closest?.('.stash-item')) return;
+      onclose?.();
     };
+    window.addEventListener('pointerdown', outsideHandler);
+    window.addEventListener('click', outsideHandler);
+  }, 50);
 
-    window.addEventListener('keydown', onKey);
-    window.addEventListener('scroll', onWindowScroll);
-    window.addEventListener('resize', onWindowScroll);
+  return () => {
+    clearTimeout(t);
+    window.removeEventListener('keydown', onKey);
+    window.removeEventListener('scroll', onWindowScroll);
+    window.removeEventListener('resize', onWindowResize);
+    if (outsideHandler) {
+      window.removeEventListener('pointerdown', outsideHandler);
+      window.removeEventListener('click', outsideHandler);
+    }
+  };
+});
 
-    // Defer outside-click/touch handler so the opening tap doesn't immediately close it.
-    let outsideHandler = null;
-    const t = setTimeout(() => {
-      outsideHandler = (e) => {
-        if (!popoverEl || popoverEl.contains(e.target)) return;
-        // Let card / stash-item clicks through — they update selection themselves
-        if (e.target.closest?.('.grid-card') || e.target.closest?.('.stash-item')) return;
-        onclose?.();
-      };
-      window.addEventListener('pointerdown', outsideHandler);
-      window.addEventListener('click', outsideHandler);
-    }, 50);
-
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('scroll', onWindowScroll);
-      window.removeEventListener('resize', onWindowScroll);
-      if (outsideHandler) {
-        window.removeEventListener('pointerdown', outsideHandler);
-        window.removeEventListener('click', outsideHandler);
-      }
-    };
-  });
 </script>
 
 {#if anchorRect}

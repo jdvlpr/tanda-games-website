@@ -385,6 +385,7 @@
       return;
     }
 
+    
     selectedAnchorRect = anchorEl ? anchorEl.getBoundingClientRect() : null;
 
     if (rest.type === 'layout') {
@@ -718,7 +719,12 @@
               computerTurn={vsComputer && visualActivePlayerId !== 0}
               autoScrollEnabled={!autoplay}
               hasSelection={!!(selectedSlot || selectedStash)}
-              onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
+              onclearselection={() => { 
+                selectedSlot = null; 
+                selectedStash = null; 
+                selectedAnchorRect = null;
+              }}
+                
               showLog={true}
               {copyTextToClipboard}
             />
