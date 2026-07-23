@@ -16,14 +16,14 @@
   });
 </script>
 
-<div class="bg-neutral-200 dark:bg-neutral-800 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 overflow-auto backdrop-blur-md {showLog ? 'h-full max-h-[calc(100vh-200px)]' : ''}">
+<div class="bg-neutral-200 dark:bg-neutral-800 max-lg:bg-neutral-50/50 max-lg:dark:bg-neutral-950/50 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 overflow-auto backdrop-blur-md max-lg:shadow-2xl {showLog ? 'h-full max-h-[calc(100vh-200px)]' : ''}">
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
-      <h3 class="text-sm uppercase tracking-wider pb-2">Action Dashboard</h3>
+      <h3 class="text-sm uppercase tracking-wider pb-2 max-lg:hidden">Action Dashboard</h3>
       
       <!-- Selection Hint -->
-      <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-3 mb-4 min-h-[44px] flex items-center justify-center text-center gap-2 flex-wrap">
+      <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-2 mb-2 min-h-[44px] flex items-center justify-center text-center gap-2 flex-wrap">
         <span class="flex-1">{@html selectionText}</span>
         {#if hasSelection && onclearselection}
           <button
@@ -35,7 +35,7 @@
 
       <!-- Action States -->
       {#if snapshot.phase === 'game_over'}
-        <div class="bg-red-100 dark:bg-red-900 p-4 rounded-md text-center">
+        <div class="bg-red-100 dark:bg-red-900 p-2 rounded-md text-center">
           <h3 class="mt-0 mb-2 pb-2">Game Over</h3>
           <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
         </div>
@@ -44,7 +44,7 @@
           🤖 Computer is taking its turn…
         </div>
       {:else if snapshot.phase === 'preparation'}
-        <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-wrap gap-2 items-center justify-center">
           {#each actions as action}
             <button 
               class={["btn-sm", action.optional && "", !action.enabled && 'hidden' ]}

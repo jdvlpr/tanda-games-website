@@ -103,13 +103,13 @@
 
 <div
   bind:this={boardEl}
-  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4", isActive ? "shadow-[0_0_20px_rgba(85,183,176,0.65)]" : "bg-neutral-200 dark:bg-neutral-800 "]}
+  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4 max-lg:scroll-mt-[8rem]", isActive ? "shadow-[0_0_20px_rgba(85,183,176,0.65)]" : "bg-neutral-200 dark:bg-neutral-800 "]}
 >
   <!-- Player Header Info -->
   <div class="flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm">
         <div class="flex items-center gap-1 w-fit">
           {#if isActive}
-            <span class=" animate-pulse">▶</span>
+            <span class="text-green-500 animate-pulse">▶</span>
           {/if}
           <p class="text-xl font-bold">{player.name}</p>
         </div>
