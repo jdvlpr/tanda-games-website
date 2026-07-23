@@ -71,7 +71,7 @@
 {#snippet cardSlot(slotIdx)}
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
-    <div class="grid-card-slot empty"></div>
+    <div class="w-[90px] h-[110px] mx-2 relative pointer-events-none empty"></div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
     {@const isAvail = isAvailable(slotIdx)}
@@ -80,7 +80,7 @@
     
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="grid-card-slot">
+    <div class="w-[90px] h-[110px] mx-2 relative pointer-events-none">
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
@@ -342,13 +342,7 @@
   .row-3 { z-index: 30; }
   .row-4 { z-index: 40; }
 
-  .grid-card-slot {
-    width: 90px;
-    height: 110px;
-    margin: 0 8px;
-    position: relative;
-    pointer-events: none;
-  }
+
 
   .grid-card {
     width: 100%;
