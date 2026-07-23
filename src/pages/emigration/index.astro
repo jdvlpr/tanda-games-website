@@ -101,14 +101,14 @@ let printAndPlay = [
                 </svg>
                 Rulebook - 20 pages</a
             >
-        <a href="/emigration/emulator" class="btn">Play in the Emulator</a>
+        <a href="/emigration/emulator" class="btn"><span>&#9654;</span> Play in the Emulator</a>
 
         <div class="inline-flex flex-col gap-2 my-4 items-start">
       <h2 class="font-bold text-2xl">Print & Play Downloads</h2>
 
       <div class="flex flex-col gap-2 items-start">
         {printAndPlay.map((item) => (
-            <a href={FILES_PATH + item.title} download={item.title} class="btn px-2 py-1 font-normal"
+            <a href={FILES_PATH + item.title} download={item.title} class="btn-sm"
                     ><svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

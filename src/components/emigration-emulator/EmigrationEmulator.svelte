@@ -388,15 +388,15 @@
 <div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
-      <h1 class="font-emi-heading  text-center mb-4 text-4xl">Emigration Game Emulator</h1>
-
-      <div class="bg-neutral-200 dark:bg-neutral-800 p-8 rounded-md flex flex-col gap-5">
+      <h1 class="text-center mb-2 text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
+      <a href="/emigration" class="underline">← Back to the Game Page</a>
+      <div class="bg-neutral-200 shadow-lg dark:bg-neutral-800 p-2 lg:p-4 rounded-md flex flex-col gap-5 mt-4">
         <div class="flex flex-col items-center gap-2">
           <p>Game Mode</p>
          
           <div class="flex justify-center">
-            <button class="btn-sm rounded-r-none border-r-0 {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class=" btn-sm rounded-l-none {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+            <button class="btn-sm rounded-r-none border-r-0 {mode === 'competitive' && 'bg-teal-100 dark:bg-teal-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class=" btn-sm rounded-l-none {mode === 'cooperative' && 'bg-teal-100 dark:bg-teal-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
           </div>
         </div>
 
@@ -436,7 +436,7 @@
           <div class="flex flex-wrap justify-center gap-2">
             {#each PACKS_LIST as pack}
               <button
-                class="btn-sm {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {selectedPacks.includes(pack) ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
                 onclick={() => {
                   if (selectedPacks.includes(pack)) {
                     selectedPacks = selectedPacks.filter(p => p !== pack);
@@ -458,19 +458,19 @@
           <p class="">Player Type</p>
           <div class="flex justify-center">
               <button
-                class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
                 onclick={() => gameType = 'vscomputer'}
               >
                 Solo
               </button>
               <button
-                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
                 onclick={() => gameType = 'passplay'}
               >
                 Multi
               </button>
               <button
-                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
                 onclick={() => gameType = 'auto'}
               >
                AI vs AI
@@ -483,7 +483,7 @@
           <div class="flex justify-center">
             {#each ['easy', 'normal', 'expert'] as diff, i}
               <button
-                class={["btn-sm", aiDifficulty === diff && 'bg-green-100 dark:bg-green-900', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
+                class={["btn-sm", aiDifficulty === diff && 'bg-teal-100 dark:bg-teal-900', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
                 onclick={() => aiDifficulty = diff}
               >
                 {diff.charAt(0).toUpperCase() + diff.slice(1)}
