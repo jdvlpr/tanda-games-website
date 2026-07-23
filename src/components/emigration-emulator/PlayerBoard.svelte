@@ -80,10 +80,11 @@
     
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="grid-card-slot" onclick={() => handleLayoutClick(slotIdx)}>
+    <div class="grid-card-slot">
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
+        onclick={() => handleLayoutClick(slotIdx)}
       >
         {#if slot.faceUp}
           <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
@@ -321,6 +322,7 @@
     position: relative;
     width: 100%;
     height: 50px; /* Creates vertical overlap */
+    pointer-events: none;
   }
 
   .row-1 { z-index: 10; }
@@ -333,6 +335,7 @@
     height: 110px;
     margin: 0 8px;
     position: relative;
+    pointer-events: none;
   }
 
   .grid-card {
@@ -347,6 +350,14 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
     position: relative;
+    z-index: 1;
+    user-select: none;
+    pointer-events: auto;
+  }
+
+  .grid-card * {
+    cursor: pointer;
+    pointer-events: none;
   }
 
   .grid-card.back {
