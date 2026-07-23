@@ -455,7 +455,7 @@
         
 
         <div class="flex flex-col gap-3">
-          <p class="">Players</p>
+          <p class="">Player Type</p>
           <div class="flex justify-center">
               <button
                 class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
