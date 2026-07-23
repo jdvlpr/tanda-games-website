@@ -181,7 +181,25 @@
     // If there is a pending choice specifically targeted at the human player (player 0),
     // we must pause AI turns so the human player can answer via the modal.
     if (pendingChoice && pendingChoice.playerIdx === 0) return;
-    
+
+    // If there is a pending choice directed at an AI player during the human's turn
+    // (e.g. persuasion-offer fired when the human targets an AI's layout), resolve it
+    // immediately without playing a full AI turn — then let the effect re-run.
+    if (pendingChoice && pendingChoice.playerIdx !== 0) {
+      aiThinking = true;
+      setTimeout(() => {
+        if (!engine || engine.phase === 'game_over') { aiThinking = false; return; }
+        let safety = 0;
+        while (engine.pendingChoice && safety < 20) {
+          if (engine.pendingChoice.playerIdx === 0) break;
+          aiPlayer.resolveChoice();
+          safety++;
+        }
+        aiThinking = false;
+      }, 500);
+      return;
+    }
+
     if (isHumanTurn) return;
 
     aiThinking = true;

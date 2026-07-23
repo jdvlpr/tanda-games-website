@@ -1794,7 +1794,7 @@ export default class EmigrationEngine {
     this._setPendingChoice({
       id: "persuasion-offer",
       playerIdx: target.id,
-      title: `${target.name}: You have Persuasion — offer it to ${player.name} instead of the targeted card?`,
+      title: `${target.name}: You have Persuasion — offer it to ${player.name} instead of "${target.layout[slotIdx]?.card?.name ?? target.layout[slotIdx]?.card?.title ?? "the targeted card"}"?`,
       cancellable: false,
       options: [
         { text: `Yes — offer Persuasion to ${player.name}`, value: "offer" },
