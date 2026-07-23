@@ -1499,19 +1499,32 @@ export default class EmigrationEngine {
       title: choice.title,
       options: choice.options,
       cancellable: choice.cancellable !== false,
+      canGoBack: !!choice.onBack,
       // playerIdx: the id of the player who must make this decision.
       // Defaults to the current acting player. Persuasion uses this
       // to hand the interrupt to the layout owner (target), not the actor.
       playerIdx: choice.playerIdx ?? this.currentPlayerIdx,
     };
     this._pendingResolve = choice.resolve;
+    this._onBack = choice.onBack || null;
     this._notify();
+  }
+
+  stepBackChoice() {
+    if (this.pendingChoice && this._onBack) {
+      const backFn = this._onBack;
+      this.pendingChoice = null;
+      this._pendingResolve = null;
+      this._onBack = null;
+      backFn();
+    }
   }
 
   resolveChoice(value) {
     if (!this._pendingResolve) return;
     const resolve = this._pendingResolve;
     this._pendingResolve = null;
+    this._onBack = null;
     this.pendingChoice = null;
     this._backup = null;
     resolve(value);
@@ -1791,6 +1804,7 @@ export default class EmigrationEngine {
     // Step 1: Ask the layout OWNER (target) if they want to offer Persuasion.
     // playerIdx is set to target.id so the UI / AI loop knows this interrupt
     // belongs to target, not to the acting player.
+    const doubleFee = baseFee * 2;
     this._setPendingChoice({
       id: "persuasion-offer",
       playerIdx: target.id,
@@ -1807,53 +1821,62 @@ export default class EmigrationEngine {
         }
         // Step 2: Ask the ACTING player (player) if they accept.
         // playerIdx is set to player.id so the UI knows to show this to them.
-        this._setPendingChoice({
-          id: "persuasion-accept",
-          playerIdx: player.id,
-          title: `${player.name}: Accept Persuasion from ${target.name}, or decline and pay double Access Fee?`,
-          cancellable: false,
-          options: [
-            {
-              text: `Accept Persuasion (pay $${baseFee} Access Fee)`,
-              value: "accept",
-            },
-            {
-              text: `Decline (pay double: $${baseFee * 2} Access Fee) and take the card`,
-              value: "decline",
-            },
-          ],
-          resolve: (buyerVal) => {
-            if (buyerVal === "accept") {
-              if (player.money < baseFee) {
-                this.log(`ERR|NO_FUNDS_${baseFee}`, "error");
-                return;
+        const canAffordDouble = player.money >= doubleFee;
+        const promptBuyer = () => {
+          this._setPendingChoice({
+            id: "persuasion-accept",
+            playerIdx: player.id,
+            title: `${player.name}: Accept Persuasion from ${target.name}, or decline and pay double Access Fee?`,
+            cancellable: false,
+            onBack: () => this._handlePersuasion(player, target, slotIdx, baseFee, callback),
+            options: [
+              {
+                text: `Accept Persuasion (pay $${baseFee} Access Fee)`,
+                value: "accept",
+              },
+              {
+                text: canAffordDouble
+                  ? `Decline (pay double: $${doubleFee} Access Fee) and take the card`
+                  : `Decline (Requires $${doubleFee} Access Fee - insufficient funds)`,
+                value: "decline",
+                disabled: !canAffordDouble,
+              },
+            ],
+            resolve: (buyerVal) => {
+              if (buyerVal === "accept") {
+                if (player.money < baseFee) {
+                  this.log(`ERR|NO_FUNDS_${baseFee}`, "error");
+                  promptBuyer();
+                  return;
+                }
+                this._payAccessFee(player, target, baseFee);
+                const persIdx = target.stash.lifeCards.findIndex(
+                  (lc) => lc.title === "Persuasion",
+                );
+                const [persCard] = target.stash.lifeCards.splice(persIdx, 1);
+                player.stash.lifeCards.push(persCard);
+                this.log(
+                  `P${player.id}|PERSUASION_ACC|FROM:P${target.id}`,
+                  "action",
+                );
+                this._onPlayerGainLifeCard(player);
+                this.advanceTurn();
+              } else {
+                if (player.money < doubleFee) {
+                  this.log(`ERR|NO_FUNDS_${doubleFee}`, "error");
+                  promptBuyer();
+                  return;
+                }
+                this.log(
+                  `P${player.id}|PERSUASION_DECLINED|FEE:${doubleFee}`,
+                  "action",
+                );
+                callback(doubleFee);
               }
-              this._payAccessFee(player, target, baseFee);
-              const persIdx = target.stash.lifeCards.findIndex(
-                (lc) => lc.title === "Persuasion",
-              );
-              const [persCard] = target.stash.lifeCards.splice(persIdx, 1);
-              player.stash.lifeCards.push(persCard);
-              this.log(
-                `P${player.id}|PERSUASION_ACC|FROM:P${target.id}`,
-                "action",
-              );
-              this._onPlayerGainLifeCard(player);
-              this.advanceTurn();
-            } else {
-              const doubleFee = baseFee * 2;
-              if (player.money < doubleFee) {
-                this.log(`ERR|NO_FUNDS_${doubleFee}`, "error");
-                return;
-              }
-              this.log(
-                `P${player.id}|PERSUASION_DECLINED|FEE:${doubleFee}`,
-                "action",
-              );
-              callback(doubleFee);
-            }
-          },
-        });
+            },
+          });
+        };
+        promptBuyer();
       },
     });
   }
@@ -2075,77 +2098,86 @@ export default class EmigrationEngine {
         done();
         break;
 
-      case "Social Butterfly":
-        this._promptTargetPlayer(
-          player,
-          "Social Butterfly: choose target",
-          (targetId) => {
-            const target = this.players[targetId];
-            const options = [];
-            if (target.stash.connections.length > 0)
+      case "Social Butterfly": {
+        const promptTarget = () => {
+          this._promptTargetPlayer(
+            player,
+            "Social Butterfly: choose target",
+            (targetId) => {
+              const target = this.players[targetId];
+              const options = [];
+              if (target.stash.connections.length > 0)
+                options.push({
+                  text: `Take 1 Connection from ${target.name}`,
+                  value: "conn",
+                });
               options.push({
-                text: `Take 1 Connection from ${target.name}`,
-                value: "conn",
+                text: `Take up to $3 from ${target.name}`,
+                value: "money",
               });
-            options.push({
-              text: `Take up to $3 from ${target.name}`,
-              value: "money",
-            });
 
-            if (options.length === 1 && options[0].value === "money") {
-              const stolen = Math.min(3, target.money);
-              target.money -= stolen;
-              player.money += stolen;
-              this.log(
-                `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
-                "action",
-              );
-              done();
-              return;
-            }
+              if (options.length === 1 && options[0].value === "money") {
+                const stolen = Math.min(3, target.money);
+                target.money -= stolen;
+                player.money += stolen;
+                this.log(
+                  `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
+                  "action",
+                );
+                done();
+                return;
+              }
 
-            this._setPendingChoice({
-              id: "social-butterfly-choice",
-              title: "Social Butterfly: take Connection or Money?",
-              options,
-              resolve: (val) => {
-                if (val === "conn") {
-                  this._setPendingChoice({
-                    id: "social-butterfly-conn",
-                    title: "Choose Connection to take",
-                    options: target.stash.connections.map((c, i) => ({
-                      text: `${c.name} ($${c.cost})`,
-                      value: String(i),
-                    })),
-                    resolve: (connIdx) => {
-                      const [taken] = target.stash.connections.splice(
-                        parseInt(connIdx),
-                        1,
-                      );
-                      player.stash.connections.push(taken);
+              const promptChoice = () => {
+                this._setPendingChoice({
+                  id: "social-butterfly-choice",
+                  title: "Social Butterfly: take Connection or Money?",
+                  options,
+                  onBack: promptTarget,
+                  resolve: (val) => {
+                    if (val === "conn") {
+                      this._setPendingChoice({
+                        id: "social-butterfly-conn",
+                        title: "Choose Connection to take",
+                        options: target.stash.connections.map((c, i) => ({
+                          text: `${c.name} ($${c.cost})`,
+                          value: String(i),
+                        })),
+                        onBack: promptChoice,
+                        resolve: (connIdx) => {
+                          const [taken] = target.stash.connections.splice(
+                            parseInt(connIdx),
+                            1,
+                          );
+                          player.stash.connections.push(taken);
+                          this.log(
+                            `P${player.id}|ACT:Social Butterfly|TAKE:CONN:${taken.name}|FROM:P${target.id}`,
+                            "action",
+                          );
+                          this._onPlayerGainConnection(player);
+                          done();
+                        },
+                      });
+                    } else {
+                      const stolen = Math.min(3, target.money);
+                      target.money -= stolen;
+                      player.money += stolen;
                       this.log(
-                        `P${player.id}|ACT:Social Butterfly|TAKE:CONN:${taken.name}|FROM:P${target.id}`,
+                        `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
                         "action",
                       );
-                      this._onPlayerGainConnection(player);
                       done();
-                    },
-                  });
-                } else {
-                  const stolen = Math.min(3, target.money);
-                  target.money -= stolen;
-                  player.money += stolen;
-                  this.log(
-                    `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
-                    "action",
-                  );
-                  done();
-                }
-              },
-            });
-          },
-        );
+                    }
+                  },
+                });
+              };
+              promptChoice();
+            },
+          );
+        };
+        promptTarget();
         break;
+      }
 
       case "Identical Twin":
         player.money += 1;
@@ -2429,62 +2461,71 @@ export default class EmigrationEngine {
         break;
       }
 
-      case "Lost & Found":
-        this._promptTargetPlayer(
-          player,
-          "Lost & Found: choose target",
-          (targetId) => {
-            const target = this.players[targetId];
-            const opts = [];
-            if (target.stash.documents.length > 0)
-              opts.push({
-                text: `Take 1 Document from ${target.name}`,
-                value: "doc",
-              });
-            opts.push({ text: `Take $2 from ${target.name}`, value: "money" });
+      case "Lost & Found": {
+        const promptTarget = () => {
+          this._promptTargetPlayer(
+            player,
+            "Lost & Found: choose target",
+            (targetId) => {
+              const target = this.players[targetId];
+              const opts = [];
+              if (target.stash.documents.length > 0)
+                opts.push({
+                  text: `Take 1 Document from ${target.name}`,
+                  value: "doc",
+                });
+              opts.push({ text: `Take $2 from ${target.name}`, value: "money" });
 
-            this._setPendingChoice({
-              id: "lost-found-choice",
-              title: "Lost & Found: Document or Money?",
-              options: opts,
-              resolve: (val) => {
-                if (val === "doc") {
-                  this._setPendingChoice({
-                    id: "lost-found-doc",
-                    title: "Select Document",
-                    options: target.stash.documents.map((c, i) => ({
-                      text: c.name,
-                      value: String(i),
-                    })),
-                    resolve: (idx) => {
-                      const [taken] = target.stash.documents.splice(
-                        parseInt(idx),
-                        1,
-                      );
-                      player.stash.documents.push(taken);
+              const promptChoice = () => {
+                this._setPendingChoice({
+                  id: "lost-found-choice",
+                  title: "Lost & Found: Document or Money?",
+                  options: opts,
+                  onBack: promptTarget,
+                  resolve: (val) => {
+                    if (val === "doc") {
+                      this._setPendingChoice({
+                        id: "lost-found-doc",
+                        title: "Select Document",
+                        options: target.stash.documents.map((c, i) => ({
+                          text: c.name,
+                          value: String(i),
+                        })),
+                        onBack: promptChoice,
+                        resolve: (idx) => {
+                          const [taken] = target.stash.documents.splice(
+                            parseInt(idx),
+                            1,
+                          );
+                          player.stash.documents.push(taken);
+                          this.log(
+                            `P${player.id}|ACT:Lost & Found|TAKE:DOC:${taken.name}|FROM:P${target.id}`,
+                            "action",
+                          );
+                          this._onPlayerGainDocument(player);
+                          done();
+                        },
+                      });
+                    } else {
+                      const stolen = Math.min(2, target.money);
+                      target.money -= stolen;
+                      player.money += stolen;
                       this.log(
-                        `P${player.id}|ACT:Lost & Found|TAKE:DOC:${taken.name}|FROM:P${target.id}`,
+                        `P${player.id}|ACT:Lost & Found|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
                         "action",
                       );
-                      this._onPlayerGainDocument(player);
                       done();
-                    },
-                  });
-                } else {
-                  const stolen = Math.min(2, target.money);
-                  target.money -= stolen;
-                  player.money += stolen;
-                  this.log(
-                    `P${player.id}|ACT:Lost & Found|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
-                    "action",
-                  );
-                  done();
-                }
-              },
-            });
-          },
-        );
+                    }
+                  },
+                });
+              };
+              promptChoice();
+            },
+          );
+        };
+        promptTarget();
         break;
+      }
 
       // ── News ──
       case "Pandemic / Economic Stimulus": {

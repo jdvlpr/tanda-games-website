@@ -488,11 +488,21 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           0,
         );
         const urgency = 20 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+        const isTicket = move.params.cardType === "ticket";
+        const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
 
-        if (move.params.cardType === "ticket") {
-          score = pTickets < 1 ? urgency : -10;
+        if (!hasDoc) {
+          score = urgency;
         } else {
-          score = pPassports < 1 ? urgency : -10;
+          // Hoarding buy: if AI has money ($4+) and opponents still need this doc type, buy to hoard!
+          const otherNeed = engine.players.some(
+            (p) => p.id !== player.id && (isTicket ? p.stash.tickets < 1 : p.stash.passports < 1)
+          );
+          if (player.money >= 4 && otherNeed && ((isTicket && engine.publicServices.tickets > 1) || (!isTicket && engine.publicServices.passports > 1))) {
+            score = 8;
+          } else {
+            score = -10;
+          }
         }
       } else if (move.type === "reclaim") {
         const faceUpLeft = engine.players.reduce(
@@ -504,31 +514,30 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           score = pTickets < 1 ? urgency : -10;
         else score = pPassports < 1 ? urgency : -10;
       } else if (move.type === "steal") {
-        if (player.money >= 2) {
-          score = -100; // Punish stealing heavily if the AI can afford to buyPool, to avoid wasting a turn.
-        } else {
-          score = -5;
-          const faceUpLeft = engine.players.reduce(
-            (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
-            0,
-          );
-          const urgency =
-            15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
-          if (move.params.cardType === "ticket" && pTickets < 1)
-            score += urgency;
-          if (move.params.cardType === "passport" && pPassports < 1)
-            score += urgency;
-          // Hoarding steal: score based on number of opponents who still need this doc type.
-          if (move.isHoardingMove) {
-            const opponentsDeprived = engine.players.filter(
-              (p) =>
-                p.id !== player.id &&
-                ((move.params.cardType === "ticket" && p.stash.tickets < 1) ||
-                  (move.params.cardType === "passport" &&
-                    p.stash.passports < 1)),
-            ).length;
-            score += opponentsDeprived * 3 - 3;
+        const isTicket = move.params.cardType === "ticket";
+        const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
+        const faceUpLeft = engine.players.reduce(
+          (sum, p) => sum + p.layout.filter((l) => l && l.faceUp).length,
+          0,
+        );
+        const urgency = 15 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+
+        if (!hasDoc) {
+          if (player.money >= 2) {
+            score = -50; // Prefer buyPool if affordable
+          } else {
+            score = urgency;
           }
+        } else if (move.isHoardingMove) {
+          const opponentsDeprived = engine.players.filter(
+            (p) =>
+              p.id !== player.id &&
+              ((isTicket && p.stash.tickets < 1) ||
+                (!isTicket && p.stash.passports < 1)),
+          ).length;
+          score = 5 + opponentsDeprived * 3;
+        } else {
+          score = -10;
         }
       } else if (move.type === "applyCollege") {
         const faceUpLeft = engine.players.reduce(
@@ -865,6 +874,23 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
       return;
     }
 
+    // Target player selection heuristic (e.g. for Swap Wallets, Social Butterfly, Lost & Found)
+    if (id === "select-player" && opts.length > 0) {
+      const title = choice.title || "";
+      let sortedOpts = [...opts];
+      if (title.includes("Swap Wallets")) {
+        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+      } else if (title.includes("Social Butterfly")) {
+        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.stash.connections.length || 0) - (engine.players[parseInt(a.value)]?.stash.connections.length || 0) || (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+      } else if (title.includes("Lost & Found")) {
+        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.stash.documents.length || 0) - (engine.players[parseInt(a.value)]?.stash.documents.length || 0) || (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+      } else {
+        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+      }
+      engine.resolveChoice(sortedOpts[0].value);
+      return;
+    }
+
     // Default: pick first option
     if (opts.length > 0) {
       engine.resolveChoice(opts[0].value);
@@ -949,12 +975,6 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
 
     const player = engine.players[engine.currentPlayerIdx];
 
-    // Optional: try to graduate if in college
-    if (player.inCollege) {
-      engine.executeOptionalAction("graduate");
-    }
-
-    // Optional: sell a card from stash if low on money (e.g. to afford access fee or tickets)
     // Optional: try to graduate if in college
     if (player.inCollege) {
       engine.executeOptionalAction("graduate");

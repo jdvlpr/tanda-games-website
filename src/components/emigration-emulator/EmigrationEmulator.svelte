@@ -701,6 +701,9 @@
         oncancel={() => {
           if (engine) engine.cancelPendingChoice();
         }}
+        onback={() => {
+          if (engine) engine.stepBackChoice();
+        }}
       />
     </div>
   {/if}
