@@ -20,15 +20,15 @@
     return engine.isCardAvailable(player, slotIdx);
   }
 
-  function handleLayoutClick(slotIdx) {
+  function handleLayoutClick(e, slotIdx) {
     if (!engine || engine.phase !== 'preparation') return;
     if (!isAvailable(slotIdx)) return;
-    if (onCardSelect) onCardSelect({ type: 'layout', playerIdx: player.id, slotIdx });
+    if (onCardSelect) onCardSelect({ type: 'layout', playerIdx: player.id, slotIdx, anchorEl: e.currentTarget });
   }
 
-  function handleStashClick(type, itemIdx) {
+  function handleStashClick(e, type, itemIdx) {
     if (!engine || engine.phase !== 'preparation') return;
-    if (onCardSelect) onCardSelect({ type: 'stash', playerIdx: player.id, stashType: type, itemIdx });
+    if (onCardSelect) onCardSelect({ type: 'stash', playerIdx: player.id, stashType: type, itemIdx, anchorEl: e.currentTarget });
   }
 
   // Get color for card type
@@ -84,7 +84,7 @@
       <div 
         class="grid-card border rounded-md shadow-md {slot.faceUp ? 'bg-neutral-100 dark:bg-neutral-900' : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp ? c.type : ''} {isCov ? 'covered' : ''} {isAvail ? 'available' : ''} {isSelected ? 'selected' : ''}"
         style={isSelected ? 'box-shadow: 0 0 10px rgba(85, 183, 176, 0.8) !important;' : ''}
-        onclick={() => handleLayoutClick(slotIdx)}
+        onclick={(e) => handleLayoutClick(e, slotIdx)}
       >
         {#if slot.faceUp}
           <div class="h-2 w-full border rounded-md" style="background:{getCardColor(c.type)}"></div>
@@ -221,7 +221,7 @@
         <div 
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-document);" 
-          onclick={() => handleStashClick('document', i)}
+          onclick={(e) => handleStashClick(e, 'document', i)}
         >
           {#if doc.icon}
             <Icon icon={doc.icon.includes(':') ? doc.icon : `game-icons:${doc.icon}`} class="size-4 shrink-0" />
@@ -242,7 +242,7 @@
         <div 
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-connection);" 
-          onclick={() => handleStashClick('connection', i)}
+          onclick={(e) => handleStashClick(e, 'connection', i)}
         >
           {#if conn.icon}
             <Icon icon={conn.icon.includes(':') ? conn.icon : `game-icons:${conn.icon}`} class="size-4 shrink-0" />
@@ -263,7 +263,7 @@
         <div 
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-ticket);" 
-          onclick={() => handleStashClick('ticket', i)}
+          onclick={(e) => handleStashClick(e, 'ticket', i)}
         >
           <Icon icon="game-icons:ticket" class="size-4 shrink-0" />
           <span>Ticket</span>
@@ -281,7 +281,7 @@
         <div 
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-passport);" 
-          onclick={() => handleStashClick('passport', i)}
+          onclick={(e) => handleStashClick(e, 'passport', i)}
         >
           <Icon icon="game-icons:passport" class="size-4 shrink-0" />
           <span>Passport</span>
@@ -299,7 +299,7 @@
         <div 
           class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
           style="border-left: 2.5px solid var(--color-emi-life);" 
-          onclick={() => handleStashClick('lifeCard', i)}
+          onclick={(e) => handleStashClick(e, 'lifeCard', i)}
         >
           {#if lc.icon}
             <Icon icon={lc.icon.includes(':') ? lc.icon : `game-icons:${lc.icon}`} class="size-4 shrink-0" />

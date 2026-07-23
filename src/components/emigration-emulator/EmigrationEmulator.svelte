@@ -1,6 +1,7 @@
 <script>
   import Icon from '@iconify/svelte';
   import ActionPanel from './ActionPanel.svelte';
+  import CardActionPopover from './CardActionPopover.svelte';
   import { createAutoPlayer } from './autoplay.js';
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.js';
   import GameLogSheet from './GameLogSheet.svelte';
@@ -69,6 +70,7 @@
   // Selection State
   let selectedSlot = $state(null);
   let selectedStash = $state(null);
+  let selectedAnchorRect = $state(null);
 
   function getLifeCardDescription(title) {
     return LIFE_CARD_DEFINITIONS.find((card) => card.title === title)?.description ?? '';
@@ -141,6 +143,39 @@
       return allowed ? action : { ...action, enabled: false };
     });
   });
+
+  // ── Action splitting ─────────────────────────────────────────────────────
+  // Card-specific actions → live in the popover
+  const POPOVER_ACTION_TYPES = new Set(['buy', 'discard', 'activate', 'sell', 'reclaim']);
+  // Also exclude 'steal' from the dashboard — it already has dedicated buttons in Public Resources
+  const DASHBOARD_EXCLUDED_TYPES = new Set(['buy', 'discard', 'activate', 'sell', 'reclaim', 'steal']);
+
+  let popoverActions    = $derived(filteredActions.filter(a => POPOVER_ACTION_TYPES.has(a.type)));
+  let dashboardActions  = $derived(filteredActions.filter(a => !DASHBOARD_EXCLUDED_TYPES.has(a.type)));
+
+  let popoverDescription = $derived.by(() => {
+    if (!snapshot) return '';
+    if (selectedSlot) {
+      const p = snapshot.players[selectedSlot.playerIdx];
+      const card = p?.layout[selectedSlot.slotIdx]?.card;
+      if (card && card.type === 'life') {
+        return getLifeCardDescription(card.name || card.title || '');
+      }
+    }
+    if (selectedStash) {
+      const p = snapshot.players[selectedStash.playerIdx];
+      const { stashType: t, itemIdx: i } = selectedStash;
+      if (t === 'lifeCard') {
+        const card = p?.stash.lifeCards[i];
+        return getLifeCardDescription(card?.title || '');
+      }
+    }
+    return '';
+  });
+
+  let showPopover = $derived(
+    !!(selectedAnchorRect && (selectedSlot || selectedStash) && snapshot?.phase === 'preparation')
+  );
 
   let actualActivePlayerId = $derived(snapshot ? (snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx)) : 0);
   let visualActivePlayerId = $state(0);
@@ -236,14 +271,7 @@
       const slot = targetPlayer?.layout[selectedSlot.slotIdx];
       if (slot && slot.card) {
         const cardName = slot.card.name || slot.card.title || '';
-        let text = `Selected Card: <span class=" font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
-        if (slot.card.type === 'life') {
-          const desc = getLifeCardDescription(cardName);
-          if (desc) {
-            text += `<br/><span class=" font-normal text-sm mt-1.5 block">${desc}</span>`;
-          }
-        }
-        return text;
+        return `Selected Card: <span class=" font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
       }
     }
     if (selectedStash) {
@@ -258,12 +286,6 @@
       else if (type === 'lifeCard') {
         const card = targetPlayer?.stash.lifeCards[i];
         cardName = card?.title || "";
-        let text = `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
-        const desc = getLifeCardDescription(cardName);
-        if (desc) {
-          text += `<br/><span class=" font-normal text-xs mt-1.5 block">${desc}</span>`;
-        }
-        return text;
       }
       
       return `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
@@ -293,6 +315,7 @@
         }
         selectedSlot = null;
         selectedStash = null;
+        selectedAnchorRect = null;
       }
     });
 
@@ -347,11 +370,28 @@
   }
 
   function handleCardSelect(selection) {
-    if (selection.type === 'layout') {
-      selectedSlot = selection;
+    const { anchorEl, ...rest } = selection;
+
+    // Toggle off if clicking the currently selected card
+    const isSameSlot = selectedSlot && rest.type === 'layout' && 
+      selectedSlot.playerIdx === rest.playerIdx && selectedSlot.slotIdx === rest.slotIdx;
+    const isSameStash = selectedStash && rest.type === 'stash' && 
+      selectedStash.playerIdx === rest.playerIdx && selectedStash.stashType === rest.stashType && selectedStash.itemIdx === rest.itemIdx;
+
+    if (isSameSlot || isSameStash) {
+      selectedSlot = null;
       selectedStash = null;
-    } else if (selection.type === 'stash') {
-      selectedStash = selection;
+      selectedAnchorRect = null;
+      return;
+    }
+
+    selectedAnchorRect = anchorEl ? anchorEl.getBoundingClientRect() : null;
+
+    if (rest.type === 'layout') {
+      selectedSlot = rest;
+      selectedStash = null;
+    } else if (rest.type === 'stash') {
+      selectedStash = rest;
       selectedSlot = null;
     }
   }
@@ -532,7 +572,7 @@
                 {engine}
                 {snapshot}
                 {currentPlayer}
-                actions={filteredActions}
+                actions={dashboardActions}
                 onaction={handleAction}
                 onselectlane={handleSelectLane}
                 {selectionText}
@@ -540,7 +580,7 @@
                 computerTurn={vsComputer && visualActivePlayerId !== 0}
                 autoScrollEnabled={!autoplay}
                 hasSelection={!!(selectedSlot || selectedStash)}
-                onclearselection={() => { selectedSlot = null; selectedStash = null; }}
+                onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
                 showLog={false}
               />
             </div>
@@ -670,7 +710,7 @@
               {engine}
               {snapshot}
               {currentPlayer}
-              actions={filteredActions}
+              actions={dashboardActions}
               onaction={handleAction}
               onselectlane={handleSelectLane}
               {selectionText}
@@ -678,7 +718,7 @@
               computerTurn={vsComputer && visualActivePlayerId !== 0}
               autoScrollEnabled={!autoplay}
               hasSelection={!!(selectedSlot || selectedStash)}
-              onclearselection={() => { selectedSlot = null; selectedStash = null; }}
+              onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
               showLog={true}
               {copyTextToClipboard}
             />
@@ -705,6 +745,16 @@
           if (engine) engine.stepBackChoice();
         }}
       />
+
+      {#if showPopover}
+        <CardActionPopover
+          anchorRect={selectedAnchorRect}
+          actions={popoverActions}
+          description={popoverDescription}
+          onaction={handleAction}
+          onclose={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
+        />
+      {/if}
     </div>
   {/if}
   <p class="italic text-xs">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
