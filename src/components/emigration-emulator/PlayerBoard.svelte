@@ -210,108 +210,120 @@
   {/if}
 
   <!-- 5-Column Stash Display -->
-  <div class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-md bg-neutral-50 dark:bg-neutral-950">
-    <!-- 1. Documents -->
-    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
-      <div class="uppercase tracking-wide text-xs mb-1">Docs ({player.stash.documents.length})</div>
-      {#each player.stash.documents as doc, i (doc.id)}
-        {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'document' && selectedStash.itemIdx === i}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid var(--color-emi-document);" 
-          onclick={(e) => handleStashClick(e, 'document', i)}
-        >
-          {#if doc.icon}
-            <Icon icon={doc.icon.includes(':') ? doc.icon : `game-icons:${doc.icon}`} class="size-4 shrink-0" />
-          {/if}
-          <span class="truncate pr-1">{doc.name}</span>
-          <span class="text-xs  font-bold">${doc.cost || 0}</span>
+  {#if player.stash.documents.length || player.stash.connections.length || player.stash.tickets || player.stash.passports || player.stash.lifeCards.length}
+    <div class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-md bg-neutral-50 dark:bg-neutral-950">
+      <!-- 1. Documents -->
+      {#if player.stash.documents.length}
+        <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
+          <div class="uppercase tracking-wide text-xs mb-1">Documents ({player.stash.documents.length})</div>
+          {#each player.stash.documents as doc, i (doc.id)}
+            {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'document' && selectedStash.itemIdx === i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div 
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
+              style="border-left: 2.5px solid var(--color-emi-document);" 
+              onclick={(e) => handleStashClick(e, 'document', i)}
+            >
+              {#if doc.icon}
+                <Icon icon={doc.icon.includes(':') ? doc.icon : `game-icons:${doc.icon}`} class="size-4 shrink-0" />
+              {/if}
+              <span class="truncate pr-1">{doc.name}</span>
+              <span class="text-xs  font-bold">${doc.cost || 0}</span>
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-
-    <!-- 2. Connections -->
-    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
-      <div class="uppercase tracking-wide text-xs mb-1">Conns ({player.stash.connections.length})</div>
-      {#each player.stash.connections as conn, i (conn.id)}
-        {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'connection' && selectedStash.itemIdx === i}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid var(--color-emi-connection);" 
-          onclick={(e) => handleStashClick(e, 'connection', i)}
-        >
-          {#if conn.icon}
-            <Icon icon={conn.icon.includes(':') ? conn.icon : `game-icons:${conn.icon}`} class="size-4 shrink-0" />
-          {/if}
-          <span class="truncate pr-1">{conn.name}</span>
-          <span class="text-xs  font-bold">${conn.cost || 0}</span>
+      {/if}
+  
+      <!-- 2. Connections -->
+      {#if player.stash.connections.length}
+        <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
+          <div class="uppercase tracking-wide text-xs mb-1">Connections ({player.stash.connections.length})</div>
+          {#each player.stash.connections as conn, i (conn.id)}
+            {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'connection' && selectedStash.itemIdx === i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div 
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
+              style="border-left: 2.5px solid var(--color-emi-connection);" 
+              onclick={(e) => handleStashClick(e, 'connection', i)}
+            >
+              {#if conn.icon}
+                <Icon icon={conn.icon.includes(':') ? conn.icon : `game-icons:${conn.icon}`} class="size-4 shrink-0" />
+              {/if}
+              <span class="truncate pr-1">{conn.name}</span>
+              <span class="text-xs  font-bold">${conn.cost || 0}</span>
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-
-    <!-- 3. Tickets -->
-    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
-      <div class="uppercase tracking-wide text-xs mb-1">Tickets ({player.stash.tickets})</div>
-      {#each Array(player.stash.tickets) as _, i}
-        {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'ticket' && selectedStash.itemIdx === i}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid var(--color-emi-ticket);" 
-          onclick={(e) => handleStashClick(e, 'ticket', i)}
-        >
-          <Icon icon="game-icons:ticket" class="size-4 shrink-0" />
-          <span>Ticket</span>
+      {/if}
+  
+      <!-- 3. Tickets -->
+      {#if player.stash.tickets}
+        <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
+          <div class="uppercase tracking-wide text-xs mb-1">Tickets ({player.stash.tickets})</div>
+          {#each Array(player.stash.tickets) as _, i}
+            {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'ticket' && selectedStash.itemIdx === i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div 
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
+              style="border-left: 2.5px solid var(--color-emi-ticket);" 
+              onclick={(e) => handleStashClick(e, 'ticket', i)}
+            >
+              <Icon icon="game-icons:ticket" class="size-4 shrink-0" />
+              <span>Ticket</span>
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-
-    <!-- 4. Passports -->
-    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
-      <div class="uppercase tracking-wide text-xs mb-1">Passports ({player.stash.passports})</div>
-      {#each Array(player.stash.passports) as _, i}
-        {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'passport' && selectedStash.itemIdx === i}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid var(--color-emi-passport);" 
-          onclick={(e) => handleStashClick(e, 'passport', i)}
-        >
-          <Icon icon="game-icons:passport" class="size-4 shrink-0" />
-          <span>Passport</span>
+      {/if}
+  
+      <!-- 4. Passports -->
+      {#if player.stash.passports}
+        <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
+          <div class="uppercase tracking-wide text-xs mb-1">Passports ({player.stash.passports})</div>
+          {#each Array(player.stash.passports) as _, i}
+            {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'passport' && selectedStash.itemIdx === i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div 
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
+              style="border-left: 2.5px solid var(--color-emi-passport);" 
+              onclick={(e) => handleStashClick(e, 'passport', i)}
+            >
+              <Icon icon="game-icons:passport" class="size-4 shrink-0" />
+              <span>Passport</span>
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-
-    <!-- 5. Kept Life -->
-    <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
-      <div class="uppercase tracking-wide text-xs mb-1">Life ({player.stash.lifeCards.length})</div>
-      {#each player.stash.lifeCards as lc, i (lc.id)}
-        {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div 
-          class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
-          style="border-left: 2.5px solid var(--color-emi-life);" 
-          onclick={(e) => handleStashClick(e, 'lifeCard', i)}
-        >
-          {#if lc.icon}
-            <Icon icon={lc.icon.includes(':') ? lc.icon : `game-icons:${lc.icon}`} class="size-4 shrink-0" />
-          {/if}
-          <span class="truncate pr-1">{lc.title}</span>
-          {#if lc.money}
-            <span class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold">${lc.money}</span>
-          {/if}
+      {/if}
+  
+      <!-- 5. Kept Life -->
+      {#if player.stash.lifeCards.length}
+        <div class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800">
+          <div class="uppercase tracking-wide text-xs mb-1">Life Cards ({player.stash.lifeCards.length})</div>
+          {#each player.stash.lifeCards as lc, i (lc.id)}
+            {@const isSel = selectedStash && selectedStash.playerIdx === player.id && selectedStash.stashType === 'lifeCard' && selectedStash.itemIdx === i}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div 
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel ? 'selected' : ''}" 
+              style="border-left: 2.5px solid var(--color-emi-life);" 
+              onclick={(e) => handleStashClick(e, 'lifeCard', i)}
+            >
+              {#if lc.icon}
+                <Icon icon={lc.icon.includes(':') ? lc.icon : `game-icons:${lc.icon}`} class="size-4 shrink-0" />
+              {/if}
+              <span class="truncate pr-1">{lc.title}</span>
+              {#if lc.money}
+                <span class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold">${lc.money}</span>
+              {/if}
+            </div>
+          {/each}
         </div>
-      {/each}
+      {/if}
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>
