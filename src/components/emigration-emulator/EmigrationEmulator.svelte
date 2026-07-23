@@ -391,11 +391,12 @@
       <h1 class="font-emi-heading  text-center mb-4 text-4xl">Emigration Game Emulator</h1>
 
       <div class="bg-neutral-200 dark:bg-neutral-800 p-8 rounded-md flex flex-col gap-5">
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col items-center gap-2">
           <p>Game Mode</p>
-          <div class="flex flex-wrap gap-3 justify-center">
-            <button class="btn-sm {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class=" btn-sm {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+         
+          <div class="flex justify-center">
+            <button class="btn-sm rounded-r-none border-r-0 {mode === 'competitive' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class=" btn-sm rounded-l-none {mode === 'cooperative' && 'bg-green-100 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
           </div>
         </div>
 
@@ -432,10 +433,10 @@
 
         <div class="flex flex-col gap-3">
           <p class="">Life Card Packs</p>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap justify-center gap-2">
             {#each PACKS_LIST as pack}
               <button
-                class="btn-sm flex-1 {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm {selectedPacks.includes(pack) ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => {
                   if (selectedPacks.includes(pack)) {
                     selectedPacks = selectedPacks.filter(p => p !== pack);
@@ -454,35 +455,35 @@
         
 
         <div class="flex flex-col gap-3">
-          <p class="">Game Type</p>
-          <div class="flex flex-wrap justify-center gap-2">
+          <p class="">Players</p>
+          <div class="flex justify-center">
               <button
-                class="btn-sm {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'vscomputer'}
               >
-                Solo vs Computer
+                Solo
               </button>
               <button
-                class="btn-sm {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType === 'passplay' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'passplay'}
               >
-                Pass & Play
+                Multi
               </button>
               <button
-                class="btn-sm {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-green-100 dark:bg-green-900  ' : ''}"
                 onclick={() => gameType = 'auto'}
               >
-               Computer vs Computer
+               AI vs AI
               </button>
           </div>
         </div>
 
-        <div class="flex flex-col gap-3">
+        <div class={["flex flex-col gap-3", gameType === 'passplay' && 'hidden']}>
           <p class="">AI Difficulty</p>
-          <div class="flex flex-wrap justify-center gap-2">
-            {#each ['easy', 'normal', 'expert'] as diff}
+          <div class="flex justify-center">
+            {#each ['easy', 'normal', 'expert'] as diff, i}
               <button
-                class="btn-sm {aiDifficulty === diff ? 'bg-green-100 dark:bg-green-900  ' : ''}"
+                class={["btn-sm", aiDifficulty === diff && 'bg-green-100 dark:bg-green-900', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
                 onclick={() => aiDifficulty = diff}
               >
                 {diff.charAt(0).toUpperCase() + diff.slice(1)}
@@ -517,7 +518,7 @@
           {#if vsComputer && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
-          <button class="btn text-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); selectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); selectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
         </div>
       </div>
 
@@ -596,14 +597,14 @@
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="btn text-sm p-2"
+                        class="btn-sm"
                         disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.money < 2 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('ticket')}
                       >
                         Buy
                       </button>
                       <button
-                        class="btn text-sm p-2"
+                        class="btn-sm"
                         disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('ticket')}
                       >
@@ -629,14 +630,14 @@
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="btn text-xs p-2"
+                        class="btn-sm"
                         disabled={snapshot.publicServices.passports <= 0 || currentPlayer.money < 2 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('passport')}
                       >
                         Buy
                       </button>
                       <button
-                        class="btn text-xs p-2"
+                        class="btn-sm"
                         disabled={snapshot.publicServices.passports <= 0 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleStealPool('passport')}
                       >

@@ -35,6 +35,10 @@
     gap: 0.5rem;
     align-items: center;
     @apply transition-all;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     &:hover {
       background-color: theme("colors.green.50");
     }
@@ -50,15 +54,20 @@
     border: 2px solid;
     border-radius: theme("borderRadius.md");
     width: fit-content;
-    padding: 0.25rem 1rem;
+    padding: 0.17rem 0.5rem;
     /* font-size: theme("fontSize.lg"); */
     font-weight: theme("fontWeight.semibold");
     /* letter-spacing: theme("letterSpacing.wide"); */
     display: inline-flex;
+    height: min-content;
     justify-content: center;
     gap: 0.5rem;
     align-items: center;
     @apply transition-all;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     &:hover {
       background-color: theme("colors.green.50");
     }
