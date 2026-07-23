@@ -47,7 +47,7 @@
         <div class="flex flex-wrap gap-2 items-center justify-center">
           {#each actions as action}
             <button 
-              class={["btn-sm", action.optional && "", !action.enabled && 'hidden' ]}
+              class={["btn-sm", action.optional && "" ]}
               disabled={!action.enabled || pendingChoice}
               onclick={() => onaction(action.type)}
             >
