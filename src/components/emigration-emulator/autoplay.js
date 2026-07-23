@@ -10,7 +10,7 @@ import { DESTINATIONS } from "./engine.js";
  * @param {import('./engine.js').default} engine
  * @returns {Object} Autoplay controller
  */
-export function createAutoPlayer(engine, difficulty = "normal") {
+export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx = null } = {}) {
   /**
    * Choose the best required action for the current player.
    * Priority: Activate Payday → Buy ticket/passport → Buy cheap cards → ...
@@ -794,6 +794,8 @@ export function createAutoPlayer(engine, difficulty = "normal") {
    */
   function resolveChoice() {
     if (!engine.pendingChoice) return;
+    // In vsComputer mode, never auto-resolve a choice that belongs to the human player.
+    if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) return;
     const choice = engine.pendingChoice;
     const opts = choice.options;
 
@@ -935,9 +937,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
       return true;
     }
 
-    // Resolve any pending choice first
+    // Resolve any pending choice first — but never steal a choice meant for the human.
     let safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
+      if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) break;
       resolveChoice();
       safetyCounter++;
     }
@@ -1046,9 +1049,10 @@ export function createAutoPlayer(engine, difficulty = "normal") {
 
     engine.executeRequiredAction(action.type, action.params);
 
-    // Resolve any resulting choices
+    // Resolve any resulting choices — but never steal a choice meant for the human.
     safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
+      if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) break;
       resolveChoice();
       safetyCounter++;
     }

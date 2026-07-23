@@ -300,7 +300,7 @@
     } else if (gameType === 'vscomputer') {
       // Solo vs AI: Player 1 (index 0) is human, all others AI
       vsComputer = true;
-      aiPlayer = createAutoPlayer(engine, aiDifficulty);
+      aiPlayer = createAutoPlayer(engine, aiDifficulty, { humanPlayerIdx: 0 });
     }
     // 'passplay': no AI, full manual play
   }
