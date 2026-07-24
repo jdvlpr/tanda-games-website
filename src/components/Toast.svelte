@@ -20,7 +20,7 @@
     class="flex items-center justify-between p-2 rounded-md shadow-lg min-w-[260px] w-full text-left text-black dark:text-white pointer-events-auto backdrop-blur-md border {typeClasses[item.type]}"
     role="alert"
 >
-    <span class="font-medium">{item.message}</span>
+    <span class="text-sm">{item.message}</span>
     
     <button 
         onclick={() => toast.remove(item.id)} 

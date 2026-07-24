@@ -1,5 +1,5 @@
 <script>
-    import { toast, timeoutMs } from '../stores/toast.svelte.js';
+    import { toast } from '../stores/toast.svelte.js';
     import ToastItem from './Toast.svelte';
 </script>
 
@@ -9,7 +9,7 @@
         <p>Notifications</p>
         <div class="flex flex-col items-start text-xs">
             <label for="timeout">Timeout</label>
-            <input id="timeout" type="range" bind:value={timeoutMs.value} min="200" max="5000" step="100" class="w-32"/>
+            <input id="timeout" type="range" bind:value={toast.timeoutMs} min="200" max="5000" step="100" class="w-32"/>
         </div>
             <button class="btn-sm bg-neutral-50 dark:bg-neutral-950 pointer-events-auto" onclick={() => {
                 toast.toasts = [];
