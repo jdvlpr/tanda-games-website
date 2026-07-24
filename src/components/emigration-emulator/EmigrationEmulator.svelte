@@ -14,6 +14,7 @@
   import Modal from './Modal.svelte';
   import { playPaydaySound } from '../../js/utils.svelte.js';
   import PlayerBoard from './PlayerBoard.svelte';
+  import { toast } from '../../stores/toast.svelte';
 
   // Responsive: track mobile vs desktop
   let isMobile = $state(false);
@@ -786,5 +787,15 @@
       {/if}
     </div>
   {/if}
+  <div class="flex flex-col gap-2 items-start text-left my-4 mx-auto w-fit">
+    <p class="font-semibold">Settings</p>
+    <label>Notifications Timeout
+      <select bind:value={toast.timeoutMs}>
+        <option value={1500}>Fast (1.5s)</option>
+        <option value={3000}>Normal (3s)</option>
+        <option value={5000}>Long (5s)</option>
+      </select>
+    </label>
+  </div>
   <p class="italic text-xs">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
 </div>

@@ -18,7 +18,7 @@ class ToastManager {
    */
   toasts = $state([]);
 
-  timeoutMs = $state(2000);
+  timeoutMs = $state(3000);
 
   /** * Tracks when the last toast in the queue is scheduled to dismiss
    * @type {number}
