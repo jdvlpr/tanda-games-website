@@ -16,16 +16,34 @@ class ToastManager {
    */
   toasts = $state([]);
 
+  /** * Tracks when the last toast in the queue is scheduled to dismiss
+   * @type {number}
+   */
+  lastDismissalTime = 0;
+
   /**
    * @param {Omit<Toast, 'id'>} toast
    */
   add(toast) {
     const id = crypto.randomUUID();
-    this.toasts.push({ ...toast, id });
+    const duration = toast.duration !== undefined ? toast.duration : 3000;
 
-    // Auto-remove after duration (default 3000ms, use 0 for persistent)
-    if (toast.duration !== 0) {
-      setTimeout(() => this.remove(id), toast.duration || 3000);
+    this.toasts.push({ ...toast, id, duration });
+
+    // Auto-remove sequentially if duration is not 0 (persistent)
+    if (duration !== 0) {
+      const now = Date.now();
+      let delay = duration;
+
+      // If there are toasts already queued to dismiss in the future,
+      // add this toast's duration to the end of that queue's time.
+      if (this.lastDismissalTime > now) {
+        delay = this.lastDismissalTime - now + duration;
+      }
+
+      this.lastDismissalTime = now + delay;
+
+      setTimeout(() => this.remove(id), delay);
     }
   }
 

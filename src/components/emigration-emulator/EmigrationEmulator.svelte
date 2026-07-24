@@ -265,7 +265,7 @@
     }, 1000);
   });
   let selectionText = $derived.by(() => {
-    if (!snapshot) return 'Select an available layout card or stash item, then choose your action.';
+    if (!snapshot) return 'Select an available card, then choose your action.';
     if (selectedSlot) {
       const targetPlayer = snapshot.players[selectedSlot.playerIdx];
       const slot = targetPlayer?.layout[selectedSlot.slotIdx];
@@ -290,13 +290,13 @@
       
       return `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
     }
-    return 'Select an available layout card or stash item, then choose your action.';
+    return 'Select an available card, then choose your action.';
   });
   
   // Tests
   let testResults = $state(null);
 
-  function startGame(gameType = 'passplay') {
+  function startGame(gameType = 'vscomputer') {
     engine = new EmigrationEngine({
       mode,
       players: activeSetup,
