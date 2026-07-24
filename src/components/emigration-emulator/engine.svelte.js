@@ -1566,19 +1566,25 @@ export default class EmigrationEngine {
       toast.error(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: missing Passport/Ticket`,
       );
+      let hasRevealed = false;
       this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
         laneIdx
       ].unshuffledTokens.map(({ tokenNumber, status }) => {
         if (status.isRevealed) return { tokenNumber, status };
-        if (tokenNumber === tokenVal)
+        if (tokenNumber === tokenVal && !hasRevealed) {
+          hasRevealed = true;
           return {
             tokenNumber,
             status: {
               isRevealed: true,
-              revealedBy: player.name,
-              success: false,
+              player: {
+                assurance: player.assurance,
+                name: player.name,
+                success: false,
+              },
             },
           };
+        }
         return { tokenNumber, status };
       });
     } else if (player.assurance >= tokenVal) {
@@ -1591,19 +1597,25 @@ export default class EmigrationEngine {
       toast.success(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, crosses with ${player.assurance} Assurance remaining`,
       );
+      let hasRevealed = false;
       this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
         laneIdx
       ].unshuffledTokens.map(({ tokenNumber, status }) => {
         if (status.isRevealed) return { tokenNumber, status };
-        if (tokenNumber === tokenVal)
+        if (tokenNumber === tokenVal && !hasRevealed) {
+          hasRevealed = true;
           return {
             tokenNumber,
             status: {
               isRevealed: true,
-              revealedBy: player.name,
-              success: true,
+              player: {
+                assurance: player.assurance,
+                name: player.name,
+                success: true,
+              },
             },
           };
+        }
         return { tokenNumber, status };
       });
     } else {
@@ -1612,19 +1624,25 @@ export default class EmigrationEngine {
       toast.error(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: has ${player.assurance} Assurance`,
       );
+      let hasRevealed = false;
       this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
         laneIdx
       ].unshuffledTokens.map(({ tokenNumber, status }) => {
         if (status.isRevealed) return { tokenNumber, status };
-        if (tokenNumber === tokenVal)
+        if (tokenNumber === tokenVal && !hasRevealed) {
+          hasRevealed = true;
           return {
             tokenNumber,
             status: {
               isRevealed: true,
-              revealedBy: player.name,
-              success: false,
+              player: {
+                assurance: player.assurance,
+                name: player.name,
+                success: false,
+              },
             },
           };
+        }
         return { tokenNumber, status };
       });
     }

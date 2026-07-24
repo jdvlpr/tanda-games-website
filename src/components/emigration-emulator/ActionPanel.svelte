@@ -35,7 +35,7 @@
 
       <!-- Action States -->
       {#if snapshot.phase === 'game_over'}
-        <div class="bg-red-100 dark:bg-red-900 p-2 rounded-md text-center">
+        <div class="bg-orange-100 dark:bg-orange-900 p-2 rounded-md text-center">
           <h3 class="mt-0 mb-2 pb-2">Game Over</h3>
           <div class="text-lg font-bold ">{snapshot.gameResult?.message}</div>
         </div>
