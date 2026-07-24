@@ -18,6 +18,8 @@ class ToastManager {
    */
   toasts = $state([]);
 
+  timeoutMs = $state({ value: 3000 });
+
   /** * Tracks when the last toast in the queue is scheduled to dismiss
    * @type {number}
    */
@@ -29,7 +31,8 @@ class ToastManager {
   add(toast) {
     if (gameType.value === "auto") return;
     const id = crypto.randomUUID();
-    const duration = toast.duration !== undefined ? toast.duration : 3000;
+    const duration =
+      toast.duration !== undefined ? toast.duration : this.timeoutMs.value;
 
     this.toasts.push({ ...toast, id, duration });
 
