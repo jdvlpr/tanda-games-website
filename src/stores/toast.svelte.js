@@ -1,3 +1,5 @@
+import { gameType } from "../components/emigration-emulator/EmigrationEmulator.svelte";
+
 /**
  * @typedef {'info' | 'success' | 'warning' | 'error'} ToastType
  */
@@ -25,6 +27,7 @@ class ToastManager {
    * @param {Omit<Toast, 'id'>} toast
    */
   add(toast) {
+    if (gameType.value === "auto") return;
     const id = crypto.randomUUID();
     const duration = toast.duration !== undefined ? toast.duration : 3000;
 

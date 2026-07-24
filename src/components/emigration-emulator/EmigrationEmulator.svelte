@@ -1,3 +1,9 @@
+<script module>
+  export let gameType = $state({
+    value: 'vscomputer',
+  });
+</script>
+
 <script>
   import Icon from '@iconify/svelte';
   import ActionPanel from './ActionPanel.svelte';
@@ -65,7 +71,6 @@
   let vsComputer = $state(false);
   let aiPlayer = $state(null);
   let aiThinking = $state(false);
-  let gameType = $state('vscomputer');
 
   // Selection State
   let selectedSlot = $state(null);
@@ -499,27 +504,27 @@
           <p class="">Player Type</p>
           <div class="flex justify-center">
               <button
-                class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType = 'vscomputer'}
+                class="btn-sm rounded-r-none {gameType.value === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'vscomputer'}
               >
                 Solo
               </button>
               <button
-                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType = 'passplay'}
+                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType.value === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'passplay'}
               >
                 Multi
               </button>
               <button
-                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType = 'auto'}
+                class="btn-sm rounded-l-none {gameType.value === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'auto'}
               >
                AI vs AI
               </button>
           </div>
         </div>
 
-        <div class={["flex flex-col gap-3", gameType === 'passplay' && 'hidden']}>
+        <div class={["flex flex-col gap-3", gameType.value === 'passplay' && 'hidden']}>
           <p class="">AI Difficulty</p>
           <div class="flex justify-center">
             {#each ['easy', 'normal', 'expert'] as diff, i}
@@ -534,7 +539,7 @@
         </div>
 
         <div class="">
-          <button class="btn text-2xl" onclick={() => startGame(gameType)}>Start</button>
+          <button class="btn text-2xl" onclick={() => startGame(gameType.value)}>Start</button>
         </div>
       </div>
 
@@ -591,7 +596,7 @@
           <!-- Security Lanes -->
             <div class="lg:col-span-2 flex flex-col gap-2 p-1 rounded-md">
                 <div class="text-sm uppercase tracking-wider ">Security Lanes</div>
-                <div class="flex gap-2 overflow-x-auto pb-1">
+                <div class="flex flex-wrap gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
                     <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[100px] flex flex-col items-center text-center flex-1 transition-all">
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
@@ -604,8 +609,8 @@
                         <div class="flex flex-col gap-1 justify-center">
                           {#each lane.unshuffledTokens.filter(({status}) => status.isRevealed) as {tokenNumber, status}}
                             <div class="flex gap-1 items-center text-xs">
-                              <span class={["rounded-md px-2 py-1", status.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-700"]}>{#if status.success}✓{:else}✗{/if} {status.revealedBy}</span>
-                              <span class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</span>
+                              <div class={["rounded-md px-2 py-1 inline-flex w-full", status.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-700"]}>{#if status.success}✅{:else}❌{/if} {status.revealedBy}</div>
+                              <div class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</div>
                             </div>
                           {/each}
                         </div>
