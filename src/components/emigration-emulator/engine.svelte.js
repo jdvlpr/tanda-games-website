@@ -4,6 +4,8 @@
  * Source of truth: game_specification.md
  */
 
+import { toast } from "../../stores/toast.svelte";
+
 // ─── Utility ─────────────────────────────────────────────────────────────────
 
 /** Fisher–Yates shuffle (in-place, returns same array). */
@@ -155,31 +157,96 @@ export const DESTINATIONS = [
 });
 
 export const DOCUMENTS_CATALOG = [
-  { name: "Write Last Will and Testament", cost: 2, icon: "tombstone", type: "document" },
-  { name: "Certificate of Excellence", cost: 2, icon: "diploma", type: "document" },
+  {
+    name: "Write Last Will and Testament",
+    cost: 2,
+    icon: "tombstone",
+    type: "document",
+  },
+  {
+    name: "Certificate of Excellence",
+    cost: 2,
+    icon: "diploma",
+    type: "document",
+  },
   { name: "Checklist", cost: 2, icon: "checklist", type: "document" },
-  { name: "Copy of Birth Certificate", cost: 2, icon: "stork-delivery", type: "document" },
+  {
+    name: "Copy of Birth Certificate",
+    cost: 2,
+    icon: "stork-delivery",
+    type: "document",
+  },
   { name: "Notebook", cost: 2, icon: "notebook", type: "document" },
-  { name: "Subscribe to Travel Updates", cost: 2, icon: "rss", type: "document" },
+  {
+    name: "Subscribe to Travel Updates",
+    cost: 2,
+    icon: "rss",
+    type: "document",
+  },
   { name: "Travel Brochure", cost: 2, icon: "open-book", type: "document" },
   { name: "Physical Exam", cost: 3, icon: "stethoscope", type: "document" },
-  { name: "Vaccination Record", cost: 3, icon: "miracle-medecine", type: "document" },
+  {
+    name: "Vaccination Record",
+    cost: 3,
+    icon: "miracle-medecine",
+    type: "document",
+  },
   { name: "Personality Test", cost: 3, icon: "skills", type: "document" },
   { name: "Travel Wallet", cost: 3, icon: "wallet", type: "document" },
-  { name: "Attend Security Training", cost: 3, icon: "padlock", type: "document" },
-  { name: "Residence Address in Destination", cost: 3, icon: "treasure-map", type: "document" },
-  { name: "Letter of Recommendation", cost: 3, icon: "thumb-up", type: "document" },
+  {
+    name: "Attend Security Training",
+    cost: 3,
+    icon: "padlock",
+    type: "document",
+  },
+  {
+    name: "Residence Address in Destination",
+    cost: 3,
+    icon: "treasure-map",
+    type: "document",
+  },
+  {
+    name: "Letter of Recommendation",
+    cost: 3,
+    icon: "thumb-up",
+    type: "document",
+  },
   { name: "Letter of Invitation", cost: 4, icon: "envelope", type: "document" },
-  { name: "Background Check", cost: 4, icon: "sherlock-holmes", type: "document" },
+  {
+    name: "Background Check",
+    cost: 4,
+    icon: "sherlock-holmes",
+    type: "document",
+  },
   { name: "Employment Contract", cost: 4, icon: "journey", type: "document" },
-  { name: "International Driving Permit", cost: 4, icon: "steering-wheel", type: "document" },
-  { name: "Vehicle Registration Papers", cost: 4, icon: "race-car", type: "document" },
+  {
+    name: "International Driving Permit",
+    cost: 4,
+    icon: "steering-wheel",
+    type: "document",
+  },
+  {
+    name: "Vehicle Registration Papers",
+    cost: 4,
+    icon: "race-car",
+    type: "document",
+  },
   { name: "Pet Passport", cost: 4, icon: "labrador-head", type: "document" },
-  { name: "Language Phrasebook", cost: 4, icon: "book-cover", type: "document" },
+  {
+    name: "Language Phrasebook",
+    cost: 4,
+    icon: "book-cover",
+    type: "document",
+  },
 ];
 
 export const CONNECTIONS_CATALOG = [
-  { name: "Coffee with Airport Employee", cost: 2, icon: "coffee-mug", type: "connection" },
+  {
+    name: "Coffee with Airport Employee",
+    cost: 2,
+    icon: "coffee-mug",
+    type: "connection",
+  },
   {
     name: "Cookies for Neighbor from Destination",
     cost: 2,
@@ -192,24 +259,94 @@ export const CONNECTIONS_CATALOG = [
     icon: "video-conference",
     type: "connection",
   },
-  { name: "Support Group Motivates You", cost: 2, icon: "cherish", type: "connection" },
-  { name: "Learn Song from Your Destination", cost: 2, icon: "banjo", type: "connection" },
-  { name: "Listen to the News", cost: 2, icon: "newspaper", type: "connection" },
-  { name: "Friend moves to your Destination", cost: 2, icon: "hiking", type: "connection" },
-  { name: "Language Classes", cost: 3, icon: "conversation", type: "connection" },
+  {
+    name: "Support Group Motivates You",
+    cost: 2,
+    icon: "cherish",
+    type: "connection",
+  },
+  {
+    name: "Learn Song from Your Destination",
+    cost: 2,
+    icon: "banjo",
+    type: "connection",
+  },
+  {
+    name: "Listen to the News",
+    cost: 2,
+    icon: "newspaper",
+    type: "connection",
+  },
+  {
+    name: "Friend moves to your Destination",
+    cost: 2,
+    icon: "hiking",
+    type: "connection",
+  },
+  {
+    name: "Language Classes",
+    cost: 3,
+    icon: "conversation",
+    type: "connection",
+  },
   { name: "Network Fair", cost: 3, icon: "mesh-network", type: "connection" },
-  { name: "Dinner with a Diplomat", cost: 3, icon: "hot-meal", type: "connection" },
-  { name: "Become World Famous", cost: 3, icon: "mona-lisa", type: "connection" },
+  {
+    name: "Dinner with a Diplomat",
+    cost: 3,
+    icon: "hot-meal",
+    type: "connection",
+  },
+  {
+    name: "Become World Famous",
+    cost: 3,
+    icon: "mona-lisa",
+    type: "connection",
+  },
   { name: "Learn from an Elder", cost: 3, icon: "wisdom", type: "connection" },
-  { name: "Excellent Teamwork", cost: 3, icon: "team-idea", type: "connection" },
-  { name: "Endorsement from Royalty", cost: 3, icon: "coronation", type: "connection" },
-  { name: "Enter Luxury Travel Club", cost: 4, icon: "winged-scepter", type: "connection" },
-  { name: "Internship in Your Destination", cost: 4, icon: "light-backpack", type: "connection" },
-  { name: "Get Engaged to a Native", cost: 4, icon: "engagement-ring", type: "connection" },
-  { name: "Politician Approves You", cost: 4, icon: "public-speaker", type: "connection" },
+  {
+    name: "Excellent Teamwork",
+    cost: 3,
+    icon: "team-idea",
+    type: "connection",
+  },
+  {
+    name: "Endorsement from Royalty",
+    cost: 3,
+    icon: "coronation",
+    type: "connection",
+  },
+  {
+    name: "Enter Luxury Travel Club",
+    cost: 4,
+    icon: "winged-scepter",
+    type: "connection",
+  },
+  {
+    name: "Internship in Your Destination",
+    cost: 4,
+    icon: "light-backpack",
+    type: "connection",
+  },
+  {
+    name: "Get Engaged to a Native",
+    cost: 4,
+    icon: "engagement-ring",
+    type: "connection",
+  },
+  {
+    name: "Politician Approves You",
+    cost: 4,
+    icon: "public-speaker",
+    type: "connection",
+  },
   { name: "Attend History Class", cost: 4, icon: "read", type: "connection" },
   { name: "Travel Concierge", cost: 4, icon: "top-hat", type: "connection" },
-  { name: "Favorable Cultural Opinion", cost: 4, icon: "vote", type: "connection" },
+  {
+    name: "Favorable Cultural Opinion",
+    cost: 4,
+    icon: "vote",
+    type: "connection",
+  },
 ];
 
 export const LIFE_CARD_DEFINITIONS = Object.freeze([
@@ -679,10 +816,12 @@ export default class EmigrationEngine {
     if (this.rollOverride) {
       const val = this.rollOverride();
       this.log(`ROLL_D6_OVR:${val}`, "roll");
+      toast.info(`Rolled: ${val}`);
       return val;
     }
     const val = Math.floor(Math.random() * 6) + 1;
     this.log(`ROLL_D6:${val}`, "roll");
+    toast.info(`Rolled: ${val}`);
     return val;
   }
 
@@ -855,6 +994,7 @@ export default class EmigrationEngine {
       ) {
         p.money += 1;
         this.log(`${p.name} gains $1 from Salvage.`, "system");
+        toast.info(`${p.name} gains $1 from Salvage.`);
       }
     }
     // Blacklisted: discarder loses 1 Money
@@ -863,6 +1003,7 @@ export default class EmigrationEngine {
     ) {
       discardingPlayer.money = Math.max(0, discardingPlayer.money - 1);
       this.log(`P${discardingPlayer.id}|BLACKLISTED|LOSS:1`, "system");
+      toast.info(`${discardingPlayer.name} loses $1 from Blacklisted.`);
     }
   }
 
@@ -876,6 +1017,7 @@ export default class EmigrationEngine {
       const left = this.getLeftPlayer(player);
       left.stash.lifeCards.push(card);
       this.log(`P${player.id}|PASS_PENALTY|TO:P${left.id}`, "system");
+      toast.info(`${player.name} passes Penalty to ${left.name}`);
     }
   }
 
@@ -894,6 +1036,7 @@ export default class EmigrationEngine {
             `P${p.id}|STAR_POWER|GAIN:1|PASS_TO:P${player.id}`,
             "system",
           );
+          toast.info(`${p.name} gains 1, passes Star Power to ${player.name}`);
         }
       }
     }
@@ -914,6 +1057,7 @@ export default class EmigrationEngine {
       const left = this.getLeftPlayer(player);
       left.stash.lifeCards.push(card);
       this.log(`P${player.id}|UNDERDOG|LOSS:1|PASS_TO:P${left.id}`, "system");
+      toast.info(`${player.name} loses 1, passes Underdog to ${left.name}`);
     }
   }
 
@@ -924,14 +1068,19 @@ export default class EmigrationEngine {
         player.assurance += 1;
         player.ticketPassportBonusClaimed = true;
         this.log(`P${player.id}|TICKET_PASSPORT_BONUS|GAIN:1A`, "system");
-      }
-    } else {
-      if (player.stash.tickets === 0 || player.stash.passports === 0) {
-        player.assurance = Math.max(0, player.assurance - 1);
-        player.ticketPassportBonusClaimed = false;
-        this.log(`P${player.id}|TICKET_PASSPORT_BONUS|LOSS:1A`, "system");
+        toast.info(
+          `${player.name} gains 1 Assurance from getting Passport & Ticket`,
+        );
       }
     }
+    // TODO: I don't think the else case is necessary. Why would a player lose an assurance?
+    // else {
+    //   if (player.stash.tickets === 0 || player.stash.passports === 0) {
+    //     player.assurance = Math.max(0, player.assurance - 1);
+    //     player.ticketPassportBonusClaimed = false;
+    //     this.log(`P${player.id}|TICKET_PASSPORT_BONUS|LOSS:1A`, "system");
+    //   }
+    // }
   }
 
   // ─── Cost Helpers ────────────────────────────────────────────────────
@@ -1190,7 +1339,7 @@ export default class EmigrationEngine {
       enabled: canApply,
     });
 
-    const hasAnyRequired = actions.some(a => !a.optional && a.enabled);
+    const hasAnyRequired = actions.some((a) => !a.optional && a.enabled);
     if (!hasAnyRequired) {
       actions.push({
         type: "forfeit",
@@ -1235,6 +1384,7 @@ export default class EmigrationEngine {
     if (next.skipNextTurn) {
       next.skipNextTurn = false;
       this.log(`P${next.id}|SKIP_TURN`, "system");
+      toast.info(`${next.name} turn skipped`);
       this.advanceTurn();
       return;
     }
@@ -1270,6 +1420,7 @@ export default class EmigrationEngine {
       );
     }
     this.log("PHASE2_START", "system");
+    toast.info(`Start Phase 2`);
 
     for (const player of this.players) {
       const dest = DESTINATIONS.find((d) => d.name === player.destination);
@@ -1653,7 +1804,10 @@ export default class EmigrationEngine {
         return this._doApplyCollege(player);
       case "forfeit":
         this.consecutiveForfeits++;
-        this.log(`P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`, "error");
+        this.log(
+          `P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`,
+          "error",
+        );
         if (this.consecutiveForfeits >= this.players.length) {
           this.log("ALL_FORFEIT|GAIN:1", "system");
           this.players.forEach((p) => {
@@ -1770,7 +1924,7 @@ export default class EmigrationEngine {
   _resolvePayday(activator) {
     const salaries = this.players.map((p) => {
       if (p.inCollege) return 0;
-      let payout = (activator && p.id === activator.id) ? p.salary : 1;
+      let payout = activator && p.id === activator.id ? p.salary : 1;
       if (p.stash.lifeCards.some((lc) => lc.title === "Insider")) payout += 1;
       if (p.stash.lifeCards.some((lc) => lc.title === "Pay Cut"))
         payout = Math.max(0, payout - 1);
@@ -1828,7 +1982,14 @@ export default class EmigrationEngine {
             playerIdx: player.id,
             title: `${player.name}: Accept Persuasion from ${target.name}, or decline and pay double Access Fee?`,
             cancellable: false,
-            onBack: () => this._handlePersuasion(player, target, slotIdx, baseFee, callback),
+            onBack: () =>
+              this._handlePersuasion(
+                player,
+                target,
+                slotIdx,
+                baseFee,
+                callback,
+              ),
             options: [
               {
                 text: `Accept Persuasion (pay $${baseFee} Access Fee)`,
@@ -2474,7 +2635,10 @@ export default class EmigrationEngine {
                   text: `Take 1 Document from ${target.name}`,
                   value: "doc",
                 });
-              opts.push({ text: `Take $2 from ${target.name}`, value: "money" });
+              opts.push({
+                text: `Take $2 from ${target.name}`,
+                value: "money",
+              });
 
               const promptChoice = () => {
                 this._setPendingChoice({
@@ -3189,8 +3353,14 @@ export function runTests() {
     const moneyA = eng.players[0].money;
     const moneyB = eng.players[1].money;
     eng._resolvePayday(eng.players[0]);
-    assert(eng.players[0].money === moneyA + 3, "Payday activator gets full salary ($3)");
-    assert(eng.players[1].money === moneyB + 1, "Non-activator gets $1 flat stipend (not full salary)");
+    assert(
+      eng.players[0].money === moneyA + 3,
+      "Payday activator gets full salary ($3)",
+    );
+    assert(
+      eng.players[1].money === moneyB + 1,
+      "Non-activator gets $1 flat stipend (not full salary)",
+    );
   } catch (e) {
     assert(false, `Payday resolution test error: ${e.message}`);
   }
@@ -3516,7 +3686,7 @@ export function runTests() {
         slotIdx: 11,
       });
 
-      eng.resolveChoice("offer");   // owner offers
+      eng.resolveChoice("offer"); // owner offers
       eng.resolveChoice("decline"); // actor declines
 
       assert(
@@ -3538,4 +3708,3 @@ export function runTests() {
 
   return results;
 }
-

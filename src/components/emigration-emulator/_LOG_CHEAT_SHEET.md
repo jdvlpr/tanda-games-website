@@ -1,6 +1,6 @@
 # Emigration Engine: Dense Log Cheat Sheet
 
-This document serves as a parsing guide for the `engine.js` event logs. The game engine emits dense, pipe-delimited (`|`) strings to record game state changes with minimal token overhead.
+This document serves as a parsing guide for the `engine.svelte.js` event logs. The game engine emits dense, pipe-delimited (`|`) strings to record game state changes with minimal token overhead.
 
 ## 1\. Syntax Anatomy
 

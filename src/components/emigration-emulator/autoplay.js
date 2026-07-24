@@ -3,14 +3,18 @@
  * Provides automated game-playing strategy for playtesting.
  */
 
-import { DESTINATIONS } from "./engine.js";
+import { DESTINATIONS } from "./engine.svelte.js";
 
 /**
  * Create an AI player that can play the game automatically.
- * @param {import('./engine.js').default} engine
+ * @param {import('./engine.svelte.js').default} engine
  * @returns {Object} Autoplay controller
  */
-export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx = null } = {}) {
+export function createAutoPlayer(
+  engine,
+  difficulty = "normal",
+  { humanPlayerIdx = null } = {},
+) {
   /**
    * Choose the best required action for the current player.
    * Priority: Activate Payday → Buy ticket/passport → Buy cheap cards → ...
@@ -402,7 +406,7 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
     );
     const estimatedTurnsRemaining = totalLayoutCardsRemaining / playerCount;
 
-    // Include Frontrunner money (mirrors engine.js Phase 2 calculation)
+    // Include Frontrunner money (mirrors engine.svelte.js Phase 2 calculation)
     const frCard = player.stash.lifeCards.find(
       (lc) => lc.title === "Frontrunner",
     );
@@ -453,7 +457,8 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
           const opponentsCount = Math.max(1, playerCount - 1);
           const totalOpponentStipends = opponentsCount * 1;
           const totalOpponentGain =
-            (move.targetId === player.id ? 0 : move.fee) + totalOpponentStipends;
+            (move.targetId === player.id ? 0 : move.fee) +
+            totalOpponentStipends;
           const avgOpponentGain = totalOpponentGain / opponentsCount;
           const relativeAdvantage = netGain - avgOpponentGain;
 
@@ -842,7 +847,11 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
   function resolveChoice() {
     if (!engine.pendingChoice) return;
     // In vsComputer mode, never auto-resolve a choice that belongs to the human player.
-    if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) return;
+    if (
+      humanPlayerIdx !== null &&
+      engine.pendingChoice.playerIdx === humanPlayerIdx
+    )
+      return;
     const choice = engine.pendingChoice;
     const opts = choice.options;
 
@@ -917,13 +926,35 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
       const title = choice.title || "";
       let sortedOpts = [...opts];
       if (title.includes("Swap Wallets")) {
-        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+        sortedOpts.sort(
+          (a, b) =>
+            (engine.players[parseInt(b.value)]?.money || 0) -
+            (engine.players[parseInt(a.value)]?.money || 0),
+        );
       } else if (title.includes("Social Butterfly")) {
-        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.stash.connections.length || 0) - (engine.players[parseInt(a.value)]?.stash.connections.length || 0) || (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+        sortedOpts.sort(
+          (a, b) =>
+            (engine.players[parseInt(b.value)]?.stash.connections.length || 0) -
+              (engine.players[parseInt(a.value)]?.stash.connections.length ||
+                0) ||
+            (engine.players[parseInt(b.value)]?.money || 0) -
+              (engine.players[parseInt(a.value)]?.money || 0),
+        );
       } else if (title.includes("Lost & Found")) {
-        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.stash.documents.length || 0) - (engine.players[parseInt(a.value)]?.stash.documents.length || 0) || (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+        sortedOpts.sort(
+          (a, b) =>
+            (engine.players[parseInt(b.value)]?.stash.documents.length || 0) -
+              (engine.players[parseInt(a.value)]?.stash.documents.length ||
+                0) ||
+            (engine.players[parseInt(b.value)]?.money || 0) -
+              (engine.players[parseInt(a.value)]?.money || 0),
+        );
       } else {
-        sortedOpts.sort((a, b) => (engine.players[parseInt(b.value)]?.money || 0) - (engine.players[parseInt(a.value)]?.money || 0));
+        sortedOpts.sort(
+          (a, b) =>
+            (engine.players[parseInt(b.value)]?.money || 0) -
+            (engine.players[parseInt(a.value)]?.money || 0),
+        );
       }
       engine.resolveChoice(sortedOpts[0].value);
       return;
@@ -1016,7 +1047,11 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
     // Resolve any pending choice first — but never steal a choice meant for the human.
     let safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
-      if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) break;
+      if (
+        humanPlayerIdx !== null &&
+        engine.pendingChoice.playerIdx === humanPlayerIdx
+      )
+        break;
       resolveChoice();
       safetyCounter++;
     }
@@ -1122,7 +1157,11 @@ export function createAutoPlayer(engine, difficulty = "normal", { humanPlayerIdx
     // Resolve any resulting choices — but never steal a choice meant for the human.
     safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
-      if (humanPlayerIdx !== null && engine.pendingChoice.playerIdx === humanPlayerIdx) break;
+      if (
+        humanPlayerIdx !== null &&
+        engine.pendingChoice.playerIdx === humanPlayerIdx
+      )
+        break;
       resolveChoice();
       safetyCounter++;
     }

@@ -93,8 +93,7 @@
   });
 </script>
 
-<!-- Only shown on mobile (< lg). On desktop, log lives in the sidebar. -->
-<div class="lg:hidden">
+<div >
   <!-- FAB Button -->
   <button
     class="fixed bottom-5 right-5 z-[200] w-[52px] h-[52px] rounded-full
@@ -156,10 +155,12 @@
 
       <!-- Header -->
       <div class="flex items-center justify-between px-4 pb-2 border-b border-neutral-800">
-        <h3 class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0">
-          Game Log
-        </h3>
-      <button class="text-xs p-2 cursor-pointer" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
+        <div class="flex gap-2 items-center">
+          <h3 class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0">
+            Game Log
+          </h3>
+        <button class="btn-sm text-neutral-400 py-2" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
+        </div>
 
         <button
           class="bg-transparent border-none text-neutral-500 text-base

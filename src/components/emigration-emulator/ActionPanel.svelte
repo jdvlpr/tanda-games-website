@@ -1,5 +1,5 @@
 <script>
-  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, showLog = true, copyTextToClipboard } = $props();
+  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, copyTextToClipboard } = $props();
 
   let logContainer = $state(null);
 
@@ -16,7 +16,7 @@
   });
 </script>
 
-<div class="bg-neutral-200 dark:bg-neutral-800 max-lg:bg-neutral-50/50 max-lg:dark:bg-neutral-950/50 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 overflow-auto backdrop-blur-md max-lg:shadow-2xl {showLog ? 'h-full max-h-[calc(100vh-200px)]' : ''}">
+<div class="bg-neutral-200 dark:bg-neutral-800 max-lg:bg-neutral-50/50 max-lg:dark:bg-neutral-950/50 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 overflow-auto backdrop-blur-md max-lg:shadow-2xl">
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
@@ -62,20 +62,5 @@
         </div>
       {/if}
     </div>
-
-    <!-- Playtest Logs (hidden on mobile where GameLogSheet is used) -->
-    {#if showLog}
-    <div class="flex-grow flex flex-col min-h-[180px] overflow-hidden">
-      <h3 class="text-sm uppercase tracking-wider pb-2">Game Playtest Logs</h3>
-      <button class="text-xs p-2 cursor-pointer" onclick={() => copyTextToClipboard('game-log')}>Copy</button>
-      <div id="game-log" class="flex-grow overflow-y-auto bg-neutral-50 dark:bg-neutral-950 rounded-md p-3 font-emi-mono text-xs text-left flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-black/10 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-sm" bind:this={logContainer}>
-        {#each snapshot.logs as log}
-          <div class="leading-snug pb-1 {log.type === 'system' ? '' : log.type === 'action' ? '' : log.type === 'error' ? 'text-red-800 dark:text-red-200' : log.type === 'roll' ? '' : ''}">
-            <span class=" text-xs">[{log.turn}]</span> {log.msg}
-          </div>
-        {/each}
-      </div>
-    </div>
-    {/if}
   {/if}
 </div>

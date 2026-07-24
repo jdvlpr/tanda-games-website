@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import ToastContainer from '../components/ToastContainer.svelte';
 
 export interface Props {
   title: string;
@@ -46,6 +47,7 @@ let year = d.getFullYear();
     class="bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 text-center min-h-[100svh] flex flex-col justify-start"
   >
     <slot />
+    <ToastContainer client:load />
     <footer class="bg-neutral-100 dark:bg-neutral-800 py-8 font-serif">
       &copy; T&A Games {year}
     </footer>

@@ -3,7 +3,7 @@
   import ActionPanel from './ActionPanel.svelte';
   import CardActionPopover from './CardActionPopover.svelte';
   import { createAutoPlayer } from './autoplay.js';
-  import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.js';
+  import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.svelte.js';
   import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
   import { playPaydaySound } from '../../js/utils.svelte.js';
@@ -582,7 +582,6 @@
                 autoScrollEnabled={!autoplay}
                 hasSelection={!!(selectedSlot || selectedStash)}
                 onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
-                showLog={false}
               />
             </div>
           {/if}
@@ -725,21 +724,19 @@
                 selectedAnchorRect = null;
               }}
                 
-              showLog={true}
               {copyTextToClipboard}
             />
           </div>
         {/if}
       </div>
 
-      <!-- Mobile Floating Log Sheet -->
-      {#if isMobile}
+      <!-- Floating Log Sheet -->
+    
         <GameLogSheet 
           logs={snapshot.logs}
           autoScrollEnabled={!autoplay}
           {copyTextToClipboard}
         />
-      {/if}
       
       <Modal 
         choice={pendingChoice} 
