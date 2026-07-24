@@ -436,7 +436,7 @@
     <div class="max-w-[750px] mx-auto">
       <h1 class="text-center mb-2 text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
       <a href="/emigration" class="underline">← Back to the Game Page</a>
-      <div class="bg-neutral-200 shadow-lg dark:bg-neutral-800 p-2 lg:p-4 rounded-md flex flex-col gap-5 mt-4">
+      <div class="flex flex-col gap-5 mt-4">
         <div class="flex flex-col items-center gap-2">
           <p>Game Mode</p>
          
@@ -456,9 +456,42 @@
             </select>
         </label>
 
+        <div class="flex flex-col gap-3">
+          <p class="">Players</p>
+          <div class="flex justify-center">
+              <button
+                class="btn-sm rounded-r-none {gameType.value === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'vscomputer'}
+              >
+                Solo
+              </button>
+              <button
+                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType.value === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'passplay'}
+              >
+                Multi
+              </button>
+              <button
+                class="btn-sm rounded-l-none {gameType.value === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                onclick={() => gameType.value = 'auto'}
+              >
+               AI vs AI
+              </button>
+          </div>
+        </div>
+
         <div class="flex flex-col gap-6">
           {#each activeSetup as p, i}
           <div class="flex flex-col gap-2">
+          {#if gameType.value === 'vscomputer' && i === 0}
+            <p class="text-sm opacity-70 text-left">
+              Human
+            </p>
+            {:else if gameType.value === 'vscomputer'}
+            <p class="text-sm opacity-70 text-left">
+              AI
+            </p>
+          {/if}
             <input class="flex-1" type="text" bind:value={p.name} placeholder="Player Name" />
               <div class="flex gap-3 items-center">
                 <select class="flex-[1.5]" bind:value={p.nationality}>
@@ -500,29 +533,7 @@
         
         
 
-        <div class="flex flex-col gap-3">
-          <p class="">Player Type</p>
-          <div class="flex justify-center">
-              <button
-                class="btn-sm rounded-r-none {gameType.value === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'vscomputer'}
-              >
-                Solo
-              </button>
-              <button
-                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType.value === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'passplay'}
-              >
-                Multi
-              </button>
-              <button
-                class="btn-sm rounded-l-none {gameType.value === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'auto'}
-              >
-               AI vs AI
-              </button>
-          </div>
-        </div>
+        
 
         <div class={["flex flex-col gap-3", gameType.value === 'passplay' && 'hidden']}>
           <p class="">AI Difficulty</p>
@@ -612,7 +623,7 @@
                               <div class="flex flex-wrap gap-1 items-center text-xs">
                                 <div class={["rounded-md px-2 py-1 w-full flex flex-wrap items-center justify-center gap-1", status.player.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-900"]}>
                                   <p>{#if status.player.success}✅{:else}❌{/if} {status.player.name}</p>
-                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"><svg class="Icon size-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g class="" transform="translate(0,0)" style=""><path d="M256 38.013c-22.458 0-66.472 110.3-84.64 123.502-18.17 13.2-136.674 20.975-143.614 42.334-6.94 21.358 84.362 97.303 91.302 118.662 6.94 21.36-22.286 136.465-4.116 149.665 18.17 13.2 118.61-50.164 141.068-50.164 22.458 0 122.9 63.365 141.068 50.164 18.17-13.2-11.056-128.306-4.116-149.665 6.94-21.36 98.242-97.304 91.302-118.663-6.94-21.36-125.444-29.134-143.613-42.335-18.168-13.2-62.182-123.502-84.64-123.502z" fill="currentColor"></path></g></svg>{status.player.assurance}</div>
+                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"> <Icon icon="game-icons:round-star" class="size-3 shrink-0" />{status.player.assurance}</div>
                                 </div>
                               </div>
                               <div class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</div>
