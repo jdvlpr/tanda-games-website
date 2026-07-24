@@ -831,7 +831,11 @@ export default class EmigrationEngine {
       unshuffledTokens: lane.tokens.map((tokenNumber) => {
         return {
           tokenNumber,
-          isRevealed: false,
+          status: {
+            isRevealed: false,
+            revealedBy: null,
+            success: false,
+          },
         };
       }),
       tokens: shuffleArray([...lane.tokens]),
@@ -1552,13 +1556,6 @@ export default class EmigrationEngine {
       `PHASE2|P${player.id}|SELECT_LANE:${lane.name}|TKN:${tokenVal}`,
       "action",
     );
-    this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
-      laneIdx
-    ].unshuffledTokens.map(({ tokenNumber, isRevealed }) => {
-      if (isRevealed) return { tokenNumber, isRevealed };
-      if (tokenNumber === tokenVal) return { tokenNumber, isRevealed: true };
-      return { tokenNumber, isRevealed };
-    });
 
     const hasTicket = player.stash.tickets > 0;
     const hasPassport = player.stash.passports > 0;
@@ -1569,6 +1566,21 @@ export default class EmigrationEngine {
       toast.error(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: missing Passport/Ticket`,
       );
+      this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
+        laneIdx
+      ].unshuffledTokens.map(({ tokenNumber, status }) => {
+        if (status.isRevealed) return { tokenNumber, status };
+        if (tokenNumber === tokenVal)
+          return {
+            tokenNumber,
+            status: {
+              isRevealed: true,
+              revealedBy: player.name,
+              success: false,
+            },
+          };
+        return { tokenNumber, status };
+      });
     } else if (player.assurance >= tokenVal) {
       player.crossedSuccessfully = true;
       player.assurance -= tokenVal;
@@ -1579,12 +1591,42 @@ export default class EmigrationEngine {
       toast.success(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, crosses with ${player.assurance} Assurance remaining`,
       );
+      this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
+        laneIdx
+      ].unshuffledTokens.map(({ tokenNumber, status }) => {
+        if (status.isRevealed) return { tokenNumber, status };
+        if (tokenNumber === tokenVal)
+          return {
+            tokenNumber,
+            status: {
+              isRevealed: true,
+              revealedBy: player.name,
+              success: true,
+            },
+          };
+        return { tokenNumber, status };
+      });
     } else {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_LOW_A`, "error");
       toast.error(
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: has ${player.assurance} Assurance`,
       );
+      this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
+        laneIdx
+      ].unshuffledTokens.map(({ tokenNumber, status }) => {
+        if (status.isRevealed) return { tokenNumber, status };
+        if (tokenNumber === tokenVal)
+          return {
+            tokenNumber,
+            status: {
+              isRevealed: true,
+              revealedBy: player.name,
+              success: false,
+            },
+          };
+        return { tokenNumber, status };
+      });
     }
 
     this.activeCrossingIdx++;
