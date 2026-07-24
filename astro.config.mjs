@@ -5,11 +5,14 @@ import svelte from "@astrojs/svelte";
 
 // https://astro.build/config
 export default defineConfig({
+  integrations: [svelte()],
   vite: {
     define: {
       "import.meta.env.PACKAGE_VERSION": JSON.stringify(packageJson.version),
     },
     plugins: [tailwindcss()],
   },
-  integrations: [svelte()],
+  redirects: {
+    "/": "/emigration",
+  },
 });
