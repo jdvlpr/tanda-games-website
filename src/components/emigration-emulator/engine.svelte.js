@@ -1527,7 +1527,13 @@ export default class EmigrationEngine {
       if (cPen > 0) tradeStr += `|PEN_C:-${cPen}A`;
       tradeStr += `|TOTAL_A:${player.assurance}`;
 
+      let toastTradeString = `${player.name} has ${player.assurance} Assurance:`;
+      toastTradeString += ` ${mGain - mPen} (Money),`;
+      toastTradeString += ` ${dGain - dPen} (Docs),`;
+      toastTradeString += ` ${cGain - cPen} (Cons)`;
+
       this.log(tradeStr, "system");
+      toast.info(toastTradeString);
     }
 
     this._notify();
@@ -1551,6 +1557,9 @@ export default class EmigrationEngine {
       `PHASE2|P${player.id}|SELECT_LANE:${lane.name}|TKN:${tokenVal}`,
       "action",
     );
+    toast.info(
+      `${player.name} selects ${lane.name}, reveals ${tokenVal} token`,
+    );
 
     const hasTicket = player.stash.tickets > 0;
     const hasPassport = player.stash.passports > 0;
@@ -1558,6 +1567,7 @@ export default class EmigrationEngine {
     if (!hasTicket || !hasPassport) {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_MISSING_DOCS`, "error");
+      toast.error(`${player.name} blocked: missing Passport/Ticket`);
     } else if (player.assurance >= tokenVal) {
       player.crossedSuccessfully = true;
       player.assurance -= tokenVal;
@@ -1565,9 +1575,13 @@ export default class EmigrationEngine {
         `PHASE2|P${player.id}|CROSS:PASS|PAID_A:${tokenVal}|REM_A:${player.assurance}`,
         "action",
       );
+      toast.success(
+        `${player.name} crosses with ${player.assurance} remaining`,
+      );
     } else {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_LOW_A`, "error");
+      toast.error(`${player.name} blocked: not enough Assurance`);
     }
 
     this.activeCrossingIdx++;
@@ -1744,8 +1758,10 @@ export default class EmigrationEngine {
             `P${player.id}|GRAD|ROLL:${roll}|RES:PASS|SALARY_INC:${raiseAmount}`,
             "action",
           );
+          toast.success(`${player.name} rolled ${roll} and graduated`);
         } else {
           this.log(`P${player.id}|GRAD|ROLL:${roll}|RES:FAIL`, "error");
+          toast.error(`${player.name} rolled ${roll} and remains in college`);
           this._graduateAttempted = true;
         }
         this._notify();
@@ -1769,6 +1785,7 @@ export default class EmigrationEngine {
         this.discardPile.push(sold);
         player.money += 2;
         this.log(`P${player.id}|SELL:${sold.name}|GAIN:2`, "action");
+        toast.info(`${player.name} sells ${sold.name} for $2`);
         this._onCardDiscarded(player, sold);
         this._notify();
         break;
@@ -1808,8 +1825,10 @@ export default class EmigrationEngine {
           `P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`,
           "error",
         );
+        toast.warning(`${player.name} forfeits turn`);
         if (this.consecutiveForfeits >= this.players.length) {
           this.log("ALL_FORFEIT|GAIN:1", "system");
+          toast.warning(`All players forfeit turns, gain $1`);
           this.players.forEach((p) => {
             p.money += 1;
           });
@@ -1837,6 +1856,7 @@ export default class EmigrationEngine {
     const fee = target.id === player.id ? 0 : player.accessFee;
     if (player.money < fee) {
       this.log(`ERR|NO_FUNDS_${fee}`, "error");
+      toast.error("Not enough funds");
       return;
     }
 
@@ -1864,6 +1884,9 @@ export default class EmigrationEngine {
               this.log(
                 `P${player.id}|KEEP_CALM_USED|DISC:${removed.card.title}`,
                 "action",
+              );
+              toast.info(
+                `${player.name} uses Keep Calm to discard "${removed.card.title}"`,
               );
               this.uncoverLayout(target);
               this.advanceTurn();
@@ -1932,6 +1955,9 @@ export default class EmigrationEngine {
       return payout;
     });
     this.log(`PAYDAY|SALARIES:[${salaries.join(",")}]`, "action");
+    toast.info(
+      `Payday: ${salaries.map((amount, i) => `P${i + 1}: $${amount}`).join(", ")}`,
+    );
 
     for (const p of this.players) {
       const frIdx = p.stash.lifeCards.findIndex(
@@ -1948,6 +1974,7 @@ export default class EmigrationEngine {
         const left = this.getLeftPlayer(p);
         left.stash.lifeCards.push(frCard);
         this.log(`P${p.id}|FRONTRUNNER_PASS|TO:P${left.id}`, "system");
+        toast.info(`${left.name} gains Frontrunner with $${fr.money}`);
       }
     }
   }
@@ -2020,6 +2047,9 @@ export default class EmigrationEngine {
                   `P${player.id}|PERSUASION_ACC|FROM:P${target.id}`,
                   "action",
                 );
+                toast.info(
+                  `${player.id} accepts Persuasion from ${target.name}`,
+                );
                 this._onPlayerGainLifeCard(player);
                 this.advanceTurn();
               } else {
@@ -2031,6 +2061,9 @@ export default class EmigrationEngine {
                 this.log(
                   `P${player.id}|PERSUASION_DECLINED|FEE:${doubleFee}`,
                   "action",
+                );
+                toast.info(
+                  `${player.id} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
                 );
                 callback(doubleFee);
               }
@@ -2160,6 +2193,7 @@ export default class EmigrationEngine {
       case "Stellar Reputation":
         player.money += 3;
         this.log(`P${player.id}|ACT:Stellar Reputation|GAIN:3`, "action");
+        toast.info(`${player.name} gains $3 from Stellar Reputation`);
         done();
         break;
 
@@ -2180,6 +2214,7 @@ export default class EmigrationEngine {
               if (val === "money") {
                 player.money += 3;
                 this.log(`P${player.id}|ACT:Rummage Sale|GAIN:3`, "action");
+                toast.info(`${player.name} gains $3 from Rummage Sale`);
               } else {
                 const docIndexInDiscard = parseInt(val.split("-")[1]);
                 let count = 0;
@@ -2191,6 +2226,9 @@ export default class EmigrationEngine {
                       this.log(
                         `P${player.id}|ACT:Rummage Sale|TAKE_DOC:${taken.name}`,
                         "action",
+                      );
+                      toast.info(
+                        `${player.name} takes Doc (${taken.name}) from Rummage Sale`,
                       );
                       this._onPlayerGainDocument(player);
                       break;
@@ -2206,6 +2244,9 @@ export default class EmigrationEngine {
         }
         player.money += 3;
         this.log(`P${player.id}|ACT:Rummage Sale|GAIN:3|NO_DOCS`, "action");
+        toast.info(
+          `${player.name} gains $3 from Rummage Sale (no Docs available)`,
+        );
         done();
         break;
       }
@@ -2221,6 +2262,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Island Paradise|${deltaStr}`, "action");
+        toast.info(
+          `${player.name} gains $1 and players with the fewest Docs gain $1`,
+        );
         done();
         break;
       }
@@ -2232,6 +2276,9 @@ export default class EmigrationEngine {
           (targetId) => {
             const target = this.players[targetId];
             const temp = player.money;
+            toast.info(
+              `${player.name} ($${player.money}) swaps wallets with ${target.name} ($${target.money})`,
+            );
             player.money = target.money;
             target.money = temp;
             this.log(
