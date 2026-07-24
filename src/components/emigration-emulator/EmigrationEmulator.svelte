@@ -608,8 +608,13 @@
                       {#if lane.unshuffledTokens.filter(({status}) => status.isRevealed).length}
                         <div class="flex flex-col gap-1 justify-center">
                           {#each lane.unshuffledTokens.filter(({status}) => status.isRevealed) as {tokenNumber, status}}
-                            <div class="flex whitespace-nowrap gap-1 items-center text-xs">
-                              <div class={["rounded-md px-2 py-1 w-full flex items-center", status.player.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-900"]}>{#if status.player.success}✅{:else}❌{/if} {status.player.name} (<svg class="Icon size-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g class="" transform="translate(0,0)" style=""><path d="M256 38.013c-22.458 0-66.472 110.3-84.64 123.502-18.17 13.2-136.674 20.975-143.614 42.334-6.94 21.358 84.362 97.303 91.302 118.662 6.94 21.36-22.286 136.465-4.116 149.665 18.17 13.2 118.61-50.164 141.068-50.164 22.458 0 122.9 63.365 141.068 50.164 18.17-13.2-11.056-128.306-4.116-149.665 6.94-21.36 98.242-97.304 91.302-118.663-6.94-21.36-125.444-29.134-143.613-42.335-18.168-13.2-62.182-123.502-84.64-123.502z" fill="currentColor"></path></g></svg>{status.player.assurance})</div>
+                            <div class="flex gap-1 items-center">
+                              <div class="flex flex-wrap gap-1 items-center text-xs">
+                                <div class={["rounded-md px-2 py-1 w-full flex flex-wrap items-center justify-center gap-1", status.player.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-900"]}>
+                                  <p>{#if status.player.success}✅{:else}❌{/if} {status.player.name}</p>
+                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"><svg class="Icon size-3 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g class="" transform="translate(0,0)" style=""><path d="M256 38.013c-22.458 0-66.472 110.3-84.64 123.502-18.17 13.2-136.674 20.975-143.614 42.334-6.94 21.358 84.362 97.303 91.302 118.662 6.94 21.36-22.286 136.465-4.116 149.665 18.17 13.2 118.61-50.164 141.068-50.164 22.458 0 122.9 63.365 141.068 50.164 18.17-13.2-11.056-128.306-4.116-149.665 6.94-21.36 98.242-97.304 91.302-118.663-6.94-21.36-125.444-29.134-143.613-42.335-18.168-13.2-62.182-123.502-84.64-123.502z" fill="currentColor"></path></g></svg>{status.player.assurance}</div>
+                                </div>
+                              </div>
                               <div class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</div>
                             </div>
                           {/each}
