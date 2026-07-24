@@ -596,8 +596,8 @@
                     <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[100px] flex flex-col items-center text-center flex-1 transition-all">
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
                       <div class="text-xs mb-1 flex gap-1">
-                      {#each lane.unshuffledTokens as tokenNumber}
-                      <p class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</p>
+                      {#each lane.unshuffledTokens as {tokenNumber, isRevealed}}
+                      <p class={["bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md", isRevealed && 'opacity-40']}>{tokenNumber}</p>
                       {/each}
                       </div>
                       <div class="flex gap-1 justify-center">

@@ -828,7 +828,12 @@ export default class EmigrationEngine {
   _setupSecurityLanes() {
     this.securityLanes = SECURITY_LANES_DATA.map((lane) => ({
       name: lane.name,
-      unshuffledTokens: lane.tokens,
+      unshuffledTokens: lane.tokens.map((tokenNumber) => {
+        return {
+          tokenNumber,
+          isRevealed: false,
+        };
+      }),
       tokens: shuffleArray([...lane.tokens]),
     }));
   }
@@ -1523,13 +1528,7 @@ export default class EmigrationEngine {
       if (cPen > 0) tradeStr += `|PEN_C:-${cPen}A`;
       tradeStr += `|TOTAL_A:${player.assurance}`;
 
-      let toastTradeString = `${player.name} has ${player.assurance} Assurance:`;
-      toastTradeString += ` ${mGain - mPen} (Money),`;
-      toastTradeString += ` ${dGain - dPen} (Docs),`;
-      toastTradeString += ` ${cGain - cPen} (Cons)`;
-
       this.log(tradeStr, "system");
-      toast.info(toastTradeString);
     }
 
     this._notify();
@@ -1553,9 +1552,13 @@ export default class EmigrationEngine {
       `PHASE2|P${player.id}|SELECT_LANE:${lane.name}|TKN:${tokenVal}`,
       "action",
     );
-    toast.info(
-      `${player.name} selects ${lane.name}, reveals ${tokenVal} token`,
-    );
+    this.securityLanes[laneIdx].unshuffledTokens = this.securityLanes[
+      laneIdx
+    ].unshuffledTokens.map(({ tokenNumber, isRevealed }) => {
+      if (isRevealed) return { tokenNumber, isRevealed };
+      if (tokenNumber === tokenVal) return { tokenNumber, isRevealed: true };
+      return { tokenNumber, isRevealed };
+    });
 
     const hasTicket = player.stash.tickets > 0;
     const hasPassport = player.stash.passports > 0;
@@ -1563,7 +1566,9 @@ export default class EmigrationEngine {
     if (!hasTicket || !hasPassport) {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_MISSING_DOCS`, "error");
-      toast.error(`${player.name} blocked: missing Passport/Ticket`);
+      toast.error(
+        `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: missing Passport/Ticket`,
+      );
     } else if (player.assurance >= tokenVal) {
       player.crossedSuccessfully = true;
       player.assurance -= tokenVal;
@@ -1572,12 +1577,14 @@ export default class EmigrationEngine {
         "action",
       );
       toast.success(
-        `${player.name} crosses with ${player.assurance} remaining`,
+        `${player.name} selects ${lane.name}, reveals ${tokenVal} token, crosses with ${player.assurance} Assurance remaining`,
       );
     } else {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_LOW_A`, "error");
-      toast.error(`${player.name} blocked: not enough Assurance`);
+      toast.error(
+        `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: has ${player.assurance} Assurance`,
+      );
     }
 
     this.activeCrossingIdx++;
