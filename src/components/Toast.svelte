@@ -17,7 +17,7 @@
 <div
     in:fly={{ y: 20, duration: 300 }}
     out:fade={{ duration: 200 }}
-    class="flex items-center justify-between p-1 rounded-md min-w-[260px] w-full text-left text-black dark:text-white pointer-events-auto backdrop-blur-md border {typeClasses[item.type]}"
+    class="flex items-center justify-between p-1 rounded-md min-w-[260px] w-full text-left text-black dark:text-white pointer-events-auto backdrop-blur-md border border-neutral-200 dark:border-neutral-800 {typeClasses[item.type]}"
     role="alert"
 >
     <span class="text-xs md:text-sm">{item.message}</span>

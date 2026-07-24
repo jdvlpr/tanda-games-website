@@ -1,9 +1,3 @@
-<script module>
-  export let gameType = $state({
-    value: 'vscomputer',
-  });
-</script>
-
 <script>
   import Icon from '@iconify/svelte';
   import ActionPanel from './ActionPanel.svelte';
@@ -67,6 +61,7 @@
   let snapshot = $state(null); // reactive copy of engine state
   let pendingChoice = $state(null);
   let autoplay = $state(null);
+  let gameType = $state('vscomputer');
 
   // Solo vs AI State
   let vsComputer = $state(false);
@@ -432,22 +427,46 @@
   }
 </script>
 
-<div class="bg-neutral-100 dark:bg-neutral-900 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
+<div class="bg-neutral-50 dark:bg-neutral-950 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
+  <h1 class="text-center mb-2 text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
+  <a href="/emigration" class="underline">← Exit</a>
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
-      <h1 class="text-center mb-2 text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
-      <a href="/emigration" class="underline">← Back to the Game Page</a>
       <div class="flex flex-col gap-5 mt-4">
-        <div class="flex flex-col items-center gap-2">
-          <p>Game Mode</p>
-         
+        <div class="flex flex-col gap-1">
+          <p class="opacity-70 text-sm">Game Mode</p>
           <div class="flex justify-center">
-            <button class="btn-sm rounded-r-none border-r-0 {mode === 'competitive' && 'bg-teal-100 dark:bg-teal-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-            <button class=" btn-sm rounded-l-none {mode === 'cooperative' && 'bg-teal-100 dark:bg-teal-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+              <button
+                class="btn-sm rounded-r-none {gameType === 'vscomputer' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
+                onclick={() => {
+                  gameType = 'vscomputer';
+                  toast.enabled = true;
+                }}
+              >
+                Solo
+              </button>
+              <button
+                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType === 'passplay' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
+                onclick={() => {
+                  gameType = 'passplay';
+                  toast.enabled = true;
+                }}
+              >
+                Pass & Play
+              </button>
+              <button
+                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
+                onclick={() =>{
+                   gameType = 'auto';
+                   toast.enabled = false;
+                }}
+              >
+               AI vs AI
+              </button>
           </div>
         </div>
 
-        <label>Player Count:
+        <label><span class="text-sm opacity-70">Number of Players:</span>
             <select class="w-fit" bind:value={playerCount} onchange={() => selectedPacks = getRandomPacks(playerCount)}>
               <option value={2}>2</option>
               <option value={3}>3</option>
@@ -457,66 +476,49 @@
             </select>
         </label>
 
-        <div class="flex flex-col gap-3">
-          <p class="">Players</p>
-          <div class="flex justify-center">
-              <button
-                class="btn-sm rounded-r-none {gameType.value === 'vscomputer' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'vscomputer'}
-              >
-                Solo
-              </button>
-              <button
-                class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType.value === 'passplay' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'passplay'}
-              >
-                Multi
-              </button>
-              <button
-                class="btn-sm rounded-l-none {gameType.value === 'auto' ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
-                onclick={() => gameType.value = 'auto'}
-              >
-               AI vs AI
-              </button>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-4">
           {#each activeSetup as p, i}
-          <div class="flex flex-col gap-2">
-          {#if gameType.value === 'vscomputer' && i === 0}
+          <div class="flex flex-col gap-2 p-2 rounded-md bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+          {#if gameType === 'vscomputer' && i === 0}
             <p class="text-sm opacity-70 text-left">
               Human
             </p>
-            {:else if gameType.value === 'vscomputer'}
+            {:else if gameType === 'vscomputer'}
             <p class="text-sm opacity-70 text-left">
               AI
             </p>
           {/if}
             <input class="flex-1" type="text" bind:value={p.name} placeholder="Player Name" />
-              <div class="flex gap-3 items-center">
-                <select class="flex-[1.5]" bind:value={p.nationality}>
-                  {#each NATIONALITIES as nat}
-                    <option value={nat.name}>{nat.name} (${nat.fund})</option>
-                  {/each}
-                </select>
-                <span class="">→</span>
-                <select class="flex-[1.5]" bind:value={p.destination}>
+              <div class="flex gap-2 items-center">
+                <div class="flex flex-col gap-1 items-start flex-[1.5]">
+                <label for="nat" class="text-sm opacity-70">Nationality</label>
+                  <select id="nat" class="" bind:value={p.nationality}>
+                    {#each NATIONALITIES as nat}
+                      <option value={nat.name}>{nat.name} (${nat.fund})</option>
+                    {/each}
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1 items-start flex-[1.5]">
+                <label for="dest" class="text-sm opacity-70">Destination</label>
+                <select id="dest" class="" bind:value={p.destination}>
                   {#each DESTINATIONS as dest}
                     <option value={dest.name}>{dest.name}</option>
                   {/each}
                 </select>
+                </div>
               </div>
           </div>
           {/each}
         </div>
 
-        <div class="flex flex-col gap-3">
-          <p class="">Life Card Packs</p>
+        <div class="flex flex-col gap-1">
+          <p class="text-sm opacity-70">Life Card Packs {#if playerCount !== selectedPacks.length}
+            <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {playerCount})</span>
+          {/if}</p>
           <div class="flex flex-wrap justify-center gap-2">
             {#each PACKS_LIST as pack}
               <button
-                class="btn-sm {selectedPacks.includes(pack) ? 'bg-teal-100 dark:bg-teal-900  ' : ''}"
+                class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {selectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
                 onclick={() => {
                   if (selectedPacks.includes(pack)) {
                     selectedPacks = selectedPacks.filter(p => p !== pack);
@@ -531,17 +533,13 @@
           </div>
         </div>
 
-        
-        
 
-        
-
-        <div class={["flex flex-col gap-3", gameType.value === 'passplay' && 'hidden']}>
-          <p class="">AI Difficulty</p>
+        <div class={["flex flex-col gap-1", gameType === 'passplay' && 'hidden']}>
+          <p class="text-sm opacity-70">AI Difficulty</p>
           <div class="flex justify-center">
             {#each ['easy', 'normal', 'expert'] as diff, i}
               <button
-                class={["btn-sm", aiDifficulty === diff && 'bg-teal-100 dark:bg-teal-900', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
+                class={["btn-sm hover:bg-blue-50 dark:hover:bg-blue-950", aiDifficulty === diff && 'bg-blue-200 dark:bg-blue-900 ', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
                 onclick={() => aiDifficulty = diff}
               >
                 {diff.charAt(0).toUpperCase() + diff.slice(1)}
@@ -550,26 +548,22 @@
           </div>
         </div>
 
-        <div class="">
-          <button class="btn text-2xl" onclick={() => startGame(gameType.value)}>Start</button>
+        <div class="flex flex-col items-center gap-1">
+          <p class="text-sm opacity-70">Game Type</p>
+         
+          <div class="flex justify-center">
+            <button class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode === 'competitive' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+            <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+          </div>
+        </div>
+
+        <div class="my-2">
+          <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start</button>
         </div>
       </div>
-
-      {#if showTestRunner}
-      <button class="my-8 cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
-        {#if testResults}
-          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
-            {#each testResults as res}
-              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
-                {res.pass ? '✅' : '❌'} {res.description}
-              </div>
-            {/each}
-          </div>
-        {/if}
-      {/if}
     </div>
   {:else if snapshot}
-    <div>
+    <div class="max-w-[1200px] mx-auto">
       <div class="flex flex-wrap gap-2 justify-between items-center mb-5">
         <h2 class="text-2xl tracking-wide">Phase: {snapshot.phase.charAt(0).toUpperCase() + snapshot.phase.slice(1)}</h2>
         <div class="flex flex-wrap items-center gap-3">
@@ -580,7 +574,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start max-w-[1600px] mx-auto w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start  mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
         <div class="flex flex-col gap-2">
           <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
@@ -604,10 +598,10 @@
           {/if}
 
           <!-- Public Center Pool -->
-          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 backdrop-blur-md">
+          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 backdrop-blur-md shadow-inner">
           <!-- Security Lanes -->
-            <div class="lg:col-span-2 flex flex-col gap-2 p-1 rounded-md">
-                <div class="text-sm uppercase tracking-wider ">Security Lanes</div>
+            <div class="lg:col-span-2 flex flex-col gap-1 p-1 rounded-md">
+                <div class="text-sm opacity-70 ">Security Lanes</div>
                 <div class="flex flex-wrap gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
                     <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[100px] flex flex-col items-center text-center flex-1 transition-all">
@@ -647,10 +641,10 @@
               </div>
             </div>
             
-            <div class="pb-2 text-sm uppercase tracking-wider ">Public Services cards</div>
+            <div class="text-sm opacity-70 ">Public Services cards</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
               <!-- Tickets -->
-              <div class="flex  items-center gap-4 bg-neutral-200 dark:bg-neutral-800 p-3.5 rounded-md">
+              <div class="flex  items-center gap-4 bg-neutral-100 dark:bg-neutral-900 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold text-sm">Tickets</div>
                   <div class="text-xs ">Cost: $2 Money</div>
@@ -683,7 +677,7 @@
               </div>
 
               <!-- Passports -->
-              <div class="flex items-center gap-4  bg-neutral-200 dark:bg-neutral-800 p-3.5 rounded-md border border-white/5">
+              <div class="flex items-center gap-4 bg-neutral-100 dark:bg-neutral-900 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold text-sm">Passports</div>
                   <div class="text-xs ">Cost: $2 Money</div>
@@ -787,15 +781,35 @@
       {/if}
     </div>
   {/if}
-  <div class="flex flex-col gap-2 items-start text-left my-4 mx-auto w-fit">
-    <p class="font-semibold">Settings</p>
-    <label>Notifications Timeout
-      <select bind:value={toast.timeoutMs}>
-        <option value={1500}>Fast (1.5s)</option>
-        <option value={3000}>Normal (3s)</option>
-        <option value={5000}>Long (5s)</option>
-      </select>
-    </label>
+  
+  <div class="flex flex-col gap-2 items-start text-left my-8 mx-auto w-fit rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+    <p class="font-semibold text-xl">Emulator Settings</p>
+    <div class="flex gap-1 items-center flex-1 justify-start ">
+      <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
+      <label class=" min-w-sm" for="enable-notifications">Show Notifications</label>
+    </div>
+    {#if toast.enabled}
+      <label>Notifications Timeout
+        <select bind:value={toast.timeoutMs}>
+          <option value={1500}>Fast (1.5s)</option>
+          <option value={3000}>Normal (3s)</option>
+          <option value={5000}>Long (5s)</option>
+        </select>
+      </label>
+    {/if}
   </div>
-  <p class="italic text-xs">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+
+  {#if showTestRunner}
+      <button class="my-8 cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
+        {#if testResults}
+          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
+            {#each testResults as res}
+              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
+                {res.pass ? '✅' : '❌'} {res.description}
+              </div>
+            {/each}
+          </div>
+        {/if}
+      {/if}
+  <p class="italic text-xs mb-8">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
 </div>

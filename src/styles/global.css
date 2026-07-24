@@ -23,7 +23,8 @@
 @layer components {
   .btn {
     cursor: pointer;
-    border: 2px solid;
+    border: 1px solid;
+    border-color: var(--color-neutral-500);
     border-radius: theme("borderRadius.md");
     width: fit-content;
     padding: 1rem 2rem;
@@ -34,24 +35,26 @@
     justify-content: center;
     gap: 0.5rem;
     align-items: center;
+    @apply shadow-sm;
     @apply transition-all;
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
     &:hover {
-      background-color: theme("colors.teal.50");
+      background-color: theme("colors.red.50");
     }
     @variant dark {
       &:hover {
-        background-color: theme("colors.teal.700");
+        background-color: theme("colors.red.700");
       }
     }
   }
 
   .btn-sm {
     cursor: pointer;
-    border: 2px solid;
+    border: 1px solid;
+    border-color: var(--color-neutral-500);
     border-radius: theme("borderRadius.md");
     width: fit-content;
     padding: 0.17rem 0.5rem;
@@ -63,17 +66,18 @@
     justify-content: center;
     gap: 0.5rem;
     align-items: center;
+    @apply shadow-sm;
     @apply transition-all;
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
     &:hover {
-      background-color: theme("colors.teal.50");
+      background-color: theme("colors.red.50");
     }
     @variant dark {
       &:hover {
-        background-color: theme("colors.teal.700");
+        background-color: theme("colors.red.700");
       }
     }
   }
@@ -81,7 +85,9 @@
   input,
   textarea,
   select {
-    border: 2px solid;
+    border: 1px solid;
+    border-color: var(--color-neutral-500);
+    background-color: white;
     padding: 0.5rem 1rem;
     font-size: theme("fontSize.base");
     font-weight: theme("fontWeight.normal");
@@ -89,6 +95,7 @@
     border-radius: theme("borderRadius.md");
     @variant dark {
       color: white;
+      background-color: black;
     }
   }
 }

@@ -20,7 +20,7 @@
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
-      <h3 class="text-sm uppercase tracking-wider pb-2 max-lg:hidden">Action Dashboard</h3>
+      <h3 class="text-sm opacity-70 bp-1 max-lg:hidden">Action Dashboard</h3>
       
       <!-- Selection Hint -->
       <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-2 mb-2 min-h-[44px] flex items-center justify-center text-center gap-2 flex-wrap">

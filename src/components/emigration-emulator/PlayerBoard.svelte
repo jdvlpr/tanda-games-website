@@ -34,23 +34,23 @@
   function getDestinationInfoText(destName) {
     switch (destName) {
       case "Bosnia and Herzegovina":
-        return "Money ≥ 6 (+2) | Docs ≥ 4 (+2), < 2 (-2) | Conns ≥ 3 (+6)";
+        return "Money x6 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+6)";
       case "China":
-        return "Money ≥ 10 (+3), < 4 (-2) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 4 (+5)";
+        return "Money x10 (+3), < 4 (-2) | Docs x4 (+2), < 2 (-3) | Conns x4 (+5)";
       case "Democratic Republic of Congo":
-        return "Money ≥ 6 (+2) | Docs ≥ 4 (+2), < 2 (-2) | Conns ≥ 3 (+6)";
+        return "Money x6 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+6)";
       case "France":
-        return "Money ≥ 8 (+2), < 3 (-1) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 3 (+4)";
+        return "Money x8 (+2), < 3 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
       case "Russia":
-        return "Money ≥ 7 (+2), < 2 (-1) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 3 (+4)";
+        return "Money x7 (+2), < 2 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
       case "Senegal":
-        return "Money ≥ 7 (+2) | Docs ≥ 4 (+2), < 2 (-2) | Conns ≥ 3 (+5)";
+        return "Money x7 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+5)";
       case "Switzerland":
-        return "Money ≥ 7 (+2), < 2 (-1) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 3 (+4)";
+        return "Money x7 (+2), < 2 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
       case "England":
-        return "Money ≥ 10 (+3), < 4 (-2) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 3 (+4)";
+        return "Money x10 (+3), < 4 (-2) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
       case "United States of America":
-        return "Money ≥ 10 (+3), < 5 (-2) | Docs ≥ 4 (+2), < 2 (-3) | Conns ≥ 4 (+5)";
+        return "Money x10 (+3), < 5 (-2) | Docs x4 (+2), < 2 (-3) | Conns x4 (+5)";
       default:
         return "";
     }
@@ -92,17 +92,17 @@
 
 <div
   bind:this={boardEl}
-  class={["rounded-md p-5 mb-6 transition-all duration-300 mt-4 max-lg:scroll-mt-[8rem] bg-neutral-200 dark:bg-neutral-800", isActive && "shadow-[0_0_20px_rgba(85,183,176,0.65)]"]}
+  class={["rounded-md p-5 my-2 transition-all duration-300 scroll-mt-[8rem] bg-neutral-200 dark:bg-neutral-800", isActive && "border-2 border-red-300 dark:border-red-900"]}
 >
   <!-- Player Header Info -->
   <div class="flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm">
         <div class="flex items-center gap-1 w-fit">
           {#if isActive}
-            <span class="text-green-500 animate-pulse">▶</span>
+            <span class="text-red-300 dark:text-red-900 animate-pulse">▶</span>
           {/if}
           <p class="text-xl font-bold">{player.name}</p>
         </div>
-        <span class="flex flex-wrap gap-1 items-center">{player.nationality}</span>
+        <span class="flex flex-wrap gap-1 items-center">{player.nationality} (${player.collegeFund})</span>
           <span class="bg-neutral-50 dark:bg-neutral-950 flex gap-1 px-1 py-0.5 rounded-md items-center" title="College Fund">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="size-5"><g class="" transform="translate(0,0)" style=""><path d="M256 89.61 22.486 177.18 256 293.937l111.22-55.61-104.337-31.9A16 16 0 0 1 256 208a16 16 0 0 1-16-16 16 16 0 0 1 16-16l-2.646 8.602 18.537 5.703a16 16 0 0 1 .008.056l27.354 8.365L455 246.645v12.146a16 16 0 0 0-7 13.21 16 16 0 0 0 7.293 13.406C448.01 312.932 448 375.383 448 400c16 10.395 16 10.775 32 0 0-24.614-.008-87.053-7.29-114.584A16 16 0 0 0 480 272a16 16 0 0 0-7-13.227v-25.42L413.676 215.1l75.838-37.92L256 89.61zM119.623 249 106.5 327.74c26.175 3.423 57.486 18.637 86.27 36.627 16.37 10.232 31.703 21.463 44.156 32.36 7.612 6.66 13.977 13.05 19.074 19.337 5.097-6.288 11.462-12.677 19.074-19.337 12.453-10.897 27.785-22.128 44.156-32.36 28.784-17.99 60.095-33.204 86.27-36.627L392.375 249h-6.25L256 314.063 125.873 249h-6.25z" fill="currentColor"/></g></svg>
             <span class="max-md:hidden">College Fund:</span>
@@ -158,7 +158,7 @@
 
   <!-- Requirements Subheader -->
   <div class="text-xs lg:text-sm text-left mb-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-md flex flex-col gap-1 items-start">
-    <p><strong>{player.destination}:</strong> <span class="">{getDestinationInfoText(player.destination)}</span></p>
+    <p><strong>{player.destination}:</strong> <span class="">{@html getDestinationInfoText(player.destination)}</span></p>
   </div>
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->

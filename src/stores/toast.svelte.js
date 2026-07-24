@@ -1,5 +1,3 @@
-import { gameType } from "../components/emigration-emulator/EmigrationEmulator.svelte";
-
 /**
  * @typedef {'info' | 'success' | 'warning' | 'error'} ToastType
  */
@@ -18,6 +16,8 @@ class ToastManager {
    */
   toasts = $state([]);
 
+  enabled = $state(true);
+
   timeoutMs = $state(3000);
 
   /** * Tracks when the last toast in the queue is scheduled to dismiss
@@ -29,7 +29,7 @@ class ToastManager {
    * @param {Omit<Toast, 'id'>} toast
    */
   add(toast) {
-    if (gameType.value === "auto") return;
+    if (!this.enabled) return;
     const id = crypto.randomUUID();
     const duration =
       toast.duration !== undefined ? toast.duration : this.timeoutMs;
