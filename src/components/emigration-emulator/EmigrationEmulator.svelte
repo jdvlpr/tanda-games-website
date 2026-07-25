@@ -81,9 +81,9 @@ const isDev = import.meta.env.DEV;
   let gameType = $state('vscomputer');
 
   // Solo vs AI State
-  let vsComputer = $state(false);
   let aiPlayer = $state(null);
   let aiThinking = $state(false);
+  let activeBotIndices = $state([]);
 
   // Selection State
   let selectedSlot = $state(null);
@@ -205,7 +205,7 @@ const isDev = import.meta.env.DEV;
       const prev = previousActualPlayerId;
       previousActualPlayerId = actualActivePlayerId;
       
-      if (vsComputer && prev !== 0 && prev !== null) {
+      if (activeBotIndices.length > 0 && prev !== 0 && prev !== null) {
         isTransitioning = true;
         setTimeout(() => {
           visualActivePlayerId = actualActivePlayerId;
@@ -218,11 +218,10 @@ const isDev = import.meta.env.DEV;
   });
 
   // In Solo vs AI mode: is it currently the human player's turn (index 0)?
-  let isHumanTurn = $derived(
-    !vsComputer ||
-    !snapshot ||
-    snapshot.phase === 'game_over' ||
-    visualActivePlayerId === 0
+  let isLocalBotTurn = $derived(
+    snapshot &&
+    snapshot.phase !== 'game_over' &&
+    activeBotIndices.includes(visualActivePlayerId)
   );
 
   // In P2P mode: is it currently this client's turn?
@@ -236,31 +235,29 @@ const isDev = import.meta.env.DEV;
 
   // Name of the player whose turn it currently is (for the "Waiting for X" message)
   let waitingForPlayerName = $derived(
-    snapshot && gameType === 'online' && !isMyP2PTurn
+    snapshot && gameType === 'online' && !isMyP2PTurn && !activeBotIndices.includes(actualActivePlayerId)
       ? (snapshot.players?.[actualActivePlayerId]?.name ?? 'another player')
       : ''
   );
 
-  // Drive AI turns whenever snapshot changes in Solo vs AI mode
+  // Drive AI turns whenever snapshot changes
   $effect(() => {
-    if (!vsComputer || !snapshot || !aiPlayer || aiThinking || isTransitioning) return;
+    if (!snapshot || !aiPlayer || aiThinking || isTransitioning || activeBotIndices.length === 0) return;
     if (snapshot.phase === 'game_over') return;
     
-    // In vsComputer mode, player 0 is the human player.
-    // If there is a pending choice specifically targeted at the human player (player 0),
-    // we must pause AI turns so the human player can answer via the modal.
-    if (pendingChoice && pendingChoice.playerIdx === 0) return;
+    const choiceBotIdx = pendingChoice ? activeBotIndices.includes(pendingChoice.playerIdx) : false;
 
-    // If there is a pending choice directed at an AI player during the human's turn
-    // (e.g. persuasion-offer fired when the human targets an AI's layout), resolve it
-    // immediately without playing a full AI turn — then let the effect re-run.
-    if (pendingChoice && pendingChoice.playerIdx !== 0) {
+    // Pause AI turns if there's a pending choice targeted at a non-bot player.
+    if (pendingChoice && !choiceBotIdx) return;
+
+    // If there is a pending choice directed at an AI player during a non-bot's turn
+    if (pendingChoice && choiceBotIdx) {
       aiThinking = true;
       setTimeout(() => {
         if (!engine || engine.phase === 'game_over') { aiThinking = false; return; }
         let safety = 0;
         while (engine.pendingChoice && safety < 20) {
-          if (engine.pendingChoice.playerIdx === 0) break;
+          if (!activeBotIndices.includes(engine.pendingChoice.playerIdx)) break;
           aiPlayer.resolveChoice();
           safety++;
         }
@@ -269,7 +266,7 @@ const isDev = import.meta.env.DEV;
       return;
     }
 
-    if (isHumanTurn) return;
+    if (!isLocalBotTurn) return;
 
     aiThinking = true;
     setTimeout(() => {
@@ -280,17 +277,17 @@ const isDev = import.meta.env.DEV;
       // Resolve any pending choice for AI players
       let safety = 0;
       while (engine.pendingChoice && safety < 20) {
-        if (vsComputer && engine.pendingChoice.playerIdx === 0) break;
+        if (!activeBotIndices.includes(engine.pendingChoice.playerIdx)) break;
         aiPlayer.resolveChoice();
         safety++;
       }
-      // Play one AI turn if no choice is pending for the human
-      if (!engine.pendingChoice || (vsComputer && engine.pendingChoice.playerIdx !== 0)) {
+      // Play one AI turn
+      if (!engine.pendingChoice || activeBotIndices.includes(engine.pendingChoice.playerIdx)) {
         aiPlayer.playTurn();
         // Resolve any resulting choices that belong to AI players
         safety = 0;
         while (engine.pendingChoice && safety < 20) {
-          if (vsComputer && engine.pendingChoice.playerIdx === 0) break;
+          if (!activeBotIndices.includes(engine.pendingChoice.playerIdx)) break;
           aiPlayer.resolveChoice();
           safety++;
         }
@@ -644,7 +641,7 @@ const isDev = import.meta.env.DEV;
     pendingChoice = engine.pendingChoice ?? null;
     isSetup = false;
     testResults = null;
-    vsComputer = false;
+    activeBotIndices = [];
     aiPlayer = null;
     aiThinking = false;
     autoplay = null;
@@ -695,19 +692,70 @@ const isDev = import.meta.env.DEV;
     testResults = null;
 
     // Reset VS computer state
-    vsComputer = false;
+    activeBotIndices = [];
     aiPlayer = null;
     aiThinking = false;
     autoplay = null;
 
     if (gameType === 'auto') {
       // AI Simulation: all players AI-controlled, plays at speed
+      activeBotIndices = engine.players.map((_, i) => i);
       autoplay = createAutoPlayer(engine, aiDifficulty);
       autoplay.playFullGame(100);
     } else if (gameType === 'vscomputer') {
       // Solo vs AI: Player 1 (index 0) is human, all others AI
-      vsComputer = true;
-      aiPlayer = createAutoPlayer(engine, aiDifficulty, { humanPlayerIdx: 0 });
+      activeBotIndices = engine.players.map((_, i) => i).filter(i => i !== 0);
+      aiPlayer = createAutoPlayer(engine, aiDifficulty, { botIndices: activeBotIndices });
+    } else if (gameType === 'online' && multiplayer.isHost) {
+      activeBotIndices = p2pPlayers.map((p, i) => p.isBot ? i : -1).filter(i => i !== -1);
+      if (activeBotIndices.length > 0) {
+        const botEngine = new Proxy(engine, {
+          get(target, prop) {
+            if (['executeRequiredAction', 'executeOptionalAction'].includes(prop)) {
+              return (actionType, params = {}) => {
+                if (['applyCollege', 'graduate', 'activate'].includes(actionType)) {
+                  params.rolls = [
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1
+                  ];
+                }
+                const res = target[prop](actionType, params);
+                multiplayer.broadcastAction('GAME_ACTION', { actionType, params });
+                if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+                return res;
+              };
+            }
+            if (prop === 'resolveChoice') {
+              return (value) => {
+                const rolls = [
+                  Math.floor(Math.random() * 6) + 1,
+                  Math.floor(Math.random() * 6) + 1,
+                  Math.floor(Math.random() * 6) + 1
+                ];
+                const res = target.resolveChoice(value, rolls);
+                multiplayer.broadcastAction('MODAL_RESOLVE', { value, rolls });
+                if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+                return res;
+              };
+            }
+            if (prop === 'selectLane') {
+              return (laneIdx) => {
+                const res = target.selectLane(laneIdx);
+                multiplayer.broadcastAction('LANE_SELECT', { laneIdx });
+                if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+                return res;
+              };
+            }
+            const orig = target[prop];
+            if (typeof orig === 'function') {
+              return orig.bind(target);
+            }
+            return orig;
+          }
+        });
+        aiPlayer = createAutoPlayer(botEngine, aiDifficulty, { botIndices: activeBotIndices });
+      }
     }
     // 'passplay': no AI, full manual play
   }
@@ -939,16 +987,31 @@ const isDev = import.meta.env.DEV;
                 <div class="flex flex-col gap-2">
                   <p class="text-sm font-bold flex justify-between items-center">
                     <span>Players in Room ({p2pPlayers.length}/6)</span>
+                    {#if multiplayer.isHost && p2pPlayers.length < 6}
+                      <button class="btn-sm bg-purple-200 dark:bg-purple-900" onclick={() => {
+                        const botName = `🤖 Robot ${p2pPlayers.length + 1}`;
+                        p2pPlayers = [...p2pPlayers, { peerId: 'robot-' + Math.random().toString(36).substr(2, 5), name: botName, isHost: false, isBot: true }];
+                        multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
+                      }}>+ Add Robot</button>
+                    {/if}
                   </p>
                   <div class="grid grid-cols-2 gap-2">
-                    {#each p2pPlayers as p}
+                    {#each p2pPlayers as p, i}
                       <div class="p-2 rounded-md bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center">
                         <span class="font-bold">{p.name || 'Anonymous'}</span>
-                        {#if p.isHost}
-                          <span class="text-[10px] uppercase bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200 px-1 py-0.5 rounded">Host</span>
-                        {:else if p.peerId === 'self'}
-                          <span class="text-[10px] uppercase bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1 py-0.5 rounded">You</span>
-                        {/if}
+                        <div class="flex items-center gap-1">
+                          {#if p.isHost}
+                            <span class="text-[10px] uppercase bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200 px-1 py-0.5 rounded">Host</span>
+                          {:else if p.peerId === 'self'}
+                            <span class="text-[10px] uppercase bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1 py-0.5 rounded">You</span>
+                          {/if}
+                          {#if multiplayer.isHost && p.isBot}
+                            <button class="text-red-500 hover:text-red-700" onclick={() => {
+                              p2pPlayers = p2pPlayers.filter((_, idx) => idx !== i);
+                              multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
+                            }} title="Remove Robot"><Icon icon="lucide:x" class="size-4" /></button>
+                          {/if}
+                        </div>
                       </div>
                     {/each}
                   </div>
@@ -1111,11 +1174,11 @@ const isDev = import.meta.env.DEV;
       <div class="flex flex-wrap gap-2 justify-between items-center mb-5">
         <h2 class="text-2xl tracking-wide">Phase: {snapshot.phase.charAt(0).toUpperCase() + snapshot.phase.slice(1)}</h2>
         <div class="flex flex-wrap items-center gap-3">
-          {#if vsComputer && aiThinking}
+          {#if activeBotIndices.length > 0 && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
           {#if gameType !== 'online' || multiplayer.isHost}
-            <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+            <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; activeBotIndices = []; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
           {/if}
         </div>
       </div>
@@ -1134,8 +1197,8 @@ const isDev = import.meta.env.DEV;
                 onaction={handleAction}
                 onselectlane={handleSelectLane}
                 {selectionText}
-                pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
-                computerTurn={vsComputer && visualActivePlayerId !== 0}
+                pendingChoice={pendingChoice || (activeBotIndices.includes(visualActivePlayerId))}
+                computerTurn={activeBotIndices.includes(visualActivePlayerId)}
                 waitingForPeer={!isMyP2PTurn}
                 waitingForName={waitingForPlayerName}
                 autoScrollEnabled={!autoplay}
@@ -1284,8 +1347,8 @@ const isDev = import.meta.env.DEV;
               onaction={handleAction}
               onselectlane={handleSelectLane}
               {selectionText}
-              pendingChoice={pendingChoice || (vsComputer && visualActivePlayerId !== 0)}
-              computerTurn={vsComputer && visualActivePlayerId !== 0}
+              pendingChoice={pendingChoice || (activeBotIndices.includes(visualActivePlayerId))}
+              computerTurn={activeBotIndices.includes(visualActivePlayerId)}
               waitingForPeer={!isMyP2PTurn}
               waitingForName={waitingForPlayerName}
               autoScrollEnabled={!autoplay}

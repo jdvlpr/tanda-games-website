@@ -13,7 +13,7 @@ import { DESTINATIONS } from "./engine.svelte.js";
 export function createAutoPlayer(
   engine,
   difficulty = "normal",
-  { humanPlayerIdx = null } = {},
+  { botIndices = null } = {},
 ) {
   /**
    * Choose the best required action for the current player.
@@ -844,10 +844,12 @@ export function createAutoPlayer(
     if (!engine.pendingChoice) return;
     // In vsComputer mode, never auto-resolve a choice that belongs to the human player.
     if (
-      humanPlayerIdx !== null &&
-      engine.pendingChoice.playerIdx === humanPlayerIdx
-    )
+      engine.pendingChoice &&
+      botIndices !== null &&
+      !botIndices.includes(engine.pendingChoice.playerIdx)
+    ) {
       return;
+    }
     const choice = engine.pendingChoice;
     const opts = choice.options;
 
@@ -1044,8 +1046,8 @@ export function createAutoPlayer(
     let safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
       if (
-        humanPlayerIdx !== null &&
-        engine.pendingChoice.playerIdx === humanPlayerIdx
+        botIndices !== null &&
+        !botIndices.includes(engine.pendingChoice.playerIdx)
       )
         break;
       resolveChoice();
@@ -1154,8 +1156,8 @@ export function createAutoPlayer(
     safetyCounter = 0;
     while (engine.pendingChoice && safetyCounter < 20) {
       if (
-        humanPlayerIdx !== null &&
-        engine.pendingChoice.playerIdx === humanPlayerIdx
+        botIndices !== null &&
+        !botIndices.includes(engine.pendingChoice.playerIdx)
       )
         break;
       resolveChoice();
