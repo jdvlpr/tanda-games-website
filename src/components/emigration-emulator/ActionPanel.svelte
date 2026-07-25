@@ -1,5 +1,5 @@
 <script>
-  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, autoScrollEnabled = true, onclearselection, hasSelection = false, copyTextToClipboard } = $props();
+  let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, waitingForPeer = false, waitingForName = '', autoScrollEnabled = true, onclearselection, hasSelection = false, copyTextToClipboard } = $props();
 
   let logContainer = $state(null);
 
@@ -42,6 +42,10 @@
       {:else if computerTurn}
         <div class="text-sm ">
           🤖 Computer is taking its turn…
+        </div>
+      {:else if waitingForPeer}
+        <div class="text-sm text-center py-2 animate-pulse">
+          ⏳ Waiting for <span class="font-bold">{waitingForName || 'another player'}</span>…
         </div>
       {:else if snapshot.phase === 'preparation'}
         <div class="flex flex-wrap gap-2 items-center justify-center">

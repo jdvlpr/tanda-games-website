@@ -3505,8 +3505,26 @@ export default class EmigrationEngine {
         logs: this.logs,
         activeCrossingIdx: this.activeCrossingIdx,
         crossingOrder: this.crossingOrder,
+        pendingChoice: this.pendingChoice,
       }),
     );
+  }
+
+  loadSnapshot(snapshot) {
+    if (!snapshot) return;
+    if (snapshot.phase !== undefined) this.phase = snapshot.phase;
+    if (snapshot.mode !== undefined) this.mode = snapshot.mode;
+    if (snapshot.turnNumber !== undefined) this.turnNumber = snapshot.turnNumber;
+    if (snapshot.currentPlayerIdx !== undefined) this.currentPlayerIdx = snapshot.currentPlayerIdx;
+    if (snapshot.publicServices !== undefined) this.publicServices = snapshot.publicServices;
+    if (snapshot.securityLanes !== undefined) this.securityLanes = snapshot.securityLanes;
+    if (snapshot.players !== undefined) this.players = snapshot.players;
+    if (snapshot.gameResult !== undefined) this.gameResult = snapshot.gameResult;
+    if (snapshot.logs !== undefined) this.logs = snapshot.logs;
+    if (snapshot.activeCrossingIdx !== undefined) this.activeCrossingIdx = snapshot.activeCrossingIdx;
+    if (snapshot.crossingOrder !== undefined) this.crossingOrder = snapshot.crossingOrder;
+    if (snapshot.pendingChoice !== undefined) this.pendingChoice = snapshot.pendingChoice;
+    this._notify();
   }
 }
 
