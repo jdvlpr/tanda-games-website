@@ -641,10 +641,59 @@ const isDev = import.meta.env.DEV;
     pendingChoice = engine.pendingChoice ?? null;
     isSetup = false;
     testResults = null;
-    activeBotIndices = [];
-    aiPlayer = null;
     aiThinking = false;
     autoplay = null;
+
+    // Set up AI bots for any robot players in the lobby
+    activeBotIndices = p2pPlayers.map((p, i) => p.isBot ? i : -1).filter(i => i !== -1);
+    if (activeBotIndices.length > 0) {
+      const botEngine = new Proxy(engine, {
+        get(target, prop) {
+          if (['executeRequiredAction', 'executeOptionalAction'].includes(prop)) {
+            return (actionType, params = {}) => {
+              if (['applyCollege', 'graduate', 'activate'].includes(actionType)) {
+                params.rolls = [
+                  Math.floor(Math.random() * 6) + 1,
+                  Math.floor(Math.random() * 6) + 1,
+                  Math.floor(Math.random() * 6) + 1
+                ];
+              }
+              const res = target[prop](actionType, params);
+              multiplayer.broadcastAction('GAME_ACTION', { actionType, params });
+              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+              return res;
+            };
+          }
+          if (prop === 'resolveChoice') {
+            return (value) => {
+              const rolls = [
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1
+              ];
+              const res = target.resolveChoice(value, rolls);
+              multiplayer.broadcastAction('MODAL_RESOLVE', { value, rolls });
+              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+              return res;
+            };
+          }
+          if (prop === 'selectLane') {
+            return (laneIdx) => {
+              const res = target.selectLane(laneIdx);
+              multiplayer.broadcastAction('LANE_SELECT', { laneIdx });
+              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
+              return res;
+            };
+          }
+          const orig = target[prop];
+          if (typeof orig === 'function') return orig.bind(target);
+          return orig;
+        }
+      });
+      aiPlayer = createAutoPlayer(botEngine, aiDifficulty, { botIndices: activeBotIndices });
+    } else {
+      aiPlayer = null;
+    }
 
     multiplayer.broadcastGameStart(snapshot);
   }
