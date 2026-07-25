@@ -64,14 +64,14 @@ class MultiplayerStore {
   #syncStateHandlers = new Set();
   #peerJoinHandlers = new Set();
   #peerLeaveHandlers = new Set();
-  
+
   // Rate limiting map: peerId -> array of timestamps
   #rateLimits = new Map();
-  
+
   #checkRateLimit(peerId) {
     const now = Date.now();
     let timestamps = this.#rateLimits.get(peerId) || [];
-    timestamps = timestamps.filter(t => now - t < 1000); // Keep last 1 second
+    timestamps = timestamps.filter((t) => now - t < 1000); // Keep last 1 second
     if (timestamps.length >= 20) {
       return false; // Rate limited (20 msgs / sec)
     }
@@ -162,9 +162,7 @@ class MultiplayerStore {
           this.peers = [...this.peers, peerId];
           this.peerCount = this.peers.length;
         }
-        toast.info(
-          `Peer connected (${this.peerCount} peer${this.peerCount > 1 ? "s" : ""})`,
-        );
+        toast.info(`New Player connected!`);
         for (const handler of this.#peerJoinHandlers) {
           try {
             handler(peerId);

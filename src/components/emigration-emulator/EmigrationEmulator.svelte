@@ -66,6 +66,7 @@ const isDev = import.meta.env.DEV;
   let localPlayerName = $state('Player 1');
   let p2pPlayers = $state([]); // Array of { peerId, name, isHost }
   let myP2PPlayerIdx = $state(-1); // Which player index is the local user in P2P mode
+  let hostPeerId = $state(null); // Track peerId of room host
 
   // Derived setup slice based on player count
   let activeSetup = $derived(playersSetup.slice(0, playerCount));
@@ -363,12 +364,35 @@ const isDev = import.meta.env.DEV;
         }
       });
       
-      const unsubLeave = multiplayer.onPeerLeave(() => {
-        if (multiplayer.isHost && isSetup) {
-          // Remove the last pack when a peer leaves
-          if (selectedPacks.length > 0) {
-            selectedPacks = selectedPacks.slice(0, -1);
+      const unsubLeave = multiplayer.onPeerLeave((leavingPeerId) => {
+        if (!multiplayer.isHost) {
+          // Peer side: check if the leaving peer is the host
+          if (hostPeerId && leavingPeerId === hostPeerId) {
+            exitRoomLocal('The host left the game. The room has been closed.');
+            return;
+          }
+          const leftPlayer = p2pPlayers.find(p => p.peerId === leavingPeerId);
+          if (leftPlayer?.isHost) {
+            exitRoomLocal('The host left the game. The room has been closed.');
+            return;
+          }
+          if (leftPlayer) {
+            toast.warning(`${leftPlayer.name} left the room.`);
+          }
+        } else {
+          // Host side: a peer left
+          const leftPlayer = p2pPlayers.find(p => p.peerId === leavingPeerId);
+          const leftName = leftPlayer?.name || 'A player';
+          p2pPlayers = p2pPlayers.filter(p => p.peerId !== leavingPeerId);
+          toast.warning(`${leftName} left the room.`);
+
+          if (isSetup) {
+            if (selectedPacks.length > 0) {
+              selectedPacks = selectedPacks.slice(0, -1);
+            }
             multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          } else {
+            multiplayer.broadcastAction('player_left', { name: leftName, peerId: leavingPeerId, p2pPlayers });
           }
         }
       });
@@ -390,6 +414,7 @@ const isDev = import.meta.env.DEV;
     // Host is always player 0
     if (asHost) {
       myP2PPlayerIdx = 0;
+      hostPeerId = 'self';
       selectedPacks = getRandomPacks(1);
     }
     // Connect async — onPeerJoin will broadcast our info once a peer is found
@@ -414,13 +439,35 @@ const isDev = import.meta.env.DEV;
     if (!data || typeof data !== 'object') return;
 
     try {
+      // Record host peer ID if message comes from host
+      if (!multiplayer.isHost && peerId) {
+        hostPeerId = peerId;
+      }
+
+      if (data.type === 'room_closed') {
+        exitRoomLocal(data.payload?.reason || 'The host closed the room.');
+        return;
+      }
+
+      if (data.type === 'player_left') {
+        if (!multiplayer.isHost) {
+          if (Array.isArray(data.payload?.p2pPlayers)) {
+            p2pPlayers = data.payload.p2pPlayers;
+          } else if (data.payload?.peerId) {
+            p2pPlayers = p2pPlayers.filter(p => p.peerId !== data.payload.peerId);
+          }
+          toast.warning(`${data.payload?.name || 'A player'} left the room.`);
+        }
+        return;
+      }
+
       // --- Pre-game waiting room messages ---
       if (data.type === 'player_info') {
         if (multiplayer.isHost && isSetup) {
           // Host: upsert the peer in our player list
           const existing = p2pPlayers.find(p => p.peerId === peerId);
           if (existing) {
-            existing.name = data.payload?.name || 'Anonymous';
+            existing.name = data.payload?.name;
           } else {
             let peerName = data.payload?.name || 'Anonymous';
             if (/^Player \d+$/.test(peerName)) {
@@ -524,14 +571,29 @@ const isDev = import.meta.env.DEV;
   }
 
   function exitRoom() {
+    if (multiplayer.isHost && currentRoomCode) {
+      try {
+        multiplayer.broadcastAction('room_closed', { reason: 'The host closed the room.' });
+      } catch (e) {
+        console.warn('Failed to broadcast room_closed:', e);
+      }
+    }
+    exitRoomLocal();
+  }
+
+  function exitRoomLocal(noticeMessage = '') {
     multiplayer.disconnect();
     currentRoomCode = '';
     p2pPlayers = [];
     myP2PPlayerIdx = -1;
+    hostPeerId = null;
     engine = null;
     snapshot = null;
     isSetup = true;
     window.history.replaceState({}, '', window.location.pathname);
+    if (noticeMessage) {
+      toast.error(noticeMessage);
+    }
   }
 
   function startP2PGame() {
@@ -765,6 +827,8 @@ const isDev = import.meta.env.DEV;
                 </svg> Rulebook</a>
     </div>
   </div>
+
+  
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
       <div class="flex flex-col gap-5 mt-4">
@@ -812,12 +876,12 @@ const isDev = import.meta.env.DEV;
 
         {#if gameType === 'online'}
           <div class="flex flex-col gap-4">
-            <div class="flex flex-col items-center gap-1 mb-2">
+            <div class="flex flex-col items-center gap-1">
               <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
               <p class="opacity-70 italic text-sm">Serverless peer-to-peer room. May not work with VPN connections.</p>
             </div>
             {#if !currentRoomCode}
-              <div class="flex flex-col gap-4 max-w-sm mx-auto w-full items-center">
+              <div class="flex flex-col gap-2 max-w-sm mx-auto w-full items-center">
                 <button class="btn bg-green-200 dark:bg-green-800" onclick={hostRoom}>Host New Game</button>
                 <div class="flex items-center gap-2 text-sm opacity-50 w-full"><hr class="flex-1"/> OR <hr class="flex-1"/></div>
                 <div class="flex gap-2 items-center">
@@ -826,26 +890,20 @@ const isDev = import.meta.env.DEV;
                 </div>
               </div>
             {:else}
-
-        <button
-          class="btn-sm mx-auto"
-          onclick={exitRoom}
-          title="exit room"
-        >
-          <Icon icon="lucide:x" class="size-3.5" />
-          {#if multiplayer.isHost}
-            Close & Exit Room
-            {:else}
-            Exit Room
-          {/if}
+            <button 
+        class="btn-sm mx-auto  bg-red-300 dark:bg-red-700"
+        onclick={exitRoom}
+      >
+        <Icon icon="lucide:x" class="size-3.5" />
+        {multiplayer.isHost ? 'Close Room' : 'Leave Room'}
       </button>
               <!-- Waiting Room -->
-              <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-2">
                 <div class="flex flex-col items-center gap-2 bg-blue-50 dark:bg-blue-950 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                   <p class="text-sm opacity-70">Room Code</p>
                   <div class="flex gap-2 items-center">
                     <span class="text-2xl font-mono tracking-widest font-bold">{currentRoomCode}</span>
-                    <button class="btn-sm" onclick={copyRoomUrl} title="Copy Link">
+                    <button class="btn-sm bg-amber-200 dark:bg-amber-800" onclick={copyRoomUrl} title="Copy Link">
                       <Icon icon="lucide:copy" />
                       Copy Link
                     </button>
@@ -853,9 +911,8 @@ const isDev = import.meta.env.DEV;
                   <p class="text-xs opacity-60">Share this code with your friends!</p>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                  <p class="text-sm font-bold">Your Profile</p>
-                  <div class="flex flex-col gap-2 p-2 rounded-md bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+                  <div class="flex flex-col gap-2 p-2 items-start rounded-md bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-sm opacity-70">Your Name</p>
                     <input
                       class="flex-1"
                       type="text"
@@ -869,7 +926,6 @@ const isDev = import.meta.env.DEV;
                       }}
                     />
                   </div>
-                </div>
 
                 <div class="flex flex-col gap-2">
                   <p class="text-sm font-bold flex justify-between items-center">
@@ -994,7 +1050,49 @@ const isDev = import.meta.env.DEV;
       </div>
     </div>
   {:else if snapshot}
-    <div class="max-w-[1200px] mx-auto">
+  <div class="max-w-[1200px] mx-auto">
+    {#if gameType === 'online' && currentRoomCode}
+      <div class="flex flex-wrap items-center justify-between gap-3 text-sm shadow-inner bg-neutral-300 dark:bg-neutral-700 w-full p-2 rounded-md mb-4">
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-1">
+            <button 
+              class="btn-sm bg-amber-200 dark:bg-amber-800"
+              onclick={copyRoomUrl}
+              title="Click to copy Room Code"
+            >
+            <span class="flex items-center gap-1.5 font-bold ">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-700 dark:bg-green-300 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-700 dark:bg-green-300"></span>
+              </span>
+              {#if multiplayer.isHost} Hosting {/if}
+              Online Room:
+            </span><span class="font-mono ">{currentRoomCode}</span>
+            </button>
+          </div>
+  
+          <div class="flex items-center gap-1.5 text-xs">
+            <span>{p2pPlayers.length} players</span>
+            <span class="opacity-40">|</span>
+            <span class="opacity-80 flex gap-1 flex-wrap">
+              {#each p2pPlayers as p}
+                <span class="px-1.5 py-0.5 rounded bg-neutral-50/60 dark:bg-neutral-950/60 {p.peerId === multiplayer.selfId || (multiplayer.isHost && p.isHost) ? 'font-semibold' : ''}">
+                  {p.name}{p.isHost ? ' (Host)' : ''}
+                </span>
+              {/each}
+            </span>
+          </div>
+        </div>
+  
+        <button 
+          class="btn-sm bg-red-300 dark:bg-red-700"
+          onclick={exitRoom}
+        >
+          <Icon icon="lucide:x" class="size-3.5" />
+          {multiplayer.isHost ? 'Close Room' : 'Leave Room'}
+        </button>
+      </div>
+    {/if}
       <div class="flex flex-wrap gap-2 justify-between items-center mb-5">
         <h2 class="text-2xl tracking-wide">Phase: {snapshot.phase.charAt(0).toUpperCase() + snapshot.phase.slice(1)}</h2>
         <div class="flex flex-wrap items-center gap-3">
