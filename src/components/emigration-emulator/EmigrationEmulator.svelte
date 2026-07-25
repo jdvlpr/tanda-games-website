@@ -352,12 +352,32 @@ const isDev = import.meta.env.DEV;
         if (currentRoomCode) {
           multiplayer.broadcastPlayerInfo({ name: localPlayerName, isHost: multiplayer.isHost });
         }
+        if (multiplayer.isHost && isSetup) {
+          // Add a random pack if we can
+          const availablePacks = PACKS_LIST.filter(p => !selectedPacks.includes(p));
+          if (availablePacks.length > 0) {
+            const randomPack = availablePacks[Math.floor(Math.random() * availablePacks.length)];
+            selectedPacks = [...selectedPacks, randomPack];
+            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          }
+        }
+      });
+      
+      const unsubLeave = multiplayer.onPeerLeave(() => {
+        if (multiplayer.isHost && isSetup) {
+          // Remove the last pack when a peer leaves
+          if (selectedPacks.length > 0) {
+            selectedPacks = selectedPacks.slice(0, -1);
+            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          }
+        }
       });
 
       return () => {
         unsubAction();
         unsubSync();
         unsubJoin();
+        unsubLeave();
       };
     }
   });
@@ -402,7 +422,7 @@ const isDev = import.meta.env.DEV;
             p2pPlayers = [...p2pPlayers, { peerId, name: data.payload?.name || 'Anonymous', isHost: false }];
           }
           // Broadcast the updated roster to all peers
-          multiplayer.broadcastSetupState(p2pPlayers);
+          multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
         }
         return;
       }
@@ -411,6 +431,7 @@ const isDev = import.meta.env.DEV;
         if (!multiplayer.isHost && Array.isArray(data.payload?.p2pPlayers)) {
           // Peer: sync the waiting room display from the host's roster
           p2pPlayers = data.payload.p2pPlayers;
+          if (data.payload.selectedPacks) selectedPacks = data.payload.selectedPacks;
           // Work out which slot we occupy so we can block out-of-turn actions
           const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
           if (myIdx !== -1) myP2PPlayerIdx = myIdx;
@@ -888,20 +909,24 @@ const isDev = import.meta.env.DEV;
           </div>
         {/if}
 
-        {#if gameType !== 'online'}
+        {#if gameType !== 'online' || currentRoomCode}
           <div class="flex flex-col gap-1">
-            <p class="text-sm opacity-70">Life Card Packs {#if playerCount !== selectedPacks.length}
-              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {playerCount})</span>
+            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== selectedPacks.length}
+              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
             {/if}</p>
             <div class="flex flex-wrap justify-center gap-2">
               {#each PACKS_LIST as pack}
                 <button
                   class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {selectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
+                  disabled={gameType === 'online' && !multiplayer.isHost}
                   onclick={() => {
                     if (selectedPacks.includes(pack)) {
                       selectedPacks = selectedPacks.filter(p => p !== pack);
                     } else {
                       selectedPacks = [...selectedPacks, pack];
+                    }
+                    if (gameType === 'online' && multiplayer.isHost) {
+                      multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
                     }
                   }}
                 >
@@ -910,6 +935,7 @@ const isDev = import.meta.env.DEV;
               {/each}
             </div>
           </div>
+        {/if}
 
           <div class={["flex flex-col gap-1", gameType === 'passplay' && 'hidden']}>
             <p class="text-sm opacity-70">Robot Skill Level</p>
@@ -932,7 +958,6 @@ const isDev = import.meta.env.DEV;
               <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
             </div>
           </div>
-        {/if}
 
         <div class="my-2">
           {#if gameType === 'online'}

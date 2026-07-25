@@ -63,6 +63,7 @@ class MultiplayerStore {
   #actionHandlers = new Set();
   #syncStateHandlers = new Set();
   #peerJoinHandlers = new Set();
+  #peerLeaveHandlers = new Set();
   
   // Rate limiting map: peerId -> array of timestamps
   #rateLimits = new Map();
@@ -180,6 +181,13 @@ class MultiplayerStore {
         toast.warning(
           `Peer disconnected (${this.peerCount} peer${this.peerCount !== 1 ? "s" : ""} remaining)`,
         );
+        for (const handler of this.#peerLeaveHandlers) {
+          try {
+            handler(peerId);
+          } catch (e) {
+            console.error("[Multiplayer] PeerLeave handler error:", e);
+          }
+        }
       };
     } catch (err) {
       console.error("[Multiplayer] Failed to connect:", err);
@@ -214,8 +222,8 @@ class MultiplayerStore {
     this.sendAction("player_info", info);
   }
 
-  broadcastSetupState(p2pPlayers) {
-    this.sendAction("setup_state", { p2pPlayers });
+  broadcastSetupState(p2pPlayers, selectedPacks = null) {
+    this.sendAction("setup_state", { p2pPlayers, selectedPacks });
   }
 
   /**
@@ -256,6 +264,12 @@ class MultiplayerStore {
   onPeerJoin(handler) {
     this.#peerJoinHandlers.add(handler);
     return () => this.#peerJoinHandlers.delete(handler);
+  }
+
+  /** Register a handler called when any peer leaves. Returns an unsubscribe fn. */
+  onPeerLeave(handler) {
+    this.#peerLeaveHandlers.add(handler);
+    return () => this.#peerLeaveHandlers.delete(handler);
   }
 
   /** Leave the current room and reset state. */
