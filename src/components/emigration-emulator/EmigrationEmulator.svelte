@@ -827,11 +827,11 @@ const isDev = import.meta.env.DEV;
 </script>
 
 <div class="bg-neutral-50 dark:bg-neutral-950 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
-  <div class="mb-4 flex flex-col items-center gap-2">
+  <div class="mb-4 flex flex-col items-center">
     <h1 class="text-center text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
-    <div class="flex gap-4 flex-wrap justify-center">
+    <div class="flex gap-4 flex-wrap justify-center text-sm">
       <a href="/emigration" class="underline w-fit">← Exit</a>
-      <a href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="underline flex items-center  gap-1 w-fit">  Rulebook (PDF)</a>
+      <a href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="underline flex items-center  gap-1 w-fit">  Rulebook</a>
     </div>
   </div>
 
@@ -860,24 +860,26 @@ const isDev = import.meta.env.DEV;
               >
                 Pass & Play
               </button>
-              <button
-                class="btn-sm border-r-0 rounded-l-none rounded-r-none {gameType === 'online' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
-                onclick={() => {
-                  gameType = 'online';
-                  toast.enabled = true;
-                }}
-              >
-                Online
-              </button>
-              <button
-                class="btn-sm rounded-l-none {gameType === 'auto' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
-                onclick={() =>{
-                   gameType = 'auto';
-                   toast.enabled = false;
-                }}
-              >
-               Robots
-              </button>
+              {#if isDev}
+                <button
+                  class="btn-sm rounded-l-none rounded-r-none border-r-0  {gameType === 'auto' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
+                  onclick={() =>{
+                    gameType = 'auto';
+                    toast.enabled = false;
+                  }}
+                >
+                 Robots
+                </button>
+              {/if}
+                <button
+                  class="btn-sm  rounded-l-none {gameType === 'online' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
+                  onclick={() => {
+                    gameType = 'online';
+                    toast.enabled = true;
+                  }}
+                >
+                  Online
+                </button>
           </div>
         </div>
 
