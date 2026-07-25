@@ -519,7 +519,7 @@ const isDev = import.meta.env.DEV;
         engine.selectLane(data.payload?.laneIdx);
       } else if (data.type === 'MODAL_RESOLVE') {
         pendingChoice = null;
-        engine.resolveChoice(data.payload?.value);
+        engine.resolveChoice(data.payload?.value, data.payload?.rolls);
       } else if (data.type === 'BUY_POOL') {
         engine.executeRequiredAction('buyPool', { cardType: data.payload?.cardType });
       } else if (data.type === 'STEAL_POOL') {
@@ -722,6 +722,19 @@ const isDev = import.meta.env.DEV;
       stashIdx: selectedStash?.itemIdx,
     };
 
+    // For actions that involve a dice roll, pre-generate the value and embed it
+    // in params so that every peer executes with the same roll and shows the
+    // same toast. Without this, each client calls Math.random() independently
+    // and can produce a different outcome (the P2P desync bug).
+    // We provide a short queue of rolls just in case the action needs multiple.
+    if (['applyCollege', 'graduate', 'activate'].includes(actionType)) {
+      params.rolls = [
+        Math.floor(Math.random() * 6) + 1,
+        Math.floor(Math.random() * 6) + 1,
+        Math.floor(Math.random() * 6) + 1
+      ];
+    }
+
     if (actionType === 'graduate' || actionType === 'sell') {
       engine.executeOptionalAction(actionType, params);
     } else {
@@ -773,8 +786,13 @@ const isDev = import.meta.env.DEV;
   function handleModalResolve(value) {
     if (!engine || !isMyP2PTurn) return;
     pendingChoice = null;
-    engine.resolveChoice(value);
-    multiplayer.broadcastAction('MODAL_RESOLVE', { value });
+    const rolls = [
+      Math.floor(Math.random() * 6) + 1,
+      Math.floor(Math.random() * 6) + 1,
+      Math.floor(Math.random() * 6) + 1
+    ];
+    engine.resolveChoice(value, rolls);
+    multiplayer.broadcastAction('MODAL_RESOLVE', { value, rolls });
     multiplayer.broadcastSyncState(engine.getSnapshot());
   }
 

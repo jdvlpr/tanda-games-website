@@ -769,6 +769,7 @@ export default class EmigrationEngine {
     this._collegeFailed = false;
     this._graduateAttempted = false;
     this._identicalTwinExtraTurn = false;
+    this.p2pRollQueue = [];
 
     // Choice system
     this.pendingChoice = null;
@@ -816,6 +817,11 @@ export default class EmigrationEngine {
     if (this.rollOverride) {
       const val = this.rollOverride();
       this.log(`ROLL_D6_OVR:${val}`, "roll");
+      return val;
+    }
+    if (this.p2pRollQueue && this.p2pRollQueue.length > 0) {
+      const val = this.p2pRollQueue.shift();
+      this.log(`ROLL_D6_P2P:${val}`, "roll");
       return val;
     }
     const val = Math.floor(Math.random() * 6) + 1;
@@ -1753,8 +1759,10 @@ export default class EmigrationEngine {
     }
   }
 
-  resolveChoice(value) {
-    if (!this._pendingResolve) return;
+  resolveChoice(value, rolls = null) {
+    if (!this.pendingChoice) return;
+    this.createBackup();
+    if (rolls) this.p2pRollQueue = [...rolls];
     const resolve = this._pendingResolve;
     this._pendingResolve = null;
     this._onBack = null;
@@ -1807,6 +1815,7 @@ export default class EmigrationEngine {
   executeOptionalAction(type, params = {}) {
     if (this.phase !== "preparation" || this.pendingChoice) return;
     this.createBackup();
+    if (params.rolls) this.p2pRollQueue = [...params.rolls];
     const player = this.players[this.currentPlayerIdx];
 
     switch (type) {
@@ -1870,6 +1879,7 @@ export default class EmigrationEngine {
       return;
     }
     this.createBackup();
+    if (params.rolls) this.p2pRollQueue = [...params.rolls];
     const player = this.players[this.currentPlayerIdx];
 
     switch (type) {
@@ -3511,8 +3521,8 @@ export default class EmigrationEngine {
   }
 
   loadSnapshot(snapshot) {
-    if (!snapshot || typeof snapshot !== 'object') return;
-    
+    if (!snapshot || typeof snapshot !== "object") return;
+
     // Deep clone to prevent prototype pollution and ensure clean POJOs
     let cleanSnap;
     try {
@@ -3521,19 +3531,27 @@ export default class EmigrationEngine {
       console.warn("Invalid snapshot payload", e);
       return;
     }
-    
+
     if (cleanSnap.phase !== undefined) this.phase = cleanSnap.phase;
     if (cleanSnap.mode !== undefined) this.mode = cleanSnap.mode;
-    if (cleanSnap.turnNumber !== undefined) this.turnNumber = cleanSnap.turnNumber;
-    if (cleanSnap.currentPlayerIdx !== undefined) this.currentPlayerIdx = cleanSnap.currentPlayerIdx;
-    if (cleanSnap.publicServices !== undefined) this.publicServices = cleanSnap.publicServices;
-    if (cleanSnap.securityLanes !== undefined) this.securityLanes = cleanSnap.securityLanes;
+    if (cleanSnap.turnNumber !== undefined)
+      this.turnNumber = cleanSnap.turnNumber;
+    if (cleanSnap.currentPlayerIdx !== undefined)
+      this.currentPlayerIdx = cleanSnap.currentPlayerIdx;
+    if (cleanSnap.publicServices !== undefined)
+      this.publicServices = cleanSnap.publicServices;
+    if (cleanSnap.securityLanes !== undefined)
+      this.securityLanes = cleanSnap.securityLanes;
     if (cleanSnap.players !== undefined) this.players = cleanSnap.players;
-    if (cleanSnap.gameResult !== undefined) this.gameResult = cleanSnap.gameResult;
+    if (cleanSnap.gameResult !== undefined)
+      this.gameResult = cleanSnap.gameResult;
     if (cleanSnap.logs !== undefined) this.logs = cleanSnap.logs;
-    if (cleanSnap.activeCrossingIdx !== undefined) this.activeCrossingIdx = cleanSnap.activeCrossingIdx;
-    if (cleanSnap.crossingOrder !== undefined) this.crossingOrder = cleanSnap.crossingOrder;
-    if (cleanSnap.pendingChoice !== undefined) this.pendingChoice = cleanSnap.pendingChoice;
+    if (cleanSnap.activeCrossingIdx !== undefined)
+      this.activeCrossingIdx = cleanSnap.activeCrossingIdx;
+    if (cleanSnap.crossingOrder !== undefined)
+      this.crossingOrder = cleanSnap.crossingOrder;
+    if (cleanSnap.pendingChoice !== undefined)
+      this.pendingChoice = cleanSnap.pendingChoice;
     this._notify();
   }
 }
