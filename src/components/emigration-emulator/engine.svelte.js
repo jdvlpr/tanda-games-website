@@ -3511,19 +3511,29 @@ export default class EmigrationEngine {
   }
 
   loadSnapshot(snapshot) {
-    if (!snapshot) return;
-    if (snapshot.phase !== undefined) this.phase = snapshot.phase;
-    if (snapshot.mode !== undefined) this.mode = snapshot.mode;
-    if (snapshot.turnNumber !== undefined) this.turnNumber = snapshot.turnNumber;
-    if (snapshot.currentPlayerIdx !== undefined) this.currentPlayerIdx = snapshot.currentPlayerIdx;
-    if (snapshot.publicServices !== undefined) this.publicServices = snapshot.publicServices;
-    if (snapshot.securityLanes !== undefined) this.securityLanes = snapshot.securityLanes;
-    if (snapshot.players !== undefined) this.players = snapshot.players;
-    if (snapshot.gameResult !== undefined) this.gameResult = snapshot.gameResult;
-    if (snapshot.logs !== undefined) this.logs = snapshot.logs;
-    if (snapshot.activeCrossingIdx !== undefined) this.activeCrossingIdx = snapshot.activeCrossingIdx;
-    if (snapshot.crossingOrder !== undefined) this.crossingOrder = snapshot.crossingOrder;
-    if (snapshot.pendingChoice !== undefined) this.pendingChoice = snapshot.pendingChoice;
+    if (!snapshot || typeof snapshot !== 'object') return;
+    
+    // Deep clone to prevent prototype pollution and ensure clean POJOs
+    let cleanSnap;
+    try {
+      cleanSnap = JSON.parse(JSON.stringify(snapshot));
+    } catch (e) {
+      console.warn("Invalid snapshot payload", e);
+      return;
+    }
+    
+    if (cleanSnap.phase !== undefined) this.phase = cleanSnap.phase;
+    if (cleanSnap.mode !== undefined) this.mode = cleanSnap.mode;
+    if (cleanSnap.turnNumber !== undefined) this.turnNumber = cleanSnap.turnNumber;
+    if (cleanSnap.currentPlayerIdx !== undefined) this.currentPlayerIdx = cleanSnap.currentPlayerIdx;
+    if (cleanSnap.publicServices !== undefined) this.publicServices = cleanSnap.publicServices;
+    if (cleanSnap.securityLanes !== undefined) this.securityLanes = cleanSnap.securityLanes;
+    if (cleanSnap.players !== undefined) this.players = cleanSnap.players;
+    if (cleanSnap.gameResult !== undefined) this.gameResult = cleanSnap.gameResult;
+    if (cleanSnap.logs !== undefined) this.logs = cleanSnap.logs;
+    if (cleanSnap.activeCrossingIdx !== undefined) this.activeCrossingIdx = cleanSnap.activeCrossingIdx;
+    if (cleanSnap.crossingOrder !== undefined) this.crossingOrder = cleanSnap.crossingOrder;
+    if (cleanSnap.pendingChoice !== undefined) this.pendingChoice = cleanSnap.pendingChoice;
     this._notify();
   }
 }

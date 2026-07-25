@@ -352,12 +352,32 @@ const isDev = import.meta.env.DEV;
         if (currentRoomCode) {
           multiplayer.broadcastPlayerInfo({ name: localPlayerName, isHost: multiplayer.isHost });
         }
+        if (multiplayer.isHost && isSetup) {
+          // Add a random pack if we can
+          const availablePacks = PACKS_LIST.filter(p => !selectedPacks.includes(p));
+          if (availablePacks.length > 0) {
+            const randomPack = availablePacks[Math.floor(Math.random() * availablePacks.length)];
+            selectedPacks = [...selectedPacks, randomPack];
+            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          }
+        }
+      });
+      
+      const unsubLeave = multiplayer.onPeerLeave(() => {
+        if (multiplayer.isHost && isSetup) {
+          // Remove the last pack when a peer leaves
+          if (selectedPacks.length > 0) {
+            selectedPacks = selectedPacks.slice(0, -1);
+            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          }
+        }
       });
 
       return () => {
         unsubAction();
         unsubSync();
         unsubJoin();
+        unsubLeave();
       };
     }
   });
@@ -368,7 +388,10 @@ const isDev = import.meta.env.DEV;
     // Initialize our own slot in the player list
     p2pPlayers = [{ peerId: 'self', name: localPlayerName, isHost: asHost }];
     // Host is always player 0
-    if (asHost) myP2PPlayerIdx = 0;
+    if (asHost) {
+      myP2PPlayerIdx = 0;
+      selectedPacks = getRandomPacks(1);
+    }
     // Connect async — onPeerJoin will broadcast our info once a peer is found
     multiplayer.connect(code, asHost);
   }
@@ -388,99 +411,116 @@ const isDev = import.meta.env.DEV;
   }
 
   function handleRemoteAction(data, peerId) {
-    if (!data) return;
+    if (!data || typeof data !== 'object') return;
 
-    // --- Pre-game waiting room messages ---
-    if (data.type === 'player_info') {
-      if (multiplayer.isHost && isSetup) {
-        // Host: upsert the peer in our player list
-        const existing = p2pPlayers.find(p => p.peerId === peerId);
-        if (existing) {
-          existing.name = data.payload.name;
-        } else {
-          p2pPlayers = [...p2pPlayers, { peerId, name: data.payload.name, isHost: false }];
+    try {
+      // --- Pre-game waiting room messages ---
+      if (data.type === 'player_info') {
+        if (multiplayer.isHost && isSetup) {
+          // Host: upsert the peer in our player list
+          const existing = p2pPlayers.find(p => p.peerId === peerId);
+          if (existing) {
+            existing.name = data.payload?.name || 'Anonymous';
+          } else {
+            let peerName = data.payload?.name || 'Anonymous';
+            if (/^Player \d+$/.test(peerName)) {
+              peerName = `Player ${p2pPlayers.length + 1}`;
+            }
+            p2pPlayers = [...p2pPlayers, { peerId, name: peerName, isHost: false }];
+          }
+          // Broadcast the updated roster to all peers
+          multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
         }
-        // Broadcast the updated roster to all peers
-        multiplayer.broadcastSetupState(p2pPlayers);
+        return;
       }
-      return;
-    }
 
-    if (data.type === 'setup_state') {
-      if (!multiplayer.isHost) {
-        // Peer: sync the waiting room display from the host's roster
-        p2pPlayers = data.payload.p2pPlayers;
-        // Work out which slot we occupy so we can block out-of-turn actions
-        const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
-        if (myIdx !== -1) myP2PPlayerIdx = myIdx;
+      if (data.type === 'setup_state') {
+        if (!multiplayer.isHost && Array.isArray(data.payload?.p2pPlayers)) {
+          // Peer: sync the waiting room display from the host's roster
+          p2pPlayers = data.payload.p2pPlayers;
+          if (data.payload.selectedPacks) selectedPacks = data.payload.selectedPacks;
+          // Work out which slot we occupy so we can block out-of-turn actions
+          const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
+          if (myIdx !== -1) {
+            myP2PPlayerIdx = myIdx;
+            localPlayerName = p2pPlayers[myIdx].name;
+          }
+        }
+        return;
       }
-      return;
-    }
 
-    if (data.type === 'start_game') {
-      // Peers: game is starting — hide setup. The actual engine state
-      // arrives via the sync_state channel handled by handleRemoteSyncState.
-      if (!multiplayer.isHost) {
-        isSetup = false;
+      if (data.type === 'start_game') {
+        // Peers: game is starting — hide setup. The actual engine state
+        // arrives via the sync_state channel handled by handleRemoteSyncState.
+        if (!multiplayer.isHost) {
+          isSetup = false;
+        }
+        return;
       }
-      return;
-    }
 
-    // --- In-game messages ---
-    if (!engine) return;
+      // --- In-game messages ---
+      if (!engine) return;
 
-    if (data.type === 'GAME_ACTION') {
-      const { actionType, params } = data.payload || {};
-      if (actionType === 'graduate' || actionType === 'sell') {
-        engine.executeOptionalAction(actionType, params);
-      } else {
-        engine.executeRequiredAction(actionType, params);
+      if (data.type === 'GAME_ACTION') {
+        const { actionType, params } = data.payload || {};
+        if (actionType === 'graduate' || actionType === 'sell') {
+          engine.executeOptionalAction(actionType, params);
+        } else if (actionType) {
+          engine.executeRequiredAction(actionType, params);
+        }
+      } else if (data.type === 'LANE_SELECT') {
+        engine.selectLane(data.payload?.laneIdx);
+      } else if (data.type === 'MODAL_RESOLVE') {
+        pendingChoice = null;
+        engine.resolveChoice(data.payload?.value);
+      } else if (data.type === 'BUY_POOL') {
+        engine.executeRequiredAction('buyPool', { cardType: data.payload?.cardType });
+      } else if (data.type === 'STEAL_POOL') {
+        engine.executeRequiredAction('steal', { cardType: data.payload?.cardType });
       }
-    } else if (data.type === 'LANE_SELECT') {
-      engine.selectLane(data.payload.laneIdx);
-    } else if (data.type === 'MODAL_RESOLVE') {
-      pendingChoice = null;
-      engine.resolveChoice(data.payload.value);
-    } else if (data.type === 'BUY_POOL') {
-      engine.executeRequiredAction('buyPool', { cardType: data.payload.cardType });
-    } else if (data.type === 'STEAL_POOL') {
-      engine.executeRequiredAction('steal', { cardType: data.payload.cardType });
-    }
 
-    snapshot = engine.getSnapshot();
-    pendingChoice = engine.pendingChoice ?? null;
+      snapshot = engine.getSnapshot();
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn("[Emulator] Dropped invalid action payload from peer:", peerId, err);
+    }
   }
 
   function handleRemoteSyncState(remoteSnapshot) {
-    if (!remoteSnapshot) return;
-    // Create the engine if it doesn't exist yet (first sync from host at game start)
-    if (!engine) {
-      isSetup = false;
-      engine = new EmigrationEngine({
-        mode: remoteSnapshot.mode || mode,
-        players: remoteSnapshot.players || [],
-        onLog: (entry) => {
-          if (engine) snapshot = engine.getSnapshot();
-          if (entry?.msg?.includes('SALARIES:')) playPaydaySound();
-        },
-        onStateChange: () => {
-          if (engine) {
-            snapshot = engine.getSnapshot();
-            pendingChoice = engine.pendingChoice ?? null;
+    if (!remoteSnapshot || typeof remoteSnapshot !== 'object') return;
+    
+    try {
+      // Create the engine if it doesn't exist yet (first sync from host at game start)
+      if (!engine) {
+        isSetup = false;
+        engine = new EmigrationEngine({
+          mode: remoteSnapshot.mode || mode,
+          players: Array.isArray(remoteSnapshot.players) ? remoteSnapshot.players : [],
+          onLog: (entry) => {
+            if (engine) snapshot = engine.getSnapshot();
+            if (entry?.msg?.includes('SALARIES:')) playPaydaySound();
+          },
+          onStateChange: () => {
+            if (engine) {
+              snapshot = engine.getSnapshot();
+              pendingChoice = engine.pendingChoice ?? null;
+            }
+            selectedSlot = null;
+            selectedStash = null;
+            selectedAnchorRect = null;
           }
-          selectedSlot = null;
-          selectedStash = null;
-          selectedAnchorRect = null;
-        }
-      });
+        });
+      }
+      engine.loadSnapshot(remoteSnapshot);
+      snapshot = engine.getSnapshot();
+      visualActivePlayerId = snapshot.phase === 'preparation'
+        ? snapshot.currentPlayerIdx
+        : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
+      previousActualPlayerId = visualActivePlayerId;
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn("[Emulator] Dropped invalid sync state from peer:", err);
     }
-    engine.loadSnapshot(remoteSnapshot);
-    snapshot = engine.getSnapshot();
-    visualActivePlayerId = snapshot.phase === 'preparation'
-      ? snapshot.currentPlayerIdx
-      : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
-    previousActualPlayerId = visualActivePlayerId;
-    pendingChoice = engine.pendingChoice ?? null;
   }
 
   function exitRoom() {
@@ -492,39 +532,6 @@ const isDev = import.meta.env.DEV;
     snapshot = null;
     isSetup = true;
     window.history.replaceState({}, '', window.location.pathname);
-  }
-
-  function startGameRemote(targetGameType = 'passplay') {
-    engine = new EmigrationEngine({
-      mode,
-      players: activeSetup,
-      selectedPacks,
-      onLog: (entry) => {
-        if (engine) snapshot = engine.getSnapshot();
-        if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-      },
-      onStateChange: () => {
-        if (engine) {
-          snapshot = engine.getSnapshot();
-          pendingChoice = engine.pendingChoice ?? null;
-        }
-        selectedSlot = null;
-        selectedStash = null;
-        selectedAnchorRect = null;
-      }
-    });
-
-    snapshot = engine.getSnapshot();
-    visualActivePlayerId = snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
-    previousActualPlayerId = visualActivePlayerId;
-    isTransitioning = false;
-    pendingChoice = engine.pendingChoice ?? null;
-    isSetup = false;
-    testResults = null;
-    vsComputer = false;
-    aiPlayer = null;
-    aiThinking = false;
-    autoplay = null;
   }
 
   function startP2PGame() {
@@ -807,8 +814,7 @@ const isDev = import.meta.env.DEV;
           <div class="flex flex-col gap-4">
             <div class="flex flex-col items-center gap-1 mb-2">
               <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
-              <p class="opacity-70 italic">Serverless peer-to-peer room. May not work with VPN connections.
-  </p>
+              <p class="opacity-70 italic text-sm">Serverless peer-to-peer room. May not work with VPN connections.</p>
             </div>
             {#if !currentRoomCode}
               <div class="flex flex-col gap-4 max-w-sm mx-auto w-full items-center">
@@ -913,20 +919,24 @@ const isDev = import.meta.env.DEV;
           </div>
         {/if}
 
-        {#if gameType !== 'online'}
+        {#if gameType !== 'online' || currentRoomCode}
           <div class="flex flex-col gap-1">
-            <p class="text-sm opacity-70">Life Card Packs {#if playerCount !== selectedPacks.length}
-              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {playerCount})</span>
+            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== selectedPacks.length}
+              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
             {/if}</p>
             <div class="flex flex-wrap justify-center gap-2">
               {#each PACKS_LIST as pack}
                 <button
                   class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {selectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
+                  disabled={gameType === 'online' && !multiplayer.isHost}
                   onclick={() => {
                     if (selectedPacks.includes(pack)) {
                       selectedPacks = selectedPacks.filter(p => p !== pack);
                     } else {
                       selectedPacks = [...selectedPacks, pack];
+                    }
+                    if (gameType === 'online' && multiplayer.isHost) {
+                      multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
                     }
                   }}
                 >
@@ -935,8 +945,9 @@ const isDev = import.meta.env.DEV;
               {/each}
             </div>
           </div>
+        {/if}
 
-          <div class={["flex flex-col gap-1", gameType === 'passplay' && 'hidden']}>
+          <div class={["flex flex-col gap-1", (gameType === 'passplay' || gameType === 'online') && 'hidden']}>
             <p class="text-sm opacity-70">Robot Skill Level</p>
             <div class="flex justify-center">
               {#each ['easy', 'normal', 'expert'] as diff, i}
@@ -957,7 +968,6 @@ const isDev = import.meta.env.DEV;
               <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
             </div>
           </div>
-        {/if}
 
         <div class="my-2">
           {#if gameType === 'online'}
@@ -978,7 +988,7 @@ const isDev = import.meta.env.DEV;
               <p class="text-sm italic opacity-60">Waiting for the host to start the game…</p>
             {/if}
           {:else}
-            <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start</button>
+            <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start Game</button>
           {/if}
         </div>
       </div>
