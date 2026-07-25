@@ -55,7 +55,9 @@ const isDev = import.meta.env.DEV;
   let isSetup = $state(true);
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
-  let selectedPacks = $state(getRandomPacks(defaultPlayerCount));
+  let localSelectedPacks = $state(getRandomPacks(defaultPlayerCount));
+  let onlineSelectedPacks = $state([]);
+  let activeSelectedPacks = $derived(gameType === 'online' ? onlineSelectedPacks : localSelectedPacks);
   let aiDifficulty = $state('expert');
   
   // Initialize default players with randomized nationalities and destinations
@@ -355,11 +357,11 @@ const isDev = import.meta.env.DEV;
         }
         if (multiplayer.isHost && isSetup) {
           // Add a random pack if we can
-          const availablePacks = PACKS_LIST.filter(p => !selectedPacks.includes(p));
+          const availablePacks = PACKS_LIST.filter(p => !onlineSelectedPacks.includes(p));
           if (availablePacks.length > 0) {
             const randomPack = availablePacks[Math.floor(Math.random() * availablePacks.length)];
-            selectedPacks = [...selectedPacks, randomPack];
-            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+            onlineSelectedPacks = [...onlineSelectedPacks, randomPack];
+            multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
           }
         }
       });
@@ -387,10 +389,10 @@ const isDev = import.meta.env.DEV;
           toast.warning(`${leftName} left the room.`);
 
           if (isSetup) {
-            if (selectedPacks.length > 0) {
-              selectedPacks = selectedPacks.slice(0, -1);
+            if (onlineSelectedPacks.length > 0) {
+              onlineSelectedPacks = onlineSelectedPacks.slice(0, -1);
             }
-            multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+            multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
           } else {
             multiplayer.broadcastAction('player_left', { name: leftName, peerId: leavingPeerId, p2pPlayers });
           }
@@ -415,7 +417,7 @@ const isDev = import.meta.env.DEV;
     if (asHost) {
       myP2PPlayerIdx = 0;
       hostPeerId = 'self';
-      selectedPacks = getRandomPacks(1);
+      onlineSelectedPacks = getRandomPacks(1);
     }
     // Connect async — onPeerJoin will broadcast our info once a peer is found
     multiplayer.connect(code, asHost);
@@ -476,7 +478,7 @@ const isDev = import.meta.env.DEV;
             p2pPlayers = [...p2pPlayers, { peerId, name: peerName, isHost: false }];
           }
           // Broadcast the updated roster to all peers
-          multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+          multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
         }
         return;
       }
@@ -485,7 +487,7 @@ const isDev = import.meta.env.DEV;
         if (!multiplayer.isHost && Array.isArray(data.payload?.p2pPlayers)) {
           // Peer: sync the waiting room display from the host's roster
           p2pPlayers = data.payload.p2pPlayers;
-          if (data.payload.selectedPacks) selectedPacks = data.payload.selectedPacks;
+          if (data.payload.selectedPacks) onlineSelectedPacks = data.payload.selectedPacks;
           // Work out which slot we occupy so we can block out-of-turn actions
           const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
           if (myIdx !== -1) {
@@ -619,7 +621,7 @@ const isDev = import.meta.env.DEV;
     engine = new EmigrationEngine({
       mode,
       players: finalPlayers,
-      selectedPacks,
+      selectedPacks: activeSelectedPacks,
       onLog: (entry) => {
         if (engine) snapshot = engine.getSnapshot();
         if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
@@ -665,7 +667,7 @@ const isDev = import.meta.env.DEV;
     engine = new EmigrationEngine({
       mode,
       players: finalPlayers,
-      selectedPacks,
+      selectedPacks: activeSelectedPacks,
       onLog: (entry) => {
         // Force reactivity on logs by updating snapshot reference
         if (engine) snapshot = engine.getSnapshot();
@@ -970,7 +972,7 @@ const isDev = import.meta.env.DEV;
           </div>
         {:else}
           <label><span class="text-sm opacity-70">Number of Players:</span>
-              <select class="w-fit" bind:value={playerCount} onchange={() => selectedPacks = getRandomPacks(playerCount)}>
+              <select class="w-fit" bind:value={playerCount} onchange={() => localSelectedPacks = getRandomPacks(playerCount)}>
                 <option value={2}>2</option>
                 <option value={3}>3</option>
                 <option value={4}>4</option>
@@ -995,22 +997,30 @@ const isDev = import.meta.env.DEV;
 
         {#if gameType !== 'online' || currentRoomCode}
           <div class="flex flex-col gap-1">
-            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== selectedPacks.length}
+            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
               <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
             {/if}</p>
             <div class="flex flex-wrap justify-center gap-2">
               {#each PACKS_LIST as pack}
                 <button
-                  class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {selectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
+                  class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {activeSelectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
                   disabled={gameType === 'online' && !multiplayer.isHost}
                   onclick={() => {
-                    if (selectedPacks.includes(pack)) {
-                      selectedPacks = selectedPacks.filter(p => p !== pack);
+                    if (gameType === 'online') {
+                      if (onlineSelectedPacks.includes(pack)) {
+                        onlineSelectedPacks = onlineSelectedPacks.filter(p => p !== pack);
+                      } else {
+                        onlineSelectedPacks = [...onlineSelectedPacks, pack];
+                      }
+                      if (multiplayer.isHost) {
+                        multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
+                      }
                     } else {
-                      selectedPacks = [...selectedPacks, pack];
-                    }
-                    if (gameType === 'online' && multiplayer.isHost) {
-                      multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+                      if (localSelectedPacks.includes(pack)) {
+                        localSelectedPacks = localSelectedPacks.filter(p => p !== pack);
+                      } else {
+                        localSelectedPacks = [...localSelectedPacks, pack];
+                      }
                     }
                   }}
                 >
@@ -1117,7 +1127,7 @@ const isDev = import.meta.env.DEV;
           {#if vsComputer && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
-          <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); selectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
         </div>
       </div>
 
@@ -1337,7 +1347,7 @@ const isDev = import.meta.env.DEV;
   <div class="flex flex-col gap-4 items-center my-8">
     <div class="flex flex-col gap-2 items-start text-left mx-auto w-fit rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
       <p class="font-semibold text-xl">Notification Settings</p>
-      <div class="flex gap-1 items-center flex-1 justify-start ">
+      <div class="flex gap-1 items-center justify-start ">
         <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
         <label class="" for="enable-notifications">Enable</label>
       </div>
