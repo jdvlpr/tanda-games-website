@@ -483,6 +483,17 @@ const isDev = import.meta.env.DEV;
     pendingChoice = engine.pendingChoice ?? null;
   }
 
+  function exitRoom() {
+    multiplayer.disconnect();
+    currentRoomCode = '';
+    p2pPlayers = [];
+    myP2PPlayerIdx = -1;
+    engine = null;
+    snapshot = null;
+    isSetup = true;
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
   function startGameRemote(targetGameType = 'passplay') {
     engine = new EmigrationEngine({
       mode,
@@ -812,15 +823,15 @@ const isDev = import.meta.env.DEV;
 
         <button
           class="btn-sm mx-auto"
-          onclick={() => {
-            currentRoomCode = '';
-            // Replaces the current URL with just the pathname, stripping the query params
-            window.history.replaceState({}, '', window.location.pathname);
-          }}
+          onclick={exitRoom}
           title="exit room"
         >
           <Icon icon="lucide:x" class="size-3.5" />
-          Exit Room
+          {#if multiplayer.isHost}
+            Close & Exit Room
+            {:else}
+            Exit Room
+          {/if}
       </button>
               <!-- Waiting Room -->
               <div class="flex flex-col gap-4">

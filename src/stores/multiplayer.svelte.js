@@ -1,11 +1,11 @@
-import { toast } from './toast.svelte';
+import { toast } from "./toast.svelte";
 
 /**
  * 5-character alphanumeric room code generator (no ambiguous chars)
  */
 export function generateRoomCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
   for (let i = 0; i < 5; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -16,9 +16,9 @@ export function generateRoomCode() {
  * Read room code from URL parameter `?room=CODE`.
  */
 export function getRoomCodeFromUrl() {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   const params = new URLSearchParams(window.location.search);
-  const code = params.get('room');
+  const code = params.get("room");
   return code ? code.trim().toUpperCase() : null;
 }
 
@@ -26,33 +26,33 @@ export function getRoomCodeFromUrl() {
  * Updates the URL ?room= parameter without reloading the page.
  */
 export function setRoomCodeInUrl(code) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   const params = new URLSearchParams(window.location.search);
-  params.set('room', code);
+  params.set("room", code);
   const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
-  window.history.replaceState(null, '', newUrl);
+  window.history.replaceState(null, "", newUrl);
 }
 
 /**
  * Copy full room URL to clipboard and show toast feedback.
  */
 export async function copyRoomUrl() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
     await navigator.clipboard.writeText(window.location.href);
-    toast.success('Room link copied to clipboard!');
+    toast.success("Room link copied to clipboard!");
   } catch (err) {
-    toast.error('Failed to copy room link.');
+    toast.error("Failed to copy room link.");
   }
 }
 
 class MultiplayerStore {
-  roomCode = $state('');
+  roomCode = $state("");
   peerCount = $state(0);
   isConnected = $state(false);
   isHost = $state(false);
   peers = $state([]);
-  selfId = $state('');
+  selfId = $state("");
 
   // Internal Trystero room & action handles
   #room = null;
@@ -70,7 +70,7 @@ class MultiplayerStore {
    * @param {boolean} asHost  True if this peer is the host
    */
   async connect(code, asHost = false) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (this.#room) {
       this.disconnect();
@@ -82,17 +82,17 @@ class MultiplayerStore {
     this.peerCount = 0;
 
     try {
-      const { joinRoom, selfId } = await import('trystero/nostr');
+      const { joinRoom, selfId } = await import("trystero/nostr");
 
-      const room = joinRoom({ appId: 'emigration-boardgame-emulator' }, code);
+      const room = joinRoom({ appId: "emigration-boardgame-emulator" }, code);
       this.#room = room;
       this.selfId = selfId;
       this.isConnected = true;
 
       // --- Set up actions ---
       // Trystero v0.25+: makeAction returns an object with .send and .onMessage
-      const gameAction = room.makeAction('game_action');
-      const syncStateAction = room.makeAction('sync_state');
+      const gameAction = room.makeAction("game_action");
+      const syncStateAction = room.makeAction("sync_state");
 
       // Store send functions
       this.#sendGameAction = (payload, targetPeerId) => {
@@ -114,16 +114,20 @@ class MultiplayerStore {
       // IMPORTANT: Trystero onMessage receives (data, { peerId })
       gameAction.onMessage = (payload, { peerId }) => {
         for (const handler of this.#actionHandlers) {
-          try { handler(payload, peerId); } catch (e) {
-            console.error('[Multiplayer] Action handler error:', e);
+          try {
+            handler(payload, peerId);
+          } catch (e) {
+            console.error("[Multiplayer] Action handler error:", e);
           }
         }
       };
 
       syncStateAction.onMessage = (data, { peerId }) => {
         for (const handler of this.#syncStateHandlers) {
-          try { handler(data, peerId); } catch (e) {
-            console.error('[Multiplayer] SyncState handler error:', e);
+          try {
+            handler(data, peerId);
+          } catch (e) {
+            console.error("[Multiplayer] SyncState handler error:", e);
           }
         }
       };
@@ -134,30 +138,35 @@ class MultiplayerStore {
           this.peers = [...this.peers, peerId];
           this.peerCount = this.peers.length;
         }
-        toast.info(`Peer connected (${this.peerCount} peer${this.peerCount > 1 ? 's' : ''})`);
+        toast.info(
+          `Peer connected (${this.peerCount} peer${this.peerCount > 1 ? "s" : ""})`,
+        );
         for (const handler of this.#peerJoinHandlers) {
-          try { handler(peerId); } catch (e) {
-            console.error('[Multiplayer] PeerJoin handler error:', e);
+          try {
+            handler(peerId);
+          } catch (e) {
+            console.error("[Multiplayer] PeerJoin handler error:", e);
           }
         }
       };
 
       room.onPeerLeave = (peerId) => {
-        this.peers = this.peers.filter(p => p !== peerId);
+        this.peers = this.peers.filter((p) => p !== peerId);
         this.peerCount = this.peers.length;
-        toast.warning(`Peer disconnected (${this.peerCount} peer${this.peerCount !== 1 ? 's' : ''} remaining)`);
+        toast.warning(
+          `Peer disconnected (${this.peerCount} peer${this.peerCount !== 1 ? "s" : ""} remaining)`,
+        );
       };
-
     } catch (err) {
-      console.error('[Multiplayer] Failed to connect:', err);
-      toast.error('Failed to initialize P2P room connection');
+      console.error("[Multiplayer] Failed to connect:", err);
+      toast.error("Failed to initialize P2P room connection");
     }
   }
 
   /** Send a typed game action to all peers (or a specific peer). */
   sendAction(type, payload, targetPeerId = null) {
     if (!this.#sendGameAction) {
-      console.warn('[Multiplayer] sendAction called before connected');
+      console.warn("[Multiplayer] sendAction called before connected");
       return;
     }
     this.#sendGameAction({ type, payload }, targetPeerId);
@@ -169,7 +178,7 @@ class MultiplayerStore {
    */
   sendSyncState(snapshot, targetPeerId = null) {
     if (!this.#sendSyncState) {
-      console.warn('[Multiplayer] sendSyncState called before connected');
+      console.warn("[Multiplayer] sendSyncState called before connected");
       return;
     }
     this.#sendSyncState(snapshot, targetPeerId);
@@ -178,11 +187,11 @@ class MultiplayerStore {
   // --- Convenience helpers for specific action types ---
 
   broadcastPlayerInfo(info) {
-    this.sendAction('player_info', info);
+    this.sendAction("player_info", info);
   }
 
   broadcastSetupState(p2pPlayers) {
-    this.sendAction('setup_state', { p2pPlayers });
+    this.sendAction("setup_state", { p2pPlayers });
   }
 
   /**
@@ -192,7 +201,7 @@ class MultiplayerStore {
    */
   broadcastGameStart(snapshot) {
     // First, signal that the game is starting (lets peers hide the waiting room)
-    this.sendAction('start_game', {});
+    this.sendAction("start_game", {});
     // Then immediately send the full authoritative snapshot on the sync channel
     this.sendSyncState(snapshot);
   }
@@ -228,7 +237,9 @@ class MultiplayerStore {
   /** Leave the current room and reset state. */
   disconnect() {
     if (this.#room) {
-      try { this.#room.leave(); } catch (_) {}
+      try {
+        this.#room.leave();
+      } catch (_) {}
       this.#room = null;
     }
     this.#sendGameAction = null;
@@ -237,11 +248,11 @@ class MultiplayerStore {
     this.isHost = false;
     this.peerCount = 0;
     this.peers = [];
-    this.roomCode = '';
-    this.selfId = '';
-    this.#peerJoinHandlers.clear();
-    this.#actionHandlers.clear();
-    this.#syncStateHandlers.clear();
+    this.roomCode = "";
+    this.selfId = "";
+    // this.#peerJoinHandlers.clear();
+    // this.#actionHandlers.clear();
+    // this.#syncStateHandlers.clear();
   }
 }
 
