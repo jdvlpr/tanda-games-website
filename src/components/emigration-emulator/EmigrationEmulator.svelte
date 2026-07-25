@@ -934,7 +934,7 @@ const isDev = import.meta.env.DEV;
 
   
   {#if isSetup}
-    <div class="max-w-[750px] mx-auto">
+    <div class="max-w-md mx-auto">
       <div class="flex flex-col gap-5 mt-4">
         <div class="flex flex-col gap-1">
           <p class="opacity-70 text-sm">Game Mode</p>
@@ -982,17 +982,13 @@ const isDev = import.meta.env.DEV;
 
         {#if gameType === 'online'}
           <div class="flex flex-col gap-4">
-            <div class="flex flex-col items-center gap-1">
-              <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
-              <p class="opacity-70 italic text-sm">Serverless peer-to-peer room. May not work with VPN connections.</p>
-            </div>
             {#if !currentRoomCode}
-              <div class="flex flex-col gap-2 max-w-sm mx-auto w-full items-center">
-                <button class="btn bg-green-200 dark:bg-green-800" onclick={hostRoom}>Host New Game</button>
+              <div class="flex flex-col gap-2 mx-auto w-full items-center">
+                <button class="btn bg-green-200 dark:bg-green-800 w-full" onclick={hostRoom}>Host New Game</button>
                 <div class="flex items-center gap-2 text-sm opacity-50 w-full"><hr class="flex-1"/> OR <hr class="flex-1"/></div>
-                <div class="flex gap-2 items-center">
-                  <input type="text" placeholder="Enter Room Code" class="flex-1 text-center font-mono uppercase" maxlength="5" bind:value={joinRoomCodeInput} />
-                  <button class="btn-sm bg-blue-200 dark:bg-blue-800" onclick={joinExistingRoom}>Join Game</button>
+                <div class="flex items-center w-full">
+                  <input type="text" placeholder="Enter Room Code" class="flex-1 text-center font-mono uppercase rounded-r-none py-[6.5px] border-r-0" maxlength="5" bind:value={joinRoomCodeInput} />
+                  <button class="btn py-[5px] px-2 bg-blue-200 dark:bg-blue-800 rounded-l-none" onclick={joinExistingRoom}>Join Game</button>
                 </div>
               </div>
             {:else}
@@ -1037,11 +1033,12 @@ const isDev = import.meta.env.DEV;
                   <p class="text-sm font-bold flex justify-between items-center">
                     <span>Players in Room ({p2pPlayers.length}/6)</span>
                     {#if multiplayer.isHost && p2pPlayers.length < 6}
-                      <button class="btn-sm bg-purple-200 dark:bg-purple-900" onclick={() => {
+                      <button class="btn-sm" onclick={() => {
                         const botName = `🤖 Robot ${p2pPlayers.length + 1}`;
                         p2pPlayers = [...p2pPlayers, { peerId: 'robot-' + Math.random().toString(36).substr(2, 5), name: botName, isHost: false, isBot: true }];
+                        onlineSelectedPacks = getRandomPacks(p2pPlayers.length);
                         multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
-                      }}>+ Add Robot</button>
+                      }}>🤖 Add Robot</button>
                     {/if}
                   </p>
                   <div class="grid grid-cols-2 gap-2">
@@ -1055,8 +1052,9 @@ const isDev = import.meta.env.DEV;
                             <span class="text-[10px] uppercase bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1 py-0.5 rounded">You</span>
                           {/if}
                           {#if multiplayer.isHost && p.isBot}
-                            <button class="text-red-500 hover:text-red-700" onclick={() => {
+                            <button class="btn-sm border-none text-red-500 hover:text-red-700" onclick={() => {
                               p2pPlayers = p2pPlayers.filter((_, idx) => idx !== i);
+                              onlineSelectedPacks = getRandomPacks(p2pPlayers.length);
                               multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
                             }} title="Remove Robot"><Icon icon="lucide:x" class="size-4" /></button>
                           {/if}
@@ -1068,6 +1066,10 @@ const isDev = import.meta.env.DEV;
               </div>
             {/if}
           </div>
+          <div class="flex flex-col items-center gap-1 max-w-md mx-auto">
+              <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
+              <p class="opacity-70 italic text-sm">Online mode uses serverless browser-based peer-to-peer rooms. It may not work with VPN connections.</p>
+            </div>
         {:else}
           <label><span class="text-sm opacity-70">Number of Players:</span>
               <select class="w-fit" bind:value={playerCount} onchange={() => localSelectedPacks = getRandomPacks(playerCount)}>
@@ -1156,7 +1158,7 @@ const isDev = import.meta.env.DEV;
           {#if gameType === 'online'}
             {#if multiplayer.isHost && currentRoomCode}
               <button
-                class="btn text-2xl bg-amber-200 dark:bg-amber-800 disabled:opacity-40"
+                class="btn w-full text-2xl bg-amber-200 dark:bg-amber-800 disabled:opacity-40"
                 disabled={p2pPlayers.length < 2}
                 onclick={startP2PGame}
               >
@@ -1171,7 +1173,7 @@ const isDev = import.meta.env.DEV;
               <p class="text-sm italic opacity-60">Waiting for the host to start the game…</p>
             {/if}
           {:else}
-            <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start Game</button>
+            <button class="btn w-full text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start Game</button>
           {/if}
         </div>
       </div>
@@ -1445,8 +1447,8 @@ const isDev = import.meta.env.DEV;
     </div>
   {/if}
   
-  <div class="flex flex-col gap-4 items-center my-8">
-    <div class="flex flex-col gap-2 items-start text-left mx-auto w-fit rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+  <div class="flex flex-col gap-4 items-center my-6 max-w-md mx-auto">
+    <div class="flex flex-col gap-2 items-start text-left mx-auto w-full rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
       <p class="font-semibold text-xl">Notification Settings</p>
       <div class="flex gap-1 items-center justify-start ">
         <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
@@ -1463,7 +1465,10 @@ const isDev = import.meta.env.DEV;
       {/if}
     </div>
   
-    <p class="italic">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+    <div class="opacity-70 text-sm">
+      <p class="italic">The game emulator may contain mistakes.</p>
+      <p class="italic">Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+    </div>
   
     {#if isDev}
         <button class="btn-sm" onclick={runEngineTests}>Run Engine Unit Tests</button>
