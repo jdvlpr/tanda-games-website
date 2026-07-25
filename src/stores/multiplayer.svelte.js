@@ -1,4 +1,8 @@
 import { toast } from "./toast.svelte";
+import {
+  PUBLIC_METERED_USERNAME,
+  PUBLIC_METERED_CREDENTIAL,
+} from "astro:env/client";
 
 /**
  * 5-character alphanumeric room code generator (no ambiguous chars)
@@ -100,7 +104,47 @@ class MultiplayerStore {
     try {
       const { joinRoom, selfId } = await import("trystero/nostr");
 
-      const room = joinRoom({ appId: "emigration-boardgame-emulator" }, code);
+      const username = PUBLIC_METERED_USERNAME;
+
+      const credential = PUBLIC_METERED_CREDENTIAL;
+
+      const iceServers = [
+        // Fast public STUN fallbacks
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "stun:stun.relay.metered.ca:80",
+        },
+        {
+          urls: "turn:global.relay.metered.ca:80",
+          username,
+          credential,
+        },
+        {
+          urls: "turn:global.relay.metered.ca:80?transport=tcp",
+          username,
+          credential,
+        },
+        {
+          urls: "turn:global.relay.metered.ca:443",
+          username,
+          credential,
+        },
+        {
+          urls: "turns:global.relay.metered.ca:443?transport=tcp",
+          username,
+          credential,
+        },
+      ];
+
+      const room = joinRoom(
+        {
+          appId: "emigration-boardgame-emulator",
+          rtcConfig: {
+            iceServers,
+          },
+        },
+        code,
+      );
       this.#room = room;
       this.selfId = selfId;
       this.isConnected = true;
