@@ -388,7 +388,10 @@ const isDev = import.meta.env.DEV;
     // Initialize our own slot in the player list
     p2pPlayers = [{ peerId: 'self', name: localPlayerName, isHost: asHost }];
     // Host is always player 0
-    if (asHost) myP2PPlayerIdx = 0;
+    if (asHost) {
+      myP2PPlayerIdx = 0;
+      selectedPacks = getRandomPacks(1);
+    }
     // Connect async — onPeerJoin will broadcast our info once a peer is found
     multiplayer.connect(code, asHost);
   }
@@ -419,7 +422,11 @@ const isDev = import.meta.env.DEV;
           if (existing) {
             existing.name = data.payload?.name || 'Anonymous';
           } else {
-            p2pPlayers = [...p2pPlayers, { peerId, name: data.payload?.name || 'Anonymous', isHost: false }];
+            let peerName = data.payload?.name || 'Anonymous';
+            if (/^Player \d+$/.test(peerName)) {
+              peerName = `Player ${p2pPlayers.length + 1}`;
+            }
+            p2pPlayers = [...p2pPlayers, { peerId, name: peerName, isHost: false }];
           }
           // Broadcast the updated roster to all peers
           multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
@@ -434,7 +441,10 @@ const isDev = import.meta.env.DEV;
           if (data.payload.selectedPacks) selectedPacks = data.payload.selectedPacks;
           // Work out which slot we occupy so we can block out-of-turn actions
           const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
-          if (myIdx !== -1) myP2PPlayerIdx = myIdx;
+          if (myIdx !== -1) {
+            myP2PPlayerIdx = myIdx;
+            localPlayerName = p2pPlayers[myIdx].name;
+          }
         }
         return;
       }
@@ -937,7 +947,7 @@ const isDev = import.meta.env.DEV;
           </div>
         {/if}
 
-          <div class={["flex flex-col gap-1", gameType === 'passplay' && 'hidden']}>
+          <div class={["flex flex-col gap-1", (gameType === 'passplay' || gameType === 'online') && 'hidden']}>
             <p class="text-sm opacity-70">Robot Skill Level</p>
             <div class="flex justify-center">
               {#each ['easy', 'normal', 'expert'] as diff, i}
@@ -978,7 +988,7 @@ const isDev = import.meta.env.DEV;
               <p class="text-sm italic opacity-60">Waiting for the host to start the game…</p>
             {/if}
           {:else}
-            <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start</button>
+            <button class="btn text-2xl bg-amber-200 dark:bg-amber-800" onclick={() => startGame(gameType)}>Start Game</button>
           {/if}
         </div>
       </div>
