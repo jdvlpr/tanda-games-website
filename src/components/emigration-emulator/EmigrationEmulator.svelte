@@ -1,14 +1,17 @@
 <script>
   import Icon from '@iconify/svelte';
+  import { playPaydaySound } from '../../js/utils.svelte.js';
+  import { toast } from '../../stores/toast.svelte';
   import ActionPanel from './ActionPanel.svelte';
-  import CardActionPopover from './CardActionPopover.svelte';
   import { createAutoPlayer } from './autoplay.js';
+  import CardActionPopover from './CardActionPopover.svelte';
   import EmigrationEngine, { DESTINATIONS, LIFE_CARD_DEFINITIONS, NATIONALITIES, NATIONALITY_TO_COUNTRY, PACKS_LIST, runTests, shuffleArray } from './engine.svelte.js';
   import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
-  import { playPaydaySound } from '../../js/utils.svelte.js';
   import PlayerBoard from './PlayerBoard.svelte';
-  import { toast } from '../../stores/toast.svelte';
+
+  // Replace dev
+const isDev = import.meta.env.DEV;
 
   // Responsive: track mobile vs desktop
   let isMobile = $state(false);
@@ -21,7 +24,7 @@
   });
 
   // Props
-  let { defaultMode = 'competitive', defaultPlayerCount = 2, showTestRunner = true } = $props();
+  let { defaultMode = 'competitive', defaultPlayerCount = 2 } = $props();
 
   function getRandomPacks(count) {
     return shuffleArray([...PACKS_LIST]).slice(0, count);
@@ -782,34 +785,37 @@
     </div>
   {/if}
   
-  <div class="flex flex-col gap-2 items-start text-left my-8 mx-auto w-fit rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
-    <p class="font-semibold text-xl">Emulator Settings</p>
-    <div class="flex gap-1 items-center flex-1 justify-start ">
-      <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
-      <label class=" min-w-sm" for="enable-notifications">Show Notifications</label>
-    </div>
-    {#if toast.enabled}
-      <label>Notifications Timeout
-        <select bind:value={toast.timeoutMs}>
-          <option value={1500}>Fast (1.5s)</option>
-          <option value={3000}>Normal (3s)</option>
-          <option value={5000}>Long (5s)</option>
-        </select>
-      </label>
-    {/if}
-  </div>
-
-  {#if showTestRunner}
-      <button class="my-8 cursor-pointer" onclick={runEngineTests}>Run Engine Unit Tests</button>
-        {#if testResults}
-          <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
-            {#each testResults as res}
-              <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
-                {res.pass ? '✅' : '❌'} {res.description}
-              </div>
-            {/each}
-          </div>
-        {/if}
+  <div class="flex flex-col gap-4 items-center my-8">
+    <div class="flex flex-col gap-2 items-start text-left mx-auto w-fit rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+      <p class="font-semibold text-xl">Notification Settings</p>
+      <div class="flex gap-1 items-center flex-1 justify-start ">
+        <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
+        <label class="" for="enable-notifications">Enable</label>
+      </div>
+      {#if toast.enabled}
+        <label>Timeout
+          <select bind:value={toast.timeoutMs}>
+            <option value={1500}>Fast (1.5s)</option>
+            <option value={3000}>Normal (3s)</option>
+            <option value={5000}>Long (5s)</option>
+          </select>
+        </label>
       {/if}
-  <p class="italic text-xs mb-8">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+    </div>
+  
+    <p class="italic">The Emulator may contain mistakes. Package Version: {import.meta.env.PACKAGE_VERSION}</p>
+  
+    {#if isDev}
+        <button class="btn-sm" onclick={runEngineTests}>Run Engine Unit Tests</button>
+          {#if testResults}
+            <div class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto">
+              {#each testResults as res}
+                <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
+                  {res.pass ? '✅' : '❌'} {res.description}
+                </div>
+              {/each}
+            </div>
+          {/if}
+        {/if}
+  </div>
 </div>

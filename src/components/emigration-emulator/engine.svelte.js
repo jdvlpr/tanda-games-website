@@ -1161,7 +1161,8 @@ export default class EmigrationEngine {
         const cost = 2 + player.accessFee;
         if (
           player.money >= cost &&
-          (p.stash.tickets > 1 || p.stash.passports > 1)
+          ((p.stash.tickets > 1 && player.stash.connections.length >= 1) ||
+            (p.stash.passports > 1 && player.stash.documents.length >= 1))
         )
           return true;
       }
@@ -3298,12 +3299,14 @@ export default class EmigrationEngine {
 
   // ── Reclaim ───────────────────────────────────────────────────────────
 
-  _doReclaim(player, { targetPlayerIdx, cardType }) {
+  _doReclaim(player, { targetPlayerIdx, cardType, stashType }) {
     const target = this.players[targetPlayerIdx];
     if (target.id === player.id) {
       this.log("ERR|CANNOT_RECLAIM_SELF", "error");
       return;
     }
+
+    const _type = cardType || stashType;
 
     const cost = 2 + player.accessFee;
     if (player.money < cost) {
@@ -3311,9 +3314,14 @@ export default class EmigrationEngine {
       return;
     }
 
-    if (cardType === "ticket") {
+    if (_type === "ticket") {
       if (target.stash.tickets <= 1) {
         this.log(`ERR|P${target.id}_LACKS_TICKETS`, "error");
+        return;
+      }
+      if (player.stash.connections.length < 1) {
+        this.log("ERR|NEED_CONN", "error");
+        toast.error("Need Connection");
         return;
       }
       player.money -= cost;
@@ -3331,6 +3339,11 @@ export default class EmigrationEngine {
     } else {
       if (target.stash.passports <= 1) {
         this.log(`ERR|P${target.id}_LACKS_PASSPORTS`, "error");
+        return;
+      }
+      if (player.stash.documents.length < 1) {
+        this.log("ERR|NEED_Doc", "error");
+        toast.error("Need Document");
         return;
       }
       player.money -= cost;
