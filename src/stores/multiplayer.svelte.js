@@ -63,6 +63,21 @@ class MultiplayerStore {
   #actionHandlers = new Set();
   #syncStateHandlers = new Set();
   #peerJoinHandlers = new Set();
+  
+  // Rate limiting map: peerId -> array of timestamps
+  #rateLimits = new Map();
+  
+  #checkRateLimit(peerId) {
+    const now = Date.now();
+    let timestamps = this.#rateLimits.get(peerId) || [];
+    timestamps = timestamps.filter(t => now - t < 1000); // Keep last 1 second
+    if (timestamps.length >= 20) {
+      return false; // Rate limited (20 msgs / sec)
+    }
+    timestamps.push(now);
+    this.#rateLimits.set(peerId, timestamps);
+    return true;
+  }
 
   /**
    * Connect to a Trystero Nostr room.
@@ -113,6 +128,10 @@ class MultiplayerStore {
 
       // IMPORTANT: Trystero onMessage receives (data, { peerId })
       gameAction.onMessage = (payload, { peerId }) => {
+        if (!this.#checkRateLimit(peerId)) {
+          console.warn(`[Multiplayer] Rate limit exceeded for peer ${peerId}`);
+          return;
+        }
         for (const handler of this.#actionHandlers) {
           try {
             handler(payload, peerId);
@@ -123,6 +142,10 @@ class MultiplayerStore {
       };
 
       syncStateAction.onMessage = (data, { peerId }) => {
+        if (!this.#checkRateLimit(peerId)) {
+          console.warn(`[Multiplayer] Rate limit exceeded for peer ${peerId}`);
+          return;
+        }
         for (const handler of this.#syncStateHandlers) {
           try {
             handler(data, peerId);
@@ -153,6 +176,7 @@ class MultiplayerStore {
       room.onPeerLeave = (peerId) => {
         this.peers = this.peers.filter((p) => p !== peerId);
         this.peerCount = this.peers.length;
+        this.#rateLimits.delete(peerId);
         toast.warning(
           `Peer disconnected (${this.peerCount} peer${this.peerCount !== 1 ? "s" : ""} remaining)`,
         );
@@ -250,6 +274,7 @@ class MultiplayerStore {
     this.peers = [];
     this.roomCode = "";
     this.selfId = "";
+    this.#rateLimits.clear();
     // this.#peerJoinHandlers.clear();
     // this.#actionHandlers.clear();
     // this.#syncStateHandlers.clear();

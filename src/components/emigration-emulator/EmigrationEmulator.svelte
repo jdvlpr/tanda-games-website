@@ -388,99 +388,108 @@ const isDev = import.meta.env.DEV;
   }
 
   function handleRemoteAction(data, peerId) {
-    if (!data) return;
+    if (!data || typeof data !== 'object') return;
 
-    // --- Pre-game waiting room messages ---
-    if (data.type === 'player_info') {
-      if (multiplayer.isHost && isSetup) {
-        // Host: upsert the peer in our player list
-        const existing = p2pPlayers.find(p => p.peerId === peerId);
-        if (existing) {
-          existing.name = data.payload.name;
-        } else {
-          p2pPlayers = [...p2pPlayers, { peerId, name: data.payload.name, isHost: false }];
+    try {
+      // --- Pre-game waiting room messages ---
+      if (data.type === 'player_info') {
+        if (multiplayer.isHost && isSetup) {
+          // Host: upsert the peer in our player list
+          const existing = p2pPlayers.find(p => p.peerId === peerId);
+          if (existing) {
+            existing.name = data.payload?.name || 'Anonymous';
+          } else {
+            p2pPlayers = [...p2pPlayers, { peerId, name: data.payload?.name || 'Anonymous', isHost: false }];
+          }
+          // Broadcast the updated roster to all peers
+          multiplayer.broadcastSetupState(p2pPlayers);
         }
-        // Broadcast the updated roster to all peers
-        multiplayer.broadcastSetupState(p2pPlayers);
+        return;
       }
-      return;
-    }
 
-    if (data.type === 'setup_state') {
-      if (!multiplayer.isHost) {
-        // Peer: sync the waiting room display from the host's roster
-        p2pPlayers = data.payload.p2pPlayers;
-        // Work out which slot we occupy so we can block out-of-turn actions
-        const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
-        if (myIdx !== -1) myP2PPlayerIdx = myIdx;
+      if (data.type === 'setup_state') {
+        if (!multiplayer.isHost && Array.isArray(data.payload?.p2pPlayers)) {
+          // Peer: sync the waiting room display from the host's roster
+          p2pPlayers = data.payload.p2pPlayers;
+          // Work out which slot we occupy so we can block out-of-turn actions
+          const myIdx = p2pPlayers.findIndex(p => p.peerId === multiplayer.selfId);
+          if (myIdx !== -1) myP2PPlayerIdx = myIdx;
+        }
+        return;
       }
-      return;
-    }
 
-    if (data.type === 'start_game') {
-      // Peers: game is starting — hide setup. The actual engine state
-      // arrives via the sync_state channel handled by handleRemoteSyncState.
-      if (!multiplayer.isHost) {
-        isSetup = false;
+      if (data.type === 'start_game') {
+        // Peers: game is starting — hide setup. The actual engine state
+        // arrives via the sync_state channel handled by handleRemoteSyncState.
+        if (!multiplayer.isHost) {
+          isSetup = false;
+        }
+        return;
       }
-      return;
-    }
 
-    // --- In-game messages ---
-    if (!engine) return;
+      // --- In-game messages ---
+      if (!engine) return;
 
-    if (data.type === 'GAME_ACTION') {
-      const { actionType, params } = data.payload || {};
-      if (actionType === 'graduate' || actionType === 'sell') {
-        engine.executeOptionalAction(actionType, params);
-      } else {
-        engine.executeRequiredAction(actionType, params);
+      if (data.type === 'GAME_ACTION') {
+        const { actionType, params } = data.payload || {};
+        if (actionType === 'graduate' || actionType === 'sell') {
+          engine.executeOptionalAction(actionType, params);
+        } else if (actionType) {
+          engine.executeRequiredAction(actionType, params);
+        }
+      } else if (data.type === 'LANE_SELECT') {
+        engine.selectLane(data.payload?.laneIdx);
+      } else if (data.type === 'MODAL_RESOLVE') {
+        pendingChoice = null;
+        engine.resolveChoice(data.payload?.value);
+      } else if (data.type === 'BUY_POOL') {
+        engine.executeRequiredAction('buyPool', { cardType: data.payload?.cardType });
+      } else if (data.type === 'STEAL_POOL') {
+        engine.executeRequiredAction('steal', { cardType: data.payload?.cardType });
       }
-    } else if (data.type === 'LANE_SELECT') {
-      engine.selectLane(data.payload.laneIdx);
-    } else if (data.type === 'MODAL_RESOLVE') {
-      pendingChoice = null;
-      engine.resolveChoice(data.payload.value);
-    } else if (data.type === 'BUY_POOL') {
-      engine.executeRequiredAction('buyPool', { cardType: data.payload.cardType });
-    } else if (data.type === 'STEAL_POOL') {
-      engine.executeRequiredAction('steal', { cardType: data.payload.cardType });
-    }
 
-    snapshot = engine.getSnapshot();
-    pendingChoice = engine.pendingChoice ?? null;
+      snapshot = engine.getSnapshot();
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn("[Emulator] Dropped invalid action payload from peer:", peerId, err);
+    }
   }
 
   function handleRemoteSyncState(remoteSnapshot) {
-    if (!remoteSnapshot) return;
-    // Create the engine if it doesn't exist yet (first sync from host at game start)
-    if (!engine) {
-      isSetup = false;
-      engine = new EmigrationEngine({
-        mode: remoteSnapshot.mode || mode,
-        players: remoteSnapshot.players || [],
-        onLog: (entry) => {
-          if (engine) snapshot = engine.getSnapshot();
-          if (entry?.msg?.includes('SALARIES:')) playPaydaySound();
-        },
-        onStateChange: () => {
-          if (engine) {
-            snapshot = engine.getSnapshot();
-            pendingChoice = engine.pendingChoice ?? null;
+    if (!remoteSnapshot || typeof remoteSnapshot !== 'object') return;
+    
+    try {
+      // Create the engine if it doesn't exist yet (first sync from host at game start)
+      if (!engine) {
+        isSetup = false;
+        engine = new EmigrationEngine({
+          mode: remoteSnapshot.mode || mode,
+          players: Array.isArray(remoteSnapshot.players) ? remoteSnapshot.players : [],
+          onLog: (entry) => {
+            if (engine) snapshot = engine.getSnapshot();
+            if (entry?.msg?.includes('SALARIES:')) playPaydaySound();
+          },
+          onStateChange: () => {
+            if (engine) {
+              snapshot = engine.getSnapshot();
+              pendingChoice = engine.pendingChoice ?? null;
+            }
+            selectedSlot = null;
+            selectedStash = null;
+            selectedAnchorRect = null;
           }
-          selectedSlot = null;
-          selectedStash = null;
-          selectedAnchorRect = null;
-        }
-      });
+        });
+      }
+      engine.loadSnapshot(remoteSnapshot);
+      snapshot = engine.getSnapshot();
+      visualActivePlayerId = snapshot.phase === 'preparation'
+        ? snapshot.currentPlayerIdx
+        : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
+      previousActualPlayerId = visualActivePlayerId;
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn("[Emulator] Dropped invalid sync state from peer:", err);
     }
-    engine.loadSnapshot(remoteSnapshot);
-    snapshot = engine.getSnapshot();
-    visualActivePlayerId = snapshot.phase === 'preparation'
-      ? snapshot.currentPlayerIdx
-      : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
-    previousActualPlayerId = visualActivePlayerId;
-    pendingChoice = engine.pendingChoice ?? null;
   }
 
   function exitRoom() {
@@ -492,39 +501,6 @@ const isDev = import.meta.env.DEV;
     snapshot = null;
     isSetup = true;
     window.history.replaceState({}, '', window.location.pathname);
-  }
-
-  function startGameRemote(targetGameType = 'passplay') {
-    engine = new EmigrationEngine({
-      mode,
-      players: activeSetup,
-      selectedPacks,
-      onLog: (entry) => {
-        if (engine) snapshot = engine.getSnapshot();
-        if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-      },
-      onStateChange: () => {
-        if (engine) {
-          snapshot = engine.getSnapshot();
-          pendingChoice = engine.pendingChoice ?? null;
-        }
-        selectedSlot = null;
-        selectedStash = null;
-        selectedAnchorRect = null;
-      }
-    });
-
-    snapshot = engine.getSnapshot();
-    visualActivePlayerId = snapshot.phase === 'preparation' ? snapshot.currentPlayerIdx : (snapshot.crossingOrder ? snapshot.crossingOrder[snapshot.activeCrossingIdx] : snapshot.activeCrossingIdx);
-    previousActualPlayerId = visualActivePlayerId;
-    isTransitioning = false;
-    pendingChoice = engine.pendingChoice ?? null;
-    isSetup = false;
-    testResults = null;
-    vsComputer = false;
-    aiPlayer = null;
-    aiThinking = false;
-    autoplay = null;
   }
 
   function startP2PGame() {
@@ -807,8 +783,7 @@ const isDev = import.meta.env.DEV;
           <div class="flex flex-col gap-4">
             <div class="flex flex-col items-center gap-1 mb-2">
               <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
-              <p class="opacity-70 italic">Serverless peer-to-peer room. May not work with VPN connections.
-  </p>
+              <p class="opacity-70 italic text-sm">Serverless peer-to-peer room. May not work with VPN connections.</p>
             </div>
             {#if !currentRoomCode}
               <div class="flex flex-col gap-4 max-w-sm mx-auto w-full items-center">

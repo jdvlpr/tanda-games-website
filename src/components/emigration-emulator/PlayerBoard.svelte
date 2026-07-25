@@ -158,7 +158,7 @@
 
   <!-- Requirements Subheader -->
   <div class="text-xs lg:text-sm text-left mb-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-md flex flex-col gap-1 items-start">
-    <p><strong>{player.destination}:</strong> <span class="">{@html getDestinationInfoText(player.destination)}</span></p>
+    <p><strong>{player.destination}:</strong> <span class="">{getDestinationInfoText(player.destination)}</span></p>
   </div>
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
