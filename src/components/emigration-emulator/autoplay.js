@@ -47,7 +47,6 @@ export function createAutoPlayer(
         if (bt) possible.push({ type: "buy", params: bt });
       }
       if (
-        player.stash.tickets < 1 &&
         engine.publicServices.tickets > 0 &&
         player.stash.connections.length >= 1 &&
         player.money >= 2
@@ -55,7 +54,6 @@ export function createAutoPlayer(
         possible.push({ type: "buyPool", params: { cardType: "ticket" } });
       }
       if (
-        player.stash.passports < 1 &&
         engine.publicServices.passports > 0 &&
         player.stash.documents.length >= 1 &&
         player.money >= 2
@@ -68,13 +66,11 @@ export function createAutoPlayer(
       }
       if (enabled("steal")) {
         if (
-          player.stash.tickets < 1 &&
           engine.publicServices.tickets > 0 &&
           player.stash.connections.length >= 1
         )
           possible.push({ type: "steal", params: { cardType: "ticket" } });
         if (
-          player.stash.passports < 1 &&
           engine.publicServices.passports > 0 &&
           player.stash.documents.length >= 1
         )
@@ -118,22 +114,6 @@ export function createAutoPlayer(
       if (paydayTarget) {
         return { type: "activate", params: paydayTarget };
       }
-    }
-    if (
-      player.stash.tickets < 1 &&
-      engine.publicServices.tickets > 0 &&
-      player.stash.connections.length >= 1 &&
-      player.money >= 2
-    ) {
-      return { type: "buyPool", params: { cardType: "ticket" } };
-    }
-    if (
-      player.stash.passports < 1 &&
-      engine.publicServices.passports > 0 &&
-      player.stash.documents.length >= 1 &&
-      player.money >= 2
-    ) {
-      return { type: "buyPool", params: { cardType: "passport" } };
     }
 
     if (enabled("reclaim")) {
@@ -770,10 +750,18 @@ export function createAutoPlayer(
     for (const p of engine.players) {
       if (p.id === player.id) continue;
       // Primary: reclaim if we need one and they have a spare
-      if (player.stash.tickets < 1 && p.stash.tickets > 1) {
+      if (
+        player.stash.tickets < 1 &&
+        p.stash.tickets > 1 &&
+        player.stash.connections.length >= 1
+      ) {
         return { targetPlayerIdx: p.id, cardType: "ticket" };
       }
-      if (player.stash.passports < 1 && p.stash.passports > 1) {
+      if (
+        player.stash.passports < 1 &&
+        p.stash.passports > 1 &&
+        player.stash.documents.length >= 1
+      ) {
         return { targetPlayerIdx: p.id, cardType: "passport" };
       }
     }
@@ -789,10 +777,18 @@ export function createAutoPlayer(
 
     for (const p of engine.players) {
       if (p.id === player.id) continue;
-      if (ticketNeeders >= 2 && p.stash.tickets > 1) {
+      if (
+        ticketNeeders >= 2 &&
+        p.stash.tickets > 1 &&
+        player.stash.connections.length >= 1
+      ) {
         return { targetPlayerIdx: p.id, cardType: "ticket" };
       }
-      if (passportNeeders >= 2 && p.stash.passports > 1) {
+      if (
+        passportNeeders >= 2 &&
+        p.stash.passports > 1 &&
+        player.stash.documents.length >= 1
+      ) {
         return { targetPlayerIdx: p.id, cardType: "passport" };
       }
     }

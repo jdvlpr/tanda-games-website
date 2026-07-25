@@ -1159,12 +1159,12 @@ export default class EmigrationEngine {
     for (const p of this.players) {
       if (p.id !== player.id) {
         const cost = 2 + player.accessFee;
-        if (
-          player.money >= cost &&
-          ((p.stash.tickets > 1 && player.stash.connections.length >= 1) ||
-            (p.stash.passports > 1 && player.stash.documents.length >= 1))
-        )
-          return true;
+        const canAfford = player.money >= cost;
+        const canReclaimTicket =
+          p.stash.tickets > 1 && player.stash.connections.length >= 1;
+        const canReclaimPassport =
+          p.stash.passports > 1 && player.stash.documents.length >= 1;
+        if (canAfford && (canReclaimTicket || canReclaimPassport)) return true;
       }
     }
 
@@ -1206,7 +1206,7 @@ export default class EmigrationEngine {
     // Optional: Graduate
     actions.push({
       type: "graduate",
-      label: "Graduate (D6)",
+      label: "Graduate",
       optional: true,
       enabled: p.inCollege && !this._graduateAttempted,
     });
@@ -1296,7 +1296,8 @@ export default class EmigrationEngine {
       if (
         op.id !== p.id &&
         p.money >= 2 + p.accessFee &&
-        (op.stash.tickets > 1 || op.stash.passports > 1)
+        ((op.stash.tickets > 1 && p.stash.connections.length >= 1) ||
+          (op.stash.passports > 1 && p.stash.documents.length >= 1))
       ) {
         canReclaim = true;
         break;
@@ -1580,6 +1581,7 @@ export default class EmigrationEngine {
               isRevealed: true,
               player: {
                 assurance: player.assurance,
+                money: player.money,
                 name: player.name,
                 success: false,
               },
@@ -1611,6 +1613,7 @@ export default class EmigrationEngine {
               isRevealed: true,
               player: {
                 assurance: player.assurance,
+                money: player.money,
                 name: player.name,
                 success: true,
               },
@@ -1638,6 +1641,7 @@ export default class EmigrationEngine {
               isRevealed: true,
               player: {
                 assurance: player.assurance,
+                money: player.money,
                 name: player.name,
                 success: false,
               },
@@ -3227,7 +3231,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.connections.length < 1) {
         this.log("ERR|NEED_CONN", "error");
-        toast.error("Need Connection");
+        toast.error(`${player.name} needs a Connection to buy a Ticket`);
         return;
       }
       if (player.money < 2) {
@@ -3246,8 +3250,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.documents.length < 1) {
         this.log("ERR|NEED_DOC", "error");
-        toast.error("Need Document");
-
+        toast.error(`${player.name} needs a Document to buy a Ticket`);
         return;
       }
       if (player.money < 2) {
@@ -3321,7 +3324,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.connections.length < 1) {
         this.log("ERR|NEED_CONN", "error");
-        toast.error("Need Connection");
+        toast.error(`${player.name} needs a Connection to reclaim a Ticket`);
         return;
       }
       player.money -= cost;
@@ -3342,7 +3345,7 @@ export default class EmigrationEngine {
         return;
       }
       if (player.stash.documents.length < 1) {
-        this.log("ERR|NEED_Doc", "error");
+        this.log("ERR|NEED_DOC", "error");
         toast.error("Need Document");
         return;
       }

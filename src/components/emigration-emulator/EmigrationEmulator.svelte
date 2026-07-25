@@ -9,6 +9,12 @@
   import GameLogSheet from './GameLogSheet.svelte';
   import Modal from './Modal.svelte';
   import PlayerBoard from './PlayerBoard.svelte';
+import { changelog } from "../../js/emegration-changelog.js";
+
+  const VERSION = changelog[0].version;
+
+  // Props
+  let { defaultMode = 'competitive', defaultPlayerCount = 2 } = $props();
 
   // Replace dev
 const isDev = import.meta.env.DEV;
@@ -23,8 +29,6 @@ const isDev = import.meta.env.DEV;
     return () => mql.removeEventListener('change', handler);
   });
 
-  // Props
-  let { defaultMode = 'competitive', defaultPlayerCount = 2 } = $props();
 
   function getRandomPacks(count) {
     return shuffleArray([...PACKS_LIST]).slice(0, count);
@@ -431,8 +435,26 @@ const isDev = import.meta.env.DEV;
 </script>
 
 <div class="bg-neutral-50 dark:bg-neutral-950 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
-  <h1 class="text-center mb-2 text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
-  <a href="/emigration" class="underline">← Exit</a>
+  <div class="mb-4 flex flex-col items-center gap-2">
+    <h1 class="text-center text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
+    <div class="flex gap-4 flex-wrap justify-center">
+      <a href="/emigration" class="btn-sm w-fit">← Exit</a>
+      <a href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="btn-sm w-fit"> <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                    />
+                </svg> Rulebook</a>
+    </div>
+  </div>
   {#if isSetup}
     <div class="max-w-[750px] mx-auto">
       <div class="flex flex-col gap-5 mt-4">
@@ -601,13 +623,13 @@ const isDev = import.meta.env.DEV;
           {/if}
 
           <!-- Public Center Pool -->
-          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md p-5 backdrop-blur-md shadow-inner">
+          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md px-2 py-1 backdrop-blur-md shadow-inner">
           <!-- Security Lanes -->
             <div class="lg:col-span-2 flex flex-col gap-1 p-1 rounded-md">
                 <div class="text-sm opacity-70 ">Security Lanes</div>
-                <div class="flex flex-wrap gap-2 pb-1">
+                <div class="flex flex-wrap justify-center gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
-                    <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[100px] flex flex-col items-center text-center flex-1 transition-all">
+                    <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all">
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
                       <div class="text-xs mb-1 flex gap-1">
                       {#each lane.unshuffledTokens as {tokenNumber, status}}
@@ -617,11 +639,12 @@ const isDev = import.meta.env.DEV;
                       {#if lane.unshuffledTokens.filter(({status}) => status.isRevealed).length}
                         <div class="flex flex-col gap-1 justify-center">
                           {#each lane.unshuffledTokens.filter(({status}) => status.isRevealed) as {tokenNumber, status}}
-                            <div class="flex gap-1 items-center">
-                              <div class="flex flex-wrap gap-1 items-center text-xs">
-                                <div class={["rounded-md px-2 py-1 w-full flex flex-wrap items-center justify-center gap-1", status.player.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-900"]}>
-                                  <p>{#if status.player.success}✅{:else}❌{/if} {status.player.name}</p>
+                            <div class="grid grid-cols-[1fr_30px] gap-1 items-center">
+                              <div class={["text-xs rounded-md px-2 py-1 w-full flex flex-col gap-1", status.player.success ? "bg-green-200 dark:bg-green-800" : "bg-red-300 dark:bg-red-900"]}>
+                                <p class="w-full">{#if status.player.success}✅{:else}❌{/if} {status.player.name}</p>
+                                <div class="flex gap-1 items-center">
                                   <div class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"> <Icon icon="game-icons:round-star" class="size-3 shrink-0" />{status.player.assurance}</div>
+                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-green-700 flex items-center gap-0"> <Icon icon="game-icons:two-coins" class="size-3 shrink-0" />{status.player.money}</div>
                                 </div>
                               </div>
                               <div class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</div>
@@ -647,9 +670,9 @@ const isDev = import.meta.env.DEV;
             <div class="text-sm opacity-70 ">Public Services cards</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
               <!-- Tickets -->
-              <div class="flex  items-center gap-4 bg-neutral-100 dark:bg-neutral-900 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
+              <div class="flex  items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
-                  <div class="font-bold text-sm">Tickets</div>
+                  <div class="font-bold">Tickets</div>
                   <div class="text-xs ">Cost: $2 Money</div>
                   <div class="text-xs ">Req: 1+ Connection</div>
                 </div>
@@ -680,9 +703,9 @@ const isDev = import.meta.env.DEV;
               </div>
 
               <!-- Passports -->
-              <div class="flex items-center gap-4 bg-neutral-100 dark:bg-neutral-900 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
+              <div class="flex items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
-                  <div class="font-bold text-sm">Passports</div>
+                  <div class="font-bold">Passports</div>
                   <div class="text-xs ">Cost: $2 Money</div>
                   <div class="text-xs ">Req: 1+ Document</div>
                 </div>
