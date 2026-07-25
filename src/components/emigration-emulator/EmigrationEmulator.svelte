@@ -793,56 +793,44 @@ const isDev = import.meta.env.DEV;
         </div>
 
         {#if gameType === 'online'}
-        <!-- P2P Room Status Bar (only visible when connected to a P2P room) -->
-    {#if currentRoomCode}
-      <div class="flex gap-2 items-center flex-wrap justify-center my-1 p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-xs sm:text-sm shadow-sm">
-        <div class="flex items-center gap-1.5 font-mono font-semibold">
-          <span class="opacity-60">Room:</span>
-          <span class="bg-neutral-200 dark:bg-neutral-800 px-2 py-0.5 rounded text-red-600 dark:text-red-400 font-bold uppercase tracking-wider">{currentRoomCode}</span>
-          {#if multiplayer.isHost}<span class="text-[10px] bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200 px-1 py-0.5 rounded uppercase">Host</span>{/if}
-        </div>
-
-        <div class="flex items-center gap-1.5 border-l border-neutral-300 dark:border-neutral-700 pl-2">
-          {#if multiplayer.peerCount > 0}
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-emerald-700 dark:text-emerald-400 font-medium">{multiplayer.peerCount} Peer{multiplayer.peerCount > 1 ? 's' : ''} Connected</span>
-          {:else}
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span class="opacity-70">Waiting for peers…</span>
-          {/if}
-        </div>
-
-        <button
-          type="button"
-          class="btn-sm flex items-center gap-1 text-xs py-1 px-2 cursor-pointer"
-          onclick={copyRoomUrl}
-          title="Copy full room URL to clipboard"
-        >
-          <Icon icon="lucide:copy" class="size-3.5" />
-          Copy Room Link
-        </button>
-      </div>
-    {/if}
-          <div class="flex flex-col gap-4 border-2 border-dashed border-neutral-300 dark:border-neutral-700 p-4 rounded-xl">
-            <h3 class="text-xl font-bold mb-2">P2P Multiplayer</h3>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col items-center gap-1 mb-2">
+              <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
+              <p class="opacity-70 italic">Serverless peer-to-peer room. May not work with VPN connections.
+  </p>
+            </div>
             {#if !currentRoomCode}
-              <div class="flex flex-col gap-4 max-w-sm mx-auto w-full">
+              <div class="flex flex-col gap-4 max-w-sm mx-auto w-full items-center">
                 <button class="btn bg-green-200 dark:bg-green-800" onclick={hostRoom}>Host New Game</button>
-                <div class="flex items-center gap-2 text-sm opacity-50"><hr class="flex-1"/> OR <hr class="flex-1"/></div>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-2 text-sm opacity-50 w-full"><hr class="flex-1"/> OR <hr class="flex-1"/></div>
+                <div class="flex gap-2 items-center">
                   <input type="text" placeholder="Enter Room Code" class="flex-1 text-center font-mono uppercase" maxlength="5" bind:value={joinRoomCodeInput} />
                   <button class="btn-sm bg-blue-200 dark:bg-blue-800" onclick={joinExistingRoom}>Join Game</button>
                 </div>
               </div>
             {:else}
+
+        <button
+          class="btn-sm mx-auto"
+          onclick={() => {
+            currentRoomCode = '';
+            // Replaces the current URL with just the pathname, stripping the query params
+            window.history.replaceState({}, '', window.location.pathname);
+          }}
+          title="exit room"
+        >
+          <Icon icon="lucide:x" class="size-3.5" />
+          Exit Room
+      </button>
               <!-- Waiting Room -->
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col items-center gap-2 bg-blue-50 dark:bg-blue-950 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                   <p class="text-sm opacity-70">Room Code</p>
                   <div class="flex gap-2 items-center">
                     <span class="text-2xl font-mono tracking-widest font-bold">{currentRoomCode}</span>
-                    <button class="p-2 bg-white dark:bg-black rounded-md shadow-sm hover:scale-105 transition-transform" onclick={copyRoomUrl} title="Copy Link">
+                    <button class="btn-sm" onclick={copyRoomUrl} title="Copy Link">
                       <Icon icon="lucide:copy" />
+                      Copy Link
                     </button>
                   </div>
                   <p class="text-xs opacity-60">Share this code with your friends!</p>
