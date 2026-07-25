@@ -950,9 +950,6 @@ const isDev = import.meta.env.DEV;
                 <div class="flex flex-col gap-2">
                   <p class="text-sm font-bold flex justify-between items-center">
                     <span>Players in Room ({p2pPlayers.length}/6)</span>
-                    {#if !multiplayer.isHost}
-                      <span class="text-xs italic font-normal animate-pulse text-amber-600 dark:text-amber-400">Waiting for host to start...</span>
-                    {/if}
                   </p>
                   <div class="grid grid-cols-2 gap-2">
                     {#each p2pPlayers as p}
@@ -995,7 +992,7 @@ const isDev = import.meta.env.DEV;
           </div>
         {/if}
 
-        {#if gameType !== 'online' || currentRoomCode}
+        {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
           <div class="flex flex-col gap-1">
             <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
               <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
@@ -1004,7 +1001,6 @@ const isDev = import.meta.env.DEV;
               {#each PACKS_LIST as pack}
                 <button
                   class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {activeSelectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
-                  disabled={gameType === 'online' && !multiplayer.isHost}
                   onclick={() => {
                     if (gameType === 'online') {
                       if (onlineSelectedPacks.includes(pack)) {
@@ -1045,13 +1041,15 @@ const isDev = import.meta.env.DEV;
             </div>
           </div>
 
-          <div class="flex flex-col items-center gap-1">
-            <p class="text-sm opacity-70">Game Type</p>
-            <div class="flex justify-center">
-              <button class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode === 'competitive' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-              <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+          {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
+            <div class="flex flex-col items-center gap-1">
+              <p class="text-sm opacity-70">Game Type</p>
+              <div class="flex justify-center">
+                <button class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode === 'competitive' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+                <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+              </div>
             </div>
-          </div>
+          {/if}
 
         <div class="my-2">
           {#if gameType === 'online'}
@@ -1127,7 +1125,9 @@ const isDev = import.meta.env.DEV;
           {#if vsComputer && aiThinking}
             <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
           {/if}
-          <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          {#if gameType !== 'online' || multiplayer.isHost}
+            <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; vsComputer = false; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+          {/if}
         </div>
       </div>
 
