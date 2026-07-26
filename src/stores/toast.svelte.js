@@ -91,6 +91,42 @@ class ToastManager {
   warning(message, opts) {
     this.add({ type: "warning", message, ...opts });
   }
+
+  /**
+   * @param {string} message
+   * @param {ToastOptions} [opts]
+   */
+  money(message, opts) {
+    this.add({ type: "money", message, ...opts });
+  }
+  /**
+   * @param {string} message
+   * @param {ToastOptions} [opts]
+   */
+  assurance(message, opts) {
+    this.add({ type: "assurance", message, ...opts });
+  }
+  /**
+   * @param {string} message
+   * @param {ToastOptions} [opts]
+   */
+  document(message, opts) {
+    this.add({ type: "document", message, ...opts });
+  }
+  /**
+   * @param {string} message
+   * @param {ToastOptions} [opts]
+   */
+  connection(message, opts) {
+    this.add({ type: "connection", message, ...opts });
+  }
+  /**
+   * @param {string} message
+   * @param {ToastOptions} [opts]
+   */
+  life(message, opts) {
+    this.add({ type: "life", message, ...opts });
+  }
 }
 
 // Export a single instance to be used globally

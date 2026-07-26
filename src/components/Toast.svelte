@@ -8,9 +8,14 @@
 
     const typeClasses = {
         success: 'bg-green-100/50 dark:bg-green-900/50',
-        error: 'bg-red-100/50 dark:bg-red-900/50',
+        error: 'bg-red-400/50 dark:bg-red-600/50',
         warning: 'bg-amber-100/50 dark:bg-amber-900/50',
-        info: 'bg-blue-100/50 dark:bg-blue-900/50'
+        info: 'bg-blue-100/50 dark:bg-blue-900/50',
+        money: 'bg-green-100/50 dark:bg-green-900/50',
+        assurance:'bg-red-200/50 dark:bg-red-800/50',
+        document:'bg-orange-200/50 dark:bg-orange-800/50',
+        connection: 'bg-pink-200/50 dark:bg-pink-800/50',
+        life: 'bg-white',
     };
 
     const indentPx = $derived((item.indent ?? 0) * 16);
