@@ -987,7 +987,7 @@ export default class EmigrationEngine {
 
   getLeftPlayer(player) {
     return this.players[
-      (player.id - 1 + this.players.length) % this.players.length
+      (player.id + 1 + this.players.length) % this.players.length
     ];
   }
 
@@ -1057,9 +1057,15 @@ export default class EmigrationEngine {
   /**
    * Called ONLY when a life card is KEPT (Must Keep or May Keep chosen to keep).
    * NOT called for Instant cards that are discarded.
-   * Triggers Underdog.
+   * Triggers Underdog — but only when a card OTHER than Underdog itself is gained
+   * (Underdog should not pass itself on its own first acquisition).
+   * @param {object} player
+   * @param {object|null} gainedCard - The card that was just added to the stash, or null if unknown.
    */
-  _onPlayerGainLifeCard(player) {
+  _onPlayerGainLifeCard(player, gainedCard = null) {
+    // Underdog only triggers when *another* life card enters the stash.
+    if (gainedCard && gainedCard.title === "Underdog") return;
+
     const idx = player.stash.lifeCards.findIndex(
       (lc) => lc.title === "Underdog",
     );
@@ -2038,25 +2044,32 @@ export default class EmigrationEngine {
     this.log(`PAYDAY|SALARIES:[${salaries.join(",")}]`, "action");
     toast.success(`${activator.name} activates Payday`);
 
+    // Snapshot all Frontrunner passes BEFORE mutating any stashes, so that a
+    // card pushed to a later-in-array player doesn't get passed a second time
+    // within the same Payday iteration.
+    const frontrunnerPasses = [];
     for (const p of this.players) {
       const frIdx = p.stash.lifeCards.findIndex(
         (lc) => lc.title === "Frontrunner",
       );
       if (frIdx !== -1) {
-        const fr = p.stash.lifeCards[frIdx];
-        if (!fr.money) fr.money = 0;
-        if (fr.money < 5) {
-          fr.money += 1;
-          this.log(`P${p.id}|FRONTRUNNER_ADD:1|TOTAL:${fr.money}`, "system");
-        }
-        const [frCard] = p.stash.lifeCards.splice(frIdx, 1);
-        const left = this.getLeftPlayer(p);
-        left.stash.lifeCards.push(frCard);
-        this.log(`P${p.id}|FRONTRUNNER_PASS|TO:P${left.id}`, "system");
-        toast.info(
-          `${p.name} passes Frontrunner with $${fr.money} to ${left.name}`,
-        );
+        frontrunnerPasses.push({ holder: p, idx: frIdx });
       }
+    }
+    for (const { holder: p, idx: frIdx } of frontrunnerPasses) {
+      const fr = p.stash.lifeCards[frIdx];
+      if (!fr.money) fr.money = 0;
+      if (fr.money < 5) {
+        fr.money += 1;
+        this.log(`P${p.id}|FRONTRUNNER_ADD:1|TOTAL:${fr.money}`, "system");
+      }
+      const [frCard] = p.stash.lifeCards.splice(frIdx, 1);
+      const left = this.getLeftPlayer(p);
+      left.stash.lifeCards.push(frCard);
+      this.log(`P${p.id}|FRONTRUNNER_PASS|TO:P${left.id}`, "system");
+      toast.info(
+        `${p.name} passes Frontrunner with $${fr.money} to ${left.name}`,
+      );
     }
   }
 
@@ -2199,7 +2212,8 @@ export default class EmigrationEngine {
   _resolveLifeCardActivation(player, layoutOwner, card) {
     if (card.keep === "Must Keep") {
       this._resolveLifeCardEffect(player, card, () => {
-        this._onPlayerGainLifeCard(player);
+        // Pass the card so Underdog doesn't self-trigger on its own first acquisition.
+        this._onPlayerGainLifeCard(player, card);
         this.uncoverLayout(layoutOwner);
         this.advanceTurn();
       });
@@ -2215,7 +2229,8 @@ export default class EmigrationEngine {
         resolve: (val) => {
           if (val === "keep") {
             this._resolveLifeCardKeep(player, card, () => {
-              this._onPlayerGainLifeCard(player);
+              // Pass the card so Underdog doesn't self-trigger on its own first acquisition.
+              this._onPlayerGainLifeCard(player, card);
               this.uncoverLayout(layoutOwner);
               this.advanceTurn();
             });
