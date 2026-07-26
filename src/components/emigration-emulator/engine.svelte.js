@@ -3046,8 +3046,9 @@ export default class EmigrationEngine {
       }
 
       case "Share": {
+        let half = 0;
         const deltaStr = this._withDelta(() => {
-          const half = Math.floor(player.money / 2);
+          half = Math.floor(player.money / 2);
           player.money -= half;
           const others = this.players.filter((p) => p.id !== player.id);
           if (others.length > 0) {

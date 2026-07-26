@@ -20,6 +20,21 @@ import { changelog } from "../../js/emegration-changelog.js";
   // Replace dev
 const isDev = import.meta.env.DEV;
 
+let showRobotMode = $state(null);
+
+$effect(() => {
+  showRobotMode = getRobotModeFromUrl()
+});
+
+function getRobotModeFromUrl() {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const robotMode = params.get("showRobotMode");
+  console.log(robotMode)
+  return !!robotMode;
+}
+ 
+
   // Responsive: track mobile vs desktop
   let isMobile = $state(false);
   $effect(() => {
@@ -957,7 +972,7 @@ const isDev = import.meta.env.DEV;
               >
                 Pass & Play
               </button>
-              {#if isDev}
+              {#if showRobotMode}
                 <button
                   class="btn-sm rounded-l-none rounded-r-none border-r-0  {gameType === 'auto' ? 'bg-red-200 dark:bg-red-900  ' : ''}"
                   onclick={() =>{
