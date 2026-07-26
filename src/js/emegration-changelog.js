@@ -3,7 +3,7 @@ export const changelog = [
     version: "0.1.1",
     date: "July 22, 2026",
     items: [
-      "Rule change: The player who Activates a Payday gets their full salary. All other players get 1 Money.",
+      "Rule change: The player who Activates a Payday gets their full salary. All other players get $1.",
     ],
   },
   {
@@ -18,7 +18,7 @@ export const changelog = [
     date: "July 11, 2026",
     items: [
       "Rules Update: You must have a Document or Connection before buying a Passport or Ticket, respectively",
-      "Modified Life Card: Lost & Found is now 'or take 2 Money from another player' instead of 'or take 1 Money from another player'",
+      "Modified Life Card: Lost & Found is now 'or take $2 from another player' instead of 'or take $1 from another player'",
       "Renamed Life Pack: Augustine -> Friendship ",
       "Renamed Life Pack: Hippocrates -> High Society",
       "Renamed Life Pack: Kierkegaard -> Emergency",
@@ -48,7 +48,7 @@ export const changelog = [
     version: "0.0.9",
     date: "July 10, 2026",
     items: [
-      "Rules: Failing to go to college now results in paying 1 Money and taking a different Required Action, instead of forfeiting your turn.",
+      "Rules: Failing to go to college now results in paying $1 and taking a different Required Action, instead of forfeiting your turn.",
       "Rules: Renamed 'Money Tokens' to 'Money'",
     ],
   },
@@ -59,9 +59,9 @@ export const changelog = [
       "Fix: Changed document icon on Destination Cards to match Document Card icons.",
       "Addition: Introduced an Access Fee when taking cards not in your Personal Cards Layout.",
       "Modified Go To College: Introduced a financial aid luck-based mechanic to potentially decrease the price of going to college.",
-      "Modified Life Card: Social Butterfly changed to 'Take 1 Connection or 3 Money Tokens from another player', from 'Take 1 Connection or 1 Money Token from another player'.",
-      "Modified Life Card: Trousers Fall Down changed to 'Lose 1 Connection. If you have none, lose 3 Money Tokens', from 'Lose 1 Document. If you have none, lose 1 Money Tokens'.",
-      "Modified Life Card: Shredder Accident changed to 'Lose 1 Document. If you have none, lose 3 Money Tokens', from 'Lose 1 Document. If you have none, lose 1 Money Tokens'.",
+      "Modified Life Card: Social Butterfly changed to 'Take 1 Connection or $3 Tokens from another player', from 'Take 1 Connection or $1 Token from another player'.",
+      "Modified Life Card: Trousers Fall Down changed to 'Lose 1 Connection. If you have none, lose $3 Tokens', from 'Lose 1 Document. If you have none, lose $1 Tokens'.",
+      "Modified Life Card: Shredder Accident changed to 'Lose 1 Document. If you have none, lose $3 Tokens', from 'Lose 1 Document. If you have none, lose $1 Tokens'.",
       "Modified Life Card: Keep Calm changed to one-time use.",
       "Rules: Added recommended Life Card packs for 3 players",
     ],

@@ -33,9 +33,9 @@ The quantities of cards mixed into the active layout deck scale dynamically with
 2. **Public Services**: Place a pool of Tickets and Passports in the center of the table. The quantity of each card is equal to the number of players.
 3. **Player Setup**: Each player randomly receives:
    - 1 **Nationality Card** (starts with the number of Money tokens indicated by the Starting Fund).
-   - 1 **Career Card** (starts at 1 Money salary).
+   - 1 **Career Card** (starts at $1 salary).
    - 1 **Destination Card** (if matching the player's Nationality card, redraw).
-   - 1 **Access Fee Card** (starts at 1 Money, hiding the higher fees, with a maximum Access Fee of 5 Money).
+   - 1 **Access Fee Card** (starts at $1, hiding the higher fees, with a maximum Access Fee of $5).
 4. **Layout Setup**:
    - Combine the scaled quantities of Documents, Connections, Paydays, and Life Cards into a single deck and shuffle.
    - Draw 2 random cards from the deck and remove them from the game face-down (without looking).
@@ -75,7 +75,7 @@ Adjacent to each player's layout grid, there is a **Stash** area — open space 
 Below/beside the layout, each player also has:
 
 - Their **Nationality Card** (visible to all players, showing nationality and starting/college fund values).
-- Their **Access Fee Card**, which is a sliding card that reveals increasing fee values (1 through 5 Money). The card is positioned so that only the current fee is visible. When a player's Access Fee increases, they slide the card to reveal the next higher number.
+- Their **Access Fee Card**, which is a sliding card that reveals increasing fee values (1 through $5). The card is positioned so that only the current fee is visible. When a player's Access Fee increases, they slide the card to reveal the next higher number.
 
 #### Career Card & Pay Raise Slots
 
@@ -83,13 +83,13 @@ Each Career Card has **2 Pay Raise Slots**:
 
 | Slot | Raise Amount | Resulting Salary |
 | :--: | :----------: | :--------------: |
-|  1   |   +1 Money   |     2 Money      |
-|  2   |   +3 Money   |     5 Money      |
+|  1   |     +$1      |        $2        |
+|  2   |     +$3      |        $5        |
 
-- All players start with a base salary of **1 Money**.
+- All players start with a base salary of **$1**.
 - Graduating from college fills the next open slot, permanently increasing salary.
 - Once both slots are filled, the player's career is **maxed** and they may not apply for college again.
-- Total maximum salary is **5 Money** (1 base + 1 first raise + 3 second raise).
+- Total maximum salary is **$5** (1 base + 1 first raise + 3 second raise).
 
 ---
 
@@ -101,15 +101,15 @@ Nationality cards dictate the Starting Fund and College Fund.
 
 | Nationality | Starting Fund (and College Fund) |
 | :---------- | :------------------------------: |
-| Bosnian     |             2 Money              |
-| Chinese     |             6 Money              |
-| Congolese   |             2 Money              |
-| French      |             5 Money              |
-| Russian     |             5 Money              |
-| Senegalese  |             3 Money              |
-| Swiss       |             4 Money              |
-| English     |             5 Money              |
-| American    |             6 Money              |
+| Bosnian     |                $2                |
+| Chinese     |                $6                |
+| Congolese   |                $2                |
+| French      |                $5                |
+| Russian     |                $5                |
+| Senegalese  |                $3                |
+| Swiss       |                $4                |
+| English     |                $5                |
+| American    |                $6                |
 
 ### 3.2 Destinations
 
@@ -144,31 +144,31 @@ Security Lanes have 3 tokens stacked face-down. The tokens in each lane's pool a
 
 ### 3.4 Documents & Connections Catalogue
 
-All standard Documents and Connections cost either 2, 3, or 4 Money:
+All standard Documents and Connections cost either $2, $3, or $4:
 
-| Documents (Cost)                           | Icon               | Connections (Cost)                                | Icon               |
-| :----------------------------------------- | :----------------- | :------------------------------------------------ | :----------------- |
-| Write Last Will and Testament (2 Money)    | `tombstone`        | Coffee with Airport Employee (2 Money)            | `coffee-mug`       |
-| Certificate of Excellence (2 Money)        | `diploma`          | Cookies for Neighbor from Destination (2 Money)   | `cookie`           |
-| Checklist (2 Money)                        | `checklist`        | Video Chat with Person from Destination (2 Money) | `video-conference` |
-| Copy of Birth Certificate (2 Money)        | `stork-delivery`   | Support Group Motivates You (2 Money)             | `cherish`          |
-| Notebook (2 Money)                         | `notebook`         | Learn Song from Your Destination (2 Money)        | `banjo`            |
-| Subscribe to Travel Updates (2 Money)      | `rss`              | Listen to the News (2 Money)                      | `newspaper`        |
-| Travel Brochure (2 Money)                  | `open-book`        | Friend moves to your Destination (2 Money)        | `hiking`           |
-| Physical Exam (3 Money)                    | `stethoscope`      | Language Classes (3 Money)                        | `conversation`     |
-| Vaccination Record (3 Money)               | `miracle-medecine` | Network Fair (3 Money)                            | `mesh-network`     |
-| Personality Test (3 Money)                 | `skills`           | Dinner with a Diplomat (3 Money)                  | `hot-meal`         |
-| Travel Wallet (3 Money)                    | `wallet`           | Become World Famous (3 Money)                     | `mona-lisa`        |
-| Attend Security Training (3 Money)         | `padlock`          | Learn from an Elder (3 Money)                     | `wisdom`           |
-| Residence Address in Destination (3 Money) | `treasure-map`     | Excellent Teamwork (3 Money)                      | `team-idea`        |
-| Letter of Recommendation (3 Money)         | `thumb-up`         | Endorsement from Royalty (3 Money)                | `coronation`       |
-| Letter of Invitation (4 Money)             | `envelope`         | Enter Luxury Travel Club (4 Money)                | `winged-scepter`   |
-| Background Check (4 Money)                 | `sherlock-holmes`  | Internship in Your Destination (4 Money)          | `light-backpack`   |
-| Employment Contract (4 Money)              | `journey`          | Get Engaged to a Native (4 Money)                 | `engagement-ring`  |
-| International Driving Permit (4 Money)     | `steering-wheel`   | Politician Approves You (4 Money)                 | `public-speaker`   |
-| Vehicle Registration Papers (4 Money)      | `race-car`         | Attend History Class (4 Money)                    | `read`             |
-| Pet Passport (4 Money)                     | `labrador-head`    | Travel Concierge (4 Money)                        | `top-hat`          |
-| Language Phrasebook (4 Money)              | `book-cover`       | Favorable Cultural Opinion (4 Money)              | `vote`             |
+| Documents (Cost)                      | Icon               | Connections (Cost)                           | Icon               |
+| :------------------------------------ | :----------------- | :------------------------------------------- | :----------------- |
+| Write Last Will and Testament ($2)    | `tombstone`        | Coffee with Airport Employee ($2)            | `coffee-mug`       |
+| Certificate of Excellence ($2)        | `diploma`          | Cookies for Neighbor from Destination ($2)   | `cookie`           |
+| Checklist ($2)                        | `checklist`        | Video Chat with Person from Destination ($2) | `video-conference` |
+| Copy of Birth Certificate ($2)        | `stork-delivery`   | Support Group Motivates You ($2)             | `cherish`          |
+| Notebook ($2)                         | `notebook`         | Learn Song from Your Destination ($2)        | `banjo`            |
+| Subscribe to Travel Updates ($2)      | `rss`              | Listen to the News ($2)                      | `newspaper`        |
+| Travel Brochure ($2)                  | `open-book`        | Friend moves to your Destination ($2)        | `hiking`           |
+| Physical Exam ($3)                    | `stethoscope`      | Language Classes ($3)                        | `conversation`     |
+| Vaccination Record ($3)               | `miracle-medecine` | Network Fair ($3)                            | `mesh-network`     |
+| Personality Test ($3)                 | `skills`           | Dinner with a Diplomat ($3)                  | `hot-meal`         |
+| Travel Wallet ($3)                    | `wallet`           | Become World Famous ($3)                     | `mona-lisa`        |
+| Attend Security Training ($3)         | `padlock`          | Learn from an Elder ($3)                     | `wisdom`           |
+| Residence Address in Destination ($3) | `treasure-map`     | Excellent Teamwork ($3)                      | `team-idea`        |
+| Letter of Recommendation ($3)         | `thumb-up`         | Endorsement from Royalty ($3)                | `coronation`       |
+| Letter of Invitation ($4)             | `envelope`         | Enter Luxury Travel Club ($4)                | `winged-scepter`   |
+| Background Check ($4)                 | `sherlock-holmes`  | Internship in Your Destination ($4)          | `light-backpack`   |
+| Employment Contract ($4)              | `journey`          | Get Engaged to a Native ($4)                 | `engagement-ring`  |
+| International Driving Permit ($4)     | `steering-wheel`   | Politician Approves You ($4)                 | `public-speaker`   |
+| Vehicle Registration Papers ($4)      | `race-car`         | Attend History Class ($4)                    | `read`             |
+| Pet Passport ($4)                     | `labrador-head`    | Travel Concierge ($4)                        | `top-hat`          |
+| Language Phrasebook ($4)              | `book-cover`       | Favorable Cultural Opinion ($4)              | `vote`             |
 
 ---
 
@@ -197,8 +197,8 @@ After any action that removes a card from a Layout (buying, activating, discardi
 #### Access Fees
 
 - Taking a card from **your own** Layout costs **no Access Fee**.
-- Taking an available card from **another player's** Layout requires paying **that player** your current Access Fee (starts at 1 Money).
-- After paying an Access Fee to an opponent, **slide your own Access Fee card to the left**, revealing your new increased Access Fee. The Access Fee increments by 1 Money each time, up to a **maximum of 5 Money**.
+- Taking an available card from **another player's** Layout requires paying **that player** your current Access Fee (starts at $1).
+- After paying an Access Fee to an opponent, **slide your own Access Fee card to the left**, revealing your new increased Access Fee. The Access Fee increments by $1 each time, up to a **maximum of $5**.
 - You **must be able to afford** the Access Fee before taking the card. The total cost is the card's purchase price (paid to the bank) **plus** the Access Fee (paid to the opponent).
 - You do **not** pay an Access Fee for taking a card from the Public Services pool or for taking a card from your own Layout.
 
@@ -211,29 +211,29 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 - If a player **cannot perform any** of the Required Actions, they **forfeit** their turn entirely.
 - A player might be able to do an Optional Action and still not be able to do a Required Action — the turn is still forfeited.
 - If a player **can** do a Required Action, they **must** do one.
-- If **no player** can do a Required Action, every player takes **1 Money from the bank** and the next player takes their turn.
+- If **no player** can do a Required Action, every player takes **$1 from the bank** and the next player takes their turn.
 
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
-1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance, and fill an open Pay Raise slot with 1 Money (permanently increasing salary). Fail results: player remains in college.
-2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect 2 Money from the bank. You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
+1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance, and fill an open Pay Raise slot with $1 (permanently increasing salary). Fail results: player remains in college.
+2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $2 from the bank. You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
 
 #### Required Actions (Must Choose Exactly One):
 
 1. **Activate**: Remove a Payday or Life Card from any player's Layout (must be an available card).
-   - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at 1 Money, increased by pay raise slots, paused if in college). All other players receive a flat stipend of 1 Money from the bank (paused if in college). Put the Payday card in the discard pile.
+   - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at $1, increased by pay raise slots, paused if in college). All other players receive a flat stipend of $1 from the bank (paused if in college). Put the Payday card in the discard pile.
    - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
 2. **Buy card**:
    - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.
-   - **Ticket**: Costs 2 Money. Must have at least 1 Connection in your stash.
-   - **Passport**: Costs 2 Money. Must have at least 1 Document in your stash.
+   - **Ticket**: Costs $2. Must have at least 1 Connection in your stash.
+   - **Passport**: Costs $2. Must have at least 1 Document in your stash.
    - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 1 Assurance.
 3. **Steal** (marked with a skip-turn icon): Take a Ticket (requires at least 1 Connection in your Stash) or Passport (requires at least 1 Document in your Stash) from the Public Services pool **for free**. You **skip your next turn** as a penalty.
-4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** 2 Money plus your Access Fee.
-5. **Discard**: Place a Document or Connection into the Discard Pile and collect 2 Money from the bank. This can target a card from your own own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent). You may not discard Paydays or Life Cards, only Documents or Connections.
+4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** $2 plus your Access Fee.
+5. **Discard**: Place a Document or Connection into the Discard Pile and collect $2 from the bank. This can target a card from your own own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent). You may not discard Paydays or Life Cards, only Documents or Connections.
 6. **Apply for College**: If you have an open pay raise slot, roll a D6.
    - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). (College Funds is the same as the Starting Fund of a player's Nationality card). A player must be able to afford minimum tuition in order to take the Apply for College action.
-   - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay 1 Money to the bank and take a different required action.
+   - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay $1 to the bank and take a different required action.
 
 ---
 
@@ -245,43 +245,43 @@ Life Cards have three keep types:
 - **May Keep**: The player chooses between an immediate effect OR keeping the card for an ongoing effect.
 - **Must Keep**: The card is always kept in the player's Stash. Its immediate effect (if any) resolves, and its ongoing effect persists.
 
-| Pack             | Card Title                   | Icon                 |   Type    | Gameplay Effect                                                                                                                                                                           |
-| :--------------- | :--------------------------- | :------------------- | :-------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Friendship**   | Stellar Reputation           | `star-struck`        | May Keep  | Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.                                                                                                      |
-| **Friendship**   | Rummage Sale                 | `bunny-slippers`     |  Instant  | Gain 3 Money, or take 1 discarded Document.                                                                                                                                               |
-| **Friendship**   | Island Paradise              | `island`             |  Instant  | Gain 1 Money and player(s) with the fewest Documents gain 1 Money.                                                                                                                        |
-| **Friendship**   | Swap Wallets                 | `cash`               |  Instant  | You may trade all your Money for another player's Money.                                                                                                                                  |
-| **High Society** | VIP                          | `laurel-crown`       |  Instant  | Gain 1 Money for every 2 Money held by the player with the most Money.                                                                                                                    |
-| **High Society** | Fancy Clothes                | `tie`                | May Keep  | Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.                                                                                                        |
-| **High Society** | Social Butterfly             | `butterfly`          |  Instant  | Take 1 Connection or 3 Money from another player.                                                                                                                                         |
-| **High Society** | Identical Twin               | `duality`            |  Instant  | Gain 1 Money and take another turn.                                                                                                                                                       |
-| **Downtown**     | Reward                       | `trophy`             |  Instant  | Gain 1 Money and take 1 Money from every other player.                                                                                                                                    |
-| **Downtown**     | Suspect                      | `crime-scene-tape`   |  Instant  | Lose 1 Money and lose 1 Connection or 1 Document.                                                                                                                                         |
-| **Downtown**     | Salvage                      | `ancient-ruins`      | Must Keep | Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.                                                                                     |
-| **Downtown**     | Blacklisted                  | `spy`                | Must Keep | Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.                                                                                                       |
-| **Emergency**    | Trousers Fall Down           | `trousers`           |  Instant  | Lose 3 Money or lose 1 Document.                                                                                                                                                          |
-| **Emergency**    | Keep Calm                    | `cement-shoes`       | Must Keep | Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.                                                                  |
-| **Emergency**    | Life Coach                   | `medallist`          |  Instant  | Take 1 Assurance.                                                                                                                                                                         |
-| **Emergency**    | Shredder Accident            | `trash-can`          |  Instant  | Lose 1 Document. If you have none, lose 1 Money.                                                                                                                                          |
-| **Vacation**     | Camping                      | `camping-tent`       |  Instant  | Gain 1 Money and player(s) with the fewest Connections gain 1 Money.                                                                                                                      |
-| **Vacation**     | FOMO                         | `card-exchange`      |  Instant  | Lose 1 Money and you may trade Destinations with someone.                                                                                                                                 |
-| **Vacation**     | Nostalgia                    | `backward-time`      |  Instant  | Replay any discarded Life Card or gain 2 Money.                                                                                                                                           |
-| **Vacation**     | Lost & Found                 | `backpack`           |  Instant  | Take 1 Document or 2 Money from another player.                                                                                                                                           |
-| **News**         | Pandemic / Economic Stimulus | `parmecia`           |  Instant  | 1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.                                                                                               |
-| **News**         | Mental Fog                   | `dread`              |  Instant  | Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.                                                                                                           |
-| **News**         | Insider                      | `read`               | May Keep  | Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.                                                                                                                 |
-| **Charity**      | Philanthropy                 | `wallet`             |  Instant  | Lose 1 Money and starting with the player to your left, give 1 Money to every other player.                                                                                               |
-| **Charity**      | Bailout                      | `receive-money`      |  Instant  | Gain 1 Money and gain 1 Money for player(s) with the least Money.                                                                                                                         |
-| **Charity**      | Share                        | `present`            |  Instant  | Distribute half your Money (round down) to other players.                                                                                                                                 |
-| **Charity**      | Pay Cut                      | `smash-arrows`       | Must Keep | Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.                                                                                                                   |
-| **Trade**        | Productivity                 | `factory-arm`        |  Instant  | Gain 1 Money and decrease your Access Fee by 1 (minimum 0).                                                                                                                               |
-| **Trade**        | Tariffs                      | `bank`               |  Instant  | Lose 1 Money and increase your Access Fee by 1 (maximum 5).                                                                                                                               |
-| **Trade**        | Boost                        | `refinery`           |  Instant  | Gain half the Money tokens of any player’s Starting Money (round down).                                                                                                                   |
-| **Trade**        | Persuasion                   | `convince`           | Must Keep | Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee. |
-| **Sports**       | Underdog                     | `giant`              | Must Keep | Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.                                 |
-| **Sports**       | Frontrunner                  | `laurels-trophy`     | Must Keep | Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
-| **Sports**       | Penalty                      | `whistle`            | Must Keep | Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.                                                             |
-| **Sports**       | Star Power                   | `podium-winner`      | Must Keep | Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.                                                                   |
+| Pack             | Card Title                   | Icon               |   Type    | Gameplay Effect                                                                                                                                                                      |
+| :--------------- | :--------------------------- | :----------------- | :-------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Friendship**   | Stellar Reputation           | `star-struck`      | May Keep  | Gain $3, or keep this card in your stash and all Connections cost $1 less.                                                                                                           |
+| **Friendship**   | Rummage Sale                 | `bunny-slippers`   |  Instant  | Gain $3, or take 1 discarded Document.                                                                                                                                               |
+| **Friendship**   | Island Paradise              | `island`           |  Instant  | Gain $1 and player(s) with the fewest Documents gain $1.                                                                                                                             |
+| **Friendship**   | Swap Wallets                 | `cash`             |  Instant  | You may trade all your Money for another player's Money.                                                                                                                             |
+| **High Society** | VIP                          | `laurel-crown`     |  Instant  | Gain $1 for every $2 held by the player with the most Money.                                                                                                                         |
+| **High Society** | Fancy Clothes                | `tie`              | May Keep  | Gain $3, or keep this card in your stash and all Documents cost $1 less.                                                                                                             |
+| **High Society** | Social Butterfly             | `butterfly`        |  Instant  | Take 1 Connection or $3 from another player.                                                                                                                                         |
+| **High Society** | Identical Twin               | `duality`          |  Instant  | Gain $1 and take another turn.                                                                                                                                                       |
+| **Downtown**     | Reward                       | `trophy`           |  Instant  | Gain $1 and take $1 from every other player.                                                                                                                                         |
+| **Downtown**     | Suspect                      | `crime-scene-tape` |  Instant  | Lose $1 and lose 1 Connection or 1 Document.                                                                                                                                         |
+| **Downtown**     | Salvage                      | `ancient-ruins`    | Must Keep | Gain $1. Keep this card in your stash and whenever another player discards a card, gain $1.                                                                                          |
+| **Downtown**     | Blacklisted                  | `spy`              | Must Keep | Lose $1. Keep this card in your stash and if you discard a card, lose $1.                                                                                                            |
+| **Emergency**    | Trousers Fall Down           | `trousers`         |  Instant  | Lose $3 or lose 1 Document.                                                                                                                                                          |
+| **Emergency**    | Keep Calm                    | `cement-shoes`     | Must Keep | Gain $1 and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.                                                                  |
+| **Emergency**    | Life Coach                   | `medallist`        |  Instant  | Take 1 Assurance.                                                                                                                                                                    |
+| **Emergency**    | Shredder Accident            | `trash-can`        |  Instant  | Lose 1 Document. If you have none, lose $1.                                                                                                                                          |
+| **Vacation**     | Camping                      | `camping-tent`     |  Instant  | Gain $1 and player(s) with the fewest Connections gain $1.                                                                                                                           |
+| **Vacation**     | FOMO                         | `card-exchange`    |  Instant  | Lose $1 and you may trade Destinations with someone.                                                                                                                                 |
+| **Vacation**     | Nostalgia                    | `backward-time`    |  Instant  | Replay any discarded Life Card or gain $2.                                                                                                                                           |
+| **Vacation**     | Lost & Found                 | `backpack`         |  Instant  | Take 1 Document or $2 from another player.                                                                                                                                           |
+| **News**         | Pandemic / Economic Stimulus | `parmecia`         |  Instant  | 1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.                                                                                          |
+| **News**         | Mental Fog                   | `dread`            |  Instant  | Lose $1 and you may discard a Life Card from any player’s Layout or Stash.                                                                                                           |
+| **News**         | Insider                      | `read`             | May Keep  | Gain $3 or keep this card in your stash and on Paydays gain $1.                                                                                                                      |
+| **Charity**      | Philanthropy                 | `wallet`           |  Instant  | Lose $1 and starting with the player to your left, give $1 to every other player.                                                                                                    |
+| **Charity**      | Bailout                      | `receive-money`    |  Instant  | Gain $1 and gain $1 for player(s) with the least Money.                                                                                                                              |
+| **Charity**      | Share                        | `present`          |  Instant  | Distribute half your Money (round down) to other players.                                                                                                                            |
+| **Charity**      | Pay Cut                      | `smash-arrows`     | Must Keep | Lose $1. Keep this card in your stash and on Paydays lose $1.                                                                                                                        |
+| **Trade**        | Productivity                 | `factory-arm`      |  Instant  | Gain $1 and decrease your Access Fee by 1 (minimum 0).                                                                                                                               |
+| **Trade**        | Tariffs                      | `bank`             |  Instant  | Lose $1 and increase your Access Fee by 1 (maximum 5).                                                                                                                               |
+| **Trade**        | Boost                        | `refinery`         |  Instant  | Gain half the Money tokens of any player’s Starting Money (round down).                                                                                                              |
+| **Trade**        | Persuasion                   | `convince`         | Must Keep | Gain $1 and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee. |
+| **Sports**       | Underdog                     | `giant`            | Must Keep | Lose $1 and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose $1 after Phase 1.                                      |
+| **Sports**       | Frontrunner                  | `laurels-trophy`   | Must Keep | Keep this card in your stash. Place $1 from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
+| **Sports**       | Penalty                      | `whistle`          | Must Keep | Lose $1 and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.                                                             |
+| **Sports**       | Star Power                   | `podium-winner`    | Must Keep | Gain $1 and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.                                                                   |
 
 ---
 

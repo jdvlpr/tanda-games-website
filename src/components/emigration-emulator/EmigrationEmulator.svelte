@@ -1281,7 +1281,7 @@ const isDev = import.meta.env.DEV;
                                 <p class="w-full">{#if status.player.success}✅{:else}❌{/if} {status.player.name}</p>
                                 <div class="flex gap-1 items-center">
                                   <div class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"> <Icon icon="game-icons:round-star" class="size-3 shrink-0" />{status.player.assurance}</div>
-                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-green-700 flex items-center gap-0"> <Icon icon="game-icons:two-coins" class="size-3 shrink-0" />{status.player.money}</div>
+                                  <div class="whitespace-nowrap p-1 rounded-md bg-white text-green-700 flex items-center gap-0"> <Icon icon="game-icons:two-coins" class="size-3 shrink-0" />${status.player.money}</div>
                                 </div>
                               </div>
                               <div class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md">{tokenNumber}</div>
@@ -1310,7 +1310,7 @@ const isDev = import.meta.env.DEV;
               <div class="flex  items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold">Tickets</div>
-                  <div class="text-xs ">Cost: $2 Money</div>
+                  <div class="text-xs ">Cost: $2</div>
                   <div class="text-xs ">Req: 1+ Connection</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
@@ -1343,7 +1343,7 @@ const isDev = import.meta.env.DEV;
               <div class="flex items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold">Passports</div>
-                  <div class="text-xs ">Cost: $2 Money</div>
+                  <div class="text-xs ">Cost: $2</div>
                   <div class="text-xs ">Req: 1+ Document</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">

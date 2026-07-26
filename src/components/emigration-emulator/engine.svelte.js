@@ -357,7 +357,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "May Keep",
     type: "life",
     description:
-      "Gain 3 Money, or keep this card in your stash and all Connections cost 1 Money less.",
+      "Gain $3, or keep this card in your stash and all Connections cost $1 less.",
   },
   {
     title: "Rummage Sale",
@@ -365,7 +365,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "bunny-slippers",
     keep: "Instant",
     type: "life",
-    description: "Gain 3 Money, or take 1 discarded Document.",
+    description: "Gain $3, or take 1 discarded Document.",
   },
   {
     title: "Island Paradise",
@@ -373,8 +373,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "island",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money and player(s) with the fewest Documents gain 1 Money.",
+    description: "Gain $1 and player(s) with the fewest Documents gain $1.",
   },
   {
     title: "Swap Wallets",
@@ -390,8 +389,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "laurel-crown",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money for every 2 Money held by the player with the most Money.",
+    description: "Gain $1 for every $2 held by the player with the most Money.",
   },
   {
     title: "Fancy Clothes",
@@ -400,7 +398,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "May Keep",
     type: "life",
     description:
-      "Gain 3 Money, or keep this card in your stash and all Documents cost 1 Money less.",
+      "Gain $3, or keep this card in your stash and all Documents cost $1 less.",
   },
   {
     title: "Social Butterfly",
@@ -408,7 +406,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "butterfly",
     keep: "Instant",
     type: "life",
-    description: "Take 1 Connection or 3 Money from another player.",
+    description: "Take 1 Connection or $3 from another player.",
   },
   {
     title: "Identical Twin",
@@ -416,7 +414,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "duality",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and take another turn.",
+    description: "Gain $1 and take another turn.",
   },
   {
     title: "Reward",
@@ -424,7 +422,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "trophy",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and take 1 Money from every other player.",
+    description: "Gain $1 and take $1 from every other player.",
   },
   {
     title: "Suspect",
@@ -432,7 +430,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "crime-scene-tape",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Money and lose 1 Connection or 1 Document.",
+    description: "Lose $1 and lose 1 Connection or 1 Document.",
   },
   {
     title: "Salvage",
@@ -441,7 +439,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain 1 Money. Keep this card in your stash and whenever another player discards a card, gain 1 Money.",
+      "Gain $1. Keep this card in your stash and whenever another player discards a card, gain $1.",
   },
   {
     title: "Blacklisted",
@@ -450,7 +448,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose 1 Money. Keep this card in your stash and if you discard a card, lose 1 Money.",
+      "Lose $1. Keep this card in your stash and if you discard a card, lose $1.",
   },
   {
     title: "Trousers Fall Down",
@@ -458,7 +456,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "trousers",
     keep: "Instant",
     type: "life",
-    description: "Lose 3 Money or lose 1 Document.",
+    description: "Lose $3 or lose 1 Document.",
   },
   {
     title: "Keep Calm",
@@ -467,7 +465,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain 1 Money and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.",
+      "Gain $1 and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.",
   },
   {
     title: "Life Coach",
@@ -483,7 +481,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "trash-can",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Document. If you have none, lose 1 Money.",
+    description: "Lose 1 Document. If you have none, lose $1.",
   },
   {
     title: "Camping",
@@ -491,8 +489,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "camping-tent",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money and player(s) with the fewest Connections gain 1 Money.",
+    description: "Gain $1 and player(s) with the fewest Connections gain $1.",
   },
   {
     title: "FOMO",
@@ -500,7 +497,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "card-exchange",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Money and you may trade Destinations with someone.",
+    description: "Lose $1 and you may trade Destinations with someone.",
   },
   {
     title: "Nostalgia",
@@ -508,7 +505,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "backward-time",
     keep: "Instant",
     type: "life",
-    description: "Replay any discarded Life Card or gain 2 Money.",
+    description: "Replay any discarded Life Card or gain $2.",
   },
   {
     title: "Lost & Found",
@@ -516,7 +513,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "backpack",
     keep: "Instant",
     type: "life",
-    description: "Take 1 Document or 2 Money from another player.",
+    description: "Take 1 Document or $2 from another player.",
   },
   {
     title: "Pandemic / Economic Stimulus",
@@ -543,7 +540,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Instant",
     type: "life",
     description:
-      "Lose 1 Money and you may discard a Life Card from any player’s Layout or Stash.",
+      "Lose $1 and you may discard a Life Card from any player’s Layout or Stash.",
   },
   {
     title: "Insider",
@@ -552,7 +549,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "May Keep",
     type: "life",
     description:
-      "Gain 3 Money or keep this card in your stash and on Paydays gain 1 Money.",
+      "Gain $3 or keep this card in your stash and on Paydays gain $1.",
   },
   {
     title: "Philanthropy",
@@ -561,7 +558,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Instant",
     type: "life",
     description:
-      "Lose 1 Money and starting with the player to your left, give 1 Money to every other player.",
+      "Lose $1 and starting with the player to your left, give $1 to every other player.",
   },
   {
     title: "Bailout",
@@ -569,8 +566,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "receive-money",
     keep: "Instant",
     type: "life",
-    description:
-      "Gain 1 Money and gain 1 Money for player(s) with the least Money.",
+    description: "Gain $1 and gain $1 for player(s) with the least Money.",
   },
   {
     title: "Share",
@@ -587,7 +583,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose 1 Money. Keep this card in your stash and on Paydays lose 1 Money.",
+      "Lose $1. Keep this card in your stash and on Paydays lose $1.",
   },
   {
     title: "Productivity",
@@ -595,7 +591,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "factory-arm",
     keep: "Instant",
     type: "life",
-    description: "Gain 1 Money and decrease your Access Fee by 1 (minimum 0).",
+    description: "Gain $1 and decrease your Access Fee by 1 (minimum 0).",
   },
   {
     title: "Tariffs",
@@ -603,7 +599,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     icon: "bank",
     keep: "Instant",
     type: "life",
-    description: "Lose 1 Money and increase your Access Fee by 1 (maximum 5).",
+    description: "Lose $1 and increase your Access Fee by 1 (maximum 5).",
   },
   {
     title: "Boost",
@@ -621,7 +617,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain 1 Money and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
+      "Gain $1 and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee.",
   },
   {
     title: "Underdog",
@@ -630,7 +626,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose 1 Money and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose 1 Money after Phase 1.",
+      "Lose $1 and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose $1 after Phase 1.",
   },
   {
     title: "Frontrunner",
@@ -639,7 +635,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Keep this card in your stash. Place 1 Money from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
+      "Keep this card in your stash. Place $1 from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
   },
   {
     title: "Penalty",
@@ -648,7 +644,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose 1 Money and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.",
+      "Lose $1 and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.",
   },
   {
     title: "Star Power",
@@ -657,7 +653,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain 1 Money and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.",
+      "Gain $1 and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.",
   },
 ]);
 
@@ -999,7 +995,7 @@ export default class EmigrationEngine {
 
   /** Called when a card is discarded. Triggers Salvage/Blacklisted. */
   _onCardDiscarded(discardingPlayer, card) {
-    // Salvage: other players gain 1 Money
+    // Salvage: other players gain $1
     for (const p of this.players) {
       if (
         p.id !== discardingPlayer.id &&
@@ -1010,13 +1006,13 @@ export default class EmigrationEngine {
         toast.info(`${p.name} gains $1 from Salvage.`);
       }
     }
-    // Blacklisted: discarder loses 1 Money
+    // Blacklisted: discarder loses $1
     if (
       discardingPlayer.stash.lifeCards.some((lc) => lc.title === "Blacklisted")
     ) {
       discardingPlayer.money = Math.max(0, discardingPlayer.money - 1);
       this.log(`P${discardingPlayer.id}|BLACKLISTED|LOSS:1`, "system");
-      toast.info(`${discardingPlayer.name} loses $1 from Blacklisted.`);
+      toast.info(`${discardingPlayer.name} loses $1 from Blacklisted`);
     }
   }
 
@@ -1029,8 +1025,9 @@ export default class EmigrationEngine {
       const [card] = player.stash.lifeCards.splice(idx, 1);
       const left = this.getLeftPlayer(player);
       left.stash.lifeCards.push(card);
+      left.money = Math.max(0, left.money - 1);
       this.log(`P${player.id}|PASS_PENALTY|TO:P${left.id}`, "system");
-      toast.info(`${player.name} passes Penalty to ${left.name}`);
+      toast.info(`${left.name} takes Penalty from ${player.name} and loses $1`);
     }
   }
 
@@ -1042,14 +1039,16 @@ export default class EmigrationEngine {
           (lc) => lc.title === "Star Power",
         );
         if (idx !== -1) {
-          p.money += 1;
           const [card] = p.stash.lifeCards.splice(idx, 1);
+          player.money += 1;
           player.stash.lifeCards.push(card);
           this.log(
             `P${p.id}|STAR_POWER|GAIN:1|PASS_TO:P${player.id}`,
             "system",
           );
-          toast.info(`${p.name} gains 1, passes Star Power to ${player.name}`);
+          toast.info(
+            `${player.name} takes Star Power from ${p.name} and gains $1`,
+          );
         }
       }
     }
@@ -1065,12 +1064,14 @@ export default class EmigrationEngine {
       (lc) => lc.title === "Underdog",
     );
     if (idx !== -1) {
-      player.money = Math.max(0, player.money - 1);
       const [card] = player.stash.lifeCards.splice(idx, 1);
       const left = this.getLeftPlayer(player);
       left.stash.lifeCards.push(card);
+      left.money = Math.max(0, left.money - 1);
       this.log(`P${player.id}|UNDERDOG|LOSS:1|PASS_TO:P${left.id}`, "system");
-      toast.info(`${player.name} loses 1, passes Underdog to ${left.name}`);
+      toast.info(
+        `${left.name} takes Underdog from ${player.name} and loses $1`,
+      );
     }
   }
 
@@ -1118,6 +1119,7 @@ export default class EmigrationEngine {
 
   /** Can the player perform ANY required action? If not, they forfeit. */
   canPerformAnyRequiredAction(player) {
+    // Activate any Payday or Life Card
     for (const p of this.players) {
       const fee = p.id === player.id ? 0 : player.accessFee;
       if (player.money >= fee) {
@@ -1130,6 +1132,7 @@ export default class EmigrationEngine {
       }
     }
 
+    // Buy a Document or Connection
     for (const p of this.players) {
       const fee = p.id === player.id ? 0 : player.accessFee;
       for (let i = 0; i < 14; i++) {
@@ -1156,12 +1159,8 @@ export default class EmigrationEngine {
       player.money >= 2
     )
       return true;
-    if (this.publicServices.tickets > 0 && player.stash.connections.length >= 1)
-      return true;
-    if (this.publicServices.passports > 0 && player.stash.documents.length >= 1)
-      return true;
 
-    // 4. Reclaim from opponent stash
+    // Reclaim Ticket or Passport from opponent stash
     for (const p of this.players) {
       if (p.id !== player.id) {
         const cost = 2 + player.accessFee;
@@ -1174,12 +1173,14 @@ export default class EmigrationEngine {
       }
     }
 
+    // Discard from own layout
     for (let i = 0; i < 14; i++) {
       if (this.isCardAvailable(player, i)) {
         const t = player.layout[i].card.type;
         if (t === "document" || t === "connection") return true;
       }
     }
+
     // Discard from opponent layout (pay access fee)
     for (const p of this.players) {
       if (p.id !== player.id && player.money >= player.accessFee) {
@@ -1192,7 +1193,7 @@ export default class EmigrationEngine {
       }
     }
 
-    // 6. Apply for College
+    // Apply for College
     if (
       !this._collegeFailed &&
       player.payRaises < MAX_PAY_RAISES &&
@@ -1221,7 +1222,7 @@ export default class EmigrationEngine {
       p.stash.documents.length > 0 || p.stash.connections.length > 0;
     actions.push({
       type: "sell",
-      label: "Sell Stash Card",
+      label: "Sell",
       optional: true,
       enabled: canSell,
     });
@@ -1245,7 +1246,7 @@ export default class EmigrationEngine {
     }
     actions.push({
       type: "activate",
-      label: "Activate Card",
+      label: "Activate",
       optional: false,
       enabled: canActivate,
     });
@@ -1280,7 +1281,7 @@ export default class EmigrationEngine {
       canBuy = true;
     actions.push({
       type: "buy",
-      label: "Buy Card",
+      label: "Buy",
       optional: false,
       enabled: canBuy,
     });
@@ -1292,7 +1293,7 @@ export default class EmigrationEngine {
       this.publicServices.passports > 0 && p.stash.documents.length >= 1;
     actions.push({
       type: "steal",
-      label: "Steal (Skip Turn)",
+      label: "Steal (skip next turn)",
       optional: false,
       enabled: canStealT || canStealP,
     });
@@ -1311,7 +1312,7 @@ export default class EmigrationEngine {
     }
     actions.push({
       type: "reclaim",
-      label: "Reclaim Card",
+      label: "Reclaim",
       optional: false,
       enabled: canReclaim,
     });
@@ -1335,7 +1336,7 @@ export default class EmigrationEngine {
     }
     actions.push({
       type: "discard",
-      label: "Discard Card",
+      label: "Discard",
       optional: false,
       enabled: canDiscard,
     });
@@ -1708,7 +1709,7 @@ export default class EmigrationEngine {
         const w = crossed[0];
         this.gameResult = {
           winner: w.name,
-          message: `WINNER: ${w.name} (Assurance: ${w.assurance}, Money: $${w.money})`,
+          message: `WINNER: ${w.name} (Assurance: ${w.assurance}, $${w.money})`,
           playerResults,
         };
       } else {
@@ -1862,7 +1863,9 @@ export default class EmigrationEngine {
         this.discardPile.push(sold);
         player.money += 2;
         this.log(`P${player.id}|SELL:${sold.name}|GAIN:2`, "action");
-        toast.warning(`${player.name} sells ${sold.name} for $2`);
+        toast.warning(
+          `${player.name} sells ${sold.type.charAt(0).toUpperCase() + sold.type.slice(1)} for $2`,
+        );
         this._onCardDiscarded(player, sold);
         this._notify();
         break;
@@ -1934,7 +1937,7 @@ export default class EmigrationEngine {
     const fee = target.id === player.id ? 0 : player.accessFee;
     if (player.money < fee) {
       this.log(`ERR|NO_FUNDS_${fee}`, "error");
-      toast.error("Not enough funds");
+      toast.error(`${player.name} can't activate card: not enough money`);
       return;
     }
 
@@ -2050,7 +2053,9 @@ export default class EmigrationEngine {
         const left = this.getLeftPlayer(p);
         left.stash.lifeCards.push(frCard);
         this.log(`P${p.id}|FRONTRUNNER_PASS|TO:P${left.id}`, "system");
-        toast.info(`${left.name} gains Frontrunner with $${fr.money}`);
+        toast.info(
+          `${p.name} passes Frontrunner with $${fr.money} to ${left.name}`,
+        );
       }
     }
   }
@@ -2167,31 +2172,26 @@ export default class EmigrationEngine {
       case "Insider":
         return {
           title: "Choose how to resolve Insider",
-          keepText: "Keep Insider for +$1 on future Paydays",
-          immediateText:
-            "Take immediate effect: gain $3 now and discard this card",
+          keepText: "Keep: +$1 on future Paydays",
+          immediateText: "Discard: gain $3",
         };
       case "Stellar Reputation":
         return {
           title: "Choose how to resolve Stellar Reputation",
-          keepText:
-            "Keep Stellar Reputation for -$1 Connections cost on future purchases",
-          immediateText:
-            "Take immediate effect: gain $3 now and discard this card",
+          keepText: "Keep: all Connections cost $1 less",
+          immediateText: "Discard: gain $3",
         };
       case "Fancy Clothes":
         return {
           title: "Choose how to resolve Fancy Clothes",
-          keepText:
-            "Keep Fancy Clothes for -$1 Documents cost on future purchases",
-          immediateText:
-            "Take immediate effect: gain $3 now and discard this card",
+          keepText: "Keep: all Documents cost $1 less",
+          immediateText: "Discard: gain $3",
         };
       default:
         return {
           title: `Choose how to resolve ${card.title}`,
-          keepText: "Keep card for its ongoing effect",
-          immediateText: "Take immediate effect and discard the card",
+          keepText: "Keep: ongoing effect",
+          immediateText: "Discard: immediate effect",
         };
     }
   }
@@ -2501,7 +2501,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Reward|${deltaStr}`, "action");
-        toast.info(`${player.name} Reward: gains $${deltaStr}`);
+        toast.info(
+          `${player.name} gains $1 from Reward and takes $1 from every other player`,
+        );
         done();
         break;
       }
@@ -2575,7 +2577,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Salvage|GAIN:1|KEEP`, "action");
-        toast.info(`${player.name} Salvage: gains $1`);
+        toast.info(`${player.name} keeps Salvage, gains $1`);
         done();
         break;
 
@@ -2583,7 +2585,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Blacklisted|LOSS:1|KEEP`, "action");
-        toast.info(`${player.name} Blacklisted: loses $1`);
+        toast.info(`${player.name} keeps Blacklisted, loses $1`);
         done();
         break;
 
@@ -2643,7 +2645,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Keep Calm|GAIN:1|KEEP`, "action");
-        toast.info(`${player.name} Keep Calm: gains $1`);
+        toast.info(`${player.name} keeps Keep Calm, gains $1`);
         done();
         break;
 
@@ -2696,7 +2698,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Camping|${deltaStr}`, "action");
-        toast.info(`${player.name} Camping: gains ${deltaStr}`);
+        toast.info(
+          `${player.name} gains $1 from Camping and player(s) with the least Connections gain $1`,
+        );
         done();
         break;
       }
@@ -2745,7 +2749,7 @@ export default class EmigrationEngine {
             options: [
               { text: "Gain $2", value: "money" },
               ...discLife.map((c, i) => ({
-                text: `Replay: ${c.title}`,
+                text: `Replay ${c.title} (${c.description})`,
                 value: `life-${i}`,
               })),
             ],
@@ -2879,9 +2883,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:PANDEMIC_STIMULUS|${deltaStr}`, "action");
-        if (deltaStr > 0)
-          toast.info(`${player.name} Pandemic: everyone gains $${deltaStr}`);
-        else toast.info(`${player.name} Pandemic: everyone loses $${deltaStr}`);
+        if (this.pandemicStimulusCount % 2 === 1)
+          toast.info(`${player.name} Pandemic: everyone loses $${roll}`);
+        else toast.info(`${player.name} Pandemic: everyone gains $${roll}`);
         done();
         break;
       }
@@ -2989,7 +2993,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Philanthropy|${deltaStr}`, "action");
-        toast.info(`${player.name} Philanthropy: $${deltaStr}`);
+        toast.info(
+          `${player.name} loses $1 from Philanthropy, and distributes $1 to every other player`,
+        );
         done();
         break;
       }
@@ -3003,7 +3009,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Bailout|${deltaStr}`, "action");
-        toast.info(`${player.name} Bailout: $${deltaStr}`);
+        toast.info(
+          `${player.name} gains $1 from Bailout and player(s) with the least Money gain $1`,
+        );
         done();
         break;
       }
@@ -3024,7 +3032,9 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Share|${deltaStr}`, "action");
-        toast.info(`${player.name} Share: $${deltaStr}`);
+        toast.info(
+          `${player.name} distributes half their Money ($${half}) to other players.`,
+        );
         done();
         break;
       }
@@ -3033,7 +3043,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Pay Cut|LOSS:1|KEEP`, "action");
-        toast.info(`${player.name} Pay Cut: loses $1`);
+        toast.info(`${player.name} keeps Pay Cut, loses $1`);
         done();
         break;
 
@@ -3082,7 +3092,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Persuasion|GAIN:1|KEEP`, "action");
-        toast.info(`${player.name} Persuasion: gains $1`);
+        toast.info(`${player.name} keeps Persuasion, gains $1`);
         done();
         break;
 
@@ -3091,14 +3101,14 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Underdog|LOSS:1|KEEP`, "action");
-        toast.info(`${player.name} Underdog: loses $1`);
+        toast.info(`${player.name} keeps Underdog, loses $1`);
         done();
         break;
 
       case "Frontrunner":
         player.stash.lifeCards.push({ ...card, money: 1 });
         this.log(`P${player.id}|ACT:Frontrunner|MONEY_PLACED:1|KEEP`, "action");
-        toast.info(`${player.name} Frontrunner: places $1 on card`);
+        toast.info(`${player.name} keeps Frontrunner, places $1 on card`);
         done();
         break;
 
@@ -3106,7 +3116,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Penalty|LOSS:1|KEEP`, "action");
-        toast.info(`${player.name} Penalty: loses $1`);
+        toast.info(`${player.name} keeps Penalty, loses $1`);
         done();
         break;
 
@@ -3114,7 +3124,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Star Power|GAIN:1|KEEP`, "action");
-        toast.info(`${player.name} Star Power: gains $1`);
+        toast.info(`${player.name} keeps Star Power, gains $1`);
         done();
         break;
 
@@ -3132,7 +3142,7 @@ export default class EmigrationEngine {
       id: "select-player",
       title,
       options: opponents.map((p) => ({
-        text: `${p.name} ($${p.money}, ${p.stash.documents.length}D, ${p.stash.connections.length}C)`,
+        text: `${p.name} ($${p.money}, ${p.stash.documents.length} Documents, ${p.stash.connections.length} Connections, $${p.startingFund} Starting Money)`,
         value: String(p.id),
       })),
       resolve: (val) => callback(parseInt(val)),
@@ -3190,7 +3200,7 @@ export default class EmigrationEngine {
     const totalCost = cost + fee;
     if (player.money < totalCost) {
       this.log(`ERR|NO_FUNDS_${totalCost}`, "error");
-      toast.error("Not enough funds");
+      toast.error(`${player.name} can't buy card: not enough funds`);
       return;
     }
 
@@ -3209,7 +3219,7 @@ export default class EmigrationEngine {
         toast.info(`${player.name} buys Document for $${cost}`);
       else
         toast.warning(
-          `${player.name} buys Document from ${target.name} ($${fee} Access Fee)`,
+          `${player.name} buys Document ($${cost}) from ${target.name} (+$${fee} Access Fee)`,
         );
       this._onPlayerGainDocument(player);
     } else {
@@ -3222,7 +3232,7 @@ export default class EmigrationEngine {
         toast.info(`${player.name} buys Connection for $${cost}`);
       else
         toast.warning(
-          `${player.name} buys Connection from ${target.name} ($${fee} Access Fee)`,
+          `${player.name} buys Connection ($${cost}) from ${target.name} (+$${fee} Access Fee)`,
         );
       this._onPlayerGainConnection(player);
     }
@@ -3428,11 +3438,13 @@ export default class EmigrationEngine {
       `P${player.id}|DISC:${removed.card.name}|FROM:P${target.id}|GAIN:2`,
       "action",
     );
+    const cardType =
+      removed.card.type.charAt(0).toUpperCase() + removed.card.type.slice(1);
     if (player.id === target.id)
-      toast.info(`${player.name} discards ${removed.card.name} and gains $2`);
+      toast.info(`${player.name} discards a ${cardType} and gains $2`);
     else
       toast.warning(
-        `${player.name} discards ${removed.card.name} from ${target.name} ($${fee} Access Fee)`,
+        `${player.name} discards a ${cardType} from ${target.name} ($${fee} Access Fee)`,
       );
     this._onCardDiscarded(player, removed.card);
     this.uncoverLayout(target);

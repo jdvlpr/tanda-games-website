@@ -24,7 +24,7 @@
         {/each}
         {#if choice.canGoBack && onback}
           <button
-            class="btn mt-2 bg-amber-900/30 hover:bg-amber-900/50 text-amber-200 border-amber-900"
+            class="btn mt-2 bg-amber-200 dark:bg-amber-800 hover:bg-amber-300 dark:hover:bg-amber-700 border-amber-900 dark:border-amber-100"
             onclick={onback}
           >
             ← Step Back
@@ -32,10 +32,10 @@
         {/if}
         {#if choice.cancellable !== false && oncancel}
           <button
-            class="btn mt-2 bg-red-900/30 hover:bg-red-900/50 text-red-200 border-red-900"
+            class="btn mt-2 bg-red-200 dark:bg-red-800 hover:bg-red-300 dark:hover:bg-red-700 border-red-900 dark:border-red-100"
             onclick={oncancel}
           >
-            Cancel Action
+            Cancel
           </button>
         {/if}
       </div>

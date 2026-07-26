@@ -429,7 +429,7 @@ export function createAutoPlayer(
 
       if (move.type === "activate") {
         if (move.card.type === "payday") {
-          // Rule 2: Never activate Payday while in college (salary is $0)
+          // Rule 2: Never activate Payday while in college (salary is 0 Money)
           if (player.inCollege) return -100;
 
           const mySalary = player.salary;
