@@ -11,6 +11,7 @@
   import Modal from './Modal.svelte';
   import PlayerBoard from './PlayerBoard.svelte';
 import { changelog } from "../../js/emegration-changelog.js";
+  import { fade, fly } from 'svelte/transition';
 
   const VERSION = changelog[0].version;
 
@@ -25,6 +26,8 @@ let showRobotMode = $state(null);
 $effect(() => {
   showRobotMode = getRobotModeFromUrl()
 });
+
+let showSettings = $state(false);
 
 function getRobotModeFromUrl() {
   if (typeof window === "undefined") return null;
@@ -936,20 +939,137 @@ function getRobotModeFromUrl() {
           .then(() => alert("Paragraph text copied!"))
           .catch(err => console.error("Failed to copy: ", err));
   }
+
+  function getSecurityLaneBackgroundColor(i) {
+    switch (i) {
+      case 0: return 'bg-yellow-100 dark:bg-yellow-900';
+      case 1: return 'bg-orange-100 dark:bg-orange-900';
+      case 2: return 'bg-red-100 dark:bg-red-900';
+      case 3: return 'bg-blue-100 dark:bg-blue-900';
+      case 4: return 'bg-green-100 dark:bg-green-900';
+    }
+  }
 </script>
 
-<div class="bg-neutral-50 dark:bg-neutral-950 font-emi-ui min-h-screen p-2 box-border *:box-border mb-8">
-  <div class="mb-4 flex flex-col items-center">
-    <h1 class="text-center text-lg uppercase tracking-widest">Emigration Game Emulator</h1>
-    <div class="flex gap-4 flex-wrap justify-center text-sm">
-      <a href="/emigration" class="underline w-fit">← Exit</a>
-      <a href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="underline flex items-center  gap-1 w-fit">  Rulebook</a>
+<!-- Settings Modal -->
+      {#if showSettings}
+        <div transition:fade={{duration: 100}} class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]" role="presentation" onclick={(e) => { if (e.target === e.currentTarget) showSettings = false; }}>
+          <div in:fly={{y:-50}} class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-md max-w-fit w-[90%] shadow-xl">
+            <div class="flex justify-between gap-2">
+              <h2 class="mb-2 text-xl font-semibold text-center">
+                Settings
+              </h2>
+              <button class="btn-sm" onclick={() => {showSettings = false}}><Icon icon="lucide:x" class=""></Icon></button>
+            </div>
+            <div class="flex flex-col gap-4 items-start text-left mx-auto w-full rounded-md p-4 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
+      <div class="flex flex-col gap-2">
+        <label class="items-center gap-2 cursor-pointer select-none inline-flex">
+    <div class="relative">
+      <input 
+        type="checkbox" 
+        class="sr-only peer" 
+        bind:checked={toast.enabled} 
+      />
+      <div class="w-11 h-6 bg-neutral-300 rounded-full peer dark:bg-neutral-700 peer-checked:bg-blue-400 dark:peer-checked:bg-blue-900 transition-colors duration-200 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white shadow-sm"></div>
+    </div>
+    <span class="text-sm font-medium text-neutral-800 dark:text-neutral-200">
+      Enable Notifications
+    </span>
+  </label>
+        {#if toast.enabled}
+          <div class="flex flex-col gap-1">
+            <label for="toast-timeout" class="text-sm opacity-70">Notifications Timeout</label>
+              <select id="toast-timeout" bind:value={toast.timeoutMs}>
+                <option value={1500}>Fast (1.5s)</option>
+                <option value={3000}>Normal (3s)</option>
+                <option value={5000}>Long (5s)</option>
+              </select>
+          </div>
+        {/if}
+      </div>
+
+      {#if isSetup}
+      {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
+          <div class="flex flex-col gap-1 max-w-md">
+            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
+              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
+            {/if}</p>
+            <div class="flex flex-wrap gap-2">
+              {#each PACKS_LIST as pack}
+                <button
+                  class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {activeSelectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
+                  onclick={() => {
+                    if (gameType === 'online') {
+                      if (onlineSelectedPacks.includes(pack)) {
+                        onlineSelectedPacks = onlineSelectedPacks.filter(p => p !== pack);
+                      } else {
+                        onlineSelectedPacks = [...onlineSelectedPacks, pack];
+                      }
+                      if (multiplayer.isHost) {
+                        multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
+                      }
+                    } else {
+                      if (localSelectedPacks.includes(pack)) {
+                        localSelectedPacks = localSelectedPacks.filter(p => p !== pack);
+                      } else {
+                        localSelectedPacks = [...localSelectedPacks, pack];
+                      }
+                    }
+                  }}
+                >
+                  {pack}
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+          {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
+            <div class="flex flex-col gap-1">
+              <p class="text-sm opacity-70">Game Type</p>
+              <div class="flex justify-center">
+                <button class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode === 'competitive' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
+                <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
+              </div>
+            </div>
+          {/if}
+
+      <div class={["flex flex-col gap-1", (gameType === 'passplay' || gameType === 'online') && 'hidden']}>
+            <p class="text-sm opacity-70">Robot Skill Level</p>
+            <div class="flex justify-center">
+              {#each ['easy', 'normal', 'expert'] as diff, i}
+                <button
+                  class={["btn-sm hover:bg-blue-50 dark:hover:bg-blue-950", aiDifficulty === diff && 'bg-blue-200 dark:bg-blue-900 ', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
+                  onclick={() => aiDifficulty = diff}
+                >
+                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                </button>
+              {/each}
+            </div>
+          </div>
+          {/if}
+    </div>
+          </div>
+        </div>
+      {/if}
+
+<div class="">
+  <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
+    <div class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1200px] mx-auto px-2">
+      <h1 class="font-bold text-xl">Emigration Game Emulator</h1>
+      <div class="flex gap-2 items-center">
+        <a title="Rulebook (PDF)" href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="btn-sm bg-white/50 dark:bg-black/50"><Icon icon="lucide:file-question-mark" class="size-5"/><span class="max-md:hidden">Rulebook</span></a>
+        <button class="btn-sm bg-white/50 dark:bg-black/50" title="Emulator Settings" onclick={() => {
+          showSettings = !showSettings
+        }}><Icon icon="lucide:settings" class="size-5"/> <span class="max-md:hidden">Settings</span></button>
+        <a href="/emigration" class="btn-sm  bg-white/50 dark:bg-black/50" title="Close Emulator"><Icon icon="lucide:x" class="size-5"/> <span class="max-md:hidden">Close</span> </a>
+      </div>
     </div>
   </div>
 
   
   {#if isSetup}
-    <div class="max-w-md mx-auto">
+    <div class="max-w-lg mx-auto px-2">
       <div class="flex flex-col gap-5 mt-4">
         <div class="flex flex-col gap-1">
           <p class="opacity-70 text-sm">Game Mode</p>
@@ -1110,64 +1230,7 @@ function getRobotModeFromUrl() {
           </div>
         {/if}
 
-        {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
-          <div class="flex flex-col gap-1">
-            <p class="text-sm opacity-70">Life Card Packs {#if (gameType === 'online' ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
-              <span class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold">(SELECT {gameType === 'online' ? p2pPlayers.length : playerCount})</span>
-            {/if}</p>
-            <div class="flex flex-wrap justify-center gap-2">
-              {#each PACKS_LIST as pack}
-                <button
-                  class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {activeSelectedPacks.includes(pack) ? 'bg-purple-100 dark:bg-purple-900  ' : ''}"
-                  onclick={() => {
-                    if (gameType === 'online') {
-                      if (onlineSelectedPacks.includes(pack)) {
-                        onlineSelectedPacks = onlineSelectedPacks.filter(p => p !== pack);
-                      } else {
-                        onlineSelectedPacks = [...onlineSelectedPacks, pack];
-                      }
-                      if (multiplayer.isHost) {
-                        multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
-                      }
-                    } else {
-                      if (localSelectedPacks.includes(pack)) {
-                        localSelectedPacks = localSelectedPacks.filter(p => p !== pack);
-                      } else {
-                        localSelectedPacks = [...localSelectedPacks, pack];
-                      }
-                    }
-                  }}
-                >
-                  {pack}
-                </button>
-              {/each}
-            </div>
-          </div>
-        {/if}
-
-          <div class={["flex flex-col gap-1", (gameType === 'passplay' || gameType === 'online') && 'hidden']}>
-            <p class="text-sm opacity-70">Robot Skill Level</p>
-            <div class="flex justify-center">
-              {#each ['easy', 'normal', 'expert'] as diff, i}
-                <button
-                  class={["btn-sm hover:bg-blue-50 dark:hover:bg-blue-950", aiDifficulty === diff && 'bg-blue-200 dark:bg-blue-900 ', i === 0 && 'rounded-r-none', i === 1 && 'rounded-x-none border-x-0 rounded-r-none rounded-l-none', i === 2 && 'rounded-l-none']}
-                  onclick={() => aiDifficulty = diff}
-                >
-                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                </button>
-              {/each}
-            </div>
-          </div>
-
-          {#if gameType !== 'online' || (currentRoomCode && multiplayer.isHost)}
-            <div class="flex flex-col items-center gap-1">
-              <p class="text-sm opacity-70">Game Type</p>
-              <div class="flex justify-center">
-                <button class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode === 'competitive' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'competitive'}>Competitive</button>
-                <button class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode === 'cooperative' && 'bg-green-200 dark:bg-green-900'}" onclick={() => mode = 'cooperative'}>Cooperative</button>
-              </div>
-            </div>
-          {/if}
+        
 
         <div class="my-2">
           {#if gameType === 'online'}
@@ -1194,13 +1257,13 @@ function getRobotModeFromUrl() {
       </div>
     </div>
   {:else if snapshot}
-  <div class="max-w-[1200px] mx-auto">
+  <div class="max-w-[1200px] mx-auto px-2">
     {#if gameType === 'online' && currentRoomCode}
-      <div class="flex flex-wrap items-center justify-between gap-3 text-sm shadow-inner bg-neutral-300 dark:bg-neutral-700 w-full p-2 rounded-md mb-4">
-        <div class="flex items-center gap-2 flex-wrap">
+      <div class="flex flex-wrap items-center justify-center md:justify-between gap-3 w-full mb-4">
+        <div class="flex justify-center md:justify-start items-center gap-2 flex-wrap">
           <div class="flex items-center gap-1">
             <button 
-              class="btn-sm bg-amber-200 dark:bg-amber-800"
+              class="btn-sm bg-emerald-200 dark:bg-emerald-800"
               onclick={copyRoomUrl}
               title="Click to copy Room Code"
             >
@@ -1232,19 +1295,15 @@ function getRobotModeFromUrl() {
           class="btn-sm bg-red-300 dark:bg-red-700"
           onclick={exitRoom}
         >
-          <Icon icon="lucide:x" class="size-3.5" />
+          <Icon icon="lucide:x" class="size-5" />
           {multiplayer.isHost ? 'Close Room' : 'Leave Room'}
         </button>
       </div>
     {/if}
-      <div class="flex flex-wrap gap-2 justify-between items-center mb-5">
-        <h2 class="text-2xl tracking-wide">Phase: {snapshot.phase.charAt(0).toUpperCase() + snapshot.phase.slice(1)}</h2>
+      <div class="flex flex-wrap gap-2 justify-center md:justify-end items-center mb-5">
         <div class="flex flex-wrap items-center gap-3">
-          {#if activeBotIndices.length > 0 && aiThinking}
-            <span class="text-sm text-neutral-500 dark:text-neutral-400 italic animate-pulse">Computer is thinking…</span>
-          {/if}
           {#if gameType !== 'online' || multiplayer.isHost}
-            <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; activeBotIndices = []; aiPlayer = null; aiThinking = false; }}>Restart / Setup</button>
+            <button class="btn-sm" onclick={() => { playersSetup = getRandomPlayersSetup(); localSelectedPacks = getRandomPacks(playerCount); isSetup = true; activeBotIndices = []; aiPlayer = null; aiThinking = false; }}><Icon icon="lucide:rotate-ccw" class="size-5"></Icon> New Game</button>
           {/if}
         </div>
       </div>
@@ -1275,17 +1334,19 @@ function getRobotModeFromUrl() {
           {/if}
 
           <!-- Public Center Pool -->
-          <div class="bg-neutral-200 dark:bg-neutral-800 rounded-md px-2 py-1 backdrop-blur-md shadow-inner">
+          <div class="">
           <!-- Security Lanes -->
             <div class="lg:col-span-2 flex flex-col gap-1 p-1 rounded-md">
-                <div class="text-sm opacity-70 ">Security Lanes</div>
+                <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
                 <div class="flex flex-wrap justify-center gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
-                    <div class="bg-neutral-300 dark:bg-neutral-700 rounded-md gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all">
+                    {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
+                    <div class={["rounded-md gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800", backgroundColor]}>
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
+                      <Icon icon="game-icons:police-officer-head" class="size-8 opacity-70"></Icon>
                       <div class="text-xs mb-1 flex gap-1">
                       {#each lane.unshuffledTokens as {tokenNumber, status}}
-                        <p class={["bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md", status.isRevealed && 'opacity-30']}>{tokenNumber}</p>
+                        <p class={["bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-md border border-red-300 dark:border-red-700", status.isRevealed && 'opacity-30']}>{tokenNumber}</p>
                       {/each}
                       </div>
                       {#if lane.unshuffledTokens.filter(({status}) => status.isRevealed).length}
@@ -1319,14 +1380,14 @@ function getRobotModeFromUrl() {
               </div>
             </div>
             
-            <div class="text-sm opacity-70 ">Public Services cards</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
+            <!-- <div class="text-sm opacity-70 ">Public Services cards</div> -->
+            <div class="flex flex-wrap gap-2 mx-auto">
               <!-- Tickets -->
-              <div class="flex  items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
+              <div class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold">Tickets</div>
-                  <div class="text-xs ">Cost: $2</div>
-                  <div class="text-xs ">Req: 1+ Connection</div>
+                  <div class="text-xs ">Requires: 1+ Connection</div>
+                  <div class="text-xs ">Ticket + Passport = 1 Assurance</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
@@ -1336,11 +1397,11 @@ function getRobotModeFromUrl() {
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="btn-sm"
+                        class="btn-sm whitespace-nowrap"
                         disabled={snapshot.publicServices.tickets <= 0 || currentPlayer.money < 2 || currentPlayer.stash.connections.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('ticket')}
                       >
-                        Buy
+                        $2 Buy
                       </button>
                       <button
                         class="btn-sm"
@@ -1355,11 +1416,11 @@ function getRobotModeFromUrl() {
               </div>
 
               <!-- Passports -->
-              <div class="flex items-center gap-4 bg-white dark:bg-black p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
+              <div class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
                 <div class="text-left">
                   <div class="font-bold">Passports</div>
-                  <div class="text-xs ">Cost: $2</div>
-                  <div class="text-xs ">Req: 1+ Document</div>
+                  <div class="text-xs ">Requires 1+ Document</div>
+                  <div class="text-xs ">Passport + Ticket = 1 Assurance</div>
                 </div>
                 <div class="flex flex-col gap-1 ml-auto items-end">
                   <div class="text-2xl font-bold flex items-center gap-1.5">
@@ -1369,11 +1430,11 @@ function getRobotModeFromUrl() {
                   {#if snapshot.phase === 'preparation' && currentPlayer}
                     <div class="flex gap-1">
                       <button
-                        class="btn-sm"
+                        class="btn-sm whitespace-nowrap"
                         disabled={snapshot.publicServices.passports <= 0 || currentPlayer.money < 2 || currentPlayer.stash.documents.length < 1 || pendingChoice}
                         onclick={() => handleBuyPool('passport')}
                       >
-                        Buy
+                         $2 Buy
                       </button>
                       <button
                         class="btn-sm"
@@ -1450,6 +1511,8 @@ function getRobotModeFromUrl() {
         }}
       />
 
+      
+
       {#if showPopover}
         <CardActionPopover
           anchorRect={selectedAnchorRect}
@@ -1462,23 +1525,8 @@ function getRobotModeFromUrl() {
     </div>
   {/if}
   
-  <div class="flex flex-col gap-4 items-center my-6 max-w-md mx-auto">
-    <div class="flex flex-col gap-2 items-start text-left mx-auto w-full rounded-md p-2 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800">
-      <p class="font-semibold text-xl">Notification Settings</p>
-      <div class="flex gap-1 items-center justify-start ">
-        <input id="enable-notifications" type="checkbox" class="" bind:checked={toast.enabled} />
-        <label class="" for="enable-notifications">Enable</label>
-      </div>
-      {#if toast.enabled}
-        <label>Timeout
-          <select bind:value={toast.timeoutMs}>
-            <option value={1500}>Fast (1.5s)</option>
-            <option value={3000}>Normal (3s)</option>
-            <option value={5000}>Long (5s)</option>
-          </select>
-        </label>
-      {/if}
-    </div>
+  <div class="flex flex-col gap-4 items-center my-7 max-w-md mx-auto px-2">
+    
   
     <div class="opacity-70 text-sm">
       <p class="italic">The game emulator may contain mistakes.</p>

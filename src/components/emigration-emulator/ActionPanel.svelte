@@ -16,11 +16,10 @@
   });
 </script>
 
-<div class="bg-neutral-200 dark:bg-neutral-800 max-lg:bg-neutral-50/50 max-lg:dark:bg-neutral-950/50 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-5 overflow-auto backdrop-blur-md max-lg:shadow-2xl">
+<div class="max-lg:bg-neutral-50/50 max-lg:dark:bg-neutral-950/50 rounded-md px-2 py-2 lg:px-4 flex flex-col gap-2 overflow-auto backdrop-blur-md max-lg:shadow-2xl">
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <div>
-      <h3 class="text-sm opacity-70 bp-1 max-lg:hidden">Action Dashboard</h3>
       
       <!-- Selection Hint -->
       <div class="text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 rounded-lg p-2 mb-2 min-h-[44px] flex items-center justify-center text-center gap-2 flex-wrap">
@@ -51,7 +50,7 @@
         <div class="flex flex-wrap gap-2 items-center justify-center">
           {#each actions as action}
             <button 
-              class={["btn-sm", action.optional && "" ]}
+              class={["btn-sm flex-1 whitespace-nowrap", action.optional && "" ]}
               disabled={!action.enabled || pendingChoice}
               onclick={() => onaction(action.type)}
             >
