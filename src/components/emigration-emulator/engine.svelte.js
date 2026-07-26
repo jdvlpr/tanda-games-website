@@ -3031,11 +3031,11 @@ export default class EmigrationEngine {
 
       case "Bailout": {
         const deltaStr = this._withDelta(() => {
-          player.money += 1;
           const minM = Math.min(...this.players.map((p) => p.money));
           for (const p of this.players) {
             if (p.money === minM) p.money += 1;
           }
+          player.money += 1;
         });
         this.log(`P${player.id}|ACT:Bailout|${deltaStr}`, "action");
         toast.money(
