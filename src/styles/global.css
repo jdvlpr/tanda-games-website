@@ -61,8 +61,8 @@
     /* font-size: theme("fontSize.lg"); */
     font-weight: theme("fontWeight.semibold");
     /* letter-spacing: theme("letterSpacing.wide"); */
-    display: inline-flex;
     height: min-content;
+    display: inline-flex;
     justify-content: center;
     gap: 0.5rem;
     align-items: center;
@@ -78,6 +78,34 @@
     @variant dark {
       &:hover {
         background-color: theme("colors.red.700");
+      }
+    }
+  }
+
+  .btn-action {
+    cursor: pointer;
+    @apply py-2 px-2 flex-1 whitespace-nowrap bg-amber-200 text-slate-900 dark:bg-amber-800 dark:text-slate-100;
+    border: 1px solid;
+    font-weight: theme("fontWeight.bold");
+    border-color: var(--color-amber-300);
+    border-radius: theme("borderRadius.md");
+    display: inline-flex;
+    justify-content: center;
+    gap: 0.5rem;
+    align-items: center;
+    @apply shadow-sm;
+    @apply transition-all;
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    &:hover {
+      background-color: theme("colors.amber.100");
+    }
+    @variant dark {
+      border-color: var(--color-amber-700);
+      &:hover {
+        background-color: theme("colors.amber.900");
       }
     }
   }

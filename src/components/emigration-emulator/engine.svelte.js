@@ -1233,6 +1233,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "graduate",
       label: "Graduate",
+      lucideIcon: 'graduation-cap',
       optional: true,
       enabled: p.inCollege && !this._graduateAttempted,
     });
@@ -1242,6 +1243,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "sell",
       label: "Sell",
+      lucideIcon: 'hand-coins',
       optional: true,
       enabled: canSell,
     });
@@ -1266,6 +1268,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "activate",
       label: "Activate",
+      lucideIcon: 'zap',
       optional: false,
       enabled: canActivate,
     });
@@ -1301,6 +1304,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "buy",
       label: "Buy",
+      lucideIcon: 'shopping-cart',
       optional: false,
       enabled: canBuy,
     });
@@ -1313,6 +1317,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "steal",
       label: "Steal (skip next turn)",
+      lucideIcon: 'hat-glasses',
       optional: false,
       enabled: canStealT || canStealP,
     });
@@ -1332,6 +1337,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "reclaim",
       label: "Reclaim",
+      lucideIcon: 'search-check',
       optional: false,
       enabled: canReclaim,
     });
@@ -1356,6 +1362,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "discard",
       label: "Discard",
+      lucideIcon: 'archive',
       optional: false,
       enabled: canDiscard,
     });
@@ -1368,6 +1375,7 @@ export default class EmigrationEngine {
     actions.push({
       type: "applyCollege",
       label: "Apply for College",
+      lucideIcon: 'notebook-pen',
       optional: false,
       enabled: canApply,
     });
@@ -1377,6 +1385,7 @@ export default class EmigrationEngine {
       actions.push({
         type: "forfeit",
         label: "Forfeit Turn",
+        lucideIcon: 'circle-arrow-right',
         optional: false,
         enabled: true,
       });

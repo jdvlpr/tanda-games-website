@@ -1,4 +1,5 @@
 <script>
+  import Icon from "@iconify/svelte";
   import { fly } from "svelte/transition";
 
   let {
@@ -111,16 +112,16 @@
     aria-label="Card actions"
     style="position:fixed;{posStyle}z-index:200;width:{POPOVER_W}px;"
     transition:fly={{ y: position.below ? -6 : 6, duration: 150, opacity: 0 }}
-    class="rounded-md shadow-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-black"
+    class="shadow-lg border border-slate-500 bg-slate-700 dark:bg-slate-300 text-white dark:text-black rounded-md"
   >
     <!-- Arrow pointing toward the card -->
     {#if position.below}
       <div
-        class="absolute -top-1.5 left-1/2 -translate-x-1/2 size-3 bg-neutral-900 dark:bg-neutral-100 rotate-45 border-l border-t border-neutral-200 dark:border-neutral-800 z-10"
+        class="absolute -top-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 dark:bg-slate-200 rotate-45 border-l border-t border-slate-500 dark:border-slate-400 z-10"
       ></div>
     {:else}
       <div
-        class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 bg-neutral-900 dark:bg-neutral-100 rotate-45 border-r border-b border-neutral-200 dark:border-neutral-800 z-10"
+        class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 dark:bg-slate-200 rotate-45 border-r border-b border-slate-500 dark:border-slate-400 z-10"
       ></div>
     {/if}
 
@@ -136,9 +137,13 @@
       {#each actions as action}
         {#if action.enabled}
           <button
-            class="btn-sm whitespace-nowrap flex-1 bg-white dark:bg-black text-black dark:text-white"
+            class={["btn-action"]}
             onclick={() => onaction?.(action.type)}
           >
+            {#if action.lucideIcon}<Icon
+                icon="lucide:{action.lucideIcon}"
+                class="size-5"
+              />{/if}
             {action.label}
           </button>
         {/if}

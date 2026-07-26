@@ -1311,7 +1311,7 @@
     <div
       class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1200px] mx-auto px-2"
     >
-      <div class="opacity-70 flex flex-col items-center md:items-start">
+      <div class="flex flex-col items-center md:items-start">
         <h1 class="font-bold text-2xl text-slate-900 dark:text-slate-100">
           Emigration
         </h1>
