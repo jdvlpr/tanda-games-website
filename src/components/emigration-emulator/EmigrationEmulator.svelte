@@ -108,6 +108,8 @@ function getRobotModeFromUrl() {
   let selectedStash = $state(null);
   let selectedAnchorRect = $state(null);
 
+  let isPreparationPhase = $derived(snapshot.phase === 'preparation');
+
   function getLifeCardDescription(title) {
     return LIFE_CARD_DEFINITIONS.find((card) => card.title === title)?.description ?? '';
   }
@@ -1310,9 +1312,9 @@ function getRobotModeFromUrl() {
 
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start  mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 relative">
           <!-- Security Lanes -->
-            <div class="flex flex-col gap-1">
+            <div class={["flex flex-col gap-1", isPreparationPhase && "hidden"]}>
                 <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
                 <div class="flex flex-wrap justify-center gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
@@ -1492,6 +1494,8 @@ function getRobotModeFromUrl() {
           </div>
         {/if}
       </div>
+    </div>
+
 
       <!-- Floating Log Sheet -->
     
@@ -1523,7 +1527,6 @@ function getRobotModeFromUrl() {
           onclose={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
         />
       {/if}
-    </div>
   {/if}
   
   <div class="flex flex-col gap-4 items-center my-7 max-w-md mx-auto px-2">
