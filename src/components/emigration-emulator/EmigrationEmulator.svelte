@@ -1311,28 +1311,6 @@ function getRobotModeFromUrl() {
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start  mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
         <div class="flex flex-col gap-2">
-          <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
-          {#if isMobile}
-            <div class="sticky top-0 z-[100]">
-              <ActionPanel 
-                {engine}
-                {snapshot}
-                {currentPlayer}
-                actions={dashboardActions}
-                onaction={handleAction}
-                onselectlane={handleSelectLane}
-                {selectionText}
-                pendingChoice={pendingChoice || (activeBotIndices.includes(visualActivePlayerId))}
-                computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-                waitingForPeer={!isMyP2PTurn}
-                waitingForName={waitingForPlayerName}
-                autoScrollEnabled={!autoplay}
-                hasSelection={!!(selectedSlot || selectedStash)}
-                onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
-              />
-            </div>
-          {/if}
-
           <!-- Public Center Pool -->
           <div class="">
           <!-- Security Lanes -->
@@ -1343,7 +1321,7 @@ function getRobotModeFromUrl() {
                     {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
                     <div class={["rounded-md gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800", backgroundColor]}>
                       <div class="font-bold text-xs leading-snug">{lane.name}</div>
-                      <Icon icon="game-icons:police-officer-head" class="size-8 opacity-70"></Icon>
+                      <Icon icon="game-icons:police-officer-head" class="size-8"></Icon>
                       <div class="text-xs mb-1 flex gap-1">
                       {#each lane.unshuffledTokens as {tokenNumber, status}}
                         <p class={["bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-md border border-red-300 dark:border-red-700", status.isRevealed && 'opacity-30']}>{tokenNumber}</p>
@@ -1379,6 +1357,28 @@ function getRobotModeFromUrl() {
                 </div>
               </div>
             </div>
+
+            <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
+          {#if isMobile}
+            <div class="sticky top-0 z-[100]">
+              <ActionPanel 
+                {engine}
+                {snapshot}
+                {currentPlayer}
+                actions={dashboardActions}
+                onaction={handleAction}
+                onselectlane={handleSelectLane}
+                {selectionText}
+                pendingChoice={pendingChoice || (activeBotIndices.includes(visualActivePlayerId))}
+                computerTurn={activeBotIndices.includes(visualActivePlayerId)}
+                waitingForPeer={!isMyP2PTurn}
+                waitingForName={waitingForPlayerName}
+                autoScrollEnabled={!autoplay}
+                hasSelection={!!(selectedSlot || selectedStash)}
+                onclearselection={() => { selectedSlot = null; selectedStash = null; selectedAnchorRect = null; }}
+              />
+            </div>
+          {/if}
             
             <!-- <div class="text-sm opacity-70 ">Public Services cards</div> -->
             <div class="flex flex-wrap gap-2 mx-auto">
@@ -1462,6 +1462,8 @@ function getRobotModeFromUrl() {
             />
           {/each}
         </div>
+
+        
         
         <!-- Right Sidebar: Desktop only -->
         {#if !isMobile}
