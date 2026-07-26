@@ -1,4 +1,6 @@
 <script>
+  import Icon from "@iconify/svelte";
+
   let { engine, snapshot, currentPlayer, actions, onaction, onselectlane, selectionText, pendingChoice, computerTurn = false, waitingForPeer = false, waitingForName = '', autoScrollEnabled = true, onclearselection, hasSelection = false, copyTextToClipboard } = $props();
 
   let logContainer = $state(null);
@@ -26,9 +28,9 @@
         <span class="flex-1">{@html selectionText}</span>
         {#if hasSelection && onclearselection}
           <button
-            class="btn-sm opacity-70 hover:opacity-100"
+            class="btn-sm"
             onclick={onclearselection}
-          >✕ Clear</button>
+          ><Icon icon="lucide:x" class="size-5"/> Clear</button>
         {/if}
       </div>
 

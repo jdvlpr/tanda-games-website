@@ -953,8 +953,8 @@ function getRobotModeFromUrl() {
 
 <!-- Settings Modal -->
       {#if showSettings}
-        <div transition:fade={{duration: 100}} class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]" role="presentation" onclick={(e) => { if (e.target === e.currentTarget) showSettings = false; }}>
-          <div in:fly={{y:-50}} class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-md max-w-fit w-[90%] shadow-xl">
+      <div transition:fade={{duration: 100}} class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]" role="presentation" onclick={(e) => { if (e.target === e.currentTarget) showSettings = false; }}>
+          <div in:fly={{y:-50}} class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-md max-w-fit w-[90%] shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between gap-2">
               <h2 class="mb-2 text-xl font-semibold text-center">
                 Settings
@@ -1057,12 +1057,12 @@ function getRobotModeFromUrl() {
   <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
     <div class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1200px] mx-auto px-2">
       <h1 class="font-bold text-xl">Emigration Game Emulator</h1>
-      <div class="flex gap-2 items-center">
-        <a title="Rulebook (PDF)" href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="btn-sm bg-white/50 dark:bg-black/50"><Icon icon="lucide:file-question-mark" class="size-5"/><span class="max-md:hidden">Rulebook</span></a>
+      <div class="flex gap-2 items-center flex-wrap justify-center">
+        <a title="Rulebook (PDF)" href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`} target="_blank" download={`emigration-game-rulebook-v${VERSION}.pdf`} class="btn-sm bg-white/50 dark:bg-black/50"><Icon icon="lucide:file-question-mark" class="size-5"/><span class="">Rulebook</span></a>
         <button class="btn-sm bg-white/50 dark:bg-black/50" title="Emulator Settings" onclick={() => {
           showSettings = !showSettings
-        }}><Icon icon="lucide:settings" class="size-5"/> <span class="max-md:hidden">Settings</span></button>
-        <a href="/emigration" class="btn-sm  bg-white/50 dark:bg-black/50" title="Close Emulator"><Icon icon="lucide:x" class="size-5"/> <span class="max-md:hidden">Close</span> </a>
+        }}><Icon icon="lucide:settings" class="size-5"/> <span class="">Settings</span></button>
+        <a href="/emigration" class="btn-sm  bg-white/50 dark:bg-black/50" title="Close Emulator"><Icon icon="lucide:x" class="size-5"/> <span class="">Close</span> </a>
       </div>
     </div>
   </div>
@@ -1311,10 +1311,8 @@ function getRobotModeFromUrl() {
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start  mx-auto w-full">
         <!-- Left Main Column: Public Pool & Player Boards -->
         <div class="flex flex-col gap-2">
-          <!-- Public Center Pool -->
-          <div class="">
           <!-- Security Lanes -->
-            <div class="lg:col-span-2 flex flex-col gap-1 p-1 rounded-md">
+            <div class="flex flex-col gap-1">
                 <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
                 <div class="flex flex-wrap justify-center gap-2 pb-1">
                   {#each snapshot.securityLanes as lane, i}
@@ -1356,8 +1354,9 @@ function getRobotModeFromUrl() {
                   {/each}
                 </div>
               </div>
-            </div>
+            
 
+          
             <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
           {#if isMobile}
             <div class="sticky top-0 z-[100]">
@@ -1379,8 +1378,7 @@ function getRobotModeFromUrl() {
               />
             </div>
           {/if}
-            
-            <!-- <div class="text-sm opacity-70 ">Public Services cards</div> -->
+
             <div class="flex flex-wrap gap-2 mx-auto">
               <!-- Tickets -->
               <div class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800">
@@ -1446,7 +1444,6 @@ function getRobotModeFromUrl() {
                     </div>
                   {/if}
                 </div>
-              </div>
           </div>
 
           <!-- Player Boards -->
@@ -1461,6 +1458,8 @@ function getRobotModeFromUrl() {
               autoScrollEnabled={!autoplay}
             />
           {/each}
+        </div>
+
         </div>
 
         
