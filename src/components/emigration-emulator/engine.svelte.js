@@ -994,7 +994,8 @@ export default class EmigrationEngine {
   // ─── Hooks ───────────────────────────────────────────────────────────
 
   /** Called when a card is discarded. Triggers Salvage/Blacklisted. */
-  _onCardDiscarded(discardingPlayer, card) {
+  _onCardDiscarded(discardingPlayer, card, isDiscardAction = false) {
+    if (!isDiscardAction) return;
     // Salvage: other players gain $1
     for (const p of this.players) {
       if (
@@ -1003,7 +1004,7 @@ export default class EmigrationEngine {
       ) {
         p.money += 1;
         this.log(`${p.name} gains $1 from Salvage.`, "system");
-        toast.info(`${p.name} gains $1 from Salvage.`);
+        toast.info(`${p.name} gains $1 from Salvage.`, { indent: 1 });
       }
     }
     // Blacklisted: discarder loses $1
@@ -1012,7 +1013,9 @@ export default class EmigrationEngine {
     ) {
       discardingPlayer.money = Math.max(0, discardingPlayer.money - 1);
       this.log(`P${discardingPlayer.id}|BLACKLISTED|LOSS:1`, "system");
-      toast.info(`${discardingPlayer.name} loses $1 from Blacklisted`);
+      toast.info(`${discardingPlayer.name} loses $1 from Blacklisted`, {
+        indent: 1,
+      });
     }
   }
 
@@ -1027,7 +1030,10 @@ export default class EmigrationEngine {
       left.stash.lifeCards.push(card);
       left.money = Math.max(0, left.money - 1);
       this.log(`P${player.id}|PASS_PENALTY|TO:P${left.id}`, "system");
-      toast.info(`${left.name} takes Penalty from ${player.name} and loses $1`);
+      toast.info(
+        `${left.name} takes Penalty from ${player.name} and loses $1`,
+        { indent: 1 },
+      );
     }
   }
 
@@ -1048,6 +1054,7 @@ export default class EmigrationEngine {
           );
           toast.info(
             `${player.name} takes Star Power from ${p.name} and gains $1`,
+            { indent: 1 },
           );
         }
       }
@@ -1077,6 +1084,7 @@ export default class EmigrationEngine {
       this.log(`P${player.id}|UNDERDOG|LOSS:1|PASS_TO:P${left.id}`, "system");
       toast.info(
         `${left.name} takes Underdog from ${player.name} and loses $1`,
+        { indent: 1 },
       );
     }
   }
@@ -1088,7 +1096,9 @@ export default class EmigrationEngine {
         player.assurance += 1;
         player.ticketPassportBonusClaimed = true;
         this.log(`P${player.id}|TICKET_PASSPORT_BONUS|GAIN:1A`, "system");
-        toast.success(`${player.name} gains 1 Assurance (Passport + Ticket)`);
+        toast.success(`${player.name} gains 1 Assurance (Passport + Ticket)`, {
+          indent: 1,
+        });
       }
     }
     // TODO: I don't think the else case is necessary. Why would a player lose an assurance?
@@ -2667,7 +2677,7 @@ export default class EmigrationEngine {
       case "Life Coach":
         player.assurance += 1;
         this.log(`P${player.id}|ACT:Life Coach|GAIN_A:1`, "action");
-        toast.info(`${player.name} Life Coach: gains 1 Assurance`);
+        toast.success(`${player.name} Life Coach: gains 1 Assurance`);
         done();
         break;
 
@@ -3461,7 +3471,7 @@ export default class EmigrationEngine {
       toast.warning(
         `${player.name} discards a ${cardType} from ${target.name} ($${fee} Access Fee)`,
       );
-    this._onCardDiscarded(player, removed.card);
+    this._onCardDiscarded(player, removed.card, true);
     this.uncoverLayout(target);
     this.advanceTurn();
   }

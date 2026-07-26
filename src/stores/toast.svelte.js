@@ -3,11 +3,16 @@
  */
 
 /**
+ * @typedef {Object} ToastOptions
+ * @property {number} [indent] - Visual nesting level (0 = root, 1 = child effect, 2 = grandchild, etc.)
+ */
+
+/**
  * @typedef {Object} Toast
  * @property {string} id
  * @property {ToastType} type
  * @property {string} message
- * @property {number} [duration]
+ * @property {number} [indent]
  */
 
 class ToastManager {
@@ -31,26 +36,21 @@ class ToastManager {
   add(toast) {
     if (!this.enabled) return;
     const id = crypto.randomUUID();
-    const duration =
-      toast.duration !== undefined ? toast.duration : this.timeoutMs;
 
-    this.toasts.push({ ...toast, id, duration });
+    this.toasts.push({ ...toast, id });
 
-    // Auto-remove sequentially if duration is not 0 (persistent)
-    if (duration !== 0) {
-      const now = Date.now();
-      let delay = duration;
+    const now = Date.now();
+    let delay = this.timeoutMs;
 
-      // If there are toasts already queued to dismiss in the future,
-      // add this toast's duration to the end of that queue's time.
-      if (this.lastDismissalTime > now) {
-        delay = this.lastDismissalTime - now + duration;
-      }
-
-      this.lastDismissalTime = now + delay;
-
-      setTimeout(() => this.remove(id), delay);
+    // If there are toasts already queued to dismiss in the future,
+    // add this toast's duration to the end of that queue's time.
+    if (this.lastDismissalTime > now) {
+      delay = this.lastDismissalTime - now + this.timeoutMs;
     }
+
+    this.lastDismissalTime = now + delay;
+
+    setTimeout(() => this.remove(id), delay);
   }
 
   /**
@@ -62,34 +62,34 @@ class ToastManager {
 
   /**
    * @param {string} message
-   * @param {number} [duration]
+   * @param {ToastOptions} [opts]
    */
-  success(message, duration) {
-    this.add({ type: "success", message, duration });
+  success(message, opts) {
+    this.add({ type: "success", message, ...opts });
   }
 
   /**
    * @param {string} message
-   * @param {number} [duration]
+   * @param {ToastOptions} [opts]
    */
-  error(message, duration) {
-    this.add({ type: "error", message, duration });
+  error(message, opts) {
+    this.add({ type: "error", message, ...opts });
   }
 
   /**
    * @param {string} message
-   * @param {number} [duration]
+   * @param {ToastOptions} [opts]
    */
-  info(message, duration) {
-    this.add({ type: "info", message, duration });
+  info(message, opts) {
+    this.add({ type: "info", message, ...opts });
   }
 
   /**
    * @param {string} message
-   * @param {number} [duration]
+   * @param {ToastOptions} [opts]
    */
-  warning(message, duration) {
-    this.add({ type: "warning", message, duration });
+  warning(message, opts) {
+    this.add({ type: "warning", message, ...opts });
   }
 }
 
