@@ -1311,7 +1311,16 @@
     <div
       class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1200px] mx-auto px-2"
     >
-      <h1 class="font-bold text-xl">Emigration Game Emulator</h1>
+      <div class="opacity-70 flex flex-col items-center md:items-start">
+        <h1 class="font-bold text-2xl text-slate-900 dark:text-slate-100">
+          Emigration
+        </h1>
+        <p
+          class="font-bold text-xs uppercase tracking-widest text-slate-600 dark:text-slate-400"
+        >
+          Game Emulator
+        </p>
+      </div>
       <div class="flex gap-2 items-center flex-wrap justify-center">
         <a
           title="Rulebook (PDF)"
@@ -1556,13 +1565,6 @@
                 </div>
               </div>
             {/if}
-          </div>
-          <div class="flex flex-col items-center gap-1 max-w-md mx-auto">
-            <!-- <h3 class="text-xl font-bold">P2P Multiplayer</h3> -->
-            <p class="opacity-70 italic text-sm">
-              Online mode uses serverless browser-based peer-to-peer rooms. It
-              may not work with VPN connections.
-            </p>
           </div>
         {:else}
           <label
@@ -1832,7 +1834,7 @@
             </div>
           {/if}
 
-          <div class="flex flex-wrap gap-2 mx-auto">
+          <div class="flex flex-wrap gap-2 mx-auto max-lg:mt-2">
             <!-- Tickets -->
             <div
               class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"

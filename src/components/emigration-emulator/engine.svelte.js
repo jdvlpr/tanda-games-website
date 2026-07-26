@@ -3292,7 +3292,7 @@ export default class EmigrationEngine {
       this.publicServices.tickets--;
       player.stash.tickets++;
       this.log(`P${player.id}|BUY_POOL:Ticket|COST:2`, "action");
-      toast.info(`${player.name} buys Ticket for $2`);
+      toast.info(`${player.name} buys a Ticket for $2`);
     } else {
       if (this.publicServices.passports <= 0) {
         this.log("ERR|NO_PASSPORTS_IN_POOL", "error");

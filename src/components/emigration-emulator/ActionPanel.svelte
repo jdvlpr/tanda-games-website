@@ -34,7 +34,7 @@
 </script>
 
 <div
-  class="max-lg:bg-neutral-50/80 max-lg:dark:bg-neutral-950/80 rounded-md max-lg:px-2 max-lg:py-2 flex flex-col gap-2 overflow-auto backdrop-blur-md max-lg:shadow-2xl"
+  class="max-lg:bg-neutral-50/80 max-lg:dark:bg-neutral-950/80 rounded-md max-lg:px-2 max-lg:py-2 flex flex-col gap-2 overflow-auto backdrop-blur-md max-lg:shadow-lg"
 >
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
