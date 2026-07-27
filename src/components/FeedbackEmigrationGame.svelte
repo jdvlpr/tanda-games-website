@@ -70,7 +70,7 @@
     <input type="hidden" name="version" value={version} />
 
     <div class="flex flex-col gap-2">
-      <label for="game-length" class="text-sm">Version Played</label>
+      <label for="game-length" class="text-sm opacity-70">Version Played</label>
       <select id="game-length" name="selected_version" class="w-fi">
         <option value="" selected>Select a version</option>
         <option value="I'm not sure">I'm not sure</option>
@@ -81,7 +81,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label for="game-length" class="text-sm"
+      <label for="game-length" class="text-sm opacity-70"
         >About how long did it take to play the game?</label
       >
       <select id="game-length" name="length_of_the_game" class="w-fit">
@@ -104,8 +104,8 @@
 
     <div class="basis-full"></div>
 
-    <div class="flex flex-col gap-2 flex-1">
-      <label for="names-of-players" class="text-sm"
+    <div class="flex flex-col gap-1 flex-1">
+      <label for="names-of-players" class="text-sm opacity-70"
         >Names of players (in turn order, comma separated)</label
       >
       <input
@@ -145,7 +145,9 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="{index}-age" class="text-sm">{player}'s Age</label>
+            <label for="{index}-age" class="text-sm opacity-70"
+              >{player}'s Age</label
+            >
             <select id="{index}-age" name="{player}'s_age" class="w-fit">
               <option value="">Select an age</option>
               {#each ageRanges as value}
@@ -155,7 +157,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="{index}-final-assurance" class="text-sm"
+            <label for="{index}-final-assurance" class="text-sm opacity-70"
               >Number of Assurance at the end of the game</label
             >
             <select
@@ -173,7 +175,7 @@
       {/each}
     {/if}
 
-    <div class="flex flex-col gap-2 flex-1">
+    <div class="flex flex-col gap-1 flex-1">
       <label for="comments" class="">Comments & Questions</label>
       <p class="text-sm italic">
         What didn't make sense? What would you change about the game? What was
@@ -192,8 +194,8 @@
 
     <div class="basis-full"></div>
 
-    <div class="flex flex-col gap-2 flex-1 items-start">
-      <p class="text-sm">
+    <div class="flex flex-col gap-1 flex-1 items-start">
+      <p class="text-sm opacity-70">
         Attach an image, video, or audio file to help describe your feedback
       </p>
       {#each files as file, index}
@@ -240,8 +242,8 @@
 
     <div class="basis-full"></div>
 
-    <div class="flex flex-col gap-2 flex-1">
-      <label for="name-or-alias" class="text-sm"
+    <div class="flex flex-col gap-1 flex-1">
+      <label for="name-or-alias" class="text-sm opacity-70"
         >Your name (if you want public credit)</label
       >
       <input
@@ -255,8 +257,8 @@
 
     <div class="basis-full"></div>
 
-    <div class="flex flex-col gap-2 flex-1">
-      <label for="email-address" class="text-sm"
+    <div class="flex flex-col gap-1 flex-1">
+      <label for="email-address" class="text-sm opacity-70"
         >Your contact email (if you want a reply)</label
       >
       <input

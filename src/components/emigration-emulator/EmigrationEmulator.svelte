@@ -22,6 +22,7 @@
     shuffleArray,
   } from "./engine.svelte.js";
   import GameLogSheet from "./GameLogSheet.svelte";
+  import QuickStartGuide from "./QuickStartGuide.svelte";
   import Modal from "./Modal.svelte";
   import PlayerBoard from "./PlayerBoard.svelte";
   import { changelog } from "../../js/emegration-changelog.js";
@@ -1290,6 +1291,7 @@
           Game Emulator
         </p>
       </div>
+
       <div class="flex gap-2 items-center flex-wrap justify-center">
         <a
           title="Rulebook (PDF)"
@@ -1934,6 +1936,9 @@
       autoScrollEnabled={!autoplay}
       {copyTextToClipboard}
     />
+
+    <!-- Quick Start Guide FAB -->
+    <!-- <QuickStartGuide /> -->
 
     <Modal
       choice={pendingChoice}
