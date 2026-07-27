@@ -103,10 +103,10 @@ let printAndPlay = [
             >
         <a href="/emigration/emulator" class="btn bg-purple-300 dark:bg-purple-700 hover:bg-purple-200 dark:hover:bg-purple-800"><span>&#9654;</span> Play</a>
 
-        <div class="inline-flex flex-col gap-2 my-4 items-start">
-      <h2 class="font-bold text-2xl">Print & Play Downloads</h2>
+        <div class="inline-flex flex-col gap-2 my-2 items-start">
+      <h2 class="font-bold text-4xl mb-2">Print & Play</h2>
 
-      <div class="flex flex-col gap-2 items-start">
+      <div class="flex flex-wrap gap-2 items-center justify-start">
         {printAndPlay.map((item) => (
             <a href={FILES_PATH + item.title} download={item.title} class="btn-sm"
                     ><svg
@@ -137,8 +137,8 @@ let printAndPlay = [
           </div>
   </div>
 
-  <div class="my-4 text-left p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
-      <h2 class="text-xl tracking-widest font-thin mb-2">Q&A</h2>
+  <div class="inline-flex flex-col gap-2 my-2 items-start">
+      <h2 class="font-bold text-4xl mb-2">Q&A</h2>
       <p class="font-bold">Where can I buy the game?</p>
       <p>
         You can't buy the game yet. But you can test the game by playing it in the emulator or by printing the game yourself. Eventually, we'd like to make the game available to buy through <a href="https://www.thegamecrafter.com/games/emigration" target="_blank" class="underline">The Game Crafter</a>.
@@ -154,16 +154,12 @@ let printAndPlay = [
         >, or email feedback@tandagames.com.
       </p>
     </div>
+    </div>
 
         
 
-        <div
-          class="text-left inline-flex flex-col justify-center items-center gap-4"
-        >
-          <div class="bg-neutral-100 p-4 dark:bg-neutral-700 w-full rounded-2xl">
-            <h2 class="text-xl tracking-widest font-thin mb-2">
-              Known Elements Needing Further Analysis
-            </h2>
+        <div class="inline-flex flex-col gap-2 my-2 items-start">
+      <h2 class="font-bold text-4xl mb-2">Elements Needing Analasys</h2>
             <ul class="list-disc ml-8">
               <li>
                 <span class="font-bold"
@@ -195,14 +191,11 @@ let printAndPlay = [
             </p>
             <p class="italic my-2">Updated July, 2026</p>
           </div>
-        </div>
       </div>
-    </div>
 
     <FeedbackEmigrationGame
       title="Playtester's Feedback"
       client:visible
-      expand={true}
       discordLink="https://discord.gg/aDV6NY73H2"
       version={VERSION}
       changelog={changelog}
