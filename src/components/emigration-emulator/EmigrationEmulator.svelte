@@ -47,7 +47,6 @@
     if (typeof window === "undefined") return null;
     const params = new URLSearchParams(window.location.search);
     const robotMode = params.get("showRobotMode");
-    console.log(robotMode);
     return !!robotMode;
   }
 
@@ -413,36 +412,6 @@
       }
       aiThinking = false;
     }, 1000);
-  });
-  let selectionText = $derived.by(() => {
-    if (!snapshot) return "Select an available card, then choose your action.";
-    if (selectedSlot) {
-      const targetPlayer = snapshot.players[selectedSlot.playerIdx];
-      const slot = targetPlayer?.layout[selectedSlot.slotIdx];
-      if (slot && slot.card) {
-        const cardName = slot.card.name || slot.card.title || "";
-        return `Selected Card: <span class=" font-bold">${cardName}</span> in ${targetPlayer.name}'s layout.`;
-      }
-    }
-    if (selectedStash) {
-      const targetPlayer = snapshot.players[selectedStash.playerIdx];
-      let cardName = "";
-      const type = selectedStash.stashType;
-      const i = selectedStash.itemIdx;
-      if (type === "document")
-        cardName = targetPlayer?.stash.documents[i]?.name || "";
-      else if (type === "connection")
-        cardName = targetPlayer?.stash.connections[i]?.name || "";
-      else if (type === "ticket") cardName = "Ticket";
-      else if (type === "passport") cardName = "Passport";
-      else if (type === "lifeCard") {
-        const card = targetPlayer?.stash.lifeCards[i];
-        cardName = card?.title || "";
-      }
-
-      return `Selected Stash Item: <span class=" font-bold">${cardName}</span> from ${targetPlayer.name}'s stash.`;
-    }
-    return "Select an available card, then choose your action.";
   });
 
   // Tests
@@ -1809,35 +1778,33 @@
 
           <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
           {#if isMobile}
-            <div class="sticky top-0 z-[100]">
-              <ActionPanel
-                {engine}
-                {snapshot}
-                {currentPlayer}
-                actions={dashboardActions}
-                onaction={handleAction}
-                onselectlane={handleSelectLane}
-                {selectionText}
-                pendingChoice={pendingChoice ||
-                  activeBotIndices.includes(visualActivePlayerId)}
-                computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-                waitingForPeer={!isMyP2PTurn}
-                waitingForName={waitingForPlayerName}
-                autoScrollEnabled={!autoplay}
-                hasSelection={!!(selectedSlot || selectedStash)}
-                onclearselection={() => {
-                  selectedSlot = null;
-                  selectedStash = null;
-                  selectedAnchorRect = null;
-                }}
-              />
-            </div>
+            <ActionPanel
+              {engine}
+              {snapshot}
+              {currentPlayer}
+              actions={dashboardActions}
+              {isMobile}
+              onaction={handleAction}
+              onselectlane={handleSelectLane}
+              pendingChoice={pendingChoice ||
+                activeBotIndices.includes(visualActivePlayerId)}
+              computerTurn={activeBotIndices.includes(visualActivePlayerId)}
+              waitingForPeer={!isMyP2PTurn}
+              waitingForName={waitingForPlayerName}
+              autoScrollEnabled={!autoplay}
+              hasSelection={!!(selectedSlot || selectedStash)}
+              onclearselection={() => {
+                selectedSlot = null;
+                selectedStash = null;
+                selectedAnchorRect = null;
+              }}
+            />
           {/if}
 
           <div class="flex flex-wrap gap-2 mx-auto max-lg:mt-2">
             <!-- Tickets -->
             <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
+              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
             >
               <div class="text-left">
                 <div class="font-bold text-xl">Tickets</div>
@@ -1877,7 +1844,7 @@
 
             <!-- Passports -->
             <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
+              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
             >
               <div class="text-left">
                 <div class="font-bold text-xl">Passports</div>
@@ -1924,6 +1891,7 @@
                 onCardSelect={handleCardSelect}
                 {selectedSlot}
                 {selectedStash}
+                {snapshot}
                 autoScrollEnabled={!autoplay}
               />
             {/each}
@@ -1938,9 +1906,9 @@
               {snapshot}
               {currentPlayer}
               actions={dashboardActions}
+              {isMobile}
               onaction={handleAction}
               onselectlane={handleSelectLane}
-              {selectionText}
               pendingChoice={pendingChoice ||
                 activeBotIndices.includes(visualActivePlayerId)}
               computerTurn={activeBotIndices.includes(visualActivePlayerId)}

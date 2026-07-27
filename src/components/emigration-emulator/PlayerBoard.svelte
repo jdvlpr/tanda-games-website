@@ -7,6 +7,7 @@
     onCardSelect,
     selectedSlot,
     selectedStash,
+    snapshot,
     autoScrollEnabled = true,
   } = $props();
 
@@ -14,7 +15,13 @@
   let wasActive = false;
 
   $effect(() => {
-    if (autoScrollEnabled && isActive && !wasActive && boardEl) {
+    if (
+      autoScrollEnabled &&
+      isActive &&
+      !wasActive &&
+      boardEl &&
+      snapshot.turnNumber > 1
+    ) {
       requestAnimationFrame(() => {
         boardEl?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -135,22 +142,21 @@
 
 <div
   bind:this={boardEl}
-  class={[
-    "rounded-md p-2 lg:p-4 my-2 transition-all duration-300 scroll-mt-[8rem] bg-neutral-100 dark:bg-neutral-900",
-    isActive
-      ? "border-2 border-red-300 dark:border-red-900 shadow-lg"
-      : "border border-neutral-400 dark:border-neutral-600",
-  ]}
+  class={["my-2 transition-all duration-300 scroll-mt-[8rem]"]}
 >
   <!-- Player Header Info -->
   <div
-    class="flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm"
+    class={[
+      "flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm rounded-md px-2 py-1.5 ",
+      isActive
+        ? "border-l-4 border-y-1 border-r-1 border-amber-400 dark:border-amber-600 shadow-md shadow-amber-200/40 dark:shadow-amber-800/40"
+        : "border border-neutral-200 dark:border-neutral-800 ",
+    ]}
   >
     <div class="flex items-center gap-1 w-fit">
-      {#if isActive}
-        <span class="text-red-300 dark:text-red-900 animate-pulse">▶</span>
-      {/if}
-      <p class="text-2xl font-bold">{player.name}</p>
+      <p class={["text-2xl font-bold"]}>
+        {player.name}
+      </p>
     </div>
     <span class="flex flex-wrap gap-1 items-center"
       >{player.nationality} (${player.collegeFund})</span
@@ -277,7 +283,7 @@
 
   <!-- Requirements Subheader -->
   <div
-    class="text-xs lg:text-sm text-left mb-2 px-3 py-1.5 bg-white dark:bg-black rounded-md flex flex-col gap-1 items-start"
+    class="text-xs lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-md flex flex-col gap-1 items-start"
   >
     <p>
       <strong>{player.destination}:</strong>
