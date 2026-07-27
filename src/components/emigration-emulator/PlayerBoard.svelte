@@ -158,10 +158,15 @@
         {player.name}
       </p>
     </div>
-    <span class="flex flex-wrap gap-1 items-center"
-      >{player.nationality} (${player.collegeFund})</span
+    <span
+      class="flex flex-wrap gap-1 items-center"
+      title="{player.name}'s Nationality and (Starting Money)"
+      >{player.nationality} (${player.startingFund})</span
     >
-    <span class="flex gap-1 items-center" title="College Fund">
+    <span
+      class="flex gap-1 items-center"
+      title="{player.name}'s college tuition (plus a die roll amount of Money, and potentially discounted based on the die roll)"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
@@ -179,7 +184,7 @@
 
     <span
       class="flex gap-1 items-center text-green-700 dark:text-green-300"
-      title="Money"
+      title="Current amount of Money"
     >
       <svg
         class="Icon size-5"
@@ -197,7 +202,7 @@
       <strong class="">${player.money}</strong>
     </span>
 
-    <span class="flex gap-1 items-center" title="Salary">
+    <span class="flex gap-1 items-center" title="Current salary">
       <svg
         class="Icon size-5"
         xmlns="http://www.w3.org/2000/svg"
