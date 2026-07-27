@@ -23,7 +23,7 @@
     cursor: pointer;
     border: 1px solid;
     border-color: var(--color-neutral-500);
-    border-radius: theme("borderRadius.md");
+    border-radius: theme("borderRadius.xl");
     width: fit-content;
     padding: 1rem 2rem;
     font-size: theme("fontSize.lg");
@@ -44,7 +44,7 @@
     }
     @variant dark {
       &:hover {
-        background-color: theme("colors.red.700");
+        background-color: theme("colors.red.950");
       }
     }
   }
@@ -53,7 +53,7 @@
     cursor: pointer;
     border: 1px solid;
     border-color: var(--color-neutral-500);
-    border-radius: theme("borderRadius.md");
+    border-radius: theme("borderRadius.xl");
     width: fit-content;
     padding: 0.17rem 0.5rem;
     /* font-size: theme("fontSize.lg"); */
@@ -75,7 +75,7 @@
     }
     @variant dark {
       &:hover {
-        background-color: theme("colors.red.700");
+        background-color: theme("colors.red.950");
       }
     }
   }
@@ -86,7 +86,7 @@
     border: 1px solid;
     font-weight: theme("fontWeight.bold");
     border-color: var(--color-amber-300);
-    border-radius: theme("borderRadius.md");
+    border-radius: theme("borderRadius.xl");
     display: inline-flex;
     justify-content: center;
     gap: 0.5rem;
@@ -118,7 +118,7 @@
     font-size: theme("fontSize.base");
     font-weight: theme("fontWeight.normal");
     width: 100%;
-    border-radius: theme("borderRadius.md");
+    border-radius: theme("borderRadius.xl");
     @variant dark {
       color: white;
       background-color: black;

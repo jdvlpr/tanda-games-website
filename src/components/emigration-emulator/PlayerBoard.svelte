@@ -106,7 +106,7 @@
       class="w-[66px] sm:w-[90px] shrink-0 h-[110px] mx-1 sm:mx-2 relative pointer-events-none"
     >
       <div
-        class="grid-card border rounded-md shadow-md {slot.faceUp
+        class="grid-card border rounded-2xl shadow-md {slot.faceUp
           ? 'bg-neutral-100 dark:bg-neutral-900'
           : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp
           ? c.type
@@ -147,7 +147,7 @@
   <!-- Player Header Info -->
   <div
     class={[
-      "flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm rounded-md px-2 py-1.5 ",
+      "flex justify-between items-center pb-2 flex-wrap gap-2 text-xs lg:text-sm rounded-2xl px-2 py-1.5 ",
       isActive
         ? "border-l-4 border-y-1 border-r-1 border-amber-400 dark:border-amber-600 shadow-md shadow-amber-200/40 dark:shadow-amber-800/40"
         : "border border-neutral-200 dark:border-neutral-800 ",
@@ -288,7 +288,7 @@
 
   <!-- Requirements Subheader -->
   <div
-    class="text-xs lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-md flex flex-col gap-1 items-start"
+    class="text-xs lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-col gap-1 items-start"
   >
     <p>
       <strong>{player.destination}:</strong>
@@ -328,7 +328,7 @@
     </div>
   {:else}
     <div
-      class="text-center py-6 text-sm font-bold bg-black/15 rounded-md border border-dashed border-white/5 mb-4"
+      class="text-center py-6 text-sm font-bold bg-black/15 rounded-2xl border border-dashed border-white/5 mb-4"
     >
       Layout Cleared (Crossing / Game Over Phase)
     </div>
@@ -337,12 +337,12 @@
   <!-- 5-Column Stash Display -->
   {#if player.stash.documents.length || player.stash.connections.length || player.stash.tickets || player.stash.passports || player.stash.lifeCards.length}
     <div
-      class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-md bg-neutral-50 dark:bg-neutral-950"
+      class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950"
     >
       <!-- 1. Documents -->
       {#if player.stash.documents.length}
         <div
-          class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800"
+          class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
         >
           <div class="uppercase tracking-wide text-xs mb-1">
             Documents ({player.stash.documents.length})
@@ -356,7 +356,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
                 ? 'selected'
                 : ''}"
               style="border-left: 2.5px solid var(--color-emi-document);"
@@ -380,7 +380,7 @@
       <!-- 2. Connections -->
       {#if player.stash.connections.length}
         <div
-          class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800"
+          class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
         >
           <div class="uppercase tracking-wide text-xs mb-1">
             Connections ({player.stash.connections.length})
@@ -394,7 +394,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
                 ? 'selected'
                 : ''}"
               style="border-left: 2.5px solid var(--color-emi-connection);"
@@ -418,7 +418,7 @@
       <!-- 3. Tickets -->
       {#if player.stash.tickets}
         <div
-          class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800"
+          class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
         >
           <div class="uppercase tracking-wide text-xs mb-1">
             Tickets ({player.stash.tickets})
@@ -432,7 +432,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
                 ? 'selected'
                 : ''}"
               style="border-left: 2.5px solid var(--color-emi-ticket);"
@@ -448,7 +448,7 @@
       <!-- 4. Passports -->
       {#if player.stash.passports}
         <div
-          class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800"
+          class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
         >
           <div class="uppercase tracking-wide text-xs mb-1">
             Passports ({player.stash.passports})
@@ -462,7 +462,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
                 ? 'selected'
                 : ''}"
               style="border-left: 2.5px solid var(--color-emi-passport);"
@@ -478,7 +478,7 @@
       <!-- 5. Kept Life -->
       {#if player.stash.lifeCards.length}
         <div
-          class="flex flex-col items-start p-2 rounded-md bg-neutral-200 dark:bg-neutral-800"
+          class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
         >
           <div class="uppercase tracking-wide text-xs mb-1">
             Life Cards ({player.stash.lifeCards.length})
@@ -492,7 +492,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-md flex items-center gap-1.5 {isSel
+              class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
                 ? 'selected'
                 : ''}"
               style="border-left: 2.5px solid var(--color-emi-life);"

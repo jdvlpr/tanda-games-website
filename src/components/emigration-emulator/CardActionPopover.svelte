@@ -13,7 +13,7 @@
   let popoverEl = $state(null);
 
   // ── Positioning ───────────────────────────────────────────────────────────
-  const POPOVER_W = 192; // ~w-48
+  const POPOVER_W = 208; // ~w-52
   const GAP = 8;
 
   let position = $derived.by(() => {
@@ -112,16 +112,16 @@
     aria-label="Card actions"
     style="position:fixed;{posStyle}z-index:200;width:{POPOVER_W}px;"
     transition:fly={{ y: position.below ? -6 : 6, duration: 150, opacity: 0 }}
-    class="shadow-lg border border-slate-500 bg-slate-700 dark:bg-slate-300 text-white dark:text-black rounded-md"
+    class="shadow-lg border border-slate-500 bg-slate-700 text-white rounded-2xl"
   >
     <!-- Arrow pointing toward the card -->
     {#if position.below}
       <div
-        class="absolute -top-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 dark:bg-slate-200 rotate-45 border-l border-t border-slate-500 dark:border-slate-400 z-10"
+        class="absolute -top-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 rotate-45 border-l border-t border-slate-500 z-10"
       ></div>
     {:else}
       <div
-        class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 dark:bg-slate-200 rotate-45 border-r border-b border-slate-500 dark:border-slate-400 z-10"
+        class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 size-3 bg-slate-700 rotate-45 border-r border-b border-slate-500 z-10"
       ></div>
     {/if}
 

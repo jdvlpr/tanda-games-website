@@ -81,7 +81,7 @@
 <div
   bind:this={headerRef}
   class={[
-    "bg-slate-300/90 dark:bg-slate-700/90 text-slate-950 dark:text-slate-50 border border-slate-300 dark:border-slate-700 rounded-md p-2 flex flex-col gap-2 backdrop-blur-md max-lg:shadow-lg transition-transform duration-300 ease-in-out sticky top-0 z-100",
+    "bg-slate-300/90 dark:bg-slate-700/90 text-slate-950 dark:text-slate-50 border border-slate-300 dark:border-slate-700 rounded-2xl p-2 flex flex-col gap-2 backdrop-blur-md max-lg:shadow-lg transition-transform duration-300 ease-in-out sticky top-0 z-100",
     isHidden ? "-translate-y-full" : "translate-y-0",
   ]}
 >
@@ -95,7 +95,7 @@
       </div>
     {:else if computerTurn}
       <span class="text-xs font-bold"
-        >{currentPlayer.name} is taking it's turn...</span
+        >{currentPlayer.name} is taking their turn...</span
       >
     {:else if waitingForPeer}
       <span class="text-xs font-bold"

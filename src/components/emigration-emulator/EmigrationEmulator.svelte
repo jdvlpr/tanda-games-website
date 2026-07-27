@@ -1124,7 +1124,7 @@
   >
     <div
       in:fly={{ y: -50 }}
-      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-md max-w-fit w-[90%] shadow-xl max-h-[90vh] overflow-y-auto"
+      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl max-w-fit w-[90%] shadow-xl max-h-[90vh] overflow-y-auto"
     >
       <div class="flex justify-between gap-2">
         <h2 class="mb-2 text-xl font-semibold text-center">Settings</h2>
@@ -1136,7 +1136,7 @@
         >
       </div>
       <div
-        class="flex flex-col gap-4 items-start text-left mx-auto w-full rounded-md p-4 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
+        class="flex flex-col gap-4 items-start text-left mx-auto w-full rounded-2xl p-4 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
       >
         <div class="flex flex-col gap-2">
           <label
@@ -1178,7 +1178,7 @@
               <p class="text-sm opacity-70">
                 Life Card Packs {#if (gameType === "online" ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
                   <span
-                    class="p-1 bg-amber-100 dark:bg-amber-900 rounded-md font-bold"
+                    class="p-1 bg-amber-100 dark:bg-amber-900 rounded-2xl font-bold"
                     >(SELECT {gameType === "online"
                       ? p2pPlayers.length
                       : playerCount})</span
@@ -1437,7 +1437,7 @@
                 </div>
 
                 <div
-                  class="flex flex-col gap-2 p-2 items-start rounded-md bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
+                  class="flex flex-col gap-2 p-2 items-start rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
                 >
                   <p class="text-sm opacity-70">Your Name</p>
                   <input
@@ -1493,7 +1493,7 @@
                   <div class="grid grid-cols-2 gap-2">
                     {#each p2pPlayers as p, i}
                       <div
-                        class="p-2 rounded-md bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center"
+                        class="p-2 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center"
                       >
                         <span class="font-bold">{p.name || "Anonymous"}</span>
                         <div class="flex items-center gap-1">
@@ -1555,7 +1555,7 @@
           <div class="flex flex-col gap-4">
             {#each activeSetup as p, i}
               <div
-                class="flex flex-col gap-2 p-2 rounded-md bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
+                class="flex flex-col gap-2 p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
               >
                 {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
                   <p class="text-sm opacity-70 text-left">Human</p>
@@ -1697,7 +1697,7 @@
                 {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
                 <div
                   class={[
-                    "rounded-md gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800",
+                    "rounded-2xl gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800",
                     backgroundColor,
                   ]}
                 >
@@ -1708,7 +1708,7 @@
                     {#each lane.unshuffledTokens as { tokenNumber, status }}
                       <p
                         class={[
-                          "bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-md border border-red-300 dark:border-red-700",
+                          "bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-2xl border border-red-300 dark:border-red-700",
                           status.isRevealed && "opacity-30",
                         ]}
                       >
@@ -1733,7 +1733,7 @@
                         >
                           <div
                             class={[
-                              "text-xs rounded-md px-2 py-1 w-full flex flex-col gap-1",
+                              "text-xs rounded-2xl px-2 py-1 w-full flex flex-col gap-1",
                               status.player.success
                                 ? "bg-green-200 dark:bg-green-800"
                                 : "bg-red-300 dark:bg-red-900",
@@ -1745,7 +1745,7 @@
                             </p>
                             <div class="flex gap-1 items-center">
                               <div
-                                class="whitespace-nowrap p-1 rounded-md bg-white text-red-500 flex items-center gap-0"
+                                class="whitespace-nowrap p-1 rounded-2xl bg-white text-red-500 flex items-center gap-0"
                               >
                                 <Icon
                                   icon="game-icons:round-star"
@@ -1753,7 +1753,7 @@
                                 />{status.player.assurance}
                               </div>
                               <div
-                                class="whitespace-nowrap p-1 rounded-md bg-white text-green-700 flex items-center gap-0"
+                                class="whitespace-nowrap p-1 rounded-2xl bg-white text-green-700 flex items-center gap-0"
                               >
                                 <Icon
                                   icon="game-icons:two-coins"
@@ -1763,7 +1763,7 @@
                             </div>
                           </div>
                           <div
-                            class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-md"
+                            class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-2xl"
                           >
                             {tokenNumber}
                           </div>
@@ -1804,7 +1804,7 @@
           <div class="flex flex-wrap gap-2 mx-auto max-lg:mt-2">
             <!-- Tickets -->
             <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
+              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
             >
               <div class="text-left">
                 <div class="font-bold text-xl">Tickets</div>
@@ -1844,7 +1844,7 @@
 
             <!-- Passports -->
             <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-md border border-neutral-200 dark:border-neutral-800"
+              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
             >
               <div class="text-left">
                 <div class="font-bold text-xl">Passports</div>

@@ -14,7 +14,7 @@
     assurance: "bg-red-200/50 dark:bg-red-800/50",
     document: "bg-orange-200/50 dark:bg-orange-800/50",
     connection: "bg-pink-200/50 dark:bg-pink-800/50",
-    life: "bg-white dark:bg-black",
+    life: "bg-white/50 dark:bg-black/50",
   };
 
   const indentPx = $derived((item.indent ?? 0) * 16);
@@ -25,7 +25,7 @@
   out:fade={{ duration: 200 }}
   style="margin-left: {indentPx}px;"
   class={[
-    "flex items-center justify-between p-1 rounded-md min-w-[260px] w-full text-left text-black dark:text-white pointer-events-auto backdrop-blur-md border border-neutral-200 dark:border-neutral-800",
+    "flex items-center justify-between p-1 pl-2.5 rounded-2xl min-w-[260px] w-full text-left text-black dark:text-white pointer-events-auto backdrop-blur-lg border border-neutral-200 dark:border-neutral-800",
     typeClasses[item.type],
   ]}
   role="alert"
