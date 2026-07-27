@@ -89,7 +89,7 @@
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
     <div
-      class="w-[66px] sm:w-[90px] shrink-0 h-[110px] mx-1 sm:mx-2 relative pointer-events-none empty"
+      class="w-[clamp(66px,20vw,100px)] shrink-0 h-[110px] lg:h-[125px] mx-1 sm:mx-2 relative pointer-events-none empty"
     ></div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
@@ -103,11 +103,11 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="w-[66px] sm:w-[90px] shrink-0 h-[110px] mx-1 sm:mx-2 relative pointer-events-none"
+      class="w-[clamp(66px,20vw,100px)] shrink-0 h-[110px] lg:h-[125px] mx-1 sm:mx-2 relative pointer-events-none"
     >
       <div
         class="grid-card border rounded-2xl shadow-md {slot.faceUp
-          ? 'bg-neutral-100 dark:bg-neutral-900'
+          ? 'bg-neutral-50 dark:bg-neutral-950'
           : 'back bg-neutral-400 dark:bg-neutral-600'} {slot.faceUp
           ? c.type
           : ''} {isCov ? 'covered' : ''} {isAvail
