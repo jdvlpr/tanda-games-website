@@ -86,6 +86,11 @@ let printAndPlay = [
     <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
       <div class="flex flex-wrap gap-4 justify-center items-start">
         <a
+          href="/emigration/emulator"
+          class="btn bg-amber-300/70 dark:bg-amber-700/70 hover:bg-amber-200 dark:hover:bg-amber-800"
+          ><span>&#9654;</span> Play</a
+        >
+        <a
           href={FILES_PATH + `${ID}-game-rulebook-v${VERSION}.pdf`}
           download={`${ID}-game-rulebook-v${VERSION}.pdf`}
           class="btn"
@@ -104,11 +109,6 @@ let printAndPlay = [
             ></path>
           </svg>
           Rulebook</a
-        >
-        <a
-          href="/emigration/emulator"
-          class="btn bg-purple-300 dark:bg-purple-700 hover:bg-purple-200 dark:hover:bg-purple-800"
-          ><span>&#9654;</span> Play</a
         >
       </div>
 

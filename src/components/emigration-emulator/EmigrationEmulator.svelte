@@ -22,13 +22,15 @@
     shuffleArray,
   } from "./engine.svelte.js";
   import GameLogSheet from "./GameLogSheet.svelte";
-  import QuickStartGuide from "./QuickStartGuide.svelte";
   import Modal from "./Modal.svelte";
   import PlayerBoard from "./PlayerBoard.svelte";
   import { changelog } from "../../js/emegration-changelog.js";
   import { fade, fly } from "svelte/transition";
 
   const VERSION = changelog[0].version;
+  const ID = "emigration";
+
+  const rulebookHref = `/files/${ID}/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`;
 
   // Props
   let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
@@ -43,6 +45,7 @@
   });
 
   let showSettings = $state(false);
+  let showRulebook = $state(false);
 
   function getRobotModeFromUrl() {
     if (typeof window === "undefined") return null;
@@ -1276,6 +1279,72 @@
   </div>
 {/if}
 
+{#if showRulebook}
+  <div
+    transition:fade={{ duration: 100 }}
+    class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]"
+    role="presentation"
+    onclick={(e) => {
+      if (e.target === e.currentTarget) showRulebook = false;
+    }}
+  >
+    <div
+      in:fly={{ y: -50 }}
+      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl w-[90%] shadow-xl max-h-[90vh] overflow-y-auto"
+    >
+      <div class="flex justify-between gap-2">
+        <h2 class="text-xl font-semibold text-center">Rulebook</h2>
+        <button
+          class="btn-sm"
+          onclick={() => {
+            showRulebook = false;
+          }}><Icon icon="lucide:x" class=""></Icon></button
+        >
+      </div>
+      <p class="text-left opacity-70 text-xs mb-2">23 MB</p>
+      <div
+        class="w-full h-[80vh] border border-slate-200 rounded-lg shadow-sm overflow-hidden bg-slate-50"
+      >
+        <object
+          title="PDF rulebook"
+          data={rulebookHref}
+          type="application/pdf"
+          class="w-full h-full"
+        >
+          <!-- Fallback UI if the browser cannot render the PDF inline -->
+          <div
+            class="flex flex-col items-center justify-center h-full p-6 text-center"
+          >
+            <svg
+              class="w-12 h-12 text-slate-400 mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+            <p class="text-slate-600 font-medium mb-4">
+              Inline PDF viewing is not supported by your browser.
+            </p>
+            <a
+              href={rulebookHref}
+              download
+              class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm transition-colors duration-150"
+            >
+              Download PDF
+            </a>
+          </div>
+        </object>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <div class="">
   <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
     <div
@@ -1293,15 +1362,13 @@
       </div>
 
       <div class="flex gap-2 items-center flex-wrap justify-center">
-        <a
+        <button
           title="Rulebook (PDF)"
-          href={`/files/emigration/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`}
-          target="_blank"
-          download={`emigration-game-rulebook-v${VERSION}.pdf`}
+          onclick={() => (showRulebook = true)}
           class="btn-sm bg-white/50 dark:bg-black/50"
           ><Icon icon="lucide:file-question-mark" class="size-5" /><span
             class="">Rulebook</span
-          ></a
+          ></button
         >
         <button
           class="btn-sm bg-white/50 dark:bg-black/50"
@@ -1936,9 +2003,6 @@
       autoScrollEnabled={!autoplay}
       {copyTextToClipboard}
     />
-
-    <!-- Quick Start Guide FAB -->
-    <!-- <QuickStartGuide /> -->
 
     <Modal
       choice={pendingChoice}
