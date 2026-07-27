@@ -21,7 +21,9 @@
     if (logs.length > lastSeenLogCount && !isOpen) {
       fabPulse = true;
       clearTimeout(pulseTimeout);
-      pulseTimeout = setTimeout(() => { fabPulse = false; }, 1500);
+      pulseTimeout = setTimeout(() => {
+        fabPulse = false;
+      }, 1500);
     }
   });
 
@@ -88,12 +90,12 @@
   $effect(() => {
     const el = sheetEl;
     if (!el) return;
-    el.addEventListener('touchmove', handleTouchMove, { passive: false });
-    return () => el.removeEventListener('touchmove', handleTouchMove);
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", handleTouchMove);
   });
 </script>
 
-<div >
+<div>
   <!-- FAB Button -->
   <button
     class="fixed bottom-3 left-3 z-150 size-10 rounded-full
@@ -106,22 +108,31 @@
     aria-label="Open game log"
   >
     <!-- Log / document icon -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-         class="w-[22px] h-[22px]">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-      <line x1="16" y1="13" x2="8" y2="13"/>
-      <line x1="16" y1="17" x2="8" y2="17"/>
-      <polyline points="10 9 9 9 8 9"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="w-[22px] h-[22px]"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
     </svg>
 
     {#if unreadCount > 0}
-      <span class="absolute -top-1 -right-1
+      <span
+        class="absolute -top-1 -right-1
                    bg-[#55b7b0] text-black text-[10px] font-bold
                    min-w-[18px] h-[18px] rounded-full
-                   flex items-center justify-center px-1 leading-none">
-        {unreadCount > 99 ? '99+' : unreadCount}
+                   flex items-center justify-center px-1 leading-none"
+      >
+        {unreadCount > 99 ? "99+" : unreadCount}
       </span>
     {/if}
   </button>
@@ -154,12 +165,19 @@
       </div>
 
       <!-- Header -->
-      <div class="flex items-center justify-between px-4 pb-2 border-b border-neutral-800">
+      <div
+        class="flex items-center justify-between px-4 pb-2 border-b border-neutral-800"
+      >
         <div class="flex gap-2 items-center">
-          <h3 class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0">
+          <h3
+            class="text-[13px] font-semibold uppercase tracking-widest text-neutral-400 m-0"
+          >
             Game Log
           </h3>
-        <button class="btn-sm text-neutral-400 py-2" onclick={() => copyTextToClipboard('game-log-mobile')}>Copy</button>
+          <button
+            class="btn-sm text-neutral-400 py-2"
+            onclick={() => copyTextToClipboard("game-log-mobile")}>Copy</button
+          >
         </div>
 
         <button
@@ -167,8 +185,8 @@
                  cursor-pointer px-2 py-1 rounded transition-colors
                  hover:text-neutral-200 hover:bg-neutral-800"
           onclick={closeSheet}
-          aria-label="Close log"
-        >✕</button>
+          aria-label="Close log">✕</button
+        >
       </div>
 
       <!-- Log Content -->
@@ -176,17 +194,24 @@
         bind:this={logContainer}
         id="game-log-mobile"
         class="flex-1 overflow-y-auto overscroll-contain
-               px-4 py-3 font-emi-mono text-[11px]
+               px-4 py-3 font-mono text-[11px]
                flex flex-col items-start text-left gap-1
                [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-sm"
       >
         {#each logs as log}
-          <div class="leading-relaxed pb-0.5 {log.type === 'error' ? 'text-red-300' : 'text-neutral-300'}">
-            <span class="text-[10px] text-neutral-500">[{log.turn}]</span> {log.msg}
+          <div
+            class="leading-relaxed pb-0.5 {log.type === 'error'
+              ? 'text-red-300'
+              : 'text-neutral-300'}"
+          >
+            <span class="text-[10px] text-neutral-500">[{log.turn}]</span>
+            {log.msg}
           </div>
         {/each}
         {#if logs.length === 0}
-          <div class="text-neutral-600 text-center py-8 italic">No log entries yet.</div>
+          <div class="text-neutral-600 text-center py-8 italic">
+            No log entries yet.
+          </div>
         {/if}
       </div>
     </div>
@@ -196,19 +221,40 @@
 <style>
   /* Custom keyframes can't be expressed as Tailwind utilities */
   @keyframes fab-pulse {
-    0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); }
-    50%       { box-shadow: 0 0 0 10px rgba(85, 183, 176, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4); }
+    0%,
+    100% {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    50% {
+      box-shadow:
+        0 0 0 10px rgba(85, 183, 176, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.4);
+    }
   }
   @keyframes fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes slide-up {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
-  :global(.animate-fab-pulse) { animation: fab-pulse 1.5s ease-in-out; }
-  :global(.animate-fade-in)   { animation: fade-in 0.2s ease-out; }
-  :global(.animate-slide-up)  { animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+  :global(.animate-fab-pulse) {
+    animation: fab-pulse 1.5s ease-in-out;
+  }
+  :global(.animate-fade-in) {
+    animation: fade-in 0.2s ease-out;
+  }
+  :global(.animate-slide-up) {
+    animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
 </style>

@@ -5,6 +5,7 @@
 @theme {
   --font-publicSans: "Public Sans", "sans-serif";
   --font-serif: "Tai Heritage Pro", "serif";
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
   /* Emigration Emulator */
   --color-emi-document: #e3a780;
@@ -14,9 +15,6 @@
   --color-emi-passport: #92b0d8;
   --color-emi-life: #fefefe;
 
-  --font-emi-ui: var(--font-publicSans), sans-serif;
-  --font-emi-heading: var(--font-serif), sans-serif;
-  --font-emi-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
 /* Custom .btn component */

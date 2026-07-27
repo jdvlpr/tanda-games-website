@@ -1973,7 +1973,7 @@
       >
       {#if testResults}
         <div
-          class="bg-black p-4 rounded-lg mb-6 font-emi-mono text-xs max-h-[200px] overflow-y-auto"
+          class="bg-black p-4 rounded-lg mb-6 font-mono text-xs max-h-[200px] overflow-y-auto"
         >
           {#each testResults as res}
             <div class="mb-1 {res.pass ? 'text-[#a3e635]' : 'text-[#ef4444]'}">
