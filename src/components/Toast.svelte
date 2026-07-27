@@ -1,7 +1,6 @@
 <script>
-  import { fly, fade } from "svelte/transition";
-  import { toast } from "../stores/toast.svelte.js";
   import Icon from "@iconify/svelte";
+  import { fade, fly } from "svelte/transition";
 
   /** @type {{ item: import('../stores/toast.svelte.js').Toast }} */
   let { item } = $props();

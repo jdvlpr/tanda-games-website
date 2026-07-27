@@ -30,7 +30,7 @@
   const VERSION = changelog[0].version;
 
   // Props
-  let { defaultMode = "competitive", defaultPlayerCount = 2 } = $props();
+  let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
 
   // Replace dev
   const isDev = import.meta.env.DEV;
