@@ -879,10 +879,10 @@ export default class EmigrationEngine {
     mainDeck.splice(0, 2);
 
     playersSetup.forEach((setup, idx) => {
-      const nat = NATIONALITIES.find((n) => n.name === setup.nationality);
-      if (!nat) throw new Error(`Unknown nationality: ${setup.nationality}`);
-      const dest = DESTINATIONS.find((d) => d.name === setup.destination);
-      if (!dest) throw new Error(`Unknown destination: ${setup.destination}`);
+      const nat = NATIONALITIES.find((n) => n.name === setup.nationality.name);
+      if (!nat) throw new Error(`Unknown nationality: ${setup.nationality.name}`);
+      const dest = DESTINATIONS.find((d) => d.name === setup.destination.name);
+      if (!dest) throw new Error(`Unknown destination: ${setup.destination.name}`);
 
       const player = {
         id: idx,
