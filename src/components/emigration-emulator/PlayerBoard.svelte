@@ -14,6 +14,26 @@
   let boardEl = null;
   let wasActive = false;
 
+  let isRow1Empty = $derived(
+    !player.layout[0] &&
+      !player.layout[1] &&
+      !player.layout[2] &&
+      !player.layout[3],
+  );
+  let isRow2Empty = $derived(
+    !player.layout[4] && !player.layout[5] && !player.layout[6],
+  );
+  let isRow3Empty = $derived(
+    !player.layout[7] &&
+      !player.layout[8] &&
+      !player.layout[9] &&
+      !player.layout[10],
+  );
+  let isRow4Empty = $derived(
+    !player.layout[11] && !player.layout[12] && !player.layout[13],
+  );
+  let isLayoutEmpty = $derived(isRow1Empty && isRow2Empty);
+
   $effect(() => {
     if (
       autoScrollEnabled &&
@@ -117,17 +137,17 @@
 
 <div
   bind:this={boardEl}
-  class={["my-2 transition-all duration-300 scroll-mt-[8rem] mx-auto"]}
+  class={["my-2 transition-all duration-300 scroll-mt-[6rem] mx-auto w-full"]}
 >
-  <!-- Player Header Info -->
   <div
     class={[
-      "flex pb-2 flex-col gap-2 rounded-2xl px-2 py-1.5 ",
+      "flex p-2 pb-4 flex-col gap-4 rounded-2xl",
       isActive
         ? "border-2 border-amber-400 dark:border-amber-600 shadow-md shadow-amber-200/50 dark:shadow-amber-800/50"
         : "border border-neutral-200 dark:border-neutral-800",
     ]}
   >
+    <!-- Player Header Info -->
     <div class="flex flex-col gap-1">
       <p class={["text-2xl font-bold"]}>
         {player.name}
@@ -137,7 +157,7 @@
         title="{player.name}'s Nationality and (Starting Money)"
       >
         <span class="fi fi-{player.nationality.countryCode}"></span>
-        <span>{player.nationality.name}</span>
+        <span class="opacity-70">{player.nationality.name}</span>
       </p>
       <span
         class="flex gap-1 items-center justify-center opacity-70"
@@ -251,10 +271,47 @@
         >Blocked</span
       >
     {/if}
+
+    <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
+    {#if engine && engine.phase === "preparation"}
+      <div class={["mb-2", !isLayoutEmpty && "pb-18"]}>
+        <!-- Row 1 -->
+        <div class={["layout-row row-1", isRow1Empty && "h-0!"]}>
+          {@render cardSlot(0)}
+          {@render cardSlot(1)}
+          {@render cardSlot(2)}
+          {@render cardSlot(3)}
+        </div>
+        <!-- Row 2 -->
+        <div class={["layout-row row-2", isRow2Empty && "h-0!"]}>
+          {@render cardSlot(4)}
+          {@render cardSlot(5)}
+          {@render cardSlot(6)}
+        </div>
+        <!-- Row 3 -->
+        <div class={["layout-row row-3", isRow3Empty && "h-0!"]}>
+          {@render cardSlot(7)}
+          {@render cardSlot(8)}
+          {@render cardSlot(9)}
+          {@render cardSlot(10)}
+        </div>
+        <!-- Row 4 -->
+        <div class={["layout-row row-4", isRow4Empty && "h-0!"]}>
+          {@render cardSlot(11)}
+          {@render cardSlot(12)}
+          {@render cardSlot(13)}
+        </div>
+      </div>
+    {:else}
+      <div
+        class="text-center py-6 text-sm font-bold bg-black/15 rounded-2xl border border-dashed border-white/5 mb-4"
+      >
+        Layout Cleared (Crossing / Game Over Phase)
+      </div>
+    {/if}
+
     <!-- Destination Card -->
-    <div
-      class="text-left flex flex-col gap-1 mt-2 border-y border-y-neutral-200 dark:border-y-neutral-800 py-2"
-    >
+    <div class="text-left flex flex-col gap-1">
       <div class="flex flex-col gap-0 items-center">
         <p class="text-xs opacity-70">Destination</p>
         <p class="font-bold">
@@ -353,49 +410,9 @@
       </div>
     </div>
 
-    <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
-    {#if engine && engine.phase === "preparation"}
-      <div class="mb-4 pt-2 pb-18 sm:min-h-[290px] max-sm:overflow-x-auto">
-        <!-- Row 1 -->
-        <div class="layout-row row-1">
-          {@render cardSlot(0)}
-          {@render cardSlot(1)}
-          {@render cardSlot(2)}
-          {@render cardSlot(3)}
-        </div>
-        <!-- Row 2 -->
-        <div class="layout-row row-2">
-          {@render cardSlot(4)}
-          {@render cardSlot(5)}
-          {@render cardSlot(6)}
-        </div>
-        <!-- Row 3 -->
-        <div class="layout-row row-3">
-          {@render cardSlot(7)}
-          {@render cardSlot(8)}
-          {@render cardSlot(9)}
-          {@render cardSlot(10)}
-        </div>
-        <!-- Row 4 -->
-        <div class="layout-row row-4">
-          {@render cardSlot(11)}
-          {@render cardSlot(12)}
-          {@render cardSlot(13)}
-        </div>
-      </div>
-    {:else}
-      <div
-        class="text-center py-6 text-sm font-bold bg-black/15 rounded-2xl border border-dashed border-white/5 mb-4"
-      >
-        Layout Cleared (Crossing / Game Over Phase)
-      </div>
-    {/if}
-
     <!-- 5-Column Stash Display -->
     {#if player.stash.documents.length || player.stash.connections.length || player.stash.tickets || player.stash.passports || player.stash.lifeCards.length}
-      <div
-        class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950"
-      >
+      <div class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2">
         <!-- 1. Documents -->
         {#if player.stash.documents.length}
           <div
