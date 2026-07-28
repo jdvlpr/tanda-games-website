@@ -84,7 +84,7 @@
   {@const slot = player.layout[slotIdx]}
   {#if !slot}
     <div
-      class="w-[clamp(66px,20vw,100px)] shrink-0 h-[110px] lg:h-[125px] mx-1 sm:mx-2 relative pointer-events-none empty"
+      class="w-[clamp(60px,18vw,100px)] shrink-0 h-[110px] md:h-[125px] mx-1 sm:mx-2 relative pointer-events-none empty"
     ></div>
   {:else}
     {@const isCov = engine ? engine.isCardCovered(player, slotIdx) : false}
@@ -98,7 +98,7 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="w-[clamp(66px,20vw,100px)] shrink-0 h-[110px] lg:h-[125px] mx-1 sm:mx-2 relative pointer-events-none"
+      class="w-[clamp(60px,18vw,100px)] shrink-0 h-[110px] md:h-[125px] mx-1 sm:mx-2 relative pointer-events-none"
     >
       <div
         class="grid-card border rounded-2xl shadow-md {slot.faceUp
@@ -137,7 +137,7 @@
 
 <div
   bind:this={boardEl}
-  class={["my-2 transition-all duration-300 scroll-mt-[6rem] mx-auto w-full"]}
+  class={["my-2 transition-all duration-300 scroll-mt-[6rem] flex-1"]}
 >
   <div
     class={[
@@ -351,12 +351,14 @@
             {/if}
           </div>
         </div>
-        <!-- 1. Documents -->
+        <!-- Documents -->
         <div
           class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
         >
           <p>
-            Documents ({player.stash.documents.length})
+            Documents {#if player.stash.documents.length}
+              ({player.stash.documents.length})
+            {/if}
           </p>
           <div class="">
             <span class="font-bold"
@@ -420,7 +422,11 @@
         <div
           class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
         >
-          <p>Connections ({player.stash.connections.length})</p>
+          <p>
+            Connections {#if player.stash.connections.length}
+              ({player.stash.connections.length})
+            {/if}
+          </p>
           <div class="">
             <span class="font-bold"
               >x{player.destination.targets.c.setSize}</span

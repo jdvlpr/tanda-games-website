@@ -40,6 +40,49 @@
 
   let showRobotMode = $state(null);
 
+  let currentlyScrolledToPlayer = $state(0);
+  let playerBoardContainer = $state(null);
+  let playerBoardElements = $state([]);
+
+  // Scroll handler for the dot buttons
+  function scrollToPlayer(index) {
+    if (playerBoardElements[index]) {
+      playerBoardElements[index].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }
+
+  $effect(() => {
+    if (!playerBoardContainer) return;
+
+    // Set up the IntersectionObserver to detect which card is visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Update the reactive state based on the dataset index
+            currentlyScrolledToPlayer = Number(entry.target.dataset.index);
+          }
+        });
+      },
+      {
+        root: playerBoardContainer,
+        threshold: 0.5, // Triggers when at least 50% of the card is visible
+      },
+    );
+
+    // Observe all card elements
+    playerBoardElements.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    // In Svelte 5, returning a function from $effect handles cleanup automatically
+    return () => observer.disconnect();
+  });
+
   $effect(() => {
     showRobotMode = getRobotModeFromUrl();
   });
@@ -1348,7 +1391,7 @@
 <div class="">
   <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
     <div
-      class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1100px] mx-auto px-2"
+      class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-3xl mx-auto px-2"
     >
       <div class="flex flex-col items-center md:items-start">
         <h1 class="font-bold text-2xl text-slate-900 dark:text-slate-100">
@@ -1676,7 +1719,7 @@
       </div>
     </div>
   {:else if snapshot}
-    <div class="max-w-[1100px] mx-auto px-2">
+    <div class="max-w-3xl mx-auto px-2">
       {#if gameType === "online" && currentRoomCode}
         <div
           class="flex flex-wrap items-center justify-center md:justify-between gap-3 w-full mb-4"
@@ -1753,206 +1796,210 @@
         </div>
       </div>
 
-      <div
-        class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start mx-auto w-full"
-      >
-        <!-- Left Main Column: Public Pool & Player Boards -->
-        <div class="flex flex-col gap-2 relative">
-          <!-- Security Lanes -->
-          <div class={["flex flex-col gap-1", isPreparationPhase && "hidden"]}>
-            <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
-            <div class="flex flex-wrap justify-center gap-2 pb-1">
-              {#each snapshot.securityLanes as lane, i}
-                {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
-                <div
-                  class={[
-                    "rounded-2xl gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800",
-                    backgroundColor,
-                  ]}
-                >
-                  <div class="font-bold text-xs leading-snug">{lane.name}</div>
-                  <Icon icon="game-icons:police-officer-head" class="size-8"
-                  ></Icon>
-                  <div class="text-xs mb-1 flex gap-1">
-                    {#each lane.unshuffledTokens as { tokenNumber, status }}
-                      <p
-                        class={[
-                          "bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-2xl border border-red-300 dark:border-red-700",
-                          status.isRevealed && "opacity-30",
-                        ]}
-                      >
-                        {tokenNumber}
-                      </p>
-                    {/each}
-                  </div>
-                  {#if snapshot.phase === "crossing"}
-                    <button
-                      class="btn w-full"
-                      disabled={lane.tokens.length === 0 || pendingChoice}
-                      onclick={() => handleSelectLane(i)}
+      <!-- Main Column: Public Pool & Player Boards -->
+      <div class="flex flex-col gap-2 relative">
+        <!-- Security Lanes -->
+        <div class={["flex flex-col gap-1", isPreparationPhase && "hidden"]}>
+          <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
+          <div class="flex flex-wrap justify-center gap-2 pb-1">
+            {#each snapshot.securityLanes as lane, i}
+              {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
+              <div
+                class={[
+                  "rounded-2xl gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800",
+                  backgroundColor,
+                ]}
+              >
+                <div class="font-bold text-xs leading-snug">{lane.name}</div>
+                <Icon icon="game-icons:police-officer-head" class="size-8"
+                ></Icon>
+                <div class="text-xs mb-1 flex gap-1">
+                  {#each lane.unshuffledTokens as { tokenNumber, status }}
+                    <p
+                      class={[
+                        "bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-2xl border border-red-300 dark:border-red-700",
+                        status.isRevealed && "opacity-30",
+                      ]}
                     >
-                      Select Lane
-                    </button>
-                  {/if}
-                  {#if lane.unshuffledTokens.filter(({ status }) => status.isRevealed).length}
-                    <div class="flex flex-col gap-1 justify-center">
-                      {#each lane.unshuffledTokens.filter(({ status }) => status.isRevealed) as { tokenNumber, status }}
+                      {tokenNumber}
+                    </p>
+                  {/each}
+                </div>
+                {#if snapshot.phase === "crossing"}
+                  <button
+                    class="btn w-full"
+                    disabled={lane.tokens.length === 0 || pendingChoice}
+                    onclick={() => handleSelectLane(i)}
+                  >
+                    Select Lane
+                  </button>
+                {/if}
+                {#if lane.unshuffledTokens.filter(({ status }) => status.isRevealed).length}
+                  <div class="flex flex-col gap-1 justify-center">
+                    {#each lane.unshuffledTokens.filter(({ status }) => status.isRevealed) as { tokenNumber, status }}
+                      <div class="grid grid-cols-[1fr_30px] gap-1 items-center">
                         <div
-                          class="grid grid-cols-[1fr_30px] gap-1 items-center"
+                          class={[
+                            "text-xs rounded-2xl px-2 py-1 w-full flex flex-col gap-1",
+                            status.player.success
+                              ? "bg-green-200 dark:bg-green-800"
+                              : "bg-red-300 dark:bg-red-900",
+                          ]}
                         >
-                          <div
-                            class={[
-                              "text-xs rounded-2xl px-2 py-1 w-full flex flex-col gap-1",
-                              status.player.success
-                                ? "bg-green-200 dark:bg-green-800"
-                                : "bg-red-300 dark:bg-red-900",
-                            ]}
-                          >
-                            <p class="w-full">
-                              {#if status.player.success}✅{:else}❌{/if}
-                              {status.player.name}
-                            </p>
-                            <div class="flex gap-1 items-center">
-                              <div
-                                class="whitespace-nowrap p-1 rounded-2xl bg-white text-red-500 flex items-center gap-0"
-                              >
-                                <Icon
-                                  icon="game-icons:round-star"
-                                  class="size-3 shrink-0"
-                                />{status.player.assurance}
-                              </div>
-                              <div
-                                class="whitespace-nowrap p-1 rounded-2xl bg-white text-green-700 flex items-center gap-0"
-                              >
-                                <Icon
-                                  icon="game-icons:two-coins"
-                                  class="size-3 shrink-0"
-                                />${status.player.money}
-                              </div>
+                          <p class="w-full">
+                            {#if status.player.success}✅{:else}❌{/if}
+                            {status.player.name}
+                          </p>
+                          <div class="flex gap-1 items-center">
+                            <div
+                              class="whitespace-nowrap p-1 rounded-2xl bg-white text-red-500 flex items-center gap-0"
+                            >
+                              <Icon
+                                icon="game-icons:round-star"
+                                class="size-3 shrink-0"
+                              />{status.player.assurance}
+                            </div>
+                            <div
+                              class="whitespace-nowrap p-1 rounded-2xl bg-white text-green-700 flex items-center gap-0"
+                            >
+                              <Icon
+                                icon="game-icons:two-coins"
+                                class="size-3 shrink-0"
+                              />${status.player.money}
                             </div>
                           </div>
-                          <div
-                            class="bg-red-200 dark:bg-red-800 px-2 py-1 text-xs rounded-2xl border border-red-300 dark:border-red-700"
-                          >
-                            {tokenNumber}
-                          </div>
                         </div>
-                      {/each}
-                    </div>
-                  {/if}
+                        <div
+                          class="bg-red-200 dark:bg-red-800 px-2 py-1 text-xs rounded-2xl border border-red-300 dark:border-red-700"
+                        >
+                          {tokenNumber}
+                        </div>
+                      </div>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <ActionPanel
+          {engine}
+          {snapshot}
+          {currentPlayer}
+          actions={dashboardActions}
+          {isMobile}
+          onaction={handleAction}
+          onselectlane={handleSelectLane}
+          pendingChoice={pendingChoice ||
+            activeBotIndices.includes(visualActivePlayerId)}
+          computerTurn={activeBotIndices.includes(visualActivePlayerId)}
+          waitingForPeer={!isMyP2PTurn}
+          waitingForName={waitingForPlayerName}
+          autoScrollEnabled={!autoplay}
+          hasSelection={!!(selectedSlot || selectedStash)}
+          onclearselection={() => {
+            selectedSlot = null;
+            selectedStash = null;
+            selectedAnchorRect = null;
+          }}
+        />
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <!-- Tickets -->
+          <div
+            class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
+          >
+            <div class="text-left">
+              <div class="font-bold text-xl">Tickets</div>
+              <div class="text-xs">Requires: 1+ Connection</div>
+              <div class="text-xs">Ticket + Passport = 1 Assurance</div>
+            </div>
+            <div class="flex flex-col gap-1 ml-auto items-end">
+              <div class="text-2xl font-bold flex items-center gap-1.5">
+                <Icon icon="game-icons:ticket" class="size-6 shrink-0" />
+                <span>{snapshot.publicServices.tickets}</span>
+              </div>
+              {#if snapshot.phase === "preparation" && currentPlayer}
+                <div class="flex gap-1">
+                  <button
+                    class="btn-sm whitespace-nowrap"
+                    disabled={snapshot.publicServices.tickets <= 0 ||
+                      currentPlayer.money < 2 ||
+                      currentPlayer.stash.connections.length < 1 ||
+                      pendingChoice}
+                    onclick={() => handleBuyPool("ticket")}
+                  >
+                    $2 Buy
+                  </button>
+                  <button
+                    class="btn-sm"
+                    disabled={snapshot.publicServices.tickets <= 0 ||
+                      currentPlayer.stash.connections.length < 1 ||
+                      pendingChoice}
+                    onclick={() => handleStealPool("ticket")}
+                  >
+                    Steal
+                  </button>
                 </div>
-              {/each}
+              {/if}
             </div>
           </div>
 
-          <!-- Mobile: Inline Sticky Action Dashboard (above boards, below header) -->
-          {#if isMobile}
-            <ActionPanel
-              {engine}
-              {snapshot}
-              {currentPlayer}
-              actions={dashboardActions}
-              {isMobile}
-              onaction={handleAction}
-              onselectlane={handleSelectLane}
-              pendingChoice={pendingChoice ||
-                activeBotIndices.includes(visualActivePlayerId)}
-              computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-              waitingForPeer={!isMyP2PTurn}
-              waitingForName={waitingForPlayerName}
-              autoScrollEnabled={!autoplay}
-              hasSelection={!!(selectedSlot || selectedStash)}
-              onclearselection={() => {
-                selectedSlot = null;
-                selectedStash = null;
-                selectedAnchorRect = null;
-              }}
-            />
-          {/if}
-
-          <div class="flex flex-wrap gap-2 mx-auto max-lg:mt-2">
-            <!-- Tickets -->
-            <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
-            >
-              <div class="text-left">
-                <div class="font-bold text-xl">Tickets</div>
-                <div class="text-xs">Requires: 1+ Connection</div>
-                <div class="text-xs">Ticket + Passport = 1 Assurance</div>
-              </div>
-              <div class="flex flex-col gap-1 ml-auto items-end">
-                <div class="text-2xl font-bold flex items-center gap-1.5">
-                  <Icon icon="game-icons:ticket" class="size-6 shrink-0" />
-                  <span>{snapshot.publicServices.tickets}</span>
-                </div>
-                {#if snapshot.phase === "preparation" && currentPlayer}
-                  <div class="flex gap-1">
-                    <button
-                      class="btn-sm whitespace-nowrap"
-                      disabled={snapshot.publicServices.tickets <= 0 ||
-                        currentPlayer.money < 2 ||
-                        currentPlayer.stash.connections.length < 1 ||
-                        pendingChoice}
-                      onclick={() => handleBuyPool("ticket")}
-                    >
-                      $2 Buy
-                    </button>
-                    <button
-                      class="btn-sm"
-                      disabled={snapshot.publicServices.tickets <= 0 ||
-                        currentPlayer.stash.connections.length < 1 ||
-                        pendingChoice}
-                      onclick={() => handleStealPool("ticket")}
-                    >
-                      Steal
-                    </button>
-                  </div>
-                {/if}
-              </div>
+          <!-- Passports -->
+          <div
+            class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
+          >
+            <div class="text-left">
+              <div class="font-bold text-xl">Passports</div>
+              <div class="text-xs">Requires 1+ Document</div>
+              <div class="text-xs">Passport + Ticket = 1 Assurance</div>
             </div>
-
-            <!-- Passports -->
-            <div
-              class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
-            >
-              <div class="text-left">
-                <div class="font-bold text-xl">Passports</div>
-                <div class="text-xs">Requires 1+ Document</div>
-                <div class="text-xs">Passport + Ticket = 1 Assurance</div>
+            <div class="flex flex-col gap-1 ml-auto items-end">
+              <div class="text-2xl font-bold flex items-center gap-1.5">
+                <Icon icon="game-icons:passport" class="size-6 shrink-0" />
+                <span>{snapshot.publicServices.passports}</span>
               </div>
-              <div class="flex flex-col gap-1 ml-auto items-end">
-                <div class="text-2xl font-bold flex items-center gap-1.5">
-                  <Icon icon="game-icons:passport" class="size-6 shrink-0" />
-                  <span>{snapshot.publicServices.passports}</span>
+              {#if snapshot.phase === "preparation" && currentPlayer}
+                <div class="flex gap-1">
+                  <button
+                    class="btn-sm whitespace-nowrap"
+                    disabled={snapshot.publicServices.passports <= 0 ||
+                      currentPlayer.money < 2 ||
+                      currentPlayer.stash.documents.length < 1 ||
+                      pendingChoice}
+                    onclick={() => handleBuyPool("passport")}
+                  >
+                    $2 Buy
+                  </button>
+                  <button
+                    class="btn-sm"
+                    disabled={snapshot.publicServices.passports <= 0 ||
+                      currentPlayer.stash.documents.length < 1 ||
+                      pendingChoice}
+                    onclick={() => handleStealPool("passport")}
+                  >
+                    Steal
+                  </button>
                 </div>
-                {#if snapshot.phase === "preparation" && currentPlayer}
-                  <div class="flex gap-1">
-                    <button
-                      class="btn-sm whitespace-nowrap"
-                      disabled={snapshot.publicServices.passports <= 0 ||
-                        currentPlayer.money < 2 ||
-                        currentPlayer.stash.documents.length < 1 ||
-                        pendingChoice}
-                      onclick={() => handleBuyPool("passport")}
-                    >
-                      $2 Buy
-                    </button>
-                    <button
-                      class="btn-sm"
-                      disabled={snapshot.publicServices.passports <= 0 ||
-                        currentPlayer.stash.documents.length < 1 ||
-                        pendingChoice}
-                      onclick={() => handleStealPool("passport")}
-                    >
-                      Steal
-                    </button>
-                  </div>
-                {/if}
-              </div>
+              {/if}
             </div>
+          </div>
+        </div>
+        <!-- Horizontal Scroll Container -->
 
-            <!-- Player Boards -->
-            {#each snapshot.players as player}
+        <div
+          class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+          lg:flex lg:flex-wrap lg:justify-center lg:w-screen lg:relative lg:left-1/2 lg:-translate-x-1/2"
+          bind:this={playerBoardContainer}
+        >
+          <!-- Player Boards -->
+          {#each snapshot.players as player, index}
+            <div
+              class="snap-center"
+              bind:this={playerBoardElements[index]}
+              data-index={index}
+            >
               <PlayerBoard
                 {engine}
                 {player}
@@ -1963,37 +2010,25 @@
                 {snapshot}
                 autoScrollEnabled={!autoplay}
               />
-            {/each}
-          </div>
+            </div>
+          {/each}
         </div>
-
-        <!-- Right Sidebar: Desktop only -->
-        {#if !isMobile}
-          <div class="lg:sticky lg:top-4 h-[calc(100vh-40px)]">
-            <ActionPanel
-              {engine}
-              {snapshot}
-              {currentPlayer}
-              actions={dashboardActions}
-              {isMobile}
-              onaction={handleAction}
-              onselectlane={handleSelectLane}
-              pendingChoice={pendingChoice ||
-                activeBotIndices.includes(visualActivePlayerId)}
-              computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-              waitingForPeer={!isMyP2PTurn}
-              waitingForName={waitingForPlayerName}
-              autoScrollEnabled={!autoplay}
-              hasSelection={!!(selectedSlot || selectedStash)}
-              onclearselection={() => {
-                selectedSlot = null;
-                selectedStash = null;
-                selectedAnchorRect = null;
-              }}
-              {copyTextToClipboard}
-            />
-          </div>
-        {/if}
+        <!-- Navigation Dots -->
+        <div class="flex justify-center gap-2 sticky bottom-16 z-150 lg:hidden">
+          <!-- The first dot starts 'active' (darker color) -->
+          {#each snapshot.players as player, i}
+            <button
+              onclick={() => scrollToPlayer(i)}
+              aria-label="Scroll to player {i + 1}"
+              class={[
+                "btn-action px-4 backdrop-blur-md",
+                currentlyScrolledToPlayer === i
+                  ? "bg-amber-200/70 dark:bg-amber-800/70"
+                  : "bg-neutral-100/70 dark:bg-neutral-900/70",
+              ]}>{i + 1}</button
+            >
+          {/each}
+        </div>
       </div>
     </div>
 
