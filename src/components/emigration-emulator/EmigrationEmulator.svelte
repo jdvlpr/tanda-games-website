@@ -2014,7 +2014,7 @@
           {/each}
         </div>
         <!-- Navigation Dots -->
-        <div class="flex justify-center gap-2 sticky bottom-16 z-150 lg:hidden">
+        <div class="flex justify-center gap-2 sticky bottom-5 z-150 lg:hidden">
           <!-- The first dot starts 'active' (darker color) -->
           {#each snapshot.players as player, i}
             <button
@@ -2065,7 +2065,7 @@
     {/if}
   {/if}
 
-  <div class="flex flex-col gap-4 items-center my-7 max-w-md mx-auto px-2">
+  <div class="flex flex-col gap-4 items-center mb-7 mt-4 max-w-md mx-auto px-2">
     <div class="opacity-70 text-sm">
       <p class="italic">The game emulator may contain mistakes.</p>
       <p class="italic">Package Version: {import.meta.env.PACKAGE_VERSION}</p>

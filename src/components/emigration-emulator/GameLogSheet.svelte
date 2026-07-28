@@ -98,7 +98,7 @@
 <div>
   <!-- FAB Button -->
   <button
-    class="fixed bottom-3 left-3 z-150 size-10 rounded-full
+    class="size-10 rounded-full mx-auto my-4
            bg-neutral-800 border-2 border-neutral-700 text-neutral-300
            flex items-center justify-center cursor-pointer
            shadow-[0_4px_16px_rgba(0,0,0,0.4)]
