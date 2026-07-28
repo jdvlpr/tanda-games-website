@@ -1290,7 +1290,7 @@
   >
     <div
       in:fly={{ y: -50 }}
-      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl w-[90%] shadow-xl max-h-[90vh] overflow-y-auto"
+      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl w-[95%] shadow-xl max-h-[90vh] overflow-y-auto"
     >
       <div class="flex justify-between gap-2">
         <h2 class="text-xl font-semibold text-center">Rulebook</h2>
@@ -1348,7 +1348,7 @@
 <div class="">
   <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
     <div
-      class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1200px] mx-auto px-2"
+      class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-[1100px] mx-auto px-2"
     >
       <div class="flex flex-col items-center md:items-start">
         <h1 class="font-bold text-2xl text-slate-900 dark:text-slate-100">
@@ -1676,7 +1676,7 @@
       </div>
     </div>
   {:else if snapshot}
-    <div class="max-w-[1200px] mx-auto px-2">
+    <div class="max-w-[1100px] mx-auto px-2">
       {#if gameType === "online" && currentRoomCode}
         <div
           class="flex flex-wrap items-center justify-center md:justify-between gap-3 w-full mb-4"

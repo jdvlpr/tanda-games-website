@@ -89,7 +89,9 @@ let printAndPlay = [
           href="/emigration/emulator"
           class="btn flex-1 bg-amber-200 dark:bg-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900"
         >
-          Play Now</a
+          <svg viewBox="0 0 100 100" class="rotate-90 size-4">
+            <polygon points="50,0 100,100 0,100" fill="currentColor"></polygon>
+          </svg> Play Now</a
         >
         <a
           href={FILES_PATH + `${ID}-game-rulebook-v${VERSION}.pdf`}
@@ -160,9 +162,11 @@ let printAndPlay = [
         <h2 class="font-bold text-4xl mb-2">Q&A</h2>
         <p class="font-bold">Where can I buy the game?</p>
         <p>
-          You can't buy the game yet. But you can test the game by playing it in
-          the emulator or by printing the game yourself. Eventually, we'd like
-          to make the game available to buy through <a
+          You can't buy the game yet. But you can test the game by <a
+            href="emigration/emulator"
+            class="underline">playing it in the emulator</a
+          > or by printing the game yourself. Eventually, we'd like to make the game
+          available to buy through <a
             href="https://www.thegamecrafter.com/games/emigration"
             target="_blank"
             class="underline">The Game Crafter</a
