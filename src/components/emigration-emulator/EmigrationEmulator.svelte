@@ -2014,14 +2014,16 @@
           {/each}
         </div>
         <!-- Navigation Dots -->
-        <div class="flex justify-center gap-2 sticky bottom-5 z-150 lg:hidden">
+        <div
+          class="flex justify-center gap-2 sticky bottom-5 z-150 lg:hidden w-fit mx-auto"
+        >
           <!-- The first dot starts 'active' (darker color) -->
           {#each snapshot.players as player, i}
             <button
               onclick={() => scrollToPlayer(i)}
               aria-label="Scroll to player {i + 1}"
               class={[
-                "btn-action px-4 backdrop-blur-md",
+                "btn-action px-4 backdrop-blur-md rounded-full",
                 currentlyScrolledToPlayer === i
                   ? "bg-amber-200/70 dark:bg-amber-800/70"
                   : "bg-neutral-100/70 dark:bg-neutral-900/70",
