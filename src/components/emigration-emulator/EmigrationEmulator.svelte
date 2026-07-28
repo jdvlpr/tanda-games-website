@@ -74,7 +74,7 @@
     const shuffledNats = shuffleArray([...NATIONALITIES]);
     const shuffledDests = shuffleArray([...DESTINATIONS]);
     return Array.from({ length: 6 }, (_, i) => {
-      const nat = shuffledNats[i % shuffledNats.length].name;
+      const nat = shuffledNats[i % shuffledNats.length];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat];
       const validDests = shuffledDests.filter(
         (d) => d.name !== matchingCountry,
@@ -84,7 +84,7 @@
         shuffledDests[i % shuffledDests.length];
       return {
         name: `Player ${i + 1}`,
-        nationality: nat,
+        nationality: nat.name,
         destination: destObj.name,
       };
     });
@@ -730,8 +730,8 @@
     const shuffledDests = shuffleArray([...DESTINATIONS]);
 
     const finalPlayers = p2pPlayers.map((p, i) => {
-      const nat = shuffledNats[i % shuffledNats.length].name;
-      const matchingCountry = NATIONALITY_TO_COUNTRY[nat];
+      const nat = shuffledNats[i % shuffledNats.length];
+      const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
       const validDests = shuffledDests.filter(
         (d) => d.name !== matchingCountry,
       );
@@ -741,7 +741,7 @@
 
       return {
         name: p.name,
-        nationality: nat,
+        nationality: nat.name,
         destination: destObj.name,
       };
     });
@@ -850,15 +850,15 @@
     const shuffledNats = shuffleArray([...NATIONALITIES]);
     const shuffledDests = shuffleArray([...DESTINATIONS]);
     const finalPlayers = activeSetup.map((p, i) => {
-      const nat = shuffledNats[i % shuffledNats.length].name;
-      const matchingCountry = NATIONALITY_TO_COUNTRY[nat];
+      const nat = shuffledNats[i % shuffledNats.length];
+      const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
       const validDests = shuffledDests.filter(
         (d) => d.name !== matchingCountry,
       );
       const destObj =
         validDests[i % validDests.length] ||
         shuffledDests[i % shuffledDests.length];
-      return { name: p.name, nationality: nat, destination: destObj.name };
+      return { name: p.name, nationality: nat.name, destination: destObj.name };
     });
 
     engine = new EmigrationEngine({

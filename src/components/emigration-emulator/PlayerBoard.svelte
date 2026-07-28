@@ -58,31 +58,6 @@
         anchorEl: e.currentTarget,
       });
   }
-
-  function getDestinationInfoText(destName) {
-    switch (destName) {
-      case "Bosnia and Herzegovina":
-        return "Money x6 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+6)";
-      case "China":
-        return "Money x10 (+3), < 4 (-2) | Docs x4 (+2), < 2 (-3) | Conns x4 (+5)";
-      case "Democratic Republic of Congo":
-        return "Money x6 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+6)";
-      case "France":
-        return "Money x8 (+2), < 3 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
-      case "Russia":
-        return "Money x7 (+2), < 2 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
-      case "Senegal":
-        return "Money x7 (+2) | Docs x4 (+2), < 2 (-2) | Conns x3 (+5)";
-      case "Switzerland":
-        return "Money x7 (+2), < 2 (-1) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
-      case "England":
-        return "Money x10 (+3), < 4 (-2) | Docs x4 (+2), < 2 (-3) | Conns x3 (+4)";
-      case "United States of America":
-        return "Money x10 (+3), < 5 (-2) | Docs x4 (+2), < 2 (-3) | Conns x4 (+5)";
-      default:
-        return "";
-    }
-  }
 </script>
 
 {#snippet cardSlot(slotIdx)}
@@ -161,7 +136,8 @@
     <span
       class="flex flex-wrap gap-1 items-center"
       title="{player.name}'s Nationality and (Starting Money)"
-      >{player.nationality} (${player.startingFund})</span
+      ><span class="fi fi-{player.nationality.countryCode}"></span>
+      {player.nationality.name} (${player.startingFund})</span
     >
     <span
       class="flex gap-1 items-center"
@@ -286,14 +262,56 @@
     {/if}
   </div>
 
-  <!-- Requirements Subheader -->
+  <!-- Destination Card -->
   <div
-    class="text-xs lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-col gap-1 items-start"
+    class="lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-wrap gap-4 items-start"
   >
-    <p>
-      <strong>{player.destination}:</strong>
-      <span class="">{getDestinationInfoText(player.destination)}</span>
-    </p>
+    <div class="flex flex-col gap-0">
+      <p class="text-xs opacity-70">Destination</p>
+      <p class="font-bold">
+        <span class="fi fi-{player.destination.countryCode} pr-1"></span>
+        {player.destination.name}
+      </p>
+    </div>
+    <div class="flex flex-col gap-0 text-sm">
+      Money
+      <span class=""
+        >x{player.destination.targets.m.setSize} = {player.destination.targets.m
+          .reward}</span
+      >
+      {#if player.destination.targets.m.minRequired && player.destination.targets.m.penalty}
+        <span class=""
+          >{`<`}{player.destination.targets.m.minRequired} = -{player
+            .destination.targets.m.penalty}</span
+        >
+      {/if}
+    </div>
+    <div class="flex flex-col gap-0 text-sm">
+      Documents
+      <span class=""
+        >x{player.destination.targets.d.setSize} = {player.destination.targets.d
+          .reward}</span
+      >
+      {#if player.destination.targets.d.minRequired && player.destination.targets.d.penalty}
+        <span class=""
+          >{`<`}{player.destination.targets.d.minRequired} = -{player
+            .destination.targets.d.penalty}</span
+        >
+      {/if}
+    </div>
+    <div class="flex flex-col gap-0 text-sm">
+      Connections
+      <span class=""
+        >x{player.destination.targets.c.setSize} = {player.destination.targets.c
+          .reward}</span
+      >
+      {#if player.destination.targets.c.minRequired && player.destination.targets.c.penalty}
+        <span class=""
+          >{`<`}{player.destination.targets.c.minRequired} = -{player
+            .destination.targets.c.penalty}</span
+        >
+      {/if}
+    </div>
   </div>
 
   <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->

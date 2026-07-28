@@ -67,15 +67,15 @@ export const NATIONALITY_TO_COUNTRY = {
 };
 
 export const NATIONALITIES = [
-  { name: "Bosnian", fund: 2 },
-  { name: "Chinese", fund: 6 },
-  { name: "Congolese", fund: 2 },
-  { name: "French", fund: 5 },
-  { name: "Russian", fund: 5 },
-  { name: "Senegalese", fund: 3 },
-  { name: "Swiss", fund: 4 },
-  { name: "English", fund: 5 },
-  { name: "American", fund: 6 },
+  { name: "Bosnian", fund: 2, countryCode: "ba" },
+  { name: "Chinese", fund: 6, countryCode: "cn" },
+  { name: "Congolese", fund: 2, countryCode: "cd" },
+  { name: "French", fund: 5, countryCode: "fr" },
+  { name: "Russian", fund: 5, countryCode: "ru" },
+  { name: "Senegalese", fund: 3, countryCode: "sn" },
+  { name: "Swiss", fund: 4, countryCode: "ch" },
+  { name: "English", fund: 5, countryCode: "gb-eng" },
+  { name: "American", fund: 6, countryCode: "us" },
 ];
 
 export const DESTINATIONS = [
@@ -89,17 +89,6 @@ export const DESTINATIONS = [
   "England",
   "United States of America",
 ].map((name, i) => {
-  const nationalities = [
-    "Bosnian",
-    "Chinese",
-    "Congolese",
-    "French",
-    "Russian",
-    "Senegalese",
-    "Swiss",
-    "English",
-    "American",
-  ];
   const allTargets = [
     {
       m: { setSize: 6, reward: 2 },
@@ -150,7 +139,8 @@ export const DESTINATIONS = [
   const targets = allTargets[i];
   return {
     name,
-    nationality: nationalities[i],
+    countryCode: NATIONALITIES[i].countryCode,
+    nationality: NATIONALITIES[i].name,
     targets,
     check: calculateAssurance(targets),
   };
@@ -891,12 +881,14 @@ export default class EmigrationEngine {
     playersSetup.forEach((setup, idx) => {
       const nat = NATIONALITIES.find((n) => n.name === setup.nationality);
       if (!nat) throw new Error(`Unknown nationality: ${setup.nationality}`);
+      const dest = DESTINATIONS.find((d) => d.name === setup.destination);
+      if (!dest) throw new Error(`Unknown destination: ${setup.destination}`);
 
       const player = {
         id: idx,
         name: setup.name,
-        nationality: nat.name,
-        destination: setup.destination,
+        nationality: nat,
+        destination: dest,
         money: nat.fund,
         salary: 1,
         payRaises: 0,
@@ -937,7 +929,7 @@ export default class EmigrationEngine {
         }
       });
       this.log(
-        `INIT|P${player.id}|NAT:${player.nationality}|DEST:${player.destination}|$${player.money}|FACEUP:[${faceUpCards.join(",")}]`,
+        `INIT|P${player.id}|NAT:${player.nationality.name}|DEST:${player.destination.name}|$${player.money}|FACEUP:[${faceUpCards.join(",")}]`,
         "system",
       );
     });
@@ -1465,7 +1457,7 @@ export default class EmigrationEngine {
     toast.info(`Start Phase 2`);
 
     for (const player of this.players) {
-      const dest = DESTINATIONS.find((d) => d.name === player.destination);
+      const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
       let totalMoney = player.money;
       const frCard = player.stash.lifeCards.find(
         (lc) => lc.title === "Frontrunner",
@@ -2755,7 +2747,7 @@ export default class EmigrationEngine {
             ...this.players
               .filter((p) => p.id !== player.id)
               .map((p) => ({
-                text: `Trade with ${p.name} (${p.destination})`,
+                text: `Trade with ${p.name} (${p.destination.name})`,
                 value: String(p.id),
               })),
           ],
@@ -2764,7 +2756,7 @@ export default class EmigrationEngine {
               const target = this.players[parseInt(val)];
               const temp = player.destination;
               toast.life(
-                `${player.name} Fomo: trades Destinations (${player.destination}) with ${target.name} (${target.destination})`,
+                `${player.name} Fomo: trades Destinations (${player.destination.name}) with ${target.name} (${target.destination.name})`,
               );
               player.destination = target.destination;
               target.destination = temp;

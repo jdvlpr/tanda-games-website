@@ -358,7 +358,7 @@ export function createAutoPlayer(
     if (possibleMoves.length === 0) return null;
 
     // Look up destination-specific Assurance rules for this player
-    const dest = DESTINATIONS.find((d) => d.name === player.destination);
+    const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
     const destTargets = dest?.targets;
     const destCheck = dest?.check;
 
@@ -588,7 +588,7 @@ export function createAutoPlayer(
 
           // Target opponent's set completion requirements
           const opponentDest = DESTINATIONS.find(
-            (dest) => dest.name === targetPlayer.destination,
+            (dest) => dest.name === targetPlayer.destination.name,
           );
           const isDoc = move.card.type === "document";
           const isConn = move.card.type === "connection";

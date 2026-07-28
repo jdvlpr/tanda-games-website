@@ -84,16 +84,17 @@ let printAndPlay = [
     </p>
 
     <div class="flex flex-col gap-4 mt-8 mb-4 justify-center items-center">
-      <div class="flex flex-wrap gap-4 justify-center items-start">
+      <div class="flex flex-wrap w-full justify-center items-center gap-2">
         <a
           href="/emigration/emulator"
-          class="btn bg-amber-300/70 dark:bg-amber-700/70 hover:bg-amber-200 dark:hover:bg-amber-800"
-          ><span>&#9654;</span> Play</a
+          class="btn flex-1 bg-amber-200 dark:bg-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900"
+        >
+          Play Now</a
         >
         <a
           href={FILES_PATH + `${ID}-game-rulebook-v${VERSION}.pdf`}
           download={`${ID}-game-rulebook-v${VERSION}.pdf`}
-          class="btn"
+          class="btn flex-1"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
