@@ -1832,7 +1832,7 @@
                             </div>
                           </div>
                           <div
-                            class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded-2xl"
+                            class="bg-red-200 dark:bg-red-800 px-2 py-1 text-xs rounded-2xl border border-red-300 dark:border-red-700"
                           >
                             {tokenNumber}
                           </div>

@@ -264,9 +264,9 @@
 
   <!-- Destination Card -->
   <div
-    class="lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-wrap gap-4 items-start"
+    class="lg:text-sm text-left my-2 px-2 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex flex-wrap gap-2"
   >
-    <div class="flex flex-col gap-0">
+    <div class="flex flex-col gap-0 max-sm:w-full">
       <p class="text-xs opacity-70">Destination</p>
       <p class="font-bold">
         <span class="fi fi-{player.destination.countryCode} pr-1"></span>
@@ -274,43 +274,73 @@
       </p>
     </div>
     <div class="flex flex-col gap-0 text-sm">
-      Money
-      <span class=""
-        >x{player.destination.targets.m.setSize} = {player.destination.targets.m
-          .reward}</span
-      >
-      {#if player.destination.targets.m.minRequired && player.destination.targets.m.penalty}
-        <span class=""
-          >{`<`}{player.destination.targets.m.minRequired} = -{player
-            .destination.targets.m.penalty}</span
+      <p class="">Money</p>
+      <div class="">
+        x{player.destination.targets.m.setSize} =
+        <span
+          class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
         >
-      {/if}
+          {player.destination.targets.m.reward}
+          <Icon icon="game-icons:round-star" class="size-3" />
+        </span>
+      </div>
+      <div>
+        {#if player.destination.targets.m.minRequired && player.destination.targets.m.penalty}
+          {`<`}{player.destination.targets.m.minRequired} =
+          <span
+            class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
+          >
+            -{player.destination.targets.m.penalty}
+            <Icon icon="game-icons:round-star" class="size-3" />
+          </span>
+        {/if}
+      </div>
     </div>
     <div class="flex flex-col gap-0 text-sm">
-      Documents
-      <span class=""
-        >x{player.destination.targets.d.setSize} = {player.destination.targets.d
-          .reward}</span
-      >
-      {#if player.destination.targets.d.minRequired && player.destination.targets.d.penalty}
-        <span class=""
-          >{`<`}{player.destination.targets.d.minRequired} = -{player
-            .destination.targets.d.penalty}</span
+      <p>Documents</p>
+      <div class="">
+        x{player.destination.targets.d.setSize} =
+        <span
+          class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
         >
-      {/if}
+          {player.destination.targets.d.reward}
+          <Icon icon="game-icons:round-star" class="size-3" />
+        </span>
+      </div>
+      <div>
+        {#if player.destination.targets.d.minRequired && player.destination.targets.d.penalty}
+          {`<`}{player.destination.targets.d.minRequired} =
+          <span
+            class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
+          >
+            -{player.destination.targets.d.penalty}
+            <Icon icon="game-icons:round-star" class="size-3" />
+          </span>
+        {/if}
+      </div>
     </div>
     <div class="flex flex-col gap-0 text-sm">
-      Connections
-      <span class=""
-        >x{player.destination.targets.c.setSize} = {player.destination.targets.c
-          .reward}</span
-      >
-      {#if player.destination.targets.c.minRequired && player.destination.targets.c.penalty}
-        <span class=""
-          >{`<`}{player.destination.targets.c.minRequired} = -{player
-            .destination.targets.c.penalty}</span
+      <p>Connections</p>
+      <div class="">
+        x{player.destination.targets.c.setSize} =
+        <span
+          class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
         >
-      {/if}
+          {player.destination.targets.c.reward}
+          <Icon icon="game-icons:round-star" class="size-3" />
+        </span>
+      </div>
+      <div>
+        {#if player.destination.targets.c.minRequired && player.destination.targets.c.penalty}
+          {`<`}{player.destination.targets.c.minRequired} =
+          <span
+            class="inline-flex gap-0.5 items-center text-red-600 dark:text-red-400 shrink-0 font-semibold"
+          >
+            -{player.destination.targets.c.penalty}
+            <Icon icon="game-icons:round-star" class="size-3" />
+          </span>
+        {/if}
+      </div>
     </div>
   </div>
 
