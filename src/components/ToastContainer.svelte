@@ -5,7 +5,7 @@
 
 {#if toast.toasts.length}
   <div
-    class="fixed top-0 left-1/2 -translate-x-1/2 z-200 pointer-events-none flex flex-col gap-1 md:gap-2 items-end justify-center text-xs bg-white/50 dark:bg-black/50 backdrop-blur-lg rounded-b-2xl p-2 shadow-md w-full max-w-lg"
+    class="pointer-events-none flex flex-col gap-1 md:gap-2 items-end justify-center text-xs bg-white/50 dark:bg-black/50 rounded-2xl p-2 w-full"
   >
     <div class="flex gap-2 justify-between items-center w-full">
       <p>Notifications</p>

@@ -8,6 +8,7 @@
     description = "",
     onaction,
     onclose,
+    playerBoardsContainer,
   } = $props();
 
   let popoverEl = $state(null);
@@ -44,12 +45,12 @@
       if (e.key === "Escape") onclose?.();
     };
 
-    // Capture initial scroll position when the effect runs (popover opens)
     const SCROLL_THRESHOLD = 10;
+
+    // --- Window Scroll Logic ---
     const initialScrollY = window.scrollY;
     const initialScrollX = window.scrollX;
 
-    // Scroll handler with pixel threshold
     const onWindowScroll = (e) => {
       if (
         e.target === window ||
@@ -65,14 +66,40 @@
       }
     };
 
+    // --- Container Scroll Logic ---
+    const initialContainerScrollY = playerBoardsContainer?.scrollTop ?? 0;
+    const initialContainerScrollX = playerBoardsContainer?.scrollLeft ?? 0;
+
+    const onContainerScroll = () => {
+      if (!playerBoardsContainer) return;
+      const deltaY = Math.abs(
+        playerBoardsContainer.scrollTop - initialContainerScrollY,
+      );
+      const deltaX = Math.abs(
+        playerBoardsContainer.scrollLeft - initialContainerScrollX,
+      );
+
+      if (deltaY > SCROLL_THRESHOLD || deltaX > SCROLL_THRESHOLD) {
+        onclose?.();
+      }
+    };
+
     // Dedicated resize handler (closes immediately without threshold)
     const onWindowResize = () => {
       onclose?.();
     };
 
+    // Attach global listeners
     window.addEventListener("keydown", onKey);
     window.addEventListener("scroll", onWindowScroll, { passive: true });
     window.addEventListener("resize", onWindowResize, { passive: true });
+
+    // Attach container listener if it exists
+    if (playerBoardsContainer) {
+      playerBoardsContainer.addEventListener("scroll", onContainerScroll, {
+        passive: true,
+      });
+    }
 
     // Defer outside-click/touch handler so the opening tap doesn't immediately close it.
     let outsideHandler = null;
@@ -91,11 +118,17 @@
       window.addEventListener("click", outsideHandler);
     }, 50);
 
+    // Cleanup
     return () => {
       clearTimeout(t);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("scroll", onWindowScroll);
       window.removeEventListener("resize", onWindowResize);
+
+      if (playerBoardsContainer) {
+        playerBoardsContainer.removeEventListener("scroll", onContainerScroll);
+      }
+
       if (outsideHandler) {
         window.removeEventListener("pointerdown", outsideHandler);
         window.removeEventListener("click", outsideHandler);

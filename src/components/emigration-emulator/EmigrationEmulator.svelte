@@ -41,7 +41,7 @@
   let showRobotMode = $state(null);
 
   let currentlyScrolledToPlayer = $state(0);
-  let playerBoardContainer = $state(null);
+  let playerBoardsContainer = $state(null);
   let playerBoardElements = $state([]);
 
   // Scroll handler for the dot buttons
@@ -56,7 +56,7 @@
   }
 
   $effect(() => {
-    if (!playerBoardContainer) return;
+    if (!playerBoardsContainer) return;
 
     // Set up the IntersectionObserver to detect which card is visible
     const observer = new IntersectionObserver(
@@ -69,7 +69,7 @@
         });
       },
       {
-        root: playerBoardContainer,
+        root: playerBoardsContainer,
         threshold: 0.5, // Triggers when at least 50% of the card is visible
       },
     );
@@ -97,38 +97,32 @@
     return !!robotMode;
   }
 
-  // Responsive: track mobile vs desktop
-  let isMobile = $state(false);
-  $effect(() => {
-    const mql = window.matchMedia("(max-width: 1023px)");
-    isMobile = mql.matches;
-    const handler = (e) => {
-      isMobile = e.matches;
-    };
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  });
-
   function getRandomPacks(count) {
     return shuffleArray([...PACKS_LIST]).slice(0, count);
   }
 
   function getRandomPlayersSetup() {
+    // Shuffle both arrays
     const shuffledNats = shuffleArray([...NATIONALITIES]);
-    const shuffledDests = shuffleArray([...DESTINATIONS]);
+    const availableDests = shuffleArray([...DESTINATIONS]);
+
     return Array.from({ length: 6 }, (_, i) => {
-      const nat = shuffledNats[i % shuffledNats.length];
-      const matchingCountry = NATIONALITY_TO_COUNTRY[nat];
-      const validDests = shuffledDests.filter(
+      // Grab a unique nationality for this player
+      const nat = shuffledNats[i];
+      const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
+
+      // Find the first destination in the available pool that is NOT their home country
+      const destIndex = availableDests.findIndex(
         (d) => d.name !== matchingCountry,
       );
-      const destObj =
-        validDests[i % validDests.length] ||
-        shuffledDests[i % shuffledDests.length];
+
+      // Remove that destination from the available pool so no one else gets it
+      const [destObj] = availableDests.splice(destIndex, 1);
+
       return {
         name: `Player ${i + 1}`,
-        nationality: nat.name,
-        destination: destObj.name,
+        nationality: nat,
+        destination: destObj,
       };
     });
   }
@@ -768,19 +762,22 @@
   function startP2PGame() {
     if (!multiplayer.isHost) return;
 
-    // Construct players from p2pPlayers, assigning random nationalities and destinations
+    // Shuffle both arrays
     const shuffledNats = shuffleArray([...NATIONALITIES]);
-    const shuffledDests = shuffleArray([...DESTINATIONS]);
+    const availableDests = shuffleArray([...DESTINATIONS]);
 
     const finalPlayers = p2pPlayers.map((p, i) => {
-      const nat = shuffledNats[i % shuffledNats.length];
+      // Grab a unique nationality for this player
+      const nat = shuffledNats[i];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
-      const validDests = shuffledDests.filter(
+
+      // Find the first destination in the available pool that is NOT their home country
+      const destIndex = availableDests.findIndex(
         (d) => d.name !== matchingCountry,
       );
-      const destObj =
-        validDests[i % validDests.length] ||
-        shuffledDests[i % shuffledDests.length];
+
+      // Remove that destination from the available pool so no one else gets it
+      const [destObj] = availableDests.splice(destIndex, 1);
 
       return {
         name: p.name,
@@ -889,19 +886,28 @@
   }
 
   function startGame(gameType = "vscomputer") {
-    // Always randomly assign nationalities and destinations
+    // Shuffle both arrays
     const shuffledNats = shuffleArray([...NATIONALITIES]);
-    const shuffledDests = shuffleArray([...DESTINATIONS]);
+    const availableDests = shuffleArray([...DESTINATIONS]);
+
     const finalPlayers = activeSetup.map((p, i) => {
-      const nat = shuffledNats[i % shuffledNats.length];
+      // Grab a unique nationality for this player
+      const nat = shuffledNats[i];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
-      const validDests = shuffledDests.filter(
+
+      // Find the first destination in the available pool that is NOT their home country
+      const destIndex = availableDests.findIndex(
         (d) => d.name !== matchingCountry,
       );
-      const destObj =
-        validDests[i % validDests.length] ||
-        shuffledDests[i % shuffledDests.length];
-      return { name: p.name, nationality: nat, destination: destObj };
+
+      // Remove that destination from the available pool so no one else gets it
+      const [destObj] = availableDests.splice(destIndex, 1);
+
+      return {
+        name: p.name,
+        nationality: nat,
+        destination: destObj,
+      };
     });
 
     engine = new EmigrationEngine({
@@ -1888,24 +1894,15 @@
           {snapshot}
           {currentPlayer}
           actions={dashboardActions}
-          {isMobile}
           onaction={handleAction}
-          onselectlane={handleSelectLane}
           pendingChoice={pendingChoice ||
             activeBotIndices.includes(visualActivePlayerId)}
           computerTurn={activeBotIndices.includes(visualActivePlayerId)}
           waitingForPeer={!isMyP2PTurn}
           waitingForName={waitingForPlayerName}
-          autoScrollEnabled={!autoplay}
-          hasSelection={!!(selectedSlot || selectedStash)}
-          onclearselection={() => {
-            selectedSlot = null;
-            selectedStash = null;
-            selectedAnchorRect = null;
-          }}
         />
 
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="flex flex-wrap gap-2">
           <!-- Tickets -->
           <div
             class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
@@ -1991,7 +1988,7 @@
         <div
           class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
           lg:flex lg:flex-wrap lg:justify-center lg:w-screen lg:relative lg:left-1/2 lg:-translate-x-1/2"
-          bind:this={playerBoardContainer}
+          bind:this={playerBoardsContainer}
         >
           <!-- Player Boards -->
           {#each snapshot.players as player, index}
@@ -2054,6 +2051,7 @@
 
     {#if showPopover}
       <CardActionPopover
+        {playerBoardsContainer}
         anchorRect={selectedAnchorRect}
         actions={popoverActions}
         description={popoverDescription}
