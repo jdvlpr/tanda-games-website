@@ -2157,7 +2157,7 @@ export default class EmigrationEngine {
                   "action",
                 );
                 toast.life(
-                  `${player.id} accepts Persuasion from ${target.name}`,
+                  `${player.name} accepts Persuasion from ${target.name}`,
                 );
                 this._onPlayerGainLifeCard(player);
                 this.advanceTurn();
@@ -2172,7 +2172,7 @@ export default class EmigrationEngine {
                   "action",
                 );
                 toast.life(
-                  `${player.id} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
+                  `${player.nam} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
                 );
                 callback(doubleFee);
               }
@@ -2988,7 +2988,7 @@ export default class EmigrationEngine {
                       "action",
                     );
                     toast.warning(
-                      `${player.name} Mental Fog: loses $1 and discards ${disc.title} from ${candidate.owner.name}`,
+                      `${player.name} Mental Fog: loses $1 and discards ${removed.card.title} from ${candidate.owner.name}`,
                     );
                     this.uncoverLayout(candidate.owner);
                   }
