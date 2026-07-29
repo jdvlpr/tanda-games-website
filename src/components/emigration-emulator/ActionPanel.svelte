@@ -13,9 +13,39 @@
     waitingForPeer = false,
     waitingForName = "",
   } = $props();
+
+  // 1. Create a state variable to hold the scroll position
+  let scrollY = $state(0);
+
+  // 2. Derive whether it should be hidden (true if within 20px of the top)
+  let isHidden = $derived(scrollY <= 130);
 </script>
 
-{#snippet content()}
+<!-- 3. Bind the window's scrollY to our state variable -->
+<svelte:window bind:scrollY />
+
+<div class="flex flex-wrap gap-2 items-center justify-center">
+  {#each actions as action}
+    <button
+      class={["btn-action", action.optional && ""]}
+      disabled={!action.enabled || pendingChoice}
+      onclick={() => onaction(action.type)}
+    >
+      {#if action.lucideIcon}<Icon
+          icon="lucide:{action.lucideIcon}"
+          class="size-5"
+        />{/if}
+      {action.label}
+    </button>
+  {/each}
+</div>
+
+<div
+  class={[
+    "fixed top-2 right-2 left-2 max-w-lg mx-auto z-[100] flex flex-col gap-2 p-2 rounded-2xl border border-slate-300 bg-slate-300/70 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-700/70 text-slate-950 dark:text-slate-50",
+    isHidden && "opacity-0 pointer-events-none",
+  ]}
+>
   {#if engine && snapshot}
     <!-- Action Dashboard Panel -->
     <!-- Action States -->
@@ -53,34 +83,5 @@
       </div>
     {/if}
   {/if}
-{/snippet}
-
-<div class="sticky top-0 z-[100]">
-  <!-- Ghost content to determine the height of the parent element when not stuck to the top of the page-->
-  <div class="invisible flex flex-col gap-2 p-2 border border-transparent">
-    <!-- Just the initial static content goes here -->
-    {@render content()}
-  </div>
-  <div
-    class="absolute top-0 left-0 right-0 flex flex-col gap-2 p-2 rounded-2xl border border-slate-300 bg-slate-300/70 shadow-lg backdrop-blur-md transition-transform duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-700/70 text-slate-950 dark:text-slate-50"
-  >
-    {@render content()}
-    <ToastContainer />
-  </div>
-</div>
-
-<div class="flex flex-wrap gap-2 items-center justify-center mt-2">
-  {#each actions as action}
-    <button
-      class={["btn-action", action.optional && ""]}
-      disabled={!action.enabled || pendingChoice}
-      onclick={() => onaction(action.type)}
-    >
-      {#if action.lucideIcon}<Icon
-          icon="lucide:{action.lucideIcon}"
-          class="size-5"
-        />{/if}
-      {action.label}
-    </button>
-  {/each}
+  <ToastContainer />
 </div>

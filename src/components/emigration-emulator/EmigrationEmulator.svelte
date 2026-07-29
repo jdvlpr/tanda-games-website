@@ -1889,19 +1889,6 @@
           </div>
         </div>
 
-        <ActionPanel
-          {engine}
-          {snapshot}
-          {currentPlayer}
-          actions={dashboardActions}
-          onaction={handleAction}
-          pendingChoice={pendingChoice ||
-            activeBotIndices.includes(visualActivePlayerId)}
-          computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-          waitingForPeer={!isMyP2PTurn}
-          waitingForName={waitingForPlayerName}
-        />
-
         <div class="flex flex-wrap gap-2">
           <!-- Tickets -->
           <div
@@ -1983,6 +1970,19 @@
             </div>
           </div>
         </div>
+
+        <ActionPanel
+          {engine}
+          {snapshot}
+          {currentPlayer}
+          actions={dashboardActions}
+          onaction={handleAction}
+          pendingChoice={pendingChoice ||
+            activeBotIndices.includes(visualActivePlayerId)}
+          computerTurn={activeBotIndices.includes(visualActivePlayerId)}
+          waitingForPeer={!isMyP2PTurn}
+          waitingForName={waitingForPlayerName}
+        />
         <!-- Horizontal Scroll Container -->
 
         <div
