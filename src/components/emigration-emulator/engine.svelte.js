@@ -3618,8 +3618,8 @@ export function runTests() {
     try {
       const setup = Array.from({ length: P }, (_, i) => ({
         name: `P${i + 1}`,
-        nationality: NATIONALITIES[i % NATIONALITIES.length].name,
-        destination: DESTINATIONS[(i + 1) % DESTINATIONS.length].name,
+        nationality: NATIONALITIES[i % NATIONALITIES.length],
+        destination: DESTINATIONS[(i + 1) % DESTINATIONS.length],
       }));
       const eng = new EmigrationEngine({ mode: "competitive", players: setup });
       assert(eng.players.length === P, `[${P}P] Correct player count`);
@@ -3635,8 +3635,8 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian"}, destination: {name: "China"} },
+      { name: "B", nationality: {name: "French"}, destination: {name: "Russia"} },
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     const p = eng.players[0];
@@ -3682,8 +3682,8 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     eng.players[0].salary = 3;
@@ -3714,8 +3714,8 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     const p = eng.players[0];
@@ -3758,8 +3758,8 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     assert(eng.securityLanes.length === 5, "5 security lanes");
@@ -3775,8 +3775,8 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     const actor = eng.players[1];
@@ -3868,9 +3868,9 @@ export function runTests() {
 
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
-      { name: "C", nationality: "Chinese", destination: "England" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
+      { name: "C", nationality: {name:"Chinese"}, destination: {name:"England"} },
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     eng.currentPlayerIdx = 1; // Player 2 (index 1) was last to take turn in Phase 1
@@ -3887,8 +3887,8 @@ export function runTests() {
   // ── Persuasion Life Card tests ───────────────────────────────────────────
   try {
     const setup = [
-      { name: "A", nationality: "Bosnian", destination: "China" },
-      { name: "B", nationality: "French", destination: "Russia" },
+      { name: "A", nationality: {name: "Bosnian",}, destination: {name:"China"}},
+      { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
 
     // ─── Scenario: layout owner skips the offer → action proceeds at normal fee

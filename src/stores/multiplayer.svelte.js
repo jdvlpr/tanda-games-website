@@ -239,6 +239,7 @@ class MultiplayerStore {
 
   /** Send a typed game action to all peers (or a specific peer). */
   sendAction(type, payload, targetPeerId = null) {
+    if (!this.#room) return;
     if (!this.#sendGameAction) {
       console.warn("[Multiplayer] sendAction called before connected");
       return;
@@ -251,6 +252,7 @@ class MultiplayerStore {
    * dedicated sync_state channel.
    */
   sendSyncState(snapshot, targetPeerId = null) {
+    if (!this.#room) return;
     if (!this.#sendSyncState) {
       console.warn("[Multiplayer] sendSyncState called before connected");
       return;

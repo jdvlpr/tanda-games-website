@@ -784,8 +784,8 @@
 
       return {
         name: p.name,
-        nationality: nat.name,
-        destination: destObj.name,
+        nationality: nat,
+        destination: destObj,
       };
     });
 
@@ -901,7 +901,7 @@
       const destObj =
         validDests[i % validDests.length] ||
         shuffledDests[i % shuffledDests.length];
-      return { name: p.name, nationality: nat.name, destination: destObj.name };
+      return { name: p.name, nationality: nat, destination: destObj };
     });
 
     engine = new EmigrationEngine({
