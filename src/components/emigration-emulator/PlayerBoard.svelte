@@ -322,7 +322,7 @@
           {player.destination.name}
         </p>
       </div>
-      <div class="flex gap-3 justify-center">
+      <div class="flex max-lg:flex-col lg:flex-wrap justify-center gap-2">
         <div
           class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
         >
@@ -497,7 +497,7 @@
         <!-- Tickets -->
         {#if player.stash.tickets}
           <div
-            class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
+            class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
           >
             <div class="uppercase tracking-wide text-xs mb-1">
               Tickets ({player.stash.tickets})
@@ -527,7 +527,7 @@
         <!-- Passports -->
         {#if player.stash.passports}
           <div
-            class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
+            class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
           >
             <div class="uppercase tracking-wide text-xs mb-1">
               Passports ({player.stash.passports})
@@ -557,7 +557,7 @@
         <!-- Kept Life -->
         {#if player.stash.lifeCards.length}
           <div
-            class="flex flex-col items-start p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800"
+            class="flex flex-col items-center gap-0 text-sm p-2 rounded-2xl bg-neutral-200 dark:bg-neutral-800 h-fit"
           >
             <div class="uppercase tracking-wide text-xs mb-1">
               Life Cards ({player.stash.lifeCards.length})
