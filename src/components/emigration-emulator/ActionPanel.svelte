@@ -67,10 +67,24 @@
     {:else if snapshot.phase === "preparation"}
       <!-- Selection Hint -->
       <div
-        class="text-sm min-h-4 flex items-center justify-center text-center gap-2 flex-col"
+        class="text-sm min-h-4 flex flex-wrap items-center justify-center text-center gap-2"
       >
         {#if currentPlayer.name}
           <span class="text-xs font-bold">{currentPlayer.name}'s Turn</span>
+          <span
+            class="flex gap-1 items-center text-green-700 dark:text-green-300 w-fit px-2 py-1 bg-green-200 dark:bg-green-800 rounded-2xl"
+            title="Current amount of Money"
+          >
+            <strong class="font-bold text-md">${currentPlayer.money}</strong>
+            <span class="text-xs">Money</span>
+          </span>
+          <span
+            class="flex gap-1 items-center text-pink-700 dark:text-pink-300 px-2 py-1 bg-pink-200 dark:bg-pink-800 rounded-2xl"
+            title="Access Fee"
+          >
+            <span class="font-bold text-md">${currentPlayer.accessFee}</span>
+            <span class="text-xs">Access Fee</span>
+          </span>
         {/if}
       </div>
     {:else if snapshot.phase === "crossing"}
