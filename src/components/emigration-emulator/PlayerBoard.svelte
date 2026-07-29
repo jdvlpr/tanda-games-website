@@ -1,5 +1,6 @@
 <script>
   import Icon from "@iconify/svelte";
+  import StashCard from "./StashCard.svelte";
   let {
     engine,
     player,
@@ -385,25 +386,12 @@
                   selectedStash.playerIdx === player.id &&
                   selectedStash.stashType === "document" &&
                   selectedStash.itemIdx === i}
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div
-                  class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
-                    ? 'selected'
-                    : ''}"
-                  style="border-left: 2.5px solid var(--color-emi-document);"
+                <StashCard
+                  card={doc}
+                  stashType="document"
+                  isSelected={isSel}
                   onclick={(e) => handleStashClick(e, "document", i)}
-                >
-                  {#if doc.icon}
-                    <Icon
-                      icon={doc.icon.includes(":")
-                        ? doc.icon
-                        : `game-icons:${doc.icon}`}
-                      class="size-4 shrink-0"
-                    />
-                  {/if}
-                  <span class="truncate pr-1">{doc.name}</span>
-                </div>
+                />
               {/each}
             </div>
           {/if}
@@ -452,26 +440,12 @@
                   selectedStash.playerIdx === player.id &&
                   selectedStash.stashType === "connection" &&
                   selectedStash.itemIdx === i}
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div
-                  class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
-                    ? 'selected'
-                    : ''}"
-                  style="border-left: 2.5px solid var(--color-emi-connection);"
+                <StashCard
+                  card={conn}
+                  stashType="connection"
+                  isSelected={isSel}
                   onclick={(e) => handleStashClick(e, "connection", i)}
-                >
-                  {#if conn.icon}
-                    <Icon
-                      icon={conn.icon.includes(":")
-                        ? conn.icon
-                        : `game-icons:${conn.icon}`}
-                      class="size-4 shrink-0"
-                    />
-                  {/if}
-                  <span class="truncate pr-1">{conn.name}</span>
-                  <span class="text-xs font-bold">${conn.cost || 0}</span>
-                </div>
+                />
               {/each}
             </div>
           {/if}
@@ -496,18 +470,12 @@
                 selectedStash.playerIdx === player.id &&
                 selectedStash.stashType === "ticket" &&
                 selectedStash.itemIdx === i}
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <div
-                class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
-                  ? 'selected'
-                  : ''}"
-                style="border-left: 2.5px solid var(--color-emi-ticket);"
+              <StashCard
+                card={{ name: "Ticket" }}
+                stashType="ticket"
+                isSelected={isSel}
                 onclick={(e) => handleStashClick(e, "ticket", i)}
-              >
-                <Icon icon="game-icons:ticket" class="size-4 shrink-0" />
-                <span>Ticket</span>
-              </div>
+              />
             {/each}
           </div>
         {/if}
@@ -526,18 +494,12 @@
                 selectedStash.playerIdx === player.id &&
                 selectedStash.stashType === "passport" &&
                 selectedStash.itemIdx === i}
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <div
-                class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
-                  ? 'selected'
-                  : ''}"
-                style="border-left: 2.5px solid var(--color-emi-passport);"
+              <StashCard
+                card={{ name: "Passport" }}
+                stashType="passport"
+                isSelected={isSel}
                 onclick={(e) => handleStashClick(e, "passport", i)}
-              >
-                <Icon icon="game-icons:passport" class="size-4 shrink-0" />
-                <span>Passport</span>
-              </div>
+              />
             {/each}
           </div>
         {/if}
@@ -556,31 +518,12 @@
                 selectedStash.playerIdx === player.id &&
                 selectedStash.stashType === "lifeCard" &&
                 selectedStash.itemIdx === i}
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <div
-                class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSel
-                  ? 'selected'
-                  : ''}"
-                style="border-left: 2.5px solid var(--color-emi-life);"
+              <StashCard
+                card={lc}
+                stashType="lifeCard"
+                isSelected={isSel}
                 onclick={(e) => handleStashClick(e, "lifeCard", i)}
-              >
-                {#if lc.icon}
-                  <Icon
-                    icon={lc.icon.includes(":")
-                      ? lc.icon
-                      : `game-icons:${lc.icon}`}
-                    class="size-4 shrink-0"
-                  />
-                {/if}
-                <span class="truncate pr-1">{lc.title}</span>
-                {#if lc.money}
-                  <span
-                    class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold"
-                    >${lc.money}</span
-                  >
-                {/if}
-              </div>
+              />
             {/each}
           </div>
         {/if}
@@ -687,7 +630,7 @@
     }
   }
 
-  /* Stash styles */
+  /* Stash styles are now owned by StashCard.svelte */
 
   .stash-column {
     background: rgba(0, 0, 0, 0.2);
@@ -696,23 +639,5 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
     min-height: 80px;
     min-width: 100px;
-  }
-
-  .stash-item {
-    font-size: 10px;
-    margin-bottom: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .stash-item:hover {
-    border-color: #55b7b0;
-  }
-
-  .stash-item.selected {
-    outline: 1px solid #55b7b0;
-    border-color: #55b7b0;
   }
 </style>

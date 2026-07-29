@@ -1,17 +1,13 @@
 <script>
-  import Icon from "@iconify/svelte";
+  import { changelog } from "../../js/emegration-changelog.js";
   import { playPaydaySound } from "../../js/utils.svelte.js";
+  import { multiplayer } from "../../stores/multiplayer.svelte.js";
   import { toast } from "../../stores/toast.svelte";
-  import {
-    multiplayer,
-    copyRoomUrl,
-    getRoomCodeFromUrl,
-    setRoomCodeInUrl,
-    generateRoomCode,
-  } from "../../stores/multiplayer.svelte.js";
   import ActionPanel from "./ActionPanel.svelte";
   import { createAutoPlayer } from "./autoplay.js";
   import CardActionPopover from "./CardActionPopover.svelte";
+  import DiscardPile from "./DiscardPile.svelte";
+  import EmulatorHeader from "./EmulatorHeader.svelte";
   import EmigrationEngine, {
     DESTINATIONS,
     LIFE_CARD_DEFINITIONS,
@@ -23,65 +19,26 @@
   } from "./engine.svelte.js";
   import GameLogSheet from "./GameLogSheet.svelte";
   import Modal from "./Modal.svelte";
-  import PlayerBoard from "./PlayerBoard.svelte";
-  import { changelog } from "../../js/emegration-changelog.js";
-  import { fade, fly } from "svelte/transition";
+  import PlayerBoardsCarousel from "./PlayerBoardsCarousel.svelte";
+  import PublicResourcePool from "./PublicResourcePool.svelte";
+  import RulebookModal from "./RulebookModal.svelte";
+  import SecurityLanes from "./SecurityLanes.svelte";
+  import SettingsModal from "./SettingsModal.svelte";
+  import SetupScreen from "./SetupScreen.svelte";
+  import { copyRoomUrl, useOnlineRoom } from "./useOnlineRoom.svelte.js";
+
+  // Props
+  let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
 
   const VERSION = changelog[0].version;
   const ID = "emigration";
 
   const rulebookHref = `/files/${ID}/v${VERSION}/emigration-game-rulebook-v${VERSION}.pdf`;
 
-  // Props
-  let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
-
-  // Replace dev
+  // Dev flag
   const isDev = import.meta.env.DEV;
 
   let showRobotMode = $state(null);
-
-  let currentlyScrolledToPlayer = $state(0);
-  let playerBoardsContainer = $state(null);
-  let playerBoardElements = $state([]);
-
-  // Scroll handler for the dot buttons
-  function scrollToPlayer(index) {
-    if (playerBoardElements[index]) {
-      playerBoardElements[index].scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
-  }
-
-  $effect(() => {
-    if (!playerBoardsContainer) return;
-
-    // Set up the IntersectionObserver to detect which card is visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Update the reactive state based on the dataset index
-            currentlyScrolledToPlayer = Number(entry.target.dataset.index);
-          }
-        });
-      },
-      {
-        root: playerBoardsContainer,
-        threshold: 0.5, // Triggers when at least 50% of the card is visible
-      },
-    );
-
-    // Observe all card elements
-    playerBoardElements.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
-    // In Svelte 5, returning a function from $effect handles cleanup automatically
-    return () => observer.disconnect();
-  });
 
   $effect(() => {
     showRobotMode = getRobotModeFromUrl();
@@ -93,8 +50,7 @@
   function getRobotModeFromUrl() {
     if (typeof window === "undefined") return null;
     const params = new URLSearchParams(window.location.search);
-    const robotMode = params.get("showRobotMode");
-    return !!robotMode;
+    return !!params.get("showRobotMode");
   }
 
   function getRandomPacks(count) {
@@ -132,24 +88,10 @@
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
   let localSelectedPacks = $state(getRandomPacks(defaultPlayerCount));
-  let onlineSelectedPacks = $state([]);
-  let activeSelectedPacks = $derived(
-    gameType === "online" ? onlineSelectedPacks : localSelectedPacks,
-  );
   let aiDifficulty = $state("expert");
 
   // Initialize default players with randomized nationalities and destinations
   let playersSetup = $state(getRandomPlayersSetup());
-
-  // P2P Specific Setup State
-  let joinRoomCodeInput = $state("");
-  let localPlayerName = $state("Player 1");
-  let p2pPlayers = $state([]); // Array of { peerId, name, isHost }
-  let myP2PPlayerIdx = $state(-1); // Which player index is the local user in P2P mode
-  let hostPeerId = $state(null); // Track peerId of room host
-
-  // Derived setup slice based on player count
-  let activeSetup = $derived(playersSetup.slice(0, playerCount));
 
   // Game State
   let engine = $state(null);
@@ -167,8 +109,109 @@
   let selectedSlot = $state(null);
   let selectedStash = $state(null);
   let selectedAnchorRect = $state(null);
+  // Carousel container (bound from PlayerBoardsCarousel for CardActionPopover)
+  let playerBoardsContainer = $state(null);
 
-  let isPreparationPhase = $derived(snapshot.phase === "preparation");
+  // ── Online Room Handlers ───────────────────────────────────────────────
+  function handleRemoteAction(data, peerId) {
+    if (!data || typeof data !== "object") return;
+    try {
+      // --- In-game messages ---
+      if (!engine) return;
+
+      if (data.type === "GAME_ACTION") {
+        const { actionType, params } = data.payload || {};
+        if (actionType === "graduate" || actionType === "sell") {
+          engine.executeOptionalAction(actionType, params);
+        } else if (actionType) {
+          engine.executeRequiredAction(actionType, params);
+        }
+      } else if (data.type === "LANE_SELECT") {
+        engine.selectLane(data.payload?.laneIdx);
+      } else if (data.type === "MODAL_RESOLVE") {
+        pendingChoice = null;
+        engine.resolveChoice(data.payload?.value, data.payload?.rolls);
+      } else if (data.type === "BUY_POOL") {
+        engine.executeRequiredAction("buyPool", {
+          cardType: data.payload?.cardType,
+        });
+      } else if (data.type === "STEAL_POOL") {
+        engine.executeRequiredAction("steal", {
+          cardType: data.payload?.cardType,
+        });
+      }
+
+      snapshot = engine.getSnapshot();
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn(
+        "[Emulator] Dropped invalid action payload from peer:",
+        peerId,
+        err,
+      );
+    }
+  }
+
+  function handleRemoteSyncState(remoteSnapshot) {
+    if (!remoteSnapshot || typeof remoteSnapshot !== "object") return;
+    try {
+      // Create the engine if it doesn't exist yet (first sync from host at game start)
+      if (!engine) {
+        isSetup = false;
+        engine = new EmigrationEngine({
+          mode: remoteSnapshot.mode || mode,
+          players: Array.isArray(remoteSnapshot.players)
+            ? remoteSnapshot.players
+            : [],
+          onLog: (entry) => {
+            if (engine) snapshot = engine.getSnapshot();
+            if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
+          },
+          onStateChange: () => {
+            if (engine) {
+              snapshot = engine.getSnapshot();
+              pendingChoice = engine.pendingChoice ?? null;
+            }
+            selectedSlot = null;
+            selectedStash = null;
+            selectedAnchorRect = null;
+          },
+        });
+      }
+      engine.loadSnapshot(remoteSnapshot);
+      snapshot = engine.getSnapshot();
+      visualActivePlayerId =
+        snapshot.phase === "preparation"
+          ? snapshot.currentPlayerIdx
+          : snapshot.crossingOrder
+            ? snapshot.crossingOrder[snapshot.activeCrossingIdx]
+            : snapshot.activeCrossingIdx;
+      previousActualPlayerId = visualActivePlayerId;
+      pendingChoice = engine.pendingChoice ?? null;
+    } catch (err) {
+      console.warn("[Emulator] Dropped invalid sync state from peer:", err);
+    }
+  }
+
+  // ── Online Room composable ───────────────────────────────────────────────
+  const room = useOnlineRoom({
+    onRemoteAction: handleRemoteAction,
+    onSyncState: handleRemoteSyncState,
+    onGameStart: () => {
+      isSetup = false;
+    },
+  });
+
+  // Convenience aliases so templates stay readable
+  let currentRoomCode = $derived(room.currentRoomCode);
+  let p2pPlayers = $derived(room.p2pPlayers);
+  let myP2PPlayerIdx = $derived(room.myP2PPlayerIdx);
+
+  let activeSelectedPacks = $derived(
+    gameType === "online" ? room.selectedPacks : localSelectedPacks,
+  );
+
+  let isPreparationPhase = $derived(snapshot?.phase === "preparation");
 
   function getLifeCardDescription(title) {
     return (
@@ -458,332 +501,72 @@
   // Tests
   let testResults = $state(null);
 
-  // Multiplayer State & Lifecycle
-  let currentRoomCode = $state("");
-
-  $effect(() => {
-    if (typeof window !== "undefined") {
-      const code = getRoomCodeFromUrl();
-      if (code && !currentRoomCode) {
-        // Auto-join from URL on load
-        gameType = "online";
-        joinRoomCodeInput = code;
-        connectToRoom(code, false);
-      }
-
-      const unsubAction = multiplayer.onAction((data, peerId) => {
-        handleRemoteAction(data, peerId);
-      });
-      const unsubSync = multiplayer.onSyncState((remoteSnapshot) => {
-        handleRemoteSyncState(remoteSnapshot);
-      });
-      const unsubJoin = multiplayer.onPeerJoin(() => {
-        // When any peer connects (fires on both host and peer sides),
-        // broadcast our own info so everyone knows who we are.
-        if (currentRoomCode) {
-          multiplayer.broadcastPlayerInfo({
-            name: localPlayerName,
-            isHost: multiplayer.isHost,
-          });
-        }
-        if (multiplayer.isHost && isSetup) {
-          // Add a random pack if we can
-          const availablePacks = PACKS_LIST.filter(
-            (p) => !onlineSelectedPacks.includes(p),
-          );
-          if (availablePacks.length > 0) {
-            const randomPack =
-              availablePacks[Math.floor(Math.random() * availablePacks.length)];
-            onlineSelectedPacks = [...onlineSelectedPacks, randomPack];
-            multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
-          }
-        }
-      });
-
-      const unsubLeave = multiplayer.onPeerLeave((leavingPeerId) => {
-        if (!multiplayer.isHost) {
-          // Peer side: check if the leaving peer is the host
-          if (hostPeerId && leavingPeerId === hostPeerId) {
-            exitRoomLocal("The host left the game. The room has been closed.");
-            return;
-          }
-          const leftPlayer = p2pPlayers.find((p) => p.peerId === leavingPeerId);
-          if (leftPlayer?.isHost) {
-            exitRoomLocal("The host left the game. The room has been closed.");
-            return;
-          }
-          if (leftPlayer) {
-            toast.warning(`${leftPlayer.name} left the room.`);
-          }
-        } else {
-          // Host side: a peer left
-          const leftPlayer = p2pPlayers.find((p) => p.peerId === leavingPeerId);
-          const leftName = leftPlayer?.name || "A player";
-          p2pPlayers = p2pPlayers.filter((p) => p.peerId !== leavingPeerId);
-          toast.warning(`${leftName} left the room.`);
-
-          if (isSetup) {
-            if (onlineSelectedPacks.length > 0) {
-              onlineSelectedPacks = onlineSelectedPacks.slice(0, -1);
+  // ── Bot proxy factory ──────────────────────────────────────────────────
+  /**
+   * Wraps a game engine with a Proxy that automatically broadcasts every action
+   * to peers over the multiplayer channel, so online bots stay in sync.
+   */
+  function createBotEngine(baseEngine) {
+    return new Proxy(baseEngine, {
+      get(target, prop) {
+        if (["executeRequiredAction", "executeOptionalAction"].includes(prop)) {
+          return (actionType, params = {}) => {
+            if (["applyCollege", "graduate", "activate"].includes(actionType)) {
+              params.rolls = [
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+              ];
             }
-            multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
-          } else {
-            multiplayer.broadcastAction("player_left", {
-              name: leftName,
-              peerId: leavingPeerId,
-              p2pPlayers,
-            });
-          }
+            const res = target[prop](actionType, params);
+            room.broadcastAction("GAME_ACTION", { actionType, params });
+            if (engine) room.broadcastSyncState(engine.getSnapshot());
+            return res;
+          };
         }
-      });
-
-      return () => {
-        unsubAction();
-        unsubSync();
-        unsubJoin();
-        unsubLeave();
-      };
-    }
-  });
-
-  function connectToRoom(code, asHost) {
-    currentRoomCode = code;
-    setRoomCodeInUrl(code);
-    // Initialize our own slot in the player list
-    p2pPlayers = [{ peerId: "self", name: localPlayerName, isHost: asHost }];
-    // Host is always player 0
-    if (asHost) {
-      myP2PPlayerIdx = 0;
-      hostPeerId = "self";
-      onlineSelectedPacks = getRandomPacks(1);
-    }
-    // Connect async — onPeerJoin will broadcast our info once a peer is found
-    multiplayer.connect(code, asHost);
-  }
-
-  function hostRoom() {
-    const code = generateRoomCode();
-    connectToRoom(code, true);
-  }
-
-  function joinExistingRoom() {
-    const code = joinRoomCodeInput.trim().toUpperCase();
-    if (code.length === 5) {
-      connectToRoom(code, false);
-    } else {
-      toast.error("Please enter a valid 5-character room code.");
-    }
-  }
-
-  function handleRemoteAction(data, peerId) {
-    if (!data || typeof data !== "object") return;
-
-    try {
-      // Record host peer ID if message comes from host
-      if (!multiplayer.isHost && peerId) {
-        hostPeerId = peerId;
-      }
-
-      if (data.type === "room_closed") {
-        exitRoomLocal(data.payload?.reason || "The host closed the room.");
-        return;
-      }
-
-      if (data.type === "player_left") {
-        if (!multiplayer.isHost) {
-          if (Array.isArray(data.payload?.p2pPlayers)) {
-            p2pPlayers = data.payload.p2pPlayers;
-          } else if (data.payload?.peerId) {
-            p2pPlayers = p2pPlayers.filter(
-              (p) => p.peerId !== data.payload.peerId,
-            );
-          }
-          toast.warning(`${data.payload?.name || "A player"} left the room.`);
-        }
-        return;
-      }
-
-      // --- Pre-game waiting room messages ---
-      if (data.type === "player_info") {
-        if (multiplayer.isHost && isSetup) {
-          // Host: upsert the peer in our player list
-          const existing = p2pPlayers.find((p) => p.peerId === peerId);
-          if (existing) {
-            existing.name = data.payload?.name;
-          } else {
-            let peerName = data.payload?.name || "Anonymous";
-            if (/^Player \d+$/.test(peerName)) {
-              peerName = `Player ${p2pPlayers.length + 1}`;
-            }
-            p2pPlayers = [
-              ...p2pPlayers,
-              { peerId, name: peerName, isHost: false },
+        if (prop === "resolveChoice") {
+          return (value) => {
+            const rolls = [
+              Math.floor(Math.random() * 6) + 1,
+              Math.floor(Math.random() * 6) + 1,
+              Math.floor(Math.random() * 6) + 1,
             ];
-          }
-          // Broadcast the updated roster to all peers
-          multiplayer.broadcastSetupState(p2pPlayers, onlineSelectedPacks);
+            const res = target.resolveChoice(value, rolls);
+            room.broadcastAction("MODAL_RESOLVE", { value, rolls });
+            if (engine) room.broadcastSyncState(engine.getSnapshot());
+            return res;
+          };
         }
-        return;
-      }
-
-      if (data.type === "setup_state") {
-        if (!multiplayer.isHost && Array.isArray(data.payload?.p2pPlayers)) {
-          // Peer: sync the waiting room display from the host's roster
-          p2pPlayers = data.payload.p2pPlayers;
-          if (data.payload.selectedPacks)
-            onlineSelectedPacks = data.payload.selectedPacks;
-          // Work out which slot we occupy so we can block out-of-turn actions
-          const myIdx = p2pPlayers.findIndex(
-            (p) => p.peerId === multiplayer.selfId,
-          );
-          if (myIdx !== -1) {
-            myP2PPlayerIdx = myIdx;
-            localPlayerName = p2pPlayers[myIdx].name;
-          }
+        if (prop === "selectLane") {
+          return (laneIdx) => {
+            const res = target.selectLane(laneIdx);
+            room.broadcastAction("LANE_SELECT", { laneIdx });
+            if (engine) room.broadcastSyncState(engine.getSnapshot());
+            return res;
+          };
         }
-        return;
-      }
-
-      if (data.type === "start_game") {
-        // Peers: game is starting — hide setup. The actual engine state
-        // arrives via the sync_state channel handled by handleRemoteSyncState.
-        if (!multiplayer.isHost) {
-          isSetup = false;
-        }
-        return;
-      }
-
-      // --- In-game messages ---
-      if (!engine) return;
-
-      if (data.type === "GAME_ACTION") {
-        const { actionType, params } = data.payload || {};
-        if (actionType === "graduate" || actionType === "sell") {
-          engine.executeOptionalAction(actionType, params);
-        } else if (actionType) {
-          engine.executeRequiredAction(actionType, params);
-        }
-      } else if (data.type === "LANE_SELECT") {
-        engine.selectLane(data.payload?.laneIdx);
-      } else if (data.type === "MODAL_RESOLVE") {
-        pendingChoice = null;
-        engine.resolveChoice(data.payload?.value, data.payload?.rolls);
-      } else if (data.type === "BUY_POOL") {
-        engine.executeRequiredAction("buyPool", {
-          cardType: data.payload?.cardType,
-        });
-      } else if (data.type === "STEAL_POOL") {
-        engine.executeRequiredAction("steal", {
-          cardType: data.payload?.cardType,
-        });
-      }
-
-      snapshot = engine.getSnapshot();
-      pendingChoice = engine.pendingChoice ?? null;
-    } catch (err) {
-      console.warn(
-        "[Emulator] Dropped invalid action payload from peer:",
-        peerId,
-        err,
-      );
-    }
-  }
-
-  function handleRemoteSyncState(remoteSnapshot) {
-    if (!remoteSnapshot || typeof remoteSnapshot !== "object") return;
-
-    try {
-      // Create the engine if it doesn't exist yet (first sync from host at game start)
-      if (!engine) {
-        isSetup = false;
-        engine = new EmigrationEngine({
-          mode: remoteSnapshot.mode || mode,
-          players: Array.isArray(remoteSnapshot.players)
-            ? remoteSnapshot.players
-            : [],
-          onLog: (entry) => {
-            if (engine) snapshot = engine.getSnapshot();
-            if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-          },
-          onStateChange: () => {
-            if (engine) {
-              snapshot = engine.getSnapshot();
-              pendingChoice = engine.pendingChoice ?? null;
-            }
-            selectedSlot = null;
-            selectedStash = null;
-            selectedAnchorRect = null;
-          },
-        });
-      }
-      engine.loadSnapshot(remoteSnapshot);
-      snapshot = engine.getSnapshot();
-      visualActivePlayerId =
-        snapshot.phase === "preparation"
-          ? snapshot.currentPlayerIdx
-          : snapshot.crossingOrder
-            ? snapshot.crossingOrder[snapshot.activeCrossingIdx]
-            : snapshot.activeCrossingIdx;
-      previousActualPlayerId = visualActivePlayerId;
-      pendingChoice = engine.pendingChoice ?? null;
-    } catch (err) {
-      console.warn("[Emulator] Dropped invalid sync state from peer:", err);
-    }
-  }
-
-  function exitRoom() {
-    if (multiplayer.isHost && currentRoomCode) {
-      try {
-        multiplayer.broadcastAction("room_closed", {
-          reason: "The host closed the room.",
-        });
-      } catch (e) {
-        console.warn("Failed to broadcast room_closed:", e);
-      }
-    }
-    exitRoomLocal();
-  }
-
-  function exitRoomLocal(noticeMessage = "") {
-    multiplayer.disconnect();
-    currentRoomCode = "";
-    p2pPlayers = [];
-    myP2PPlayerIdx = -1;
-    hostPeerId = null;
-    engine = null;
-    snapshot = null;
-    isSetup = true;
-    window.history.replaceState({}, "", window.location.pathname);
-    if (noticeMessage) {
-      toast.error(noticeMessage);
-    }
+        const orig = target[prop];
+        if (typeof orig === "function") return orig.bind(target);
+        return orig;
+      },
+    });
   }
 
   function startP2PGame() {
-    if (!multiplayer.isHost) return;
+    if (!room.isHost) return;
 
     // Shuffle both arrays
     const shuffledNats = shuffleArray([...NATIONALITIES]);
     const availableDests = shuffleArray([...DESTINATIONS]);
 
     const finalPlayers = p2pPlayers.map((p, i) => {
-      // Grab a unique nationality for this player
       const nat = shuffledNats[i];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
-
-      // Find the first destination in the available pool that is NOT their home country
       const destIndex = availableDests.findIndex(
         (d) => d.name !== matchingCountry,
       );
-
-      // Remove that destination from the available pool so no one else gets it
       const [destObj] = availableDests.splice(destIndex, 1);
-
-      return {
-        name: p.name,
-        nationality: nat,
-        destination: destObj,
-      };
+      return { name: p.name, nationality: nat, destination: destObj };
     });
 
     engine = new EmigrationEngine({
@@ -825,89 +608,30 @@
       .map((p, i) => (p.isBot ? i : -1))
       .filter((i) => i !== -1);
     if (activeBotIndices.length > 0) {
-      const botEngine = new Proxy(engine, {
-        get(target, prop) {
-          if (
-            ["executeRequiredAction", "executeOptionalAction"].includes(prop)
-          ) {
-            return (actionType, params = {}) => {
-              if (
-                ["applyCollege", "graduate", "activate"].includes(actionType)
-              ) {
-                params.rolls = [
-                  Math.floor(Math.random() * 6) + 1,
-                  Math.floor(Math.random() * 6) + 1,
-                  Math.floor(Math.random() * 6) + 1,
-                ];
-              }
-              const res = target[prop](actionType, params);
-              multiplayer.broadcastAction("GAME_ACTION", {
-                actionType,
-                params,
-              });
-              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
-              return res;
-            };
-          }
-          if (prop === "resolveChoice") {
-            return (value) => {
-              const rolls = [
-                Math.floor(Math.random() * 6) + 1,
-                Math.floor(Math.random() * 6) + 1,
-                Math.floor(Math.random() * 6) + 1,
-              ];
-              const res = target.resolveChoice(value, rolls);
-              multiplayer.broadcastAction("MODAL_RESOLVE", { value, rolls });
-              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
-              return res;
-            };
-          }
-          if (prop === "selectLane") {
-            return (laneIdx) => {
-              const res = target.selectLane(laneIdx);
-              multiplayer.broadcastAction("LANE_SELECT", { laneIdx });
-              if (engine) multiplayer.broadcastSyncState(engine.getSnapshot());
-              return res;
-            };
-          }
-          const orig = target[prop];
-          if (typeof orig === "function") return orig.bind(target);
-          return orig;
-        },
-      });
-      aiPlayer = createAutoPlayer(botEngine, aiDifficulty, {
+      aiPlayer = createAutoPlayer(createBotEngine(engine), aiDifficulty, {
         botIndices: activeBotIndices,
       });
     } else {
       aiPlayer = null;
     }
 
-    multiplayer.broadcastGameStart(snapshot);
+    room.broadcastGameStart(snapshot);
   }
 
-  function startGame(gameType = "vscomputer") {
+  function startGame(requestedGameType = "vscomputer") {
     // Shuffle both arrays
     const shuffledNats = shuffleArray([...NATIONALITIES]);
     const availableDests = shuffleArray([...DESTINATIONS]);
 
+    const activeSetup = playersSetup.slice(0, playerCount);
     const finalPlayers = activeSetup.map((p, i) => {
-      // Grab a unique nationality for this player
       const nat = shuffledNats[i];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
-
-      // Find the first destination in the available pool that is NOT their home country
       const destIndex = availableDests.findIndex(
         (d) => d.name !== matchingCountry,
       );
-
-      // Remove that destination from the available pool so no one else gets it
       const [destObj] = availableDests.splice(destIndex, 1);
-
-      return {
-        name: p.name,
-        nationality: nat,
-        destination: destObj,
-      };
+      return { name: p.name, nationality: nat, destination: destObj };
     });
 
     engine = new EmigrationEngine({
@@ -915,11 +639,8 @@
       players: finalPlayers,
       selectedPacks: activeSelectedPacks,
       onLog: (entry) => {
-        // Force reactivity on logs by updating snapshot reference
         if (engine) snapshot = engine.getSnapshot();
-        if (entry?.msg?.includes("SALARIES:")) {
-          playPaydaySound();
-        }
+        if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
       },
       onStateChange: () => {
         if (engine) {
@@ -951,78 +672,23 @@
     aiThinking = false;
     autoplay = null;
 
-    if (gameType === "auto") {
+    if (requestedGameType === "auto") {
       // AI Simulation: all players AI-controlled, plays at speed
       activeBotIndices = engine.players.map((_, i) => i);
       autoplay = createAutoPlayer(engine, aiDifficulty);
       autoplay.playFullGame(100);
-    } else if (gameType === "vscomputer") {
+    } else if (requestedGameType === "vscomputer") {
       // Solo vs AI: Player 1 (index 0) is human, all others AI
       activeBotIndices = engine.players.map((_, i) => i).filter((i) => i !== 0);
       aiPlayer = createAutoPlayer(engine, aiDifficulty, {
         botIndices: activeBotIndices,
       });
-    } else if (gameType === "online" && multiplayer.isHost) {
+    } else if (requestedGameType === "online" && room.isHost) {
       activeBotIndices = p2pPlayers
         .map((p, i) => (p.isBot ? i : -1))
         .filter((i) => i !== -1);
       if (activeBotIndices.length > 0) {
-        const botEngine = new Proxy(engine, {
-          get(target, prop) {
-            if (
-              ["executeRequiredAction", "executeOptionalAction"].includes(prop)
-            ) {
-              return (actionType, params = {}) => {
-                if (
-                  ["applyCollege", "graduate", "activate"].includes(actionType)
-                ) {
-                  params.rolls = [
-                    Math.floor(Math.random() * 6) + 1,
-                    Math.floor(Math.random() * 6) + 1,
-                    Math.floor(Math.random() * 6) + 1,
-                  ];
-                }
-                const res = target[prop](actionType, params);
-                multiplayer.broadcastAction("GAME_ACTION", {
-                  actionType,
-                  params,
-                });
-                if (engine)
-                  multiplayer.broadcastSyncState(engine.getSnapshot());
-                return res;
-              };
-            }
-            if (prop === "resolveChoice") {
-              return (value) => {
-                const rolls = [
-                  Math.floor(Math.random() * 6) + 1,
-                  Math.floor(Math.random() * 6) + 1,
-                  Math.floor(Math.random() * 6) + 1,
-                ];
-                const res = target.resolveChoice(value, rolls);
-                multiplayer.broadcastAction("MODAL_RESOLVE", { value, rolls });
-                if (engine)
-                  multiplayer.broadcastSyncState(engine.getSnapshot());
-                return res;
-              };
-            }
-            if (prop === "selectLane") {
-              return (laneIdx) => {
-                const res = target.selectLane(laneIdx);
-                multiplayer.broadcastAction("LANE_SELECT", { laneIdx });
-                if (engine)
-                  multiplayer.broadcastSyncState(engine.getSnapshot());
-                return res;
-              };
-            }
-            const orig = target[prop];
-            if (typeof orig === "function") {
-              return orig.bind(target);
-            }
-            return orig;
-          },
-        });
-        aiPlayer = createAutoPlayer(botEngine, aiDifficulty, {
+        aiPlayer = createAutoPlayer(createBotEngine(engine), aiDifficulty, {
           botIndices: activeBotIndices,
         });
       }
@@ -1165,565 +831,80 @@
   }
 </script>
 
-<!-- Settings Modal -->
-{#if showSettings}
-  <div
-    transition:fade={{ duration: 100 }}
-    class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]"
-    role="presentation"
-    onclick={(e) => {
-      if (e.target === e.currentTarget) showSettings = false;
-    }}
-  >
-    <div
-      in:fly={{ y: -50 }}
-      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl max-w-fit w-[90%] shadow-xl max-h-[90vh] overflow-y-auto"
-    >
-      <div class="flex justify-between gap-2">
-        <h2 class="mb-2 text-xl font-semibold text-center">Settings</h2>
-        <button
-          class="btn-sm"
-          onclick={() => {
-            showSettings = false;
-          }}><Icon icon="lucide:x" class=""></Icon></button
-        >
-      </div>
-      <div
-        class="flex flex-col gap-4 items-start text-left mx-auto w-full rounded-2xl p-4 bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
-      >
-        <div class="flex flex-col gap-2">
-          <label
-            class="items-center gap-2 cursor-pointer select-none inline-flex"
-          >
-            <div class="relative">
-              <input
-                type="checkbox"
-                class="sr-only peer"
-                bind:checked={toast.enabled}
-              />
-              <div
-                class="w-11 h-6 bg-neutral-300 rounded-full peer dark:bg-neutral-700 peer-checked:bg-blue-400 dark:peer-checked:bg-blue-900 transition-colors duration-200 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white shadow-sm"
-              ></div>
-            </div>
-            <span
-              class="text-sm font-medium text-neutral-800 dark:text-neutral-200"
-            >
-              Enable Notifications
-            </span>
-          </label>
-          {#if toast.enabled}
-            <div class="flex flex-col gap-1">
-              <label for="toast-timeout" class="text-sm opacity-70"
-                >Notifications Timeout</label
-              >
-              <select id="toast-timeout" bind:value={toast.timeoutMs}>
-                <option value={1500}>Fast (1.5s)</option>
-                <option value={3000}>Normal (3s)</option>
-                <option value={5000}>Long (5s)</option>
-              </select>
-            </div>
-          {/if}
-        </div>
+<!-- Modals -->
+<SettingsModal
+  bind:show={showSettings}
+  {toast}
+  {isSetup}
+  {gameType}
+  {mode}
+  {aiDifficulty}
+  {PACKS_LIST}
+  {activeSelectedPacks}
+  {playerCount}
+  {p2pPlayers}
+  {currentRoomCode}
+  {multiplayer}
+  onlineSelectedPacks={room.selectedPacks}
+  onmodechange={(m) => (mode = m)}
+  onaidifficulty={(d) => (aiDifficulty = d)}
+  ontogglepack={(pack) => {
+    if (gameType === "online") {
+      room.togglePack(pack);
+    } else {
+      if (localSelectedPacks.includes(pack)) {
+        localSelectedPacks = localSelectedPacks.filter((p) => p !== pack);
+      } else {
+        localSelectedPacks = [...localSelectedPacks, pack];
+      }
+    }
+  }}
+/>
 
-        {#if isSetup}
-          {#if gameType !== "online" || (currentRoomCode && multiplayer.isHost)}
-            <div class="flex flex-col gap-1 max-w-md">
-              <p class="text-sm opacity-70">
-                Life Card Packs {#if (gameType === "online" ? p2pPlayers.length : playerCount) !== activeSelectedPacks.length}
-                  <span
-                    class="p-1 bg-amber-100 dark:bg-amber-900 rounded-2xl font-bold"
-                    >(SELECT {gameType === "online"
-                      ? p2pPlayers.length
-                      : playerCount})</span
-                  >
-                {/if}
-              </p>
-              <div class="flex flex-wrap gap-2">
-                {#each PACKS_LIST as pack}
-                  <button
-                    class="btn-sm hover:bg-purple-50 dark:hover:bg-purple-950 {activeSelectedPacks.includes(
-                      pack,
-                    )
-                      ? 'bg-purple-100 dark:bg-purple-900  '
-                      : ''}"
-                    onclick={() => {
-                      if (gameType === "online") {
-                        if (onlineSelectedPacks.includes(pack)) {
-                          onlineSelectedPacks = onlineSelectedPacks.filter(
-                            (p) => p !== pack,
-                          );
-                        } else {
-                          onlineSelectedPacks = [...onlineSelectedPacks, pack];
-                        }
-                        if (multiplayer.isHost) {
-                          multiplayer.broadcastSetupState(
-                            p2pPlayers,
-                            onlineSelectedPacks,
-                          );
-                        }
-                      } else {
-                        if (localSelectedPacks.includes(pack)) {
-                          localSelectedPacks = localSelectedPacks.filter(
-                            (p) => p !== pack,
-                          );
-                        } else {
-                          localSelectedPacks = [...localSelectedPacks, pack];
-                        }
-                      }
-                    }}
-                  >
-                    {pack}
-                  </button>
-                {/each}
-              </div>
-            </div>
-          {/if}
+<RulebookModal bind:show={showRulebook} {rulebookHref} />
 
-          {#if gameType !== "online" || (currentRoomCode && multiplayer.isHost)}
-            <div class="flex flex-col gap-1">
-              <p class="text-sm opacity-70">Game Type</p>
-              <div class="flex justify-center">
-                <button
-                  class="btn-sm rounded-r-none border-r-0 hover:bg-green-50 dark:hover:bg-green-950 {mode ===
-                    'competitive' && 'bg-green-200 dark:bg-green-900'}"
-                  onclick={() => (mode = "competitive")}>Competitive</button
-                >
-                <button
-                  class=" btn-sm rounded-l-none hover:bg-green-50 dark:hover:bg-green-950 {mode ===
-                    'cooperative' && 'bg-green-200 dark:bg-green-900'}"
-                  onclick={() => (mode = "cooperative")}>Cooperative</button
-                >
-              </div>
-            </div>
-          {/if}
-
-          <div
-            class={[
-              "flex flex-col gap-1",
-              (gameType === "passplay" || gameType === "online") && "hidden",
-            ]}
-          >
-            <p class="text-sm opacity-70">Robot Skill Level</p>
-            <div class="flex justify-center">
-              {#each ["easy", "normal", "expert"] as diff, i}
-                <button
-                  class={[
-                    "btn-sm hover:bg-blue-50 dark:hover:bg-blue-950",
-                    aiDifficulty === diff && "bg-blue-200 dark:bg-blue-900 ",
-                    i === 0 && "rounded-r-none",
-                    i === 1 &&
-                      "rounded-x-none border-x-0 rounded-r-none rounded-l-none",
-                    i === 2 && "rounded-l-none",
-                  ]}
-                  onclick={() => (aiDifficulty = diff)}
-                >
-                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                </button>
-              {/each}
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
-  </div>
-{/if}
-
-{#if showRulebook}
-  <div
-    transition:fade={{ duration: 100 }}
-    class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center z-[9999]"
-    role="presentation"
-    onclick={(e) => {
-      if (e.target === e.currentTarget) showRulebook = false;
-    }}
-  >
-    <div
-      in:fly={{ y: -50 }}
-      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl w-[95%] shadow-xl max-h-[90vh] overflow-y-auto"
-    >
-      <div class="flex justify-between gap-2">
-        <h2 class="text-xl font-semibold text-center">Rulebook</h2>
-        <button
-          class="btn-sm"
-          onclick={() => {
-            showRulebook = false;
-          }}><Icon icon="lucide:x" class=""></Icon></button
-        >
-      </div>
-      <p class="text-left opacity-70 text-xs mb-2">23 MB</p>
-      <div
-        class="w-full h-[80vh] border border-slate-200 rounded-lg shadow-sm overflow-hidden bg-slate-50"
-      >
-        <object
-          title="PDF rulebook"
-          data={rulebookHref}
-          type="application/pdf"
-          class="w-full h-full"
-        >
-          <!-- Fallback UI if the browser cannot render the PDF inline -->
-          <div
-            class="flex flex-col items-center justify-center h-full p-6 text-center"
-          >
-            <svg
-              class="w-12 h-12 text-slate-400 mb-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
-            <p class="text-slate-600 font-medium mb-4">
-              Inline PDF viewing is not supported by your browser.
-            </p>
-            <a
-              href={rulebookHref}
-              download
-              class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm transition-colors duration-150"
-            >
-              Download PDF
-            </a>
-          </div>
-        </object>
-      </div>
-    </div>
-  </div>
-{/if}
-
+<!-- App Shell -->
 <div class="">
-  <div class="mb-4 py-2 w-full bg-slate-300 dark:bg-slate-700">
-    <div
-      class="flex items-center max-sm:flex-wrap max-sm:justify-center justify-between gap-2 max-w-3xl mx-auto px-2"
-    >
-      <div class="flex flex-col items-center md:items-start">
-        <h1 class="font-bold text-2xl text-slate-900 dark:text-slate-100">
-          Emigration
-        </h1>
-        <p
-          class="font-bold text-xs uppercase tracking-widest text-slate-600 dark:text-slate-400"
-        >
-          Game Emulator
-        </p>
-      </div>
-
-      <div class="flex gap-2 items-center flex-wrap justify-center">
-        <button
-          title="Rulebook (PDF)"
-          onclick={() => (showRulebook = true)}
-          class="btn-sm bg-white/50 dark:bg-black/50"
-          ><Icon icon="lucide:file-question-mark" class="size-5" /><span
-            class="">Rulebook</span
-          ></button
-        >
-        <button
-          class="btn-sm bg-white/50 dark:bg-black/50"
-          title="Emulator Settings"
-          onclick={() => {
-            showSettings = !showSettings;
-          }}
-          ><Icon icon="lucide:settings" class="size-5" />
-          <span class="">Settings</span></button
-        >
-        <a
-          href="/emigration"
-          class="btn-sm bg-white/50 dark:bg-black/50"
-          title="Close Emulator"
-          ><Icon icon="lucide:x" class="size-5" /> <span class="">Close</span>
-        </a>
-      </div>
-    </div>
-  </div>
+  <EmulatorHeader
+    onrulebook={() => (showRulebook = true)}
+    onsettings={() => (showSettings = !showSettings)}
+  />
 
   {#if isSetup}
-    <div class="max-w-lg mx-auto px-2">
-      <div class="flex flex-col gap-5 mt-4">
-        <div class="flex flex-col gap-1">
-          <p class="opacity-70 text-sm">Game Mode</p>
-          <div class="flex justify-center flex-wrap gap-y-1">
-            <button
-              class="btn-sm rounded-r-none {gameType === 'vscomputer'
-                ? 'bg-red-200 dark:bg-red-900  '
-                : ''}"
-              onclick={() => {
-                gameType = "vscomputer";
-                toast.enabled = true;
-              }}
-            >
-              Solo
-            </button>
-            <button
-              class="btn-sm border-x-0 rounded-l-none rounded-r-none {gameType ===
-              'passplay'
-                ? 'bg-red-200 dark:bg-red-900  '
-                : ''}"
-              onclick={() => {
-                gameType = "passplay";
-                toast.enabled = true;
-              }}
-            >
-              Pass & Play
-            </button>
-            {#if showRobotMode}
-              <button
-                class="btn-sm rounded-l-none rounded-r-none border-r-0 {gameType ===
-                'auto'
-                  ? 'bg-red-200 dark:bg-red-900  '
-                  : ''}"
-                onclick={() => {
-                  gameType = "auto";
-                  toast.enabled = false;
-                }}
-              >
-                Robots
-              </button>
-            {/if}
-            <button
-              class="btn-sm rounded-l-none {gameType === 'online'
-                ? 'bg-red-200 dark:bg-red-900  '
-                : ''}"
-              onclick={() => {
-                gameType = "online";
-                toast.enabled = true;
-              }}
-            >
-              Online
-            </button>
-          </div>
-        </div>
-
-        {#if gameType === "online"}
-          <div class="flex flex-col gap-4">
-            {#if !currentRoomCode}
-              <div class="flex flex-col gap-2 mx-auto w-full items-center">
-                <button
-                  class="btn bg-green-200 dark:bg-green-800 w-full"
-                  onclick={hostRoom}>Host New Game</button
-                >
-                <div class="flex items-center gap-2 text-sm opacity-50 w-full">
-                  <hr class="flex-1" />
-                  OR
-                  <hr class="flex-1" />
-                </div>
-                <div class="flex items-center w-full">
-                  <input
-                    type="text"
-                    placeholder="Enter Room Code"
-                    class="flex-1 text-center font-mono uppercase rounded-r-none py-[6.5px] border-r-0"
-                    maxlength="5"
-                    bind:value={joinRoomCodeInput}
-                  />
-                  <button
-                    class="btn py-[5px] px-2 bg-blue-200 dark:bg-blue-800 rounded-l-none"
-                    onclick={joinExistingRoom}>Join Game</button
-                  >
-                </div>
-              </div>
-            {:else}
-              <button
-                class="btn-sm mx-auto bg-red-300 dark:bg-red-700"
-                onclick={exitRoom}
-              >
-                <Icon icon="lucide:x" class="size-3.5" />
-                {multiplayer.isHost ? "Close Room" : "Leave Room"}
-              </button>
-              <!-- Waiting Room -->
-              <div class="flex flex-col gap-2">
-                <div
-                  class="flex flex-col items-center gap-2 bg-blue-50 dark:bg-blue-950 p-3 rounded-lg border border-blue-200 dark:border-blue-800"
-                >
-                  <p class="text-sm opacity-70">Room Code</p>
-                  <div class="flex gap-2 items-center">
-                    <span class="text-2xl font-mono tracking-widest font-bold"
-                      >{currentRoomCode}</span
-                    >
-                    <button
-                      class="btn-sm bg-amber-200 dark:bg-amber-800"
-                      onclick={copyRoomUrl}
-                      title="Copy Link"
-                    >
-                      <Icon icon="lucide:copy" />
-                      Copy Link
-                    </button>
-                  </div>
-                  <p class="text-xs opacity-60">
-                    Share this code with your friends!
-                  </p>
-                </div>
-
-                <div
-                  class="flex flex-col gap-2 p-2 items-start rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
-                >
-                  <p class="text-sm opacity-70">Your Name</p>
-                  <input
-                    class="flex-1"
-                    type="text"
-                    bind:value={localPlayerName}
-                    placeholder="Your Name"
-                    oninput={() => {
-                      // Keep local p2pPlayers in sync and broadcast to peers
-                      const me = p2pPlayers.find((p) => p.peerId === "self");
-                      if (me) me.name = localPlayerName;
-                      if (currentRoomCode)
-                        multiplayer.broadcastPlayerInfo({
-                          name: localPlayerName,
-                          isHost: multiplayer.isHost,
-                        });
-                    }}
-                  />
-                </div>
-
-                <div class="flex flex-col gap-2">
-                  <p
-                    class="text-sm font-bold flex justify-between items-center"
-                  >
-                    <span>Players in Room ({p2pPlayers.length}/6)</span>
-                    {#if multiplayer.isHost && p2pPlayers.length < 6}
-                      <button
-                        class="btn-sm"
-                        onclick={() => {
-                          const botName = `🤖 Robot ${p2pPlayers.length + 1}`;
-                          p2pPlayers = [
-                            ...p2pPlayers,
-                            {
-                              peerId:
-                                "robot-" +
-                                Math.random().toString(36).substr(2, 5),
-                              name: botName,
-                              isHost: false,
-                              isBot: true,
-                            },
-                          ];
-                          onlineSelectedPacks = getRandomPacks(
-                            p2pPlayers.length,
-                          );
-                          multiplayer.broadcastSetupState(
-                            p2pPlayers,
-                            onlineSelectedPacks,
-                          );
-                        }}>🤖 Add Robot</button
-                      >
-                    {/if}
-                  </p>
-                  <div class="grid grid-cols-2 gap-2">
-                    {#each p2pPlayers as p, i}
-                      <div
-                        class="p-2 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center"
-                      >
-                        <span class="font-bold">{p.name || "Anonymous"}</span>
-                        <div class="flex items-center gap-1">
-                          {#if p.isHost}
-                            <span
-                              class="text-[10px] uppercase bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200 px-1 py-0.5 rounded"
-                              >Host</span
-                            >
-                          {:else if p.peerId === "self"}
-                            <span
-                              class="text-[10px] uppercase bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1 py-0.5 rounded"
-                              >You</span
-                            >
-                          {/if}
-                          {#if multiplayer.isHost && p.isBot}
-                            <button
-                              class="btn-sm border-none text-red-500 hover:text-red-700"
-                              onclick={() => {
-                                p2pPlayers = p2pPlayers.filter(
-                                  (_, idx) => idx !== i,
-                                );
-                                onlineSelectedPacks = getRandomPacks(
-                                  p2pPlayers.length,
-                                );
-                                multiplayer.broadcastSetupState(
-                                  p2pPlayers,
-                                  onlineSelectedPacks,
-                                );
-                              }}
-                              title="Remove Robot"
-                              ><Icon icon="lucide:x" class="size-4" /></button
-                            >
-                          {/if}
-                        </div>
-                      </div>
-                    {/each}
-                  </div>
-                </div>
-              </div>
-            {/if}
-          </div>
-        {:else}
-          <label
-            ><span class="text-sm opacity-70">Number of Players:</span>
-            <select
-              class="w-fit"
-              bind:value={playerCount}
-              onchange={() =>
-                (localSelectedPacks = getRandomPacks(playerCount))}
-            >
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-              <option value={6}>6</option>
-            </select>
-          </label>
-
-          <div class="flex flex-col gap-4">
-            {#each activeSetup as p, i}
-              <div
-                class="flex flex-col gap-2 p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
-              >
-                {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
-                  <p class="text-sm opacity-70 text-left">Human</p>
-                {:else if gameType === "vscomputer" || gameType === "auto"}
-                  <p class="text-sm opacity-70 text-left">Robot</p>
-                {/if}
-                <input
-                  class="flex-1"
-                  type="text"
-                  bind:value={p.name}
-                  placeholder="Player Name"
-                />
-              </div>
-            {/each}
-          </div>
-        {/if}
-
-        <div class="my-2">
-          {#if gameType === "online"}
-            {#if multiplayer.isHost && currentRoomCode}
-              <button
-                class="btn w-full text-2xl bg-amber-200 dark:bg-amber-800 disabled:opacity-40"
-                disabled={p2pPlayers.length < 2}
-                onclick={startP2PGame}
-              >
-                Start Game ({p2pPlayers.length} Player{p2pPlayers.length !== 1
-                  ? "s"
-                  : ""})
-              </button>
-              {#if p2pPlayers.length < 2}
-                <p class="text-xs opacity-60 mt-1">
-                  Waiting for at least 1 more player to join…
-                </p>
-              {/if}
-            {:else if !currentRoomCode}
-              <!-- No room joined yet, no start button -->
-            {:else}
-              <p class="text-sm italic opacity-60">
-                Waiting for the host to start the game…
-              </p>
-            {/if}
-          {:else}
-            <button
-              class="btn w-full text-2xl bg-amber-200 dark:bg-amber-800"
-              onclick={() => startGame(gameType)}>Start Game</button
-            >
-          {/if}
-        </div>
-      </div>
-    </div>
+    <SetupScreen
+      bind:gameType
+      {showRobotMode}
+      bind:playersSetup
+      bind:playerCount
+      bind:localSelectedPacks
+      {toast}
+      {currentRoomCode}
+      {p2pPlayers}
+      isHost={room.isHost}
+      selfId={room.selfId}
+      onlineSelectedPacks={room.selectedPacks}
+      onstart={({ gameType: gt }) => {
+        if (gt === "online") {
+          startP2PGame();
+        } else {
+          startGame(gt);
+        }
+      }}
+      onhostroom={room.hostRoom}
+      onjoinroom={room.joinRoom}
+      onexitroom={room.exitRoom}
+      onaddbot={room.addBot}
+      onremovebot={room.removeBot}
+      ontogglelocalpack={(pack) => {
+        if (localSelectedPacks.includes(pack)) {
+          localSelectedPacks = localSelectedPacks.filter((p) => p !== pack);
+        } else {
+          localSelectedPacks = [...localSelectedPacks, pack];
+        }
+      }}
+      ontoggleonlinepack={room.togglePack}
+      onupdatename={room.updateLocalPlayerName}
+    />
   {:else if snapshot}
     <div class="max-w-3xl mx-auto px-2">
       {#if gameType === "online" && currentRoomCode}
@@ -1775,9 +956,11 @@
             </div>
           </div>
 
-          <button class="btn-sm bg-red-300 dark:bg-red-700" onclick={exitRoom}>
-            <Icon icon="lucide:x" class="size-5" />
-            {multiplayer.isHost ? "Close Room" : "Leave Room"}
+          <button
+            class="btn-sm bg-red-300 dark:bg-red-700"
+            onclick={room.exitRoom}
+          >
+            Exit Room
           </button>
         </div>
       {/if}
@@ -1795,8 +978,7 @@
                 activeBotIndices = [];
                 aiPlayer = null;
                 aiThinking = false;
-              }}
-              ><Icon icon="lucide:rotate-ccw" class="size-5"></Icon> New Game</button
+              }}><span>↩ New Game</span></button
             >
           {/if}
         </div>
@@ -1805,171 +987,22 @@
       <!-- Main Column: Public Pool & Player Boards -->
       <div class="flex flex-col gap-2 relative">
         <!-- Security Lanes -->
-        <div class={["flex flex-col gap-1", isPreparationPhase && "hidden"]}>
-          <!-- <div class="text-sm opacity-70 ">Security Lanes</div> -->
-          <div class="flex flex-wrap justify-center gap-2 pb-1">
-            {#each snapshot.securityLanes as lane, i}
-              {@const backgroundColor = getSecurityLaneBackgroundColor(i)}
-              <div
-                class={[
-                  "rounded-2xl gap-1 p-2 min-w-[130px] max-w-[300px] flex flex-col items-center text-center flex-1 transition-all border border-neutral-200 dark:border-neutral-800",
-                  backgroundColor,
-                ]}
-              >
-                <div class="font-bold text-xs leading-snug">{lane.name}</div>
-                <Icon icon="game-icons:police-officer-head" class="size-8"
-                ></Icon>
-                <div class="text-xs mb-1 flex gap-1">
-                  {#each lane.unshuffledTokens as { tokenNumber, status }}
-                    <p
-                      class={[
-                        "bg-red-200 dark:bg-red-800 px-2 py-1 shadow-sm rounded-2xl border border-red-300 dark:border-red-700",
-                        status.isRevealed && "opacity-30",
-                      ]}
-                    >
-                      {tokenNumber}
-                    </p>
-                  {/each}
-                </div>
-                {#if snapshot.phase === "crossing"}
-                  <button
-                    class="btn w-full"
-                    disabled={lane.tokens.length === 0 || pendingChoice}
-                    onclick={() => handleSelectLane(i)}
-                  >
-                    Select Lane
-                  </button>
-                {/if}
-                {#if lane.unshuffledTokens.filter(({ status }) => status.isRevealed).length}
-                  <div class="flex flex-col gap-1 justify-center">
-                    {#each lane.unshuffledTokens.filter(({ status }) => status.isRevealed) as { tokenNumber, status }}
-                      <div class="grid grid-cols-[1fr_30px] gap-1 items-center">
-                        <div
-                          class={[
-                            "text-xs rounded-2xl px-2 py-1 w-full flex flex-col gap-1",
-                            status.player.success
-                              ? "bg-green-200 dark:bg-green-800"
-                              : "bg-red-300 dark:bg-red-900",
-                          ]}
-                        >
-                          <p class="w-full">
-                            {#if status.player.success}✅{:else}❌{/if}
-                            {status.player.name}
-                          </p>
-                          <div class="flex gap-1 items-center">
-                            <div
-                              class="whitespace-nowrap p-1 rounded-2xl bg-white text-red-500 flex items-center gap-0"
-                            >
-                              <Icon
-                                icon="game-icons:round-star"
-                                class="size-3 shrink-0"
-                              />{status.player.assurance}
-                            </div>
-                            <div
-                              class="whitespace-nowrap p-1 rounded-2xl bg-white text-green-700 flex items-center gap-0"
-                            >
-                              <Icon
-                                icon="game-icons:two-coins"
-                                class="size-3 shrink-0"
-                              />${status.player.money}
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="bg-red-200 dark:bg-red-800 px-2 py-1 text-xs rounded-2xl border border-red-300 dark:border-red-700"
-                        >
-                          {tokenNumber}
-                        </div>
-                      </div>
-                    {/each}
-                  </div>
-                {/if}
-              </div>
-            {/each}
-          </div>
-        </div>
+        <SecurityLanes
+          lanes={snapshot.securityLanes}
+          phase={snapshot.phase}
+          pendingChoice={!!pendingChoice}
+          onlaneselect={handleSelectLane}
+        />
 
-        <div class="flex flex-wrap gap-2">
-          <!-- Tickets -->
-          <div
-            class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
-          >
-            <div class="text-left">
-              <div class="font-bold text-xl">Tickets</div>
-              <div class="text-xs">Requires: 1+ Connection</div>
-              <div class="text-xs">Ticket + Passport = 1 Assurance</div>
-            </div>
-            <div class="flex flex-col gap-1 ml-auto items-end">
-              <div class="text-2xl font-bold flex items-center gap-1.5">
-                <Icon icon="game-icons:ticket" class="size-6 shrink-0" />
-                <span>{snapshot.publicServices.tickets}</span>
-              </div>
-              {#if snapshot.phase === "preparation" && currentPlayer}
-                <div class="flex gap-1">
-                  <button
-                    class="btn-sm whitespace-nowrap"
-                    disabled={snapshot.publicServices.tickets <= 0 ||
-                      currentPlayer.money < 2 ||
-                      currentPlayer.stash.connections.length < 1 ||
-                      pendingChoice}
-                    onclick={() => handleBuyPool("ticket")}
-                  >
-                    $2 Buy
-                  </button>
-                  <button
-                    class="btn-sm"
-                    disabled={snapshot.publicServices.tickets <= 0 ||
-                      currentPlayer.stash.connections.length < 1 ||
-                      pendingChoice}
-                    onclick={() => handleStealPool("ticket")}
-                  >
-                    Steal
-                  </button>
-                </div>
-              {/if}
-            </div>
-          </div>
-
-          <!-- Passports -->
-          <div
-            class="flex flex-1 items-center gap-4 bg-blue-50 dark:bg-blue-950/50 p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800"
-          >
-            <div class="text-left">
-              <div class="font-bold text-xl">Passports</div>
-              <div class="text-xs">Requires 1+ Document</div>
-              <div class="text-xs">Passport + Ticket = 1 Assurance</div>
-            </div>
-            <div class="flex flex-col gap-1 ml-auto items-end">
-              <div class="text-2xl font-bold flex items-center gap-1.5">
-                <Icon icon="game-icons:passport" class="size-6 shrink-0" />
-                <span>{snapshot.publicServices.passports}</span>
-              </div>
-              {#if snapshot.phase === "preparation" && currentPlayer}
-                <div class="flex gap-1">
-                  <button
-                    class="btn-sm whitespace-nowrap"
-                    disabled={snapshot.publicServices.passports <= 0 ||
-                      currentPlayer.money < 2 ||
-                      currentPlayer.stash.documents.length < 1 ||
-                      pendingChoice}
-                    onclick={() => handleBuyPool("passport")}
-                  >
-                    $2 Buy
-                  </button>
-                  <button
-                    class="btn-sm"
-                    disabled={snapshot.publicServices.passports <= 0 ||
-                      currentPlayer.stash.documents.length < 1 ||
-                      pendingChoice}
-                    onclick={() => handleStealPool("passport")}
-                  >
-                    Steal
-                  </button>
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
+        <!-- Public Resource Pool -->
+        <PublicResourcePool
+          publicServices={snapshot.publicServices}
+          {currentPlayer}
+          phase={snapshot.phase}
+          pendingChoice={!!pendingChoice}
+          onbuy={handleBuyPool}
+          onsteal={handleStealPool}
+        />
 
         <ActionPanel
           {engine}
@@ -1983,60 +1016,24 @@
           waitingForPeer={!isMyP2PTurn}
           waitingForName={waitingForPlayerName}
         />
-        <!-- Horizontal Scroll Container -->
 
-        <div
-          class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth gap-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-          lg:flex lg:flex-wrap lg:justify-center lg:w-screen lg:relative lg:left-1/2 lg:-translate-x-1/2"
-          bind:this={playerBoardsContainer}
-        >
-          <!-- Player Boards -->
-          {#each snapshot.players as player, index}
-            <div
-              class="snap-center"
-              bind:this={playerBoardElements[index]}
-              data-index={index}
-            >
-              <PlayerBoard
-                {engine}
-                {player}
-                isActive={visualActivePlayerId === player.id}
-                onCardSelect={handleCardSelect}
-                {selectedSlot}
-                {selectedStash}
-                {snapshot}
-                autoScrollEnabled={!autoplay}
-              />
-            </div>
-          {/each}
-        </div>
-        <!-- Navigation Dots -->
-        <div
-          class="flex justify-center gap-2 sticky bottom-5 z-150 lg:hidden w-fit mx-auto"
-        >
-          <!-- The first dot starts 'active' (darker color) -->
-          {#each snapshot.players as player, i}
-            <button
-              onclick={() => scrollToPlayer(i)}
-              aria-label="Scroll to player {i + 1}"
-              class={[
-                "btn-action px-4 backdrop-blur-md rounded-full",
-                currentlyScrolledToPlayer === i
-                  ? "bg-amber-200/70 dark:bg-amber-800/70"
-                  : "bg-neutral-100/70 dark:bg-neutral-900/70",
-              ]}>{i + 1}</button
-            >
-          {/each}
-        </div>
+        <!-- Player Boards Carousel -->
+        <PlayerBoardsCarousel
+          players={snapshot.players}
+          {engine}
+          {snapshot}
+          {visualActivePlayerId}
+          {selectedSlot}
+          {selectedStash}
+          autoScrollEnabled={!autoplay}
+          onCardSelect={handleCardSelect}
+          bind:container={playerBoardsContainer}
+        />
+
+        <!-- Discard Pile -->
+        <DiscardPile discardPile={engine.discardPile} />
       </div>
     </div>
-
-    {#if engine.discardPile.length}
-      <p>Discard Pile:</p>
-      {#each engine.discardPile as { name, title, type }, i}
-        <p>{type} {name || title} {i}</p>
-      {/each}
-    {/if}
 
     <!-- Floating Log Sheet -->
     <GameLogSheet
