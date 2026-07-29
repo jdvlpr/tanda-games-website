@@ -2031,6 +2031,13 @@
       </div>
     </div>
 
+    {#if engine.discardPile.length}
+      <p>Discard Pile:</p>
+      {#each engine.discardPile as { name, title, type }, i}
+        <p>{type} {name || title} {i}</p>
+      {/each}
+    {/if}
+
     <!-- Floating Log Sheet -->
     <GameLogSheet
       logs={snapshot.logs}

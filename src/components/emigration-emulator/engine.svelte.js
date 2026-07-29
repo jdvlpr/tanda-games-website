@@ -745,7 +745,7 @@ export default class EmigrationEngine {
     this.players = [];
     this.publicServices = { tickets: 0, passports: 0 };
     this.securityLanes = [];
-    this.discardPile = [];
+    this.discardPile = $state([]);
     this.logs = [];
     this.turnNumber = 1;
     this.consecutiveForfeits = 0;
