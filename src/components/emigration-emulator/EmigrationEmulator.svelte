@@ -304,14 +304,7 @@
           selectionCardType === "connection"
         ) {
           // Doc & Conn in layout: Buy or Discard only
-          // You cannot buy your own layout cards
-          if (action.type === "buy") {
-            allowed = !isOwnTarget;
-          } else if (action.type === "discard") {
-            allowed = true;
-          } else {
-            allowed = false;
-          }
+          allowed = action.type === "buy" || action.type === "discard";
         }
       } else if (
         selectionSource === "stash-doc" ||
