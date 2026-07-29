@@ -11,6 +11,8 @@
    */
   let { discardPile = [] } = $props();
 
+  let discardPileReversed = $derived(discardPile.toReversed());
+
   let isExpanded = $state(false);
 
   function getStashType(card) {
@@ -18,15 +20,15 @@
   }
 </script>
 
-{#if discardPile.length}
-  <div class="mt-2">
+{#if discardPileReversed.length}
+  <div class="my-4 mx-auto">
     <button
       class="btn-sm w-full flex items-center justify-between"
       onclick={() => (isExpanded = !isExpanded)}
     >
       <span class="flex items-center gap-1.5">
-        <Icon icon="lucide:trash-2" class="size-4" />
-        Discard Pile ({discardPile.length})
+        <Icon icon="lucide:archive" class="size-4" />
+        Discarded Cards ({discardPile.length})
       </span>
       <Icon
         icon={isExpanded ? "lucide:chevron-up" : "lucide:chevron-down"}
@@ -38,7 +40,7 @@
       <div
         class="mt-2 flex flex-col gap-1 max-h-[260px] overflow-y-auto p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
       >
-        {#each discardPile as card, i (card.id ?? i)}
+        {#each discardPileReversed as card, i (card.id ?? i)}
           <StashCard
             {card}
             stashType={getStashType(card)}

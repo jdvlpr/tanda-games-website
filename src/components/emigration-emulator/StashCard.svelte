@@ -49,18 +49,16 @@
   class="stash-item bg-neutral-50 dark:bg-neutral-900 px-2 py-1 rounded-2xl flex items-center gap-1.5 {isSelected
     ? 'selected'
     : ''} {readonly ? 'cursor-default' : ''}"
-  style="border-left: 2.5px solid {borderColor};"
+  style="border-left: 4px solid {borderColor};border-right: 4px solid {borderColor};"
   onclick={!readonly ? onclick : null}
 >
   {#if displayIcon}
     <Icon icon={displayIcon} class="size-4 shrink-0" />
   {/if}
   <span class="truncate pr-1">{displayLabel}</span>
-  {#if stashType === "connection" && card.cost != null}
-    <span class="text-xs font-bold">${card.cost}</span>
-  {/if}
   {#if stashType === "lifeCard" && card.money}
-    <span class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold"
+    <span
+      class="bg-amber-500 text-black px-1 rounded-[3px] text-[0.55rem] font-bold"
       >${card.money}</span
     >
   {/if}
