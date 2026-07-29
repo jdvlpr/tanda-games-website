@@ -1,4 +1,5 @@
 <script>
+  import Icon from "@iconify/svelte";
   import { changelog } from "../../js/emegration-changelog.js";
   import { playPaydaySound } from "../../js/utils.svelte.js";
   import { multiplayer } from "../../stores/multiplayer.svelte.js";
@@ -288,6 +289,12 @@
     return raw.map((action) => {
       let allowed = true;
 
+      const isOwnTarget =
+        (selectedSlot &&
+          selectedSlot.playerIdx === snapshot.currentPlayerIdx) ||
+        (selectedStash &&
+          selectedStash.playerIdx === snapshot.currentPlayerIdx);
+
       if (selectionSource === "layout") {
         if (selectionCardType === "payday" || selectionCardType === "life") {
           // Payday & Life: only Activate
@@ -297,20 +304,28 @@
           selectionCardType === "connection"
         ) {
           // Doc & Conn in layout: Buy or Discard only
-          allowed = action.type === "buy" || action.type === "discard";
+          // You cannot buy your own layout cards
+          if (action.type === "buy") {
+            allowed = !isOwnTarget;
+          } else if (action.type === "discard") {
+            allowed = true;
+          } else {
+            allowed = false;
+          }
         }
       } else if (
         selectionSource === "stash-doc" ||
         selectionSource === "stash-conn"
       ) {
         // Stash doc/conn: Sell only (Discard is only valid on layout cards)
-        allowed = action.type === "sell";
+        // You can only sell your own stash items
+        allowed = action.type === "sell" && isOwnTarget;
       } else if (
         selectionSource === "stash-ticket" ||
         selectionSource === "stash-passport"
       ) {
         // Stash ticket/passport: only Reclaim (targeting another player's extra ticket/passport)
-        allowed = action.type === "reclaim";
+        allowed = action.type === "reclaim" && !isOwnTarget;
       }
 
       return allowed ? action : { ...action, enabled: false };
@@ -408,24 +423,37 @@
       activeBotIndices.includes(visualActivePlayerId),
   );
 
-  // In P2P mode: is it currently this client's turn?
-  let isMyP2PTurn = $derived(
-    gameType !== "online" ||
-      myP2PPlayerIdx === -1 ||
-      !snapshot ||
-      snapshot.phase === "game_over" ||
-      actualActivePlayerId === myP2PPlayerIdx,
-  );
+  // Is it currently this client's turn to provide input?
+  let isMyTurn = $derived.by(() => {
+    if (!snapshot || snapshot.phase === "game_over") return false;
+
+    const actingPlayerIdx = pendingChoice
+      ? pendingChoice.playerIdx
+      : actualActivePlayerId;
+
+    if (gameType === "online") {
+      if (myP2PPlayerIdx === -1) return true;
+      return actingPlayerIdx === myP2PPlayerIdx;
+    }
+
+    if (activeBotIndices.includes(actingPlayerIdx)) {
+      return false;
+    }
+
+    return true;
+  });
 
   // Name of the player whose turn it currently is (for the "Waiting for X" message)
-  let waitingForPlayerName = $derived(
-    snapshot &&
-      gameType === "online" &&
-      !isMyP2PTurn &&
-      !activeBotIndices.includes(actualActivePlayerId)
-      ? (snapshot.players?.[actualActivePlayerId]?.name ?? "another player")
-      : "",
-  );
+  let waitingForPlayerName = $derived.by(() => {
+    if (!snapshot || gameType !== "online" || isMyTurn) return "";
+
+    const actingPlayerIdx = pendingChoice
+      ? pendingChoice.playerIdx
+      : actualActivePlayerId;
+    if (activeBotIndices.includes(actingPlayerIdx)) return "";
+
+    return snapshot.players?.[actingPlayerIdx]?.name ?? "another player";
+  });
 
   // Drive AI turns whenever snapshot changes
   $effect(() => {
@@ -697,7 +725,7 @@
   }
 
   function handleAction(actionType) {
-    if (!engine || !isMyP2PTurn) return;
+    if (!engine || !isMyTurn) return;
 
     const source = selectedSlot ? "layout" : selectedStash ? "stash" : null;
     const params = {
@@ -732,7 +760,7 @@
   }
 
   function handleSelectLane(laneIdx) {
-    if (!engine || !isMyP2PTurn) return;
+    if (!engine || !isMyTurn) return;
     engine.selectLane(laneIdx);
     multiplayer.broadcastAction("LANE_SELECT", { laneIdx });
     multiplayer.broadcastSyncState(engine.getSnapshot());
@@ -740,7 +768,7 @@
 
   function handleCardSelect(selection) {
     // Ignore card taps when it's not this client's turn in P2P
-    if (!isMyP2PTurn) return;
+    if (!isMyTurn) return;
 
     const { anchorEl, ...rest } = selection;
 
@@ -776,7 +804,7 @@
   }
 
   function handleModalResolve(value) {
-    if (!engine || !isMyP2PTurn) return;
+    if (!engine || !isMyTurn) return;
     pendingChoice = null;
     const rolls = [
       Math.floor(Math.random() * 6) + 1,
@@ -793,14 +821,14 @@
   }
 
   function handleBuyPool(cardType) {
-    if (!engine || !isMyP2PTurn) return;
+    if (!engine || !isMyTurn) return;
     engine.executeRequiredAction("buyPool", { cardType });
     multiplayer.broadcastAction("BUY_POOL", { cardType });
     multiplayer.broadcastSyncState(engine.getSnapshot());
   }
 
   function handleStealPool(cardType) {
-    if (!engine || !isMyP2PTurn) return;
+    if (!engine || !isMyTurn) return;
     engine.executeRequiredAction("steal", { cardType });
     multiplayer.broadcastAction("STEAL_POOL", { cardType });
     multiplayer.broadcastSyncState(engine.getSnapshot());
@@ -978,7 +1006,10 @@
                 activeBotIndices = [];
                 aiPlayer = null;
                 aiThinking = false;
-              }}><span>↩ New Game</span></button
+              }}
+              ><Icon icon="lucide:rotate-ccw"></Icon><span>
+                New Game</span
+              ></button
             >
           {/if}
         </div>
@@ -1013,7 +1044,7 @@
           pendingChoice={pendingChoice ||
             activeBotIndices.includes(visualActivePlayerId)}
           computerTurn={activeBotIndices.includes(visualActivePlayerId)}
-          waitingForPeer={!isMyP2PTurn}
+          waitingForPeer={!isMyTurn}
           waitingForName={waitingForPlayerName}
         />
 
