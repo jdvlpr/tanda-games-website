@@ -3513,18 +3513,19 @@ export default class EmigrationEngine {
     this._payAccessFee(player, target, fee);
     const [removed] = target.layout.splice(slotIdx, 1, null);
     this.discardPile.push(removed.card);
-    player.money += 2;
+    const payout = this.players.length <= 3 ? 3 : 2;
+    player.money += payout;
     this.log(
-      `P${player.id}|DISC:${removed.card.name}|FROM:P${target.id}|GAIN:2`,
+      `P${player.id}|DISC:${removed.card.name}|FROM:P${target.id}|GAIN:${payout}`,
       "action",
     );
     const cardType =
       removed.card.type.charAt(0).toUpperCase() + removed.card.type.slice(1);
     if (player.id === target.id)
       if (cardType === "Document")
-        this.notifyToast("document", `${player.name} discards a ${cardType} and gains $2`);
+        this.notifyToast("document", `${player.name} discards a ${cardType} and gains $${payout}`);
       else
-        this.notifyToast("connection", `${player.name} discards a ${cardType} and gains $2`);
+        this.notifyToast("connection", `${player.name} discards a ${cardType} and gains $${payout}`);
     else if (cardType === "Document")
       this.notifyToast("document", 
         `${player.name} discards a ${cardType} from ${target.name} ($${fee} Access Fee)`,

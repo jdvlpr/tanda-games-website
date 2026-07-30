@@ -790,7 +790,8 @@ export function createAutoPlayer(
         // Conservative never discards from an opponent's layout
         if (isConservative && move.targetId !== player.id) return -100;
 
-        score = 2 - move.fee;
+        const payout = playerCount <= 3 ? 3 : 2;
+        score = payout - move.fee;
         if (move.targetId !== player.id) {
           const targetPlayer = engine.players[move.targetId];
           const opponentFaceUp = targetPlayer
