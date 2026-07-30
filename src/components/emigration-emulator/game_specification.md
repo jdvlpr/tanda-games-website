@@ -235,6 +235,8 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
    - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). (College Funds is the same as the Starting Fund of a player's Nationality card). A player must be able to afford minimum tuition in order to take the Apply for College action.
    - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay $1 to the bank and take a different required action.
 
+### 4.3 End of Phase 1
+Phase 1 ends when there are no more face-up cards left in any player's layout. Play continues into Phase 2 from the last player to take a turn in Phase 1. 
 ---
 
 ## 5. Life Card Reference Catalogue
@@ -287,14 +289,7 @@ Life Cards have three keep types:
 
 ## 6. Phase 2: Border Crossing Mechanics
 
-### 6.1 Triggering Phase 2
-
-Phase 2 triggers immediately when:
-
-- There are no more face-up cards left in any player's layout, **AND**
-- No Tickets or Passports remain in the center pool.
-
-### 6.2 Crossing Resolution
+### 6.1 Crossing Resolution
 
 Each player gets exactly one turn to attempt crossing the border:
 

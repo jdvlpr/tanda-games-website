@@ -3301,7 +3301,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.documents.length < 1) {
         this.log("ERR|NEED_DOC", "error");
-        toast.error(`${player.name} needs a Document to buy a Ticket`);
+        toast.error(`${player.name} needs a Document to buy a Passport`);
         return;
       }
       if (player.money < 2) {
