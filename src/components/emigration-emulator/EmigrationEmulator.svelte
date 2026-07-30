@@ -27,6 +27,7 @@
   import SettingsModal from "./SettingsModal.svelte";
   import SetupScreen from "./SetupScreen.svelte";
   import { copyRoomUrl, useOnlineRoom } from "./useOnlineRoom.svelte.js";
+  import { getRandomPacks, getRandomPlayersSetup, createStandardGameSetup } from "./gameSetup.js";
 
   // Props
   let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
@@ -54,42 +55,31 @@
     return !!params.get("showRobotMode");
   }
 
-  function getRandomPacks(count) {
-    return shuffleArray([...PACKS_LIST]).slice(0, count);
-  }
 
-  function getRandomPlayersSetup() {
-    // Shuffle both arrays
-    const shuffledNats = shuffleArray([...NATIONALITIES]);
-    const availableDests = shuffleArray([...DESTINATIONS]);
-
-    return Array.from({ length: 6 }, (_, i) => {
-      // Grab a unique nationality for this player
-      const nat = shuffledNats[i];
-      const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
-
-      // Find the first destination in the available pool that is NOT their home country
-      const destIndex = availableDests.findIndex(
-        (d) => d.name !== matchingCountry,
-      );
-
-      // Remove that destination from the available pool so no one else gets it
-      const [destObj] = availableDests.splice(destIndex, 1);
-
-      return {
-        name: `Player ${i + 1}`,
-        nationality: nat,
-        destination: destObj,
-      };
-    });
-  }
 
   // Setup State
   let isSetup = $state(true);
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
   let localSelectedPacks = $state(getRandomPacks(defaultPlayerCount));
-  let aiDifficulty = $state("expert");
+  let botPersonas = $state({});
+
+  // Heuristic personas available for random assignment
+  const HEURISTIC_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conservative'];
+
+  /**
+   * Returns a copy of botPersonas with any unset bot slot filled with a random persona.
+   * Explicit SetupScreen selections are always preserved.
+   */
+  function resolvePersonas(botIndices) {
+    const resolved = { ...botPersonas };
+    for (const idx of botIndices) {
+      if (!resolved[idx]) {
+        resolved[idx] = HEURISTIC_PERSONAS[Math.floor(Math.random() * HEURISTIC_PERSONAS.length)];
+      }
+    }
+    return resolved;
+  }
 
   // Initialize default players with randomized nationalities and destinations
   let playersSetup = $state(getRandomPlayersSetup());
@@ -159,15 +149,16 @@
       // Create the engine if it doesn't exist yet (first sync from host at game start)
       if (!engine) {
         isSetup = false;
-        engine = new EmigrationEngine({
+        engine = createStandardGameSetup({
           mode: remoteSnapshot.mode || mode,
-          players: Array.isArray(remoteSnapshot.players)
+          playersSetupOverride: Array.isArray(remoteSnapshot.players)
             ? remoteSnapshot.players
             : [],
           onLog: (entry) => {
-            if (engine) snapshot = engine.getSnapshot();
-            if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-          },
+        if (engine) snapshot = engine.getSnapshot();
+        if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
+        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
+      },
           onStateChange: () => {
             if (engine) {
               snapshot = engine.getSnapshot();
@@ -177,7 +168,7 @@
             selectedStash = null;
             selectedAnchorRect = null;
           },
-        });
+        }).engine;
       }
       engine.loadSnapshot(remoteSnapshot);
       snapshot = engine.getSnapshot();
@@ -590,13 +581,14 @@
       return { name: p.name, nationality: nat, destination: destObj };
     });
 
-    engine = new EmigrationEngine({
+    engine = createStandardGameSetup({
       mode,
-      players: finalPlayers,
+      playersSetupOverride: finalPlayers,
       selectedPacks: activeSelectedPacks,
       onLog: (entry) => {
         if (engine) snapshot = engine.getSnapshot();
         if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
+        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
       },
       onStateChange: () => {
         if (engine) {
@@ -607,7 +599,7 @@
         selectedStash = null;
         selectedAnchorRect = null;
       },
-    });
+    }).engine;
 
     snapshot = engine.getSnapshot();
     visualActivePlayerId =
@@ -629,8 +621,10 @@
       .map((p, i) => (p.isBot ? i : -1))
       .filter((i) => i !== -1);
     if (activeBotIndices.length > 0) {
-      aiPlayer = createAutoPlayer(createBotEngine(engine), aiDifficulty, {
+      const resolvedPersonas = resolvePersonas(activeBotIndices);
+      aiPlayer = createAutoPlayer(createBotEngine(engine), "expert", {
         botIndices: activeBotIndices,
+        personas: resolvedPersonas,
       });
     } else {
       aiPlayer = null;
@@ -655,13 +649,14 @@
       return { name: p.name, nationality: nat, destination: destObj };
     });
 
-    engine = new EmigrationEngine({
+    engine = createStandardGameSetup({
       mode,
-      players: finalPlayers,
+      playersSetupOverride: finalPlayers,
       selectedPacks: activeSelectedPacks,
       onLog: (entry) => {
         if (engine) snapshot = engine.getSnapshot();
         if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
+        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
       },
       onStateChange: () => {
         if (engine) {
@@ -672,7 +667,7 @@
         selectedStash = null;
         selectedAnchorRect = null;
       },
-    });
+    }).engine;
 
     snapshot = engine.getSnapshot();
     visualActivePlayerId =
@@ -696,21 +691,24 @@
     if (requestedGameType === "auto") {
       // AI Simulation: all players AI-controlled, plays at speed
       activeBotIndices = engine.players.map((_, i) => i);
-      autoplay = createAutoPlayer(engine, aiDifficulty);
+      autoplay = createAutoPlayer(engine, "expert", { personas: resolvePersonas(activeBotIndices) });
       autoplay.playFullGame(100);
     } else if (requestedGameType === "vscomputer") {
       // Solo vs AI: Player 1 (index 0) is human, all others AI
       activeBotIndices = engine.players.map((_, i) => i).filter((i) => i !== 0);
-      aiPlayer = createAutoPlayer(engine, aiDifficulty, {
+      aiPlayer = createAutoPlayer(engine, "expert", {
         botIndices: activeBotIndices,
+        personas: resolvePersonas(activeBotIndices),
       });
     } else if (requestedGameType === "online" && room.isHost) {
       activeBotIndices = p2pPlayers
         .map((p, i) => (p.isBot ? i : -1))
         .filter((i) => i !== -1);
       if (activeBotIndices.length > 0) {
-        aiPlayer = createAutoPlayer(createBotEngine(engine), aiDifficulty, {
+        const resolvedPersonas = resolvePersonas(activeBotIndices);
+        aiPlayer = createAutoPlayer(createBotEngine(engine), "expert", {
           botIndices: activeBotIndices,
+          personas: resolvedPersonas,
         });
       }
     }
@@ -859,7 +857,6 @@
   {isSetup}
   {gameType}
   {mode}
-  {aiDifficulty}
   {PACKS_LIST}
   {activeSelectedPacks}
   {playerCount}
@@ -868,7 +865,6 @@
   {multiplayer}
   onlineSelectedPacks={room.selectedPacks}
   onmodechange={(m) => (mode = m)}
-  onaidifficulty={(d) => (aiDifficulty = d)}
   ontogglepack={(pack) => {
     if (gameType === "online") {
       room.togglePack(pack);
@@ -893,6 +889,7 @@
 
   {#if isSetup}
     <SetupScreen
+      bind:botPersonas
       bind:gameType
       {showRobotMode}
       bind:playersSetup

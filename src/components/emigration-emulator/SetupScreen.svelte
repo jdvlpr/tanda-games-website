@@ -37,6 +37,7 @@
     showRobotMode = false,
     playersSetup = $bindable([]),
     playerCount = $bindable(4),
+    botPersonas = $bindable({}),
     localSelectedPacks = $bindable([]),
     toast,
     currentRoomCode = "",
@@ -264,7 +265,17 @@
             {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
               <p class="text-sm opacity-70 text-left">Human</p>
             {:else if gameType === "vscomputer" || gameType === "auto"}
-              <p class="text-sm opacity-70 text-left">Robot</p>
+              <div class="flex justify-between items-center">
+                <p class="text-sm opacity-70 text-left">Robot</p>
+                <select class="bg-transparent text-sm border border-neutral-300 dark:border-neutral-700 rounded px-1" bind:value={botPersonas[i]}>
+                  <option value="expert">Expert</option>
+                  <option value="rusher">Rusher</option>
+                  <option value="hoarder">Hoarder</option>
+                  <option value="saboteur">Saboteur</option>
+                  <option value="conservative">Conservative</option>
+                  <option value="easy">Easy</option>
+                </select>
+              </div>
             {/if}
             <input
               class="flex-1"

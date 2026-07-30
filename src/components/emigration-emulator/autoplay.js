@@ -12,8 +12,8 @@ import { DESTINATIONS } from "./engine.svelte.js";
  */
 export function createAutoPlayer(
   engine,
-  difficulty = "normal",
-  { botIndices = null } = {},
+  difficulty = "expert",
+  { botIndices = null, personas = {} } = {},
 ) {
   /**
    * Choose the best required action for the current player.
@@ -25,15 +25,17 @@ export function createAutoPlayer(
     const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
 
     // Expert Mode: evaluate all possible valid moves with a heuristic score
-    if (difficulty === "expert") {
-      const bestMove = _getBestHeuristicAction(player, actions);
+    const persona = personas[engine.currentPlayerIdx] || difficulty;
+
+    if (persona === "expert" || persona === "rusher" || persona === "hoarder" || persona === "saboteur" || persona === "conservative") {
+      const bestMove = _getBestHeuristicAction(player, actions, persona);
       if (bestMove) return { type: bestMove.type, params: bestMove.params };
     }
 
     // Difficulty logic: Easy is 100% random choice, Normal is 30% random choice
     if (
-      difficulty === "easy" ||
-      (difficulty === "normal" && Math.random() < 0.3)
+      persona === "easy" || persona === "random" ||
+      (persona === "normal" && Math.random() < 0.3)
     ) {
       const possible = [];
       if (enabled("activate")) {
@@ -211,7 +213,7 @@ export function createAutoPlayer(
     return null;
   }
 
-  function _getBestHeuristicAction(player, actions) {
+  function _getBestHeuristicAction(player, actions, persona) {
     const possibleMoves = [];
     const enabled = (type) => actions.find((a) => a.type === type)?.enabled;
 
@@ -427,10 +429,17 @@ export function createAutoPlayer(
     const evaluateScore = (move) => {
       let score = 0;
 
+      const isRusher = persona === 'rusher';
+      const isHoarder = persona === 'hoarder';
+      const isSaboteur = persona === 'saboteur';
+      const isConservative = persona === 'conservative';
+
       if (move.type === "activate") {
         if (move.card.type === "payday") {
           // Rule 2: Never activate Payday while in college (salary is 0 Money)
           if (player.inCollege) return -100;
+          // Conservative: only activate own Payday (avoids giving stipends to opponents)
+          if (isConservative && move.targetId !== player.id) return -100;
 
           const mySalary = player.salary;
           const netGain = mySalary - move.fee;
@@ -453,7 +462,7 @@ export function createAutoPlayer(
           );
 
           // Rule 3: Exploiting Payday Asymmetry
-          score = relativeAdvantage * 3 + (assuranceAfter - assuranceNow) * 4;
+          score = relativeAdvantage * (isHoarder ? 6 : 3) + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId === player.id) {
             score += 4; // Bonus for activating own layout (removes a card for free)
           }
@@ -466,7 +475,7 @@ export function createAutoPlayer(
       } else if (move.type === "buy") {
         const totalCost = move.cost + move.fee;
         // Mild liquidity penalty (Assurance already penalizes money spent)
-        score = -(totalCost * 0.5);
+        score = -(totalCost * (isHoarder ? 1.5 : 0.5));
 
         const isDoc = move.card.type === "document";
         const isConn = move.card.type === "connection";
@@ -478,7 +487,7 @@ export function createAutoPlayer(
           c + (isConn ? 1 : 0),
         );
 
-        score += (assuranceAfter - assuranceNow) * 5;
+        score += (assuranceAfter - assuranceNow) * (isHoarder ? 10 : 5);
 
         // Penalty avoidance boost: high incentive to clear destination minRequired missing cards
         if (
@@ -512,7 +521,7 @@ export function createAutoPlayer(
       } else if (move.type === "buyPool") {
         // Rule 1: Mandatory Ticket/Passport Safety Gate
         // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
-        const urgency = 20 + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+        const urgency = (isRusher ? 40 : 20) + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         const isTicket = move.params.cardType === "ticket";
         const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
 
@@ -563,22 +572,30 @@ export function createAutoPlayer(
         } else {
           score = -10;
         }
+        if (isSaboteur) score += 20;
+        if (isConservative) return -100; // Never steals — prefers buyPool
       } else if (move.type === "applyCollege") {
+        // Conservative applies to college more eagerly — lower reserve threshold
         const maxTuition = (player.startingFund || 6) + 6;
-        const reserveNeeded = maxTuition + Math.ceil(8 / playerCount);
+        const reserveNeeded = isConservative
+          ? maxTuition
+          : maxTuition + Math.ceil(8 / playerCount);
 
         if (player.money < reserveNeeded) {
           score = -100; // Do not apply if financial risk is high
-        } else if (estimatedTurnsRemaining < 6) {
+        } else if (estimatedTurnsRemaining < (isConservative ? 4 : 6)) {
           score = -20; // Not enough turns remaining for salary returns to materialize
         } else {
           // Scale early-game application score by remaining layout progress and player count factor
-          const earlyBonus = (1 - layoutProgress) * 6;
+          const earlyBonus = (1 - layoutProgress) * (isConservative ? 10 : 6);
           const countFactor = 1 + 2 / playerCount;
           score = earlyBonus * countFactor;
-          if (currentAssurance < 6) score += 2;
+          if (currentAssurance < 6) score += isConservative ? 5 : 2;
         }
       } else if (move.type === "discard") {
+        // Conservative never discards from an opponent's layout
+        if (isConservative && move.targetId !== player.id) return -100;
+
         score = 2 - move.fee;
         if (move.targetId !== player.id) {
           const targetPlayer = engine.players[move.targetId];
@@ -618,7 +635,7 @@ export function createAutoPlayer(
           }
 
           const disruptBonus = opponentFaceUp <= 3 ? 3 : 2;
-          score += disruptBonus + denialBonus;
+          score += (disruptBonus + denialBonus) * (isSaboteur ? 3 : 1);
 
           // Apply layout preservation penalty if self is not ready for Phase 2
           if (readinessScore < 0) {
@@ -1066,10 +1083,13 @@ export function createAutoPlayer(
     let action = null;
     let didSell = false;
 
-    if (difficulty === "expert") {
+    const currentPersona = personas[engine.currentPlayerIdx] || difficulty;
+    const isHeuristicPersona = ["expert", "rusher", "hoarder", "saboteur", "conservative"].includes(currentPersona);
+
+    if (isHeuristicPersona) {
       // 1. Evaluate actions WITHOUT selling
       const actionsNoSell = engine.getValidActions(player);
-      const bestMoveNoSell = _getBestHeuristicAction(player, actionsNoSell);
+      const bestMoveNoSell = _getBestHeuristicAction(player, actionsNoSell, currentPersona);
       const scoreNoSell = bestMoveNoSell ? bestMoveNoSell._score : -999;
 
       // 2. Evaluate actions WITH a simulated sell, if possible
@@ -1088,7 +1108,7 @@ export function createAutoPlayer(
           player.money += 2;
 
           const simActions = engine.getValidActions(player);
-          const simBest = _getBestHeuristicAction(player, simActions);
+          const simBest = _getBestHeuristicAction(player, simActions, currentPersona);
           if (simBest && simBest._score > scoreWithSell) {
             scoreWithSell = simBest._score;
             bestMoveWithSell = simBest;

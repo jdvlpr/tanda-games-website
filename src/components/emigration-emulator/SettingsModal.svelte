@@ -30,7 +30,6 @@
     isSetup,
     gameType,
     mode,
-    aiDifficulty,
     PACKS_LIST = [],
     activeSelectedPacks = [],
     playerCount,
@@ -38,7 +37,6 @@
     currentRoomCode = "",
     multiplayer,
     onmodechange = null,
-    onaidifficulty = null,
     ontogglepack = null,
   } = $props();
 </script>
@@ -152,31 +150,6 @@
             </div>
           {/if}
 
-          <div
-            class={[
-              "flex flex-col gap-1",
-              (gameType === "passplay" || gameType === "online") && "hidden",
-            ]}
-          >
-            <p class="text-sm opacity-70">Robot Skill Level</p>
-            <div class="flex justify-center">
-              {#each ["easy", "normal", "expert"] as diff, i}
-                <button
-                  class={[
-                    "btn-sm hover:bg-blue-50 dark:hover:bg-blue-950",
-                    aiDifficulty === diff && "bg-blue-200 dark:bg-blue-900 ",
-                    i === 0 && "rounded-r-none",
-                    i === 1 &&
-                      "rounded-x-none border-x-0 rounded-r-none rounded-l-none",
-                    i === 2 && "rounded-l-none",
-                  ]}
-                  onclick={() => onaidifficulty?.(diff)}
-                >
-                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
-                </button>
-              {/each}
-            </div>
-          </div>
         {/if}
       </div>
     </div>

@@ -4,7 +4,6 @@
  * Source of truth: game_specification.md
  */
 
-import { toast } from "../../stores/toast.svelte";
 
 // ─── Utility ─────────────────────────────────────────────────────────────────
 
@@ -745,7 +744,7 @@ export default class EmigrationEngine {
     this.players = [];
     this.publicServices = { tickets: 0, passports: 0 };
     this.securityLanes = [];
-    this.discardPile = $state([]);
+    this.discardPile = [];
     this.logs = [];
     this.turnNumber = 1;
     this.consecutiveForfeits = 0;
@@ -786,6 +785,14 @@ export default class EmigrationEngine {
     const entry = { msg: formattedMsg, type, turn: this.turnNumber };
     this.logs.push(entry);
     if (this.onLog) this.onLog(entry);
+  }
+
+
+  /** Triggers UI toast messages via the onLog callback. */
+  notifyToast(style, msg, opts = {}) {
+    if (this.onLog) {
+      this.onLog({ type: 'toast', style, toastMsg: msg, opts });
+    }
   }
 
   /** Helper to track and format DELTA array for global events. */
@@ -996,7 +1003,7 @@ export default class EmigrationEngine {
       ) {
         p.money += 1;
         this.log(`${p.name} gains $1 from Salvage.`, "system");
-        toast.money(`${p.name} gains $1 from Salvage.`, { indent: 1 });
+        this.notifyToast("money", `${p.name} gains $1 from Salvage.`, { indent: 1 });
       }
     }
     // Blacklisted: discarder loses $1
@@ -1005,7 +1012,7 @@ export default class EmigrationEngine {
     ) {
       discardingPlayer.money = Math.max(0, discardingPlayer.money - 1);
       this.log(`P${discardingPlayer.id}|BLACKLISTED|LOSS:1`, "system");
-      toast.money(`${discardingPlayer.name} loses $1 from Blacklisted`, {
+      this.notifyToast("money", `${discardingPlayer.name} loses $1 from Blacklisted`, {
         indent: 1,
       });
     }
@@ -1022,7 +1029,7 @@ export default class EmigrationEngine {
       left.stash.lifeCards.push(card);
       left.money = Math.max(0, left.money - 1);
       this.log(`P${player.id}|PASS_PENALTY|TO:P${left.id}`, "system");
-      toast.money(
+      this.notifyToast("money", 
         `${left.name} takes Penalty from ${player.name} and loses $1`,
         { indent: 1 },
       );
@@ -1044,7 +1051,7 @@ export default class EmigrationEngine {
             `P${p.id}|STAR_POWER|GAIN:1|PASS_TO:P${player.id}`,
             "system",
           );
-          toast.money(
+          this.notifyToast("money", 
             `${player.name} takes Star Power from ${p.name} and gains $1`,
             { indent: 1 },
           );
@@ -1074,7 +1081,7 @@ export default class EmigrationEngine {
       left.stash.lifeCards.push(card);
       left.money = Math.max(0, left.money - 1);
       this.log(`P${player.id}|UNDERDOG|LOSS:1|PASS_TO:P${left.id}`, "system");
-      toast.money(
+      this.notifyToast("money", 
         `${left.name} takes Underdog from ${player.name} and loses $1`,
         { indent: 1 },
       );
@@ -1088,7 +1095,7 @@ export default class EmigrationEngine {
         player.assurance += 1;
         player.ticketPassportBonusClaimed = true;
         this.log(`P${player.id}|TICKET_PASSPORT_BONUS|GAIN:1A`, "system");
-        toast.assurance(
+        this.notifyToast("assurance", 
           `${player.name} gains 1 Assurance (Passport + Ticket)`,
           {
             indent: 1,
@@ -1418,7 +1425,7 @@ export default class EmigrationEngine {
     if (next.skipNextTurn) {
       next.skipNextTurn = false;
       this.log(`P${next.id}|SKIP_TURN`, "system");
-      toast.info(`${next.name} turn skipped`);
+      this.notifyToast("info", `${next.name} turn skipped`);
       this.advanceTurn();
       return;
     }
@@ -1454,7 +1461,7 @@ export default class EmigrationEngine {
       );
     }
     this.log("PHASE2_START", "system");
-    toast.info(`Start Phase 2`);
+    this.notifyToast("info", `Start Phase 2`);
 
     for (const player of this.players) {
       const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
@@ -1592,7 +1599,7 @@ export default class EmigrationEngine {
     if (!hasTicket || !hasPassport) {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_MISSING_DOCS`, "error");
-      toast.error(
+      this.notifyToast("error", 
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: missing Passport/Ticket`,
       );
       let hasRevealed = false;
@@ -1624,7 +1631,7 @@ export default class EmigrationEngine {
         `PHASE2|P${player.id}|CROSS:PASS|PAID_A:${tokenVal}|REM_A:${player.assurance}`,
         "action",
       );
-      toast.success(
+      this.notifyToast("success", 
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, crosses with ${player.assurance} Assurance remaining`,
       );
       let hasRevealed = false;
@@ -1652,7 +1659,7 @@ export default class EmigrationEngine {
     } else {
       player.crossedSuccessfully = false;
       this.log(`PHASE2|P${player.id}|CROSS:FAIL_LOW_A`, "error");
-      toast.error(
+      this.notifyToast("error", 
         `${player.name} selects ${lane.name}, reveals ${tokenVal} token, blocked: has ${player.assurance} Assurance`,
       );
       let hasRevealed = false;
@@ -1856,10 +1863,10 @@ export default class EmigrationEngine {
             `P${player.id}|GRAD|ROLL:${roll}|RES:PASS|SALARY_INC:${raiseAmount}`,
             "action",
           );
-          toast.success(`${player.name} rolled ${roll} and graduated`);
+          this.notifyToast("success", `${player.name} rolled ${roll} and graduated`);
         } else {
           this.log(`P${player.id}|GRAD|ROLL:${roll}|RES:FAIL`, "error");
-          toast.error(`${player.name} rolled ${roll} and remains in college`);
+          this.notifyToast("error", `${player.name} rolled ${roll} and remains in college`);
           this._graduateAttempted = true;
         }
         this._notify();
@@ -1883,7 +1890,7 @@ export default class EmigrationEngine {
         this.discardPile.push(sold);
         player.money += 2;
         this.log(`P${player.id}|SELL:${sold.name}|GAIN:2`, "action");
-        toast.warning(
+        this.notifyToast("warning", 
           `${player.name} sells ${sold.type.charAt(0).toUpperCase() + sold.type.slice(1)} for $2`,
         );
         this._onCardDiscarded(player, sold);
@@ -1926,10 +1933,10 @@ export default class EmigrationEngine {
           `P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`,
           "error",
         );
-        toast.warning(`${player.name} forfeits turn`);
+        this.notifyToast("warning", `${player.name} forfeits turn`);
         if (this.consecutiveForfeits >= this.players.length) {
           this.log("ALL_FORFEIT|GAIN:1", "system");
-          toast.warning(`All players forfeit turns, gain $1`);
+          this.notifyToast("warning", `All players forfeit turns, gain $1`);
           this.players.forEach((p) => {
             p.money += 1;
           });
@@ -1957,7 +1964,7 @@ export default class EmigrationEngine {
     const fee = target.id === player.id ? 0 : player.accessFee;
     if (player.money < fee) {
       this.log(`ERR|NO_FUNDS_${fee}`, "error");
-      toast.error(`${player.name} can't activate card: not enough money`);
+      this.notifyToast("error", `${player.name} can't activate card: not enough money`);
       return;
     }
 
@@ -1986,7 +1993,7 @@ export default class EmigrationEngine {
                 `P${player.id}|KEEP_CALM_USED|DISC:${removed.card.title}`,
                 "action",
               );
-              toast.life(
+              this.notifyToast("life", 
                 `${player.name} uses Keep Calm to discard "${removed.card.title}"`,
               );
               this.uncoverLayout(target);
@@ -2056,7 +2063,7 @@ export default class EmigrationEngine {
       return payout;
     });
     this.log(`PAYDAY|SALARIES:[${salaries.join(",")}]`, "action");
-    toast.money(`${activator.name} activates Payday`);
+    this.notifyToast("money", `${activator.name} activates Payday`);
 
     // Snapshot all Frontrunner passes BEFORE mutating any stashes, so that a
     // card pushed to a later-in-array player doesn't get passed a second time
@@ -2081,7 +2088,7 @@ export default class EmigrationEngine {
       const left = this.getLeftPlayer(p);
       left.stash.lifeCards.push(frCard);
       this.log(`P${p.id}|FRONTRUNNER_PASS|TO:P${left.id}`, "system");
-      toast.life(
+      this.notifyToast("life", 
         `${p.name} passes Frontrunner with $${fr.money} to ${left.name}`,
         { indent: 1 },
       );
@@ -2156,7 +2163,7 @@ export default class EmigrationEngine {
                   `P${player.id}|PERSUASION_ACC|FROM:P${target.id}`,
                   "action",
                 );
-                toast.life(
+                this.notifyToast("life", 
                   `${player.name} accepts Persuasion from ${target.name}`,
                 );
                 this._onPlayerGainLifeCard(player);
@@ -2171,7 +2178,7 @@ export default class EmigrationEngine {
                   `P${player.id}|PERSUASION_DECLINED|FEE:${doubleFee}`,
                   "action",
                 );
-                toast.life(
+                this.notifyToast("life", 
                   `${player.nam} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
                 );
                 callback(doubleFee);
@@ -2272,19 +2279,19 @@ export default class EmigrationEngine {
       case "Stellar Reputation":
         player.stash.lifeCards.push({ ...card, keep: "Must Keep" });
         this.log(`P${player.id}|KEEP:Stellar Reputation`, "action");
-        toast.life(`${player.name} keeps Stellar Reputation`);
+        this.notifyToast("life", `${player.name} keeps Stellar Reputation`);
         done();
         break;
       case "Fancy Clothes":
         player.stash.lifeCards.push({ ...card, keep: "Must Keep" });
         this.log(`P${player.id}|KEEP:Fancy Clothes`, "action");
-        toast.life(`${player.name} keeps Fancy Clothes`);
+        this.notifyToast("life", `${player.name} keeps Fancy Clothes`);
         done();
         break;
       case "Insider":
         player.stash.lifeCards.push({ ...card, keep: "Must Keep" });
         this.log(`P${player.id}|KEEP:Insider`, "action");
-        toast.life(`${player.name} keeps Insider`);
+        this.notifyToast("life", `${player.name} keeps Insider`);
         done();
         break;
       default:
@@ -2302,7 +2309,7 @@ export default class EmigrationEngine {
       case "Stellar Reputation":
         player.money += 3;
         this.log(`P${player.id}|ACT:Stellar Reputation|GAIN:3`, "action");
-        toast.money(`${player.name} gains $3 from Stellar Reputation`);
+        this.notifyToast("money", `${player.name} gains $3 from Stellar Reputation`);
         done();
         break;
 
@@ -2323,7 +2330,7 @@ export default class EmigrationEngine {
               if (val === "money") {
                 player.money += 3;
                 this.log(`P${player.id}|ACT:Rummage Sale|GAIN:3`, "action");
-                toast.money(`${player.name} gains $3 from Rummage Sale`);
+                this.notifyToast("money", `${player.name} gains $3 from Rummage Sale`);
               } else {
                 const docIndexInDiscard = parseInt(val.split("-")[1]);
                 let count = 0;
@@ -2336,7 +2343,7 @@ export default class EmigrationEngine {
                         `P${player.id}|ACT:Rummage Sale|TAKE_DOC:${taken.name}`,
                         "action",
                       );
-                      toast.document(
+                      this.notifyToast("document", 
                         `${player.name} takes Document from Rummage Sale`,
                       );
                       this._onPlayerGainDocument(player);
@@ -2353,7 +2360,7 @@ export default class EmigrationEngine {
         }
         player.money += 3;
         this.log(`P${player.id}|ACT:Rummage Sale|GAIN:3|NO_DOCS`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} gains $3 from Rummage Sale (no Docs available)`,
         );
         done();
@@ -2371,7 +2378,7 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Island Paradise|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} gains $1 and players with the fewest Docs gain $1`,
         );
         done();
@@ -2385,7 +2392,7 @@ export default class EmigrationEngine {
           (targetId) => {
             const target = this.players[targetId];
             const temp = player.money;
-            toast.money(
+            this.notifyToast("money", 
               `${player.name} ($${player.money}) swaps wallets with ${target.name} ($${target.money})`,
             );
             player.money = target.money;
@@ -2405,7 +2412,7 @@ export default class EmigrationEngine {
         const bonus = Math.floor(maxM / 2);
         player.money += bonus;
         this.log(`P${player.id}|ACT:VIP|GAIN:${bonus}`, "action");
-        toast.money(`${player.name} VIP: gains ${bonus}`);
+        this.notifyToast("money", `${player.name} VIP: gains ${bonus}`);
         done();
         break;
       }
@@ -2413,7 +2420,7 @@ export default class EmigrationEngine {
       case "Fancy Clothes":
         player.money += 3;
         this.log(`P${player.id}|ACT:Fancy Clothes|GAIN:3`, "action");
-        toast.money(`${player.name} Fancy Clothes: gains $3`);
+        this.notifyToast("money", `${player.name} Fancy Clothes: gains $3`);
         done();
         break;
 
@@ -2443,7 +2450,7 @@ export default class EmigrationEngine {
                   `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
                   "action",
                 );
-                toast.money(
+                this.notifyToast("money", 
                   `${player.name} Social Butterfly: takes $${stolen} from ${target.name}`,
                 );
                 done();
@@ -2476,7 +2483,7 @@ export default class EmigrationEngine {
                             `P${player.id}|ACT:Social Butterfly|TAKE:CONN:${taken.name}|FROM:P${target.id}`,
                             "action",
                           );
-                          toast.connection(
+                          this.notifyToast("connection", 
                             `${player.name} Social Butterfly: takes Connection from ${target.name}`,
                           );
                           this._onPlayerGainConnection(player);
@@ -2491,7 +2498,7 @@ export default class EmigrationEngine {
                         `P${player.id}|ACT:Social Butterfly|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
                         "action",
                       );
-                      toast.money(
+                      this.notifyToast("money", 
                         `${player.name} Social Butterfly: takes $${stolen} from ${target.name}`,
                       );
                       done();
@@ -2514,7 +2521,7 @@ export default class EmigrationEngine {
           `P${player.id}|ACT:Identical Twin|GAIN:1|EXTRA_TURN`,
           "action",
         );
-        toast.life(`${player.name} Identical Twin: takes another turn`);
+        this.notifyToast("life", `${player.name} Identical Twin: takes another turn`);
         done();
         break;
 
@@ -2531,7 +2538,7 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Reward|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} gains $1 from Reward and takes $1 from every other player`,
         );
         done();
@@ -2566,7 +2573,7 @@ export default class EmigrationEngine {
                   `P${player.id}|ACT:Suspect|DISC:${disc.name}`,
                   "action",
                 );
-                toast.warning(
+                this.notifyToast("warning", 
                   `${player.name} Suspect: loses $1 and discards ${disc.name}`,
                 );
                 this._onCardDiscarded(player, disc);
@@ -2586,7 +2593,7 @@ export default class EmigrationEngine {
                       `P${player.id}|ACT:Suspect|DISC:${disc.name}`,
                       "action",
                     );
-                    toast.warning(
+                    this.notifyToast("warning", 
                       `${player.name} Suspect: loses $1 and discards ${disc.name}`,
                     );
                     this._onCardDiscarded(player, disc);
@@ -2599,7 +2606,7 @@ export default class EmigrationEngine {
           return;
         }
         this.log(`P${player.id}|ACT:Suspect|NOTHING_TO_LOSE`, "system");
-        toast.money(`${player.name} Suspect: loses $1 (no Doc or Con to lose)`);
+        this.notifyToast("money", `${player.name} Suspect: loses $1 (no Doc or Con to lose)`);
         done();
         break;
 
@@ -2607,7 +2614,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Salvage|GAIN:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Salvage, gains $1`);
+        this.notifyToast("money", `${player.name} keeps Salvage, gains $1`);
         done();
         break;
 
@@ -2615,7 +2622,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Blacklisted|LOSS:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Blacklisted, loses $1`);
+        this.notifyToast("money", `${player.name} keeps Blacklisted, loses $1`);
         done();
         break;
 
@@ -2636,7 +2643,7 @@ export default class EmigrationEngine {
                   `P${player.id}|ACT:Trousers Fall Down|LOSS:3`,
                   "action",
                 );
-                toast.money(`${player.name} Trousers Fall Down: loses $3`);
+                this.notifyToast("money", `${player.name} Trousers Fall Down: loses $3`);
 
                 done();
               } else {
@@ -2650,7 +2657,7 @@ export default class EmigrationEngine {
                       `P${player.id}|ACT:Trousers Fall Down|DISC:${disc.name}`,
                       "action",
                     );
-                    toast.document(
+                    this.notifyToast("document", 
                       `${player.name} Trousers Fall Down: discards ${disc.name}`,
                     );
                     this._onCardDiscarded(player, disc);
@@ -2667,7 +2674,7 @@ export default class EmigrationEngine {
           `P${player.id}|ACT:Trousers Fall Down|LOSS:3|NO_DOCS`,
           "action",
         );
-        toast.money(`${player.name} Trousers Fall Down: loses $3 (no Docs)`);
+        this.notifyToast("money", `${player.name} Trousers Fall Down: loses $3 (no Docs)`);
         done();
         break;
 
@@ -2675,14 +2682,14 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Keep Calm|GAIN:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Keep Calm, gains $1`);
+        this.notifyToast("money", `${player.name} keeps Keep Calm, gains $1`);
         done();
         break;
 
       case "Life Coach":
         player.assurance += 1;
         this.log(`P${player.id}|ACT:Life Coach|GAIN_A:1`, "action");
-        toast.assurance(`${player.name} Life Coach: gains 1 Assurance`);
+        this.notifyToast("assurance", `${player.name} Life Coach: gains 1 Assurance`);
         done();
         break;
 
@@ -2698,7 +2705,7 @@ export default class EmigrationEngine {
                 `P${player.id}|ACT:Shredder Accident|DISC:${disc.name}`,
                 "action",
               );
-              toast.document(
+              this.notifyToast("document", 
                 `${player.name} Shredder Accident: discards ${disc.name}`,
               );
               this._onCardDiscarded(player, disc);
@@ -2712,7 +2719,7 @@ export default class EmigrationEngine {
           `P${player.id}|ACT:Shredder Accident|LOSS:1|NO_DOCS`,
           "action",
         );
-        toast.money(`${player.name} Shredder Accident: loses $1 (no Docs)`);
+        this.notifyToast("money", `${player.name} Shredder Accident: loses $1 (no Docs)`);
         done();
         break;
 
@@ -2728,7 +2735,7 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Camping|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} gains $1 from Camping and player(s) with the least Connections gain $1`,
         );
         done();
@@ -2738,7 +2745,7 @@ export default class EmigrationEngine {
       case "FOMO":
         player.money = Math.max(0, player.money - 1);
         this.log(`P${player.id}|ACT:FOMO|LOSS:1`, "action");
-        toast.money(`${player.name} Fomo: loses $1`);
+        this.notifyToast("money", `${player.name} Fomo: loses $1`);
         this._setPendingChoice({
           id: "fomo",
           title: "FOMO: Trade destinations with another player?",
@@ -2755,7 +2762,7 @@ export default class EmigrationEngine {
             if (val !== "skip") {
               const target = this.players[parseInt(val)];
               const temp = player.destination;
-              toast.life(
+              this.notifyToast("life", 
                 `${player.name} Fomo: trades Destinations (${player.destination.name}) with ${target.name} (${target.destination.name})`,
               );
               player.destination = target.destination;
@@ -2787,7 +2794,7 @@ export default class EmigrationEngine {
               if (val === "money") {
                 player.money += 2;
                 this.log(`P${player.id}|ACT:Nostalgia|GAIN:2`, "action");
-                toast.money(`${player.name} Nostalgia: gains $2`);
+                this.notifyToast("money", `${player.name} Nostalgia: gains $2`);
                 done();
               } else {
                 const lifeIdx = parseInt(val.split("-")[1]);
@@ -2800,7 +2807,7 @@ export default class EmigrationEngine {
                         `P${player.id}|ACT:Nostalgia|REPLAY:${taken.title}`,
                         "action",
                       );
-                      toast.life(
+                      this.notifyToast("life", 
                         `${player.name} Nostalgia: replays ${taken.title}`,
                       );
                       this._resolveLifeCardEffect(player, taken, () => {
@@ -2821,7 +2828,7 @@ export default class EmigrationEngine {
         }
         player.money += 2;
         this.log(`P${player.id}|ACT:Nostalgia|GAIN:2|NO_LIFE`, "action");
-        toast.money(`${player.name} Nostalgia: gains $2 (no Life Card)`);
+        this.notifyToast("money", `${player.name} Nostalgia: gains $2 (no Life Card)`);
         done();
         break;
       }
@@ -2870,7 +2877,7 @@ export default class EmigrationEngine {
                             `P${player.id}|ACT:Lost & Found|TAKE:DOC:${taken.name}|FROM:P${target.id}`,
                             "action",
                           );
-                          toast.document(
+                          this.notifyToast("document", 
                             `${player.name} Lost & Found: takes ${taken.name} from ${target.name}`,
                           );
                           this._onPlayerGainDocument(player);
@@ -2885,7 +2892,7 @@ export default class EmigrationEngine {
                         `P${player.id}|ACT:Lost & Found|TAKE:MONEY:${stolen}|FROM:P${target.id}`,
                         "action",
                       );
-                      toast.money(
+                      this.notifyToast("money", 
                         `${player.name} Lost & Found: takes $${stolen} from ${target.name}`,
                       );
                       done();
@@ -2914,8 +2921,8 @@ export default class EmigrationEngine {
         });
         this.log(`P${player.id}|ACT:PANDEMIC_STIMULUS|${deltaStr}`, "action");
         if (this.pandemicStimulusCount % 2 === 1)
-          toast.money(`${player.name} Pandemic: everyone loses $${roll}`);
-        else toast.money(`${player.name} Pandemic: everyone gains $${roll}`);
+          this.notifyToast("money", `${player.name} Pandemic: everyone loses $${roll}`);
+        else this.notifyToast("money", `${player.name} Pandemic: everyone gains $${roll}`);
         done();
         break;
       }
@@ -2971,7 +2978,7 @@ export default class EmigrationEngine {
                     `P${player.id}|ACT:Mental Fog|DISC_STASH:${disc.title}|FROM:P${candidate.owner.id}`,
                     "action",
                   );
-                  toast.warning(
+                  this.notifyToast("warning", 
                     `${player.name} Mental Fog: loses $1 and discards ${disc.title} from ${candidate.owner.name}`,
                   );
                 } else {
@@ -2987,7 +2994,7 @@ export default class EmigrationEngine {
                       `P${player.id}|ACT:Mental Fog|DISC_LAYOUT:${removed.card.title}|FROM:P${candidate.owner.id}`,
                       "action",
                     );
-                    toast.warning(
+                    this.notifyToast("warning", 
                       `${player.name} Mental Fog: loses $1 and discards ${removed.card.title} from ${candidate.owner.name}`,
                     );
                     this.uncoverLayout(candidate.owner);
@@ -3005,7 +3012,7 @@ export default class EmigrationEngine {
       case "Insider":
         player.money += 3;
         this.log(`P${player.id}|ACT:Insider|GAIN:3`, "action");
-        toast.money(`${player.name} Insider: gains $3`);
+        this.notifyToast("money", `${player.name} Insider: gains $3`);
         done();
         break;
 
@@ -3023,7 +3030,7 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Philanthropy|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} loses $1 from Philanthropy, and distributes $1 to every other player`,
         );
         done();
@@ -3039,7 +3046,7 @@ export default class EmigrationEngine {
           player.money += 1;
         });
         this.log(`P${player.id}|ACT:Bailout|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} gains $1 from Bailout and player(s) with the least Money gain $1`,
         );
         done();
@@ -3063,7 +3070,7 @@ export default class EmigrationEngine {
           }
         });
         this.log(`P${player.id}|ACT:Share|${deltaStr}`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} distributes half their Money ($${half}) to other players.`,
         );
         done();
@@ -3074,7 +3081,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Pay Cut|LOSS:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Pay Cut, loses $1`);
+        this.notifyToast("money", `${player.name} keeps Pay Cut, loses $1`);
         done();
         break;
 
@@ -3083,7 +3090,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.accessFee = Math.max(0, player.accessFee - 1);
         this.log(`P${player.id}|ACT:Productivity|GAIN:1|FEE_DEC:1`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} Productivity: gains $1 and Access Fee decreases to ${player.accessFee}`,
         );
         done();
@@ -3093,7 +3100,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.accessFee = Math.min(5, player.accessFee + 1);
         this.log(`P${player.id}|ACT:Tariffs|LOSS:1|FEE_INC:1`, "action");
-        toast.money(
+        this.notifyToast("money", 
           `${player.name} Tariffs: loses $1 and Access Fee increases to ${player.accessFee}`,
         );
         done();
@@ -3111,7 +3118,7 @@ export default class EmigrationEngine {
               `P${player.id}|ACT:Boost|GAIN:${amt}|FROM_NAT_STARTING:P${targetId}`,
               "action",
             );
-            toast.money(
+            this.notifyToast("money", 
               `${player.name} Boost: gains $${amt} (${target.name}'s Starting Money amount)`,
             );
             done();
@@ -3123,7 +3130,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Persuasion|GAIN:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Persuasion, gains $1`);
+        this.notifyToast("money", `${player.name} keeps Persuasion, gains $1`);
         done();
         break;
 
@@ -3132,14 +3139,14 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Underdog|LOSS:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Underdog, loses $1`);
+        this.notifyToast("money", `${player.name} keeps Underdog, loses $1`);
         done();
         break;
 
       case "Frontrunner":
         player.stash.lifeCards.push({ ...card, money: 1 });
         this.log(`P${player.id}|ACT:Frontrunner|MONEY_PLACED:1|KEEP`, "action");
-        toast.life(`${player.name} keeps Frontrunner, places $1 on card`);
+        this.notifyToast("life", `${player.name} keeps Frontrunner, places $1 on card`);
         done();
         break;
 
@@ -3147,7 +3154,7 @@ export default class EmigrationEngine {
         player.money = Math.max(0, player.money - 1);
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Penalty|LOSS:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Penalty, loses $1`);
+        this.notifyToast("money", `${player.name} keeps Penalty, loses $1`);
         done();
         break;
 
@@ -3155,7 +3162,7 @@ export default class EmigrationEngine {
         player.money += 1;
         player.stash.lifeCards.push({ ...card });
         this.log(`P${player.id}|ACT:Star Power|GAIN:1|KEEP`, "action");
-        toast.money(`${player.name} keeps Star Power, gains $1`);
+        this.notifyToast("money", `${player.name} keeps Star Power, gains $1`);
         done();
         break;
 
@@ -3231,7 +3238,7 @@ export default class EmigrationEngine {
     const totalCost = cost + fee;
     if (player.money < totalCost) {
       this.log(`ERR|NO_FUNDS_${totalCost}`, "error");
-      toast.error(`${player.name} can't buy card: not enough funds`);
+      this.notifyToast("error", `${player.name} can't buy card: not enough funds`);
       return;
     }
 
@@ -3247,9 +3254,9 @@ export default class EmigrationEngine {
         "action",
       );
       if (player.id === target.id)
-        toast.document(`${player.name} buys Document for $${cost}`);
+        this.notifyToast("document", `${player.name} buys Document for $${cost}`);
       else
-        toast.document(
+        this.notifyToast("document", 
           `${player.name} buys Document ($${cost}) from ${target.name} (+$${fee} Access Fee)`,
         );
       this._onPlayerGainDocument(player);
@@ -3260,9 +3267,9 @@ export default class EmigrationEngine {
         "action",
       );
       if (player.id === target.id)
-        toast.connection(`${player.name} buys Connection for $${cost}`);
+        this.notifyToast("connection", `${player.name} buys Connection for $${cost}`);
       else
-        toast.connection(
+        this.notifyToast("connection", 
           `${player.name} buys Connection ($${cost}) from ${target.name} (+$${fee} Access Fee)`,
         );
       this._onPlayerGainConnection(player);
@@ -3282,7 +3289,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.connections.length < 1) {
         this.log("ERR|NEED_CONN", "error");
-        toast.error(`${player.name} needs a Connection to buy a Ticket`);
+        this.notifyToast("error", `${player.name} needs a Connection to buy a Ticket`);
         return;
       }
       if (player.money < 2) {
@@ -3293,7 +3300,7 @@ export default class EmigrationEngine {
       this.publicServices.tickets--;
       player.stash.tickets++;
       this.log(`P${player.id}|BUY_POOL:Ticket|COST:2`, "action");
-      toast.info(`${player.name} buys a Ticket for $2`);
+      this.notifyToast("info", `${player.name} buys a Ticket for $2`);
     } else {
       if (this.publicServices.passports <= 0) {
         this.log("ERR|NO_PASSPORTS_IN_POOL", "error");
@@ -3301,7 +3308,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.documents.length < 1) {
         this.log("ERR|NEED_DOC", "error");
-        toast.error(`${player.name} needs a Document to buy a Passport`);
+        this.notifyToast("error", `${player.name} needs a Document to buy a Passport`);
         return;
       }
       if (player.money < 2) {
@@ -3312,7 +3319,7 @@ export default class EmigrationEngine {
       this.publicServices.passports--;
       player.stash.passports++;
       this.log(`P${player.id}|BUY_POOL:Passport|COST:2`, "action");
-      toast.info(`${player.name} buys Passport for $2`);
+      this.notifyToast("info", `${player.name} buys Passport for $2`);
     }
     this.checkTicketPassportBonus(player);
     this.advanceTurn();
@@ -3332,7 +3339,7 @@ export default class EmigrationEngine {
       this.publicServices.tickets--;
       player.stash.tickets++;
       this.log(`P${player.id}|STEAL:Ticket|SKIP_NEXT`, "action");
-      toast.warning(`${player.name} steals a Ticket and skips next turn`);
+      this.notifyToast("warning", `${player.name} steals a Ticket and skips next turn`);
     } else {
       if (
         this.publicServices.passports <= 0 ||
@@ -3344,7 +3351,7 @@ export default class EmigrationEngine {
       this.publicServices.passports--;
       player.stash.passports++;
       this.log(`P${player.id}|STEAL:Passport|SKIP_NEXT`, "action");
-      toast.warning(`${player.name} steals a Passport and skips next turn`);
+      this.notifyToast("warning", `${player.name} steals a Passport and skips next turn`);
     }
     player.skipNextTurn = true;
     this.checkTicketPassportBonus(player);
@@ -3375,7 +3382,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.connections.length < 1) {
         this.log("ERR|NEED_CONN", "error");
-        toast.error(`${player.name} needs a Connection to reclaim a Ticket`);
+        this.notifyToast("error", `${player.name} needs a Connection to reclaim a Ticket`);
         return;
       }
       player.money -= cost;
@@ -3387,7 +3394,7 @@ export default class EmigrationEngine {
         `P${player.id}|RECLAIM:Ticket|FROM:P${target.id}|COST:${cost}`,
         "action",
       );
-      toast.info(
+      this.notifyToast("info", 
         `${player.name} reclaims a Ticket from ${target.name} for $${cost}`,
       );
     } else {
@@ -3397,7 +3404,7 @@ export default class EmigrationEngine {
       }
       if (player.stash.documents.length < 1) {
         this.log("ERR|NEED_DOC", "error");
-        toast.error("Need Document");
+        this.notifyToast("error", "Need Document");
         return;
       }
       player.money -= cost;
@@ -3409,7 +3416,7 @@ export default class EmigrationEngine {
         `P${player.id}|RECLAIM:Passport|FROM:P${target.id}|COST:${cost}`,
         "action",
       );
-      toast.info(
+      this.notifyToast("info", 
         `${player.name} reclaims a Passport from ${target.name} for $${cost}`,
       );
     }
@@ -3473,15 +3480,15 @@ export default class EmigrationEngine {
       removed.card.type.charAt(0).toUpperCase() + removed.card.type.slice(1);
     if (player.id === target.id)
       if (cardType === "Document")
-        toast.document(`${player.name} discards a ${cardType} and gains $2`);
+        this.notifyToast("document", `${player.name} discards a ${cardType} and gains $2`);
       else
-        toast.connection(`${player.name} discards a ${cardType} and gains $2`);
+        this.notifyToast("connection", `${player.name} discards a ${cardType} and gains $2`);
     else if (cardType === "Document")
-      toast.document(
+      this.notifyToast("document", 
         `${player.name} discards a ${cardType} from ${target.name} ($${fee} Access Fee)`,
       );
     else
-      toast.connection(
+      this.notifyToast("connection", 
         `${player.name} discards a ${cardType} from ${target.name} ($${fee} Access Fee)`,
       );
     this._onCardDiscarded(player, removed.card, true);
@@ -3522,7 +3529,7 @@ export default class EmigrationEngine {
         `P${player.id}|COLLEGE_APP|ROLL:${roll}|TUITION:${tuition}|RES:PASS`,
         "action",
       );
-      toast.success(
+      this.notifyToast("success", 
         `${player.name} goes to college (rolls ${roll}, pays $${tuition})`,
       );
       this.advanceTurn();
@@ -3533,7 +3540,7 @@ export default class EmigrationEngine {
         `P${player.id}|COLLEGE_APP|ROLL:${roll}|TUITION:${tuition}|RES:FAIL`,
         "error",
       );
-      toast.error(
+      this.notifyToast("error", 
         `${player.name} fails to go to college (rolls ${roll}, tuition is $${tuition})`,
       );
       if (!this.canPerformAnyRequiredAction(player)) {
