@@ -1,19 +1,20 @@
-//  pending (in emulator but not yet in print & play): {
-//     version: "0.1.2",
-//     date: "July 30, 2026",
-//     items: [
-//       "Rule change: If a player Forfeits their turn, they gain $1
-//       "Rule change: SALARY_RAISES — changed from [1, 3] to [3, 2].
-//       "Rule change: Graduation — First time is +2 Assurance, second time is +1 Assurance
-//       "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.
-//       "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.
-//       "Life Card change: Insider — Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.
-//       "Life Card change: Salvage - Gain $1. Keep this card in your stash and whenever another player discards a Document gain $1.                                                                        |
-//       "Life Card change: Blacklisted - Lose $1. Keep this card in your stash and if you discard a Connection, lose $1.     
-//       "Life Card change: Frontrunner - Max $3 instead of max $5    
-//       "Destination changes: Bosnia, DRC, Senegal ' others — document penalty threshold raised from < 2 → −2 to < 3 → −3
-//     ],
-//   },
+export const pendingChanges =  {
+    version: "0.1.2",
+    date: "July 30, 2026",
+    items: [
+      "Rule change: If a player Forfeits their turn, they gain $1",
+      "Rule change: SALARY_RAISES — changed from [1, 3] to [3, 2].",
+      "Rule change: Graduation — changed from [2, 2] to [2, 1]",
+      "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.",
+      "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",
+      "Rule change: Ticket + Passport bonus in 2 or 3 player games is +2, in 4+ player game's it's still +1.",
+      "Destination changes: multiple thresholds updated",
+      "Life Card change: Insider — Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.",
+      "Life Card change: Salvage - Gain $1. Keep this card in your stash and whenever another player discards a Document gain $1.                                                                        |",
+      "Life Card change: Blacklisted - Lose $1. Keep this card in your stash and if you discard a Connection, lose $1.     ",
+      "Life Card change: Frontrunner - Max $3 instead of max $5",
+    ],
+  };
 
 export const changelog = [
   {

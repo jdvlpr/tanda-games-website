@@ -27,7 +27,11 @@
   import SettingsModal from "./SettingsModal.svelte";
   import SetupScreen from "./SetupScreen.svelte";
   import { copyRoomUrl, useOnlineRoom } from "./useOnlineRoom.svelte.js";
-  import { getRandomPacks, getRandomPlayersSetup, createStandardGameSetup } from "./gameSetup.js";
+  import {
+    getRandomPacks,
+    getRandomPlayersSetup,
+    createStandardGameSetup,
+  } from "./gameSetup.js";
 
   // Props
   let { defaultMode = "competitive", defaultPlayerCount = 4 } = $props();
@@ -55,8 +59,6 @@
     return !!params.get("showRobotMode");
   }
 
-
-
   // Setup State
   let isSetup = $state(true);
   let mode = $state(defaultMode);
@@ -65,7 +67,7 @@
   let botPersonas = $state({});
 
   // Bot personas available for random assignment are now defined in autoplay.js
-  
+
   /**
    * Returns a copy of botPersonas with any unset bot slot filled with a random persona.
    * Explicit SetupScreen selections are always preserved.
@@ -154,10 +156,11 @@
             ? remoteSnapshot.players
             : [],
           onLog: (entry) => {
-        if (engine) snapshot = engine.getSnapshot();
-        if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
-      },
+            if (engine) snapshot = engine.getSnapshot();
+            if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
+            if (entry?.type === "toast")
+              toast[entry.style](entry.toastMsg, entry.opts);
+          },
           onStateChange: () => {
             if (engine) {
               snapshot = engine.getSnapshot();
@@ -587,7 +590,8 @@
       onLog: (entry) => {
         if (engine) snapshot = engine.getSnapshot();
         if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
+        if (entry?.type === "toast")
+          toast[entry.style](entry.toastMsg, entry.opts);
       },
       onStateChange: () => {
         if (engine) {
@@ -655,7 +659,8 @@
       onLog: (entry) => {
         if (engine) snapshot = engine.getSnapshot();
         if (entry?.msg?.includes("SALARIES:")) playPaydaySound();
-        if (entry?.type === 'toast') toast[entry.style](entry.toastMsg, entry.opts);
+        if (entry?.type === "toast")
+          toast[entry.style](entry.toastMsg, entry.opts);
       },
       onStateChange: () => {
         if (engine) {
@@ -690,7 +695,9 @@
     if (requestedGameType === "auto") {
       // AI Simulation: all players AI-controlled, plays at speed
       activeBotIndices = engine.players.map((_, i) => i);
-      autoplay = createAutoPlayer(engine, "expert", { personas: resolvePersonas(activeBotIndices) });
+      autoplay = createAutoPlayer(engine, "expert", {
+        personas: resolvePersonas(activeBotIndices),
+      });
       autoplay.playFullGame(100);
     } else if (requestedGameType === "vscomputer") {
       // Solo vs AI: Player 1 (index 0) is human, all others AI

@@ -1,6 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   import { fade, fly } from "svelte/transition";
+  import { pendingChanges } from "../../js/emegration-changelog";
 
   /**
    * Renders the Rulebook PDF in an overlay modal.
@@ -9,10 +10,7 @@
    *   show        – bind:show to toggle visibility
    *   rulebookHref – URL to the PDF file
    */
-  let {
-    show = $bindable(false),
-    rulebookHref = "",
-  } = $props();
+  let { show = $bindable(false), rulebookHref = "" } = $props();
 </script>
 
 {#if show}
@@ -26,7 +24,7 @@
   >
     <div
       in:fly={{ y: -50 }}
-      class="bg-neutral-200 dark:bg-neutral-800 p-2 rounded-2xl w-[95%] shadow-xl max-h-[90vh] overflow-y-auto"
+      class="bg-neutral-200 dark:bg-neutral-800 p-8 rounded-2xl w-[95%] shadow-xl max-h-[90vh] overflow-y-auto"
     >
       <div class="flex justify-between gap-2">
         <h2 class="text-xl font-semibold text-center">Rulebook</h2>
@@ -38,6 +36,18 @@
         >
       </div>
       <p class="text-left opacity-70 text-xs mb-2">23 MB</p>
+
+      <div class="flex flex-col items-start opacity-70 text-left mb-2">
+        <p class="font-semibold text-xs">
+          Note the following rule changes which haven't been incorporated into
+          the PDF Print & Play game yet:
+        </p>
+        {#each pendingChanges.items as item}
+          <p class="text-xs flex gap-1 items-start">
+            <span class="font-bold">- </span>{item}
+          </p>
+        {/each}
+      </div>
       <div
         class="w-full h-[80vh] border border-slate-200 rounded-lg shadow-sm overflow-hidden bg-slate-50"
       >
