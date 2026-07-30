@@ -2,7 +2,7 @@
   import Icon from "@iconify/svelte";
   import { copyRoomUrl } from "./useOnlineRoom.svelte.js";
   import { PACKS_LIST } from "./engine.svelte.js";
-  import { getRandomPersona } from "./autoplay.js";
+  import { BOT_PERSONAS, getRandomPersona } from "./autoplay.js";
 
   /**
    * Pre-game setup screen.
@@ -288,12 +288,12 @@
               <div class="w-fit flex flex-col gap-2 h-fit">
                 <p class="text-sm opacity-70 text-left">Skill</p>
                 <select class="w-fit" bind:value={botPersonas[i]}>
-                  <option value="expert">Expert</option>
-                  <option value="rusher">Rusher</option>
-                  <option value="hoarder">Hoarder</option>
-                  <option value="saboteur">Saboteur</option>
-                  <option value="conservative">Conservative</option>
-                  <option value="easy">Easy</option>
+                  {#each BOT_PERSONAS as persona}
+                    <option value={persona}
+                      >{persona.charAt(0).toUpperCase() +
+                        persona.slice(1)}</option
+                    >
+                  {/each}
                 </select>
               </div>
             {/if}
