@@ -1,3 +1,13 @@
+//  pending (in emulator but not in print & play): {
+//     version: "0.1.2",
+//     date: "July 30, 2026",
+//     items: [
+//       "Rule change: If a player Forfeits their turn, they gain $1
+//       "Destination changes: Bosnia, DRC, Senegal — document penalty threshold raised from < 2 → −2 to < 3 → −3
+//       "Rule change: SALARY_RAISES — changed from [1, 3] to [1, 2]. Max salary is now 4 instead of 5
+//     ],
+//   },
+
 export const changelog = [
   {
     version: "0.1.1",

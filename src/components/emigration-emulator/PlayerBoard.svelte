@@ -216,7 +216,7 @@
               class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >=
                 2 && 'border-solid bg-green-100 dark:bg-green-900'}"
             >
-              +$3
+              +$2
             </div>
           </div>
         </span>

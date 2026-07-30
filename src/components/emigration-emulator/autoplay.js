@@ -745,8 +745,14 @@ export function createAutoPlayer(
         } else {
           score = -10;
         }
-        if (isSaboteur) score += 20;
-        if (isConservative) return -100; // Never steals — prefers buyPool
+        if (isSaboteur) score += 10 + playerCount * 2;
+        if (isConservative) {
+          // Allow steal only when critically short: no ticket/passport AND can't afford buyPool
+          const isTicket = move.params.cardType === "ticket";
+          const alreadyHas = isTicket ? pTickets >= 1 : pPassports >= 1;
+          if (alreadyHas || player.money >= 2) return -100;
+          // else fall through: critical-need steal is permitted
+        }
       } else if (move.type === "applyCollege") {
         const maxTuition = (player.startingFund || 6) + 6;
         const reserveNeeded = (isConservative || isScholar)
@@ -759,7 +765,7 @@ export function createAutoPlayer(
           // Dynamic College ROI calculation based on remaining deck size and estimated paydays
           const totalPaydaysInDeck = playerCount * 4;
           const expectedPaydaysRemaining = Math.max(1, totalPaydaysInDeck * (1 - layoutProgress));
-          const nextRaise = player.payRaiseSlotsFilled === 0 ? 1 : 3;
+          const nextRaise = player.payRaises === 0 ? 1 : 2;
           const roiFinancial = nextRaise * expectedPaydaysRemaining - maxTuition;
           const roiAssurance = 8; // Graduation gives +2 Assurance (~8 pts)
           const totalROI = roiFinancial + roiAssurance;

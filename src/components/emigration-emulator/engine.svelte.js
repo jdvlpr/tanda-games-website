@@ -91,7 +91,7 @@ export const DESTINATIONS = [
   const allTargets = [
     {
       m: { setSize: 6, reward: 2 },
-      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 6 },
     },
     {
@@ -101,7 +101,7 @@ export const DESTINATIONS = [
     },
     {
       m: { setSize: 6, reward: 2 },
-      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 6 },
     },
     {
@@ -116,7 +116,7 @@ export const DESTINATIONS = [
     },
     {
       m: { setSize: 7, reward: 2 },
-      d: { setSize: 4, reward: 2, minRequired: 2, penalty: 2 },
+      d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 5 },
     },
     {
@@ -700,7 +700,7 @@ export const LAYOUT_COVERS = {
 };
 
 /** Pay raise amounts for the 2 career slots. */
-export const SALARY_RAISES = [1, 3];
+export const SALARY_RAISES = [1, 2];
 
 /** Maximum number of pay raise slots. */
 export const MAX_PAY_RAISES = 2;
@@ -1932,20 +1932,12 @@ export default class EmigrationEngine {
       case "applyCollege":
         return this._doApplyCollege(player);
       case "forfeit":
-        this.consecutiveForfeits++;
+        player.money += 1;
         this.log(
-          `P${player.id}|FORFEIT|CONS:${this.consecutiveForfeits}`,
+          `P${player.id}|FORFEIT|GAIN:1`,
           "error",
         );
-        this.notifyToast("warning", `${player.name} forfeits turn`);
-        if (this.consecutiveForfeits >= this.players.length) {
-          this.log("ALL_FORFEIT|GAIN:1", "system");
-          this.notifyToast("warning", `All players forfeit turns, gain $1`);
-          this.players.forEach((p) => {
-            p.money += 1;
-          });
-          this.consecutiveForfeits = 0;
-        }
+        this.notifyToast("warning", `${player.name} forfeits — gains $1`);
         this.advanceTurn();
         return;
     }
@@ -3682,12 +3674,12 @@ export function runTests() {
   try {
     assert(SALARY_RAISES.length === 2, "2 pay raise slots");
     assert(SALARY_RAISES[0] === 1, "First raise = +$1");
-    assert(SALARY_RAISES[1] === 3, "Second raise = +$3");
+    assert(SALARY_RAISES[1] === 2, "Second raise = +$2");
     let salary = 1;
     salary += SALARY_RAISES[0];
     assert(salary === 2, "After 1st raise: salary = $2");
     salary += SALARY_RAISES[1];
-    assert(salary === 5, "After 2nd raise: salary = $5");
+    assert(salary === 4, "After 2nd raise: salary = $4");
   } catch (e) {
     assert(false, `Pay raise error: ${e.message}`);
   }

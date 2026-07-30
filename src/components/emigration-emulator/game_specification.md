@@ -84,12 +84,12 @@ Each Career Card has **2 Pay Raise Slots**:
 | Slot | Raise Amount | Resulting Salary |
 | :--: | :----------: | :--------------: |
 |  1   |     +$1      |        $2        |
-|  2   |     +$3      |        $5        |
+|  2   |     +$2      |        $4        |
 
 - All players start with a base salary of **$1**.
 - Graduating from college fills the next open slot, permanently increasing salary.
 - Once both slots are filled, the player's career is **maxed** and they may not apply for college again.
-- Total maximum salary is **$5** (1 base + 1 first raise + 3 second raise).
+- Total maximum salary is **$4** (1 base + 1 first raise + 2 second raise).
 
 ---
 
@@ -120,15 +120,15 @@ Each Destination card outlines the specific requirements to earn or lose Assuran
 
 | Destination                      | Money                                 | Documents                            | Connections       |
 | :------------------------------- | :------------------------------------ | :----------------------------------- | :---------------- |
-| **Bosnia and Herzegovina**       | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +6     |
-| **China**                        | ≥ 10 &rarr; +3 <br> < 4 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 4 &rarr; +5     |
-| **Democratic Republic of Congo** | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +6     |
-| **France**                       | ≥ 8 &rarr; +2 <br> < 3 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
-| **Russia**                       | ≥ 7 &rarr; +2 <br> < 2 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
-| **Senegal**                      | ≥ 7 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +5     |
-| **Switzerland**                  | ≥ 7 &rarr; +2 <br> < 2 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
-| **England**                      | ≥ 10 &rarr; +3 <br> < 4 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
-| **United States of America**     | ≥ 10 &rarr; +3 <br> < 5 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 4 &rarr; +5     |
+| **Bosnia and Herzegovina**       | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
+| **China**                        | ≥ 10 &rarr; +3 < 4 &rarr; -2          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 4 &rarr; +5     |
+| **Democratic Republic of Congo** | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
+| **France**                       | ≥ 8 &rarr; +2 < 3 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **Russia**                       | ≥ 7 &rarr; +2 < 2 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **Senegal**                      | ≥ 7 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +5     |
+| **Switzerland**                  | ≥ 7 &rarr; +2 < 2 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **England**                      | ≥ 10 &rarr; +3 < 4 &rarr; -2          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **United States of America**     | ≥ 10 &rarr; +3 < 5 &rarr; -2          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 4 &rarr; +5     |
 
 ### 3.3 Security Lanes
 
@@ -208,10 +208,9 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 
 #### Exceptions / Forfeit Rule
 
-- If a player **cannot perform any** of the Required Actions, they **forfeit** their turn entirely.
-- A player might be able to do an Optional Action and still not be able to do a Required Action — the turn is still forfeited.
+- If a player **cannot perform any** of the Required Actions, they **forfeit** their turn and take **$1 from the bank**.
+- A player might be able to do an Optional Action and still not be able to do a Required Action — the turn is still forfeited (and they still gain $1).
 - If a player **can** do a Required Action, they **must** do one.
-- If **no player** can do a Required Action, every player takes **$1 from the bank** and the next player takes their turn.
 
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
