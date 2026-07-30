@@ -428,7 +428,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain $1. Keep this card in your stash and whenever another player discards a card, gain $1.",
+      "Gain $1. Keep this card in your stash and whenever another player discards a Document or Connection, gain $1.",
   },
   {
     title: "Blacklisted",
@@ -437,7 +437,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose $1. Keep this card in your stash and if you discard a card, lose $1.",
+      "Lose $1. Keep this card in your stash and if you discard a Document or Connection, lose $1.",
   },
   {
     title: "Trousers Fall Down",
@@ -992,9 +992,16 @@ export default class EmigrationEngine {
 
   // ─── Hooks ───────────────────────────────────────────────────────────
 
-  /** Called when a card is discarded. Triggers Salvage/Blacklisted. */
+  /**
+   * Called when a card is discarded.
+   * Triggers Salvage/Blacklisted ONLY when the DISCARD required action removes
+   * a Document or Connection from a layout. Life cards and Paydays discarded
+   * via activation, selling, or any other means do NOT trigger these effects.
+   */
   _onCardDiscarded(discardingPlayer, card, isDiscardAction = false) {
     if (!isDiscardAction) return;
+    // Only Documents and Connections trigger Salvage/Blacklisted.
+    if (card.type !== "document" && card.type !== "connection") return;
     // Salvage: other players gain $1
     for (const p of this.players) {
       if (
@@ -3800,10 +3807,29 @@ export function runTests() {
     actor.money = 10;
     eng.currentPlayerIdx = 1;
     eng.executeRequiredAction("activate", { targetPlayerIdx: 1, slotIdx: 11 });
+    // Resolve any pendingChoice from Nostalgia (e.g. gain $2 option)
+    if (eng.pendingChoice) eng.resolveChoice(eng.pendingChoice.options[0].value);
 
     assert(
-      salvageOwner.money === 3,
-      "Salvage triggers when another player activates and discards a life card",
+      salvageOwner.money === 2,
+      "Salvage does NOT trigger when another player activates (discards) a life card",
+    );
+
+    // Salvage DOES trigger on a document discard (the DISCARD required action).
+    const discardEng = new EmigrationEngine({ mode: "competitive", players: setup });
+    const discardActor = discardEng.players[1];
+    const discardSalvageOwner = discardEng.players[0];
+    discardSalvageOwner.stash.lifeCards.push({ title: "Salvage", type: "life" });
+    discardActor.layout[11] = {
+      card: { title: "Work Permit", type: "document", cost: 2 },
+      faceUp: true,
+      index: 11,
+    };
+    discardEng.currentPlayerIdx = 1;
+    discardEng.executeRequiredAction("discard", { targetPlayerIdx: 1, slotIdx: 11 });
+    assert(
+      discardSalvageOwner.money === 3,
+      "Salvage triggers when another player discards a Document",
     );
 
     const keeper = eng.players[0];
