@@ -6,7 +6,7 @@ import { PACKS_LIST } from '../src/components/emigration-emulator/engine.svelte.
 
 const { values } = parseArgs({
   options: {
-    games:   { type: 'string',  short: 'g', default: '100' },
+    games:   { type: 'string',  short: 'g', default: '1000' },
     players: { type: 'string',  short: 'p', default: 'random' },
     personas:{ type: 'string',              default: '' },
     packs:   { type: 'string',              default: '' },
@@ -59,7 +59,7 @@ const metrics = {
 
 async function run() {
   for (let g = 0; g < NUM_GAMES; g++) {
-    if (!verbose && g > 0 && g % 10 === 0) {
+    if (!verbose && g > 0 && g % 100 === 0) {
       console.log(`Simulated ${g} games...`);
     }
 
@@ -210,12 +210,6 @@ async function run() {
     metrics.winnerLifeCards = Object.fromEntries(sortedLifeCards);
     metrics.winsByPack = Object.fromEntries(Object.entries(metrics.winsByPack).sort((a, b) => b[1] - a[1]));
     
-    for (const count of Object.keys(metrics.winsByPersonaByPlayerCount)) {
-      metrics.winsByPersonaByPlayerCount[count] = Object.fromEntries(
-        Object.entries(metrics.winsByPersonaByPlayerCount[count]).sort((a, b) => b[1] - a[1])
-      );
-    }
-
     const avgTurnsPerPlayerByPlayerCount = {};
     for (const countStr of sortedPlayerCounts) {
       const count = parseInt(countStr, 10);
@@ -225,8 +219,14 @@ async function run() {
     }
     metrics.averageTurnsOverall = parseFloat((metrics.totalTurns / NUM_GAMES).toFixed(1));
     metrics.averageTurnsPerPlayerByPlayerCount = avgTurnsPerPlayerByPlayerCount;
-    delete metrics.totalTurns;
-    delete metrics.turnsByPlayerCount;
+    metrics.totalTurns;
+    metrics.turnsByPlayerCount;
+    
+    for (const count of Object.keys(metrics.winsByPersonaByPlayerCount)) {
+      metrics.winsByPersonaByPlayerCount[count] = Object.fromEntries(
+        Object.entries(metrics.winsByPersonaByPlayerCount[count]).sort((a, b) => b[1] - a[1])
+      );
+    }
 
     fs.writeFileSync(values.output, JSON.stringify(metrics, null, 2));
     console.log(`Data exported to ${values.output}`);
