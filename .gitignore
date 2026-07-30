@@ -12,6 +12,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 cli/results.json
+cli/results.txt
 
 
 # environment variables

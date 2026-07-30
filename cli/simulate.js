@@ -322,6 +322,12 @@ async function run() {
 
     fs.writeFileSync(values.output, JSON.stringify(metrics, null, 2));
     console.log(`\nData exported to ${values.output}`);
+
+    const txtOutput = values.output.endsWith('.json') 
+      ? values.output.replace(/\.json$/, '.txt') 
+      : `${values.output}.txt`;
+      
+    fs.writeFileSync(txtOutput, JSON.stringify(metrics));
   }
 }
 

@@ -99,17 +99,17 @@ Each Career Card has **2 Pay Raise Slots**:
 
 Nationality cards dictate the Starting Fund and College Fund.
 
-| Nationality | Starting Fund (and College Fund) |
-| :---------- | :------------------------------: |
-| Bosnian     |                $2                |
-| Chinese     |                $6                |
-| Congolese   |                $2                |
-| French      |                $5                |
-| Russian     |                $5                |
-| Senegalese  |                $3                |
-| Swiss       |                $4                |
-| English     |                $5                |
-| American    |                $6                |
+| Nationality | Starting Fund  | College Fund |
+| :---------- | :------------: | :----------: |
+| Bosnian     |       $2       |      $4      |
+| Congolese   |       $2       |      $4      |
+| Senegalese  |       $2       |      $4      |
+| Swiss       |       $6       |      $6      |
+| French      |       $6       |      $6      |
+| Russian     |       $6       |      $6      |
+| English     |       $10      |      $8      |
+| Chinese     |       $10      |      $8      |
+| American    |       $10      |      $8      |
 
 ### 3.2 Destinations
 
@@ -120,11 +120,11 @@ Each Destination card outlines the specific requirements to earn or lose Assuran
 
 | Destination                      | Money                                 | Documents                            | Connections       |
 | :------------------------------- | :------------------------------------ | :----------------------------------- | :---------------- |
-| **Bosnia and Herzegovina**       | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
+| **Bosnia and Herzegovina**       | ≥ 7 &rarr; +2 < 3 &rarr; -1           | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
 | **China**                        | ≥ 10 &rarr; +3 < 4 &rarr; -2          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 4 &rarr; +5     |
-| **Democratic Republic of Congo** | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
-| **France**                       | ≥ 8 &rarr; +2 < 3 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
-| **Russia**                       | ≥ 7 &rarr; +2 < 2 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **Democratic Republic of Congo** | ≥ 7 &rarr; +2 < 2 &rarr; -2           | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +6     |
+| **France**                       | ≥ 8 &rarr; +2 < 3 &rarr; -1           | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
+| **Russia**                       | ≥ 7 &rarr; +2 < 2 &rarr; -1           | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
 | **Senegal**                      | ≥ 7 &rarr; +2                         | ≥ 4 &rarr; +2 < 3 &rarr; -3          | ≥ 3 &rarr; +5     |
 | **Switzerland**                  | ≥ 7 &rarr; +2 < 2 &rarr; -1          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
 | **England**                      | ≥ 10 &rarr; +3 < 4 &rarr; -2          | ≥ 4 &rarr; +2 < 2 &rarr; -3          | ≥ 3 &rarr; +4     |
@@ -214,7 +214,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
-1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 1 Assurance if it's the first time you graduate, or gain 1 Assurance if it's the second time you graduate, and also fill the text open Pay Raise slot permanently increasing salary by +$2 for each time you graduate. Fail results: player remains in college.
+1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance if it's the first time you graduate, or gain 1 Assurance if it's the second time you graduate, and also fill the text open Pay Raise slot permanently increasing salary by +$3 and then +2 (respectively for each time you graduate). Fail results: player remains in college.
 2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $2 from the bank. You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
 
 #### Required Actions (Must Choose Exactly One):
