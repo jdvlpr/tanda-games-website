@@ -7,7 +7,7 @@ import { PACKS_LIST } from '../src/components/emigration-emulator/engine.svelte.
 const { values } = parseArgs({
   options: {
     games:   { type: 'string',  short: 'g', default: '100' },
-    players: { type: 'string',  short: 'p', default: '4' },
+    players: { type: 'string',  short: 'p', default: 'random' },
     personas:{ type: 'string',              default: '' },
     packs:   { type: 'string',              default: '' },
     output:  { type: 'string',  short: 'o', default: '' },
@@ -16,24 +16,21 @@ const { values } = parseArgs({
 });
 
 const NUM_GAMES  = parseInt(values.games, 10);
-const NUM_PLAYERS = parseInt(values.players, 10);
 const verbose    = values.verbose;
 
-// Use BOT_PERSONAS from autoplay.js
-
 const fixedPersonasArray = values.personas ? values.personas.split(',') : [];
-// If --personas is supplied, fix personas for every game; otherwise randomise per game
-const fixedPersonas = fixedPersonasArray.length > 0
-  ? Object.fromEntries(Array.from({ length: NUM_PLAYERS }, (_, i) => [i, fixedPersonasArray[i] || 'expert']))
-  : null;
 
-if (fixedPersonas) {
-  console.log(`Personas (fixed):`, fixedPersonas);
+let basePlayers = values.players === 'random' ? null : parseInt(values.players, 10);
+if (basePlayers === null && fixedPersonasArray.length > 0) {
+  basePlayers = fixedPersonasArray.length;
+}
+
+if (fixedPersonasArray.length > 0) {
+  console.log(`Personas (fixed): ${fixedPersonasArray.join(', ')}`);
 } else {
   console.log(`Personas: random per player per game (pool: ${BOT_PERSONAS.join(', ')})`);
 }
 
-// --packs: comma-separated pack names (validated against PACKS_LIST), or random each game
 const packsArg = values.packs
   ? values.packs.split(',').map(s => s.trim()).filter(s => PACKS_LIST.includes(s))
   : null;
@@ -43,19 +40,18 @@ if (values.packs && packsArg.length === 0) {
 }
 
 console.log(`Starting Emigration Simulation...`);
-console.log(`Games: ${NUM_GAMES}, Players: ${NUM_PLAYERS}`);
+console.log(`Games: ${NUM_GAMES}, Players: ${basePlayers !== null ? basePlayers : 'random (2-6)'}`);
 console.log(`Life Packs: ${packsArg ? packsArg.join(', ') : 'random each game'}`);
 
 const metrics = {
   totalGames: NUM_GAMES,
+  gamesByPlayerCount: {},
+  turnsByPlayerCount: {},
   winsByPersona: {},
-  // Life card name -> number of times that card appeared in the winner's stash
+  winsByPersonaByPlayerCount: {},
   winnerLifeCards: {},
-  // Pack name -> number of wins where that pack was in play
   winsByPack: {},
   totalTurns: 0,
-  assuranceScores: [],
-  // Per-game winner snapshots for deeper analysis
   winnerSnapshots: [],
 };
 
@@ -65,16 +61,22 @@ async function run() {
       console.log(`Simulated ${g} games...`);
     }
 
-    // Assign personas: fixed if --personas supplied, otherwise random per player per game
+    const numPlayers = basePlayers !== null ? basePlayers : Math.floor(Math.random() * 5) + 2; // 2 to 6
+    metrics.gamesByPlayerCount[numPlayers] = (metrics.gamesByPlayerCount[numPlayers] || 0) + 1;
+
+    const fixedPersonas = fixedPersonasArray.length > 0
+      ? Object.fromEntries(Array.from({ length: numPlayers }, (_, i) => [i, fixedPersonasArray[i] || 'expert']))
+      : null;
+
     const botPersonas = fixedPersonas ?? Object.fromEntries(
-      Array.from({ length: NUM_PLAYERS }, (_, i) => [
+      Array.from({ length: numPlayers }, (_, i) => [
         i,
         BOT_PERSONAS[Math.floor(Math.random() * BOT_PERSONAS.length)],
       ])
     );
 
     const { engine } = createStandardGameSetup({
-      playerCount: NUM_PLAYERS,
+      playerCount: numPlayers,
       mode: 'competitive',
       selectedPacks: packsArg && packsArg.length > 0 ? packsArg : null,
       onLog: (entry) => {
@@ -92,8 +94,8 @@ async function run() {
     await autoplay.playFullGame(0);
 
     metrics.totalTurns += engine.turnNumber;
+    metrics.turnsByPlayerCount[numPlayers] = (metrics.turnsByPlayerCount[numPlayers] || 0) + engine.turnNumber;
 
-    // The packs actually used this game (engine resolves random if none supplied)
     const usedPacks = engine.selectedPacks ?? [];
 
     if (engine.gameResult && engine.gameResult.winner) {
@@ -102,23 +104,25 @@ async function run() {
       const winnerIdx = engine.players.indexOf(winner);
       const persona = botPersonas[winnerIdx] ?? 'expert';
 
-      // Wins by persona
       metrics.winsByPersona[persona] = (metrics.winsByPersona[persona] || 0) + 1;
+      
+      if (!metrics.winsByPersonaByPlayerCount[numPlayers]) {
+        metrics.winsByPersonaByPlayerCount[numPlayers] = {};
+      }
+      metrics.winsByPersonaByPlayerCount[numPlayers][persona] = (metrics.winsByPersonaByPlayerCount[numPlayers][persona] || 0) + 1;
 
-      // Winner's life cards
       const lifeCardNames = winner.stash.lifeCards.map(c => c.title);
       for (const name of lifeCardNames) {
         metrics.winnerLifeCards[name] = (metrics.winnerLifeCards[name] || 0) + 1;
       }
 
-      // Wins per pack (any pack in play at time of win)
       for (const pack of usedPacks) {
         metrics.winsByPack[pack] = (metrics.winsByPack[pack] || 0) + 1;
       }
 
-      // Per-game winner snapshot
       metrics.winnerSnapshots.push({
         game: g,
+        players: numPlayers,
         name: winnerName,
         persona,
         packs: usedPacks,
@@ -132,25 +136,72 @@ async function run() {
       });
     }
 
-    // Assurance scores for all players
-    engine.players.forEach(p => {
-      metrics.assuranceScores.push(p.assurance);
-    });
+
   }
 
   console.log(`\nSimulation Complete!`);
-  console.log(`Win Rate by Persona:`);
-  for (const [persona, wins] of Object.entries(metrics.winsByPersona)) {
+  console.log(`Win Rate by Persona (Overall):`);
+  const overallSorted = Object.entries(metrics.winsByPersona).sort((a, b) => b[1] - a[1]);
+  for (const [persona, wins] of overallSorted) {
     console.log(`  ${persona}: ${((wins / NUM_GAMES) * 100).toFixed(1)}% (${wins} wins)`);
   }
-  console.log(`Average Turns: ${(metrics.totalTurns / NUM_GAMES).toFixed(1)}`);
-  console.log(`Winner Life Cards (by frequency):`);
+
+  if (basePlayers === null) {
+    console.log(`\nWin Rate by Persona by Player Count:`);
+    const counts = Object.keys(metrics.gamesByPlayerCount).sort((a, b) => a - b);
+    for (const count of counts) {
+      const games = metrics.gamesByPlayerCount[count];
+      console.log(`  ${count} Players (${games} games):`);
+      const winsByPersona = metrics.winsByPersonaByPlayerCount[count] || {};
+      const sortedWinsByPersona = Object.entries(winsByPersona).sort((a, b) => b[1] - a[1]);
+      for (const [persona, wins] of sortedWinsByPersona) {
+        console.log(`    ${persona}: ${((wins / games) * 100).toFixed(1)}% (${wins} wins)`);
+      }
+    }
+  }
+
+  console.log(`\nAverage Turns (Overall): ${(metrics.totalTurns / NUM_GAMES).toFixed(1)}`);
+  console.log(`Average Turns per Player by Player Count:`);
+  const sortedPlayerCounts = Object.keys(metrics.gamesByPlayerCount).sort((a, b) => a - b);
+  for (const countStr of sortedPlayerCounts) {
+    const count = parseInt(countStr, 10);
+    const games = metrics.gamesByPlayerCount[countStr];
+    const turns = metrics.turnsByPlayerCount[countStr] || 0;
+    const avgTurnsPerGame = turns / games;
+    const avgTurnsPerPlayer = avgTurnsPerGame / count;
+    console.log(`  ${count} Players: ${avgTurnsPerPlayer.toFixed(1)} turns/player (${avgTurnsPerGame.toFixed(1)} total turns per game)`);
+  }
+
+  console.log(`\nWinner Life Cards (by frequency):`);
   const sortedLifeCards = Object.entries(metrics.winnerLifeCards).sort((a, b) => b[1] - a[1]);
   for (const [name, count] of sortedLifeCards) {
     console.log(`  "${name}": ${count} times`);
   }
 
   if (values.output) {
+    // Sort keys in objects before writing to JSON
+    metrics.winsByPersona = Object.fromEntries(overallSorted);
+    metrics.winnerLifeCards = Object.fromEntries(sortedLifeCards);
+    metrics.winsByPack = Object.fromEntries(Object.entries(metrics.winsByPack).sort((a, b) => b[1] - a[1]));
+    
+    for (const count of Object.keys(metrics.winsByPersonaByPlayerCount)) {
+      metrics.winsByPersonaByPlayerCount[count] = Object.fromEntries(
+        Object.entries(metrics.winsByPersonaByPlayerCount[count]).sort((a, b) => b[1] - a[1])
+      );
+    }
+
+    const avgTurnsPerPlayerByPlayerCount = {};
+    for (const countStr of sortedPlayerCounts) {
+      const count = parseInt(countStr, 10);
+      const games = metrics.gamesByPlayerCount[countStr];
+      const turns = metrics.turnsByPlayerCount[countStr] || 0;
+      avgTurnsPerPlayerByPlayerCount[countStr] = parseFloat((turns / (games * count)).toFixed(1));
+    }
+    metrics.averageTurnsOverall = parseFloat((metrics.totalTurns / NUM_GAMES).toFixed(1));
+    metrics.averageTurnsPerPlayerByPlayerCount = avgTurnsPerPlayerByPlayerCount;
+    delete metrics.totalTurns;
+    delete metrics.turnsByPlayerCount;
+
     fs.writeFileSync(values.output, JSON.stringify(metrics, null, 2));
     console.log(`Data exported to ${values.output}`);
   }
