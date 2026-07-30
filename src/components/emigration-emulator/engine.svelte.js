@@ -36,9 +36,9 @@ const calculateAssurance = (targets) => (m, d, c) => {
     const rules = targets[key];
     if (!rules) continue;
 
-    // 1. Add reward for every set met
-    if (rules.setSize > 0) {
-      a += Math.floor(amount / rules.setSize) * (rules.reward || 0);
+    // 1. Add reward for meeting set requirement (max 1 set)
+    if (rules.setSize > 0 && amount >= rules.setSize) {
+      a += rules.reward || 0;
     }
 
     // 2. Apply penalty if below minimum required
@@ -1486,10 +1486,9 @@ export default class EmigrationEngine {
 
       if (dest.targets) {
         if (dest.targets.m) {
-          if (dest.targets.m.setSize > 0) {
-            const sets = Math.floor(totalMoney / dest.targets.m.setSize);
-            consumedMoney = sets * dest.targets.m.setSize;
-            mGain = sets * (dest.targets.m.reward || 0);
+          if (dest.targets.m.setSize > 0 && totalMoney >= dest.targets.m.setSize) {
+            consumedMoney = dest.targets.m.setSize;
+            mGain = dest.targets.m.reward || 0;
           }
           if (
             dest.targets.m.minRequired !== undefined &&
@@ -1499,10 +1498,9 @@ export default class EmigrationEngine {
           }
         }
         if (dest.targets.d) {
-          if (dest.targets.d.setSize > 0) {
-            const sets = Math.floor(docs / dest.targets.d.setSize);
-            consumedDocs = sets * dest.targets.d.setSize;
-            dGain = sets * (dest.targets.d.reward || 0);
+          if (dest.targets.d.setSize > 0 && docs >= dest.targets.d.setSize) {
+            consumedDocs = dest.targets.d.setSize;
+            dGain = dest.targets.d.reward || 0;
           }
           if (
             dest.targets.d.minRequired !== undefined &&
@@ -1512,10 +1510,9 @@ export default class EmigrationEngine {
           }
         }
         if (dest.targets.c) {
-          if (dest.targets.c.setSize > 0) {
-            const sets = Math.floor(conns / dest.targets.c.setSize);
-            consumedConns = sets * dest.targets.c.setSize;
-            cGain = sets * (dest.targets.c.reward || 0);
+          if (dest.targets.c.setSize > 0 && conns >= dest.targets.c.setSize) {
+            consumedConns = dest.targets.c.setSize;
+            cGain = dest.targets.c.reward || 0;
           }
           if (
             dest.targets.c.minRequired !== undefined &&

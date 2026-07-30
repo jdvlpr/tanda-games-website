@@ -307,7 +307,7 @@
           <p class="">Money ({player.money})</p>
           <div class="">
             <span class="font-bold"
-              >x{player.destination.targets.m.setSize}</span
+              >≥{player.destination.targets.m.setSize}</span
             >
             =
             <span
@@ -343,7 +343,7 @@
           </p>
           <div class="">
             <span class="font-bold"
-              >x{player.destination.targets.d.setSize}</span
+              >≥{player.destination.targets.d.setSize}</span
             >
             =
             <span
@@ -397,7 +397,7 @@
           </p>
           <div class="">
             <span class="font-bold"
-              >x{player.destination.targets.c.setSize}</span
+              >≥{player.destination.targets.c.setSize}</span
             >
             =
             <span

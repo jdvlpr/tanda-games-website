@@ -113,22 +113,22 @@ Nationality cards dictate the Starting Fund and College Fund.
 
 ### 3.2 Destinations
 
-Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border). Rewards for resource sets stack, meaning players can earn the reward multiple times if they turn in multiple sets. Penalties for failing to meet minimum requirements apply only once.
+Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border). Players can earn a single Assurance reward per resource type by meeting or exceeding the set threshold (maximum 1 set per resource). Penalties for failing to meet minimum requirements apply only once.
 
-- **Format**: `Every [X] Sets` &rarr; `Assurance Reward`
+- **Format**: `≥ [X]` &rarr; `Assurance Reward`
 - **Format**: `< [Minimum Required]` &rarr; `Assurance Penalty`
 
 | Destination                      | Money                                 | Documents                            | Connections       |
 | :------------------------------- | :------------------------------------ | :----------------------------------- | :---------------- |
-| **Bosnia and Herzegovina**       | Every 6 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +6 |
-| **China**                        | Every 10 &rarr; +3 <br> < 4 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 4 &rarr; +5 |
-| **Democratic Republic of Congo** | Every 6 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +6 |
-| **France**                       | Every 8 &rarr; +2 <br> < 3 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
-| **Russia**                       | Every 7 &rarr; +2 <br> < 2 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
-| **Senegal**                      | Every 7 &rarr; +2                     | Every 4 &rarr; +2 <br> < 2 &rarr; -2 | Every 3 &rarr; +5 |
-| **Switzerland**                  | Every 7 &rarr; +2 <br> < 2 &rarr; -1  | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
-| **England**                      | Every 10 &rarr; +3 <br> < 4 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 3 &rarr; +4 |
-| **United States of America**     | Every 10 &rarr; +3 <br> < 5 &rarr; -2 | Every 4 &rarr; +2 <br> < 2 &rarr; -3 | Every 4 &rarr; +5 |
+| **Bosnia and Herzegovina**       | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +6     |
+| **China**                        | ≥ 10 &rarr; +3 <br> < 4 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 4 &rarr; +5     |
+| **Democratic Republic of Congo** | ≥ 6 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +6     |
+| **France**                       | ≥ 8 &rarr; +2 <br> < 3 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
+| **Russia**                       | ≥ 7 &rarr; +2 <br> < 2 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
+| **Senegal**                      | ≥ 7 &rarr; +2                         | ≥ 4 &rarr; +2 <br> < 2 &rarr; -2     | ≥ 3 &rarr; +5     |
+| **Switzerland**                  | ≥ 7 &rarr; +2 <br> < 2 &rarr; -1      | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
+| **England**                      | ≥ 10 &rarr; +3 <br> < 4 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 3 &rarr; +4     |
+| **United States of America**     | ≥ 10 &rarr; +3 <br> < 5 &rarr; -2     | ≥ 4 &rarr; +2 <br> < 2 &rarr; -3     | ≥ 4 &rarr; +5     |
 
 ### 3.3 Security Lanes
 
@@ -293,7 +293,7 @@ Life Cards have three keep types:
 
 Each player gets exactly one turn to attempt crossing the border:
 
-1. **Assurance Withdrawal**: The player evaluates their Destination criteria against their ending Money, Documents, and Connections (from Section 3.2). The resources used to form complete sets for these rewards are consumed (Money is returned to the bank; Documents and Connections are placed in the discard pile). Leftover resources that do not complete a set remain with the player. Adjust their Assurance total accordingly.
+1. **Assurance Withdrawal**: The player evaluates their Destination criteria against their ending Money, Documents, and Connections (from Section 3.2). For each resource type meeting the threshold, at most one set is traded in for the Assurance reward (Money is returned to the bank; Documents and Connections are placed in the discard pile). Any remaining excess resources beyond the single set threshold remain with the player. Adjust their Assurance total accordingly.
 2. **Lane Selection**: Choose a Security Lane (1–5) containing tokens. Flip the top token.
 3. **Immigration Check**:
    - If the player does not have a Ticket and a Passport, they fail automatically.

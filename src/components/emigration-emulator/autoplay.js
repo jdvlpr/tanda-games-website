@@ -11,6 +11,7 @@ export const BOT_PERSONAS = [
   "hoarder",
   "saboteur",
   "conservative",
+  "scholar",
   "easy",
 ];
 
@@ -40,7 +41,14 @@ export function createAutoPlayer(
     // Expert Mode: evaluate all possible valid moves with a heuristic score
     const persona = personas[engine.currentPlayerIdx] || difficulty;
 
-    if (persona === "expert" || persona === "rusher" || persona === "hoarder" || persona === "saboteur" || persona === "conservative") {
+    if (
+      persona === "expert" ||
+      persona === "rusher" ||
+      persona === "hoarder" ||
+      persona === "saboteur" ||
+      persona === "conservative" ||
+      persona === "scholar"
+    ) {
       const bestMove = _getBestHeuristicAction(player, actions, persona);
       if (bestMove) return { type: bestMove.type, params: bestMove.params };
     }
@@ -484,15 +492,92 @@ export function createAutoPlayer(
         }
 
         if (rules.setSize > 0) {
-          // Discrete reward for completed sets
-          score += Math.floor(amount / rules.setSize) * (rules.reward || 0);
-          // Smaller continuous reward for partial sets to guide the AI
-          score +=
-            ((amount % rules.setSize) / rules.setSize) *
-            ((rules.reward || 0) * 0.5);
+          // Destination Target Capping: max 1 set per resource yields Assurance reward
+          const effectiveAmount = Math.min(amount, rules.setSize);
+          if (effectiveAmount >= rules.setSize) {
+            // Discrete reward for completed set (max 1 set)
+            score += rules.reward || 0;
+          } else {
+            // Smaller continuous reward for partial set to guide the AI
+            score += (effectiveAmount / rules.setSize) * ((rules.reward || 0) * 0.5);
+          }
         }
       }
       return score;
+    };
+
+    const _evaluateLifeCardUtility = (card, player, fee, persona, engine) => {
+      let utility = 3 - fee;
+
+      const isScholar = persona === "scholar";
+      const isHoarder = persona === "hoarder";
+      const isSaboteur = persona === "saboteur";
+      const isConservative = persona === "conservative";
+      const isRusher = persona === "rusher";
+
+      if (!card) return utility;
+
+      switch (card.title) {
+        case "VIP": {
+          const maxMoney = Math.max(...engine.players.map((p) => p.money));
+          const gain = Math.floor(maxMoney / 2);
+          utility += gain * 1.5;
+          break;
+        }
+        case "Identical Twin": {
+          utility += 15;
+          break;
+        }
+        case "Social Butterfly": {
+          const richOpponent = engine.players.some(
+            (p) => p.id !== player.id && (p.money >= 3 || p.stash.connections.length > 0)
+          );
+          if (richOpponent) utility += isSaboteur ? 8 : 5;
+          break;
+        }
+        case "Lost & Found": {
+          const docOpponent = engine.players.some(
+            (p) => p.id !== player.id && (p.stash.documents.length > 0 || p.money >= 2)
+          );
+          if (docOpponent) utility += isSaboteur ? 8 : 5;
+          break;
+        }
+        case "Fancy Clothes": {
+          const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
+          const setSize = dest?.targets?.d?.setSize || 4;
+          if (player.stash.documents.length < setSize) utility += 6;
+          else utility += 2;
+          break;
+        }
+        case "Stellar Reputation": {
+          const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
+          const setSize = dest?.targets?.c?.setSize || 3;
+          if (player.stash.connections.length < setSize) utility += 6;
+          else utility += 2;
+          break;
+        }
+        case "Insider": {
+          utility += (isScholar || isHoarder) ? 10 : 5;
+          break;
+        }
+        case "Salvage": {
+          utility += isHoarder ? 7 : 4;
+          break;
+        }
+        case "Tariffs": {
+          utility += isConservative ? 2 : -2;
+          break;
+        }
+        case "Productivity": {
+          utility += (persona === "expert" || isRusher) ? 6 : 3;
+          break;
+        }
+        default:
+          utility += 2;
+          break;
+      }
+
+      return utility;
     };
 
     const evaluateScore = (move) => {
@@ -502,6 +587,7 @@ export function createAutoPlayer(
       const isHoarder = persona === 'hoarder';
       const isSaboteur = persona === 'saboteur';
       const isConservative = persona === 'conservative';
+      const isScholar = persona === 'scholar';
 
       if (move.type === "activate") {
         if (move.card.type === "payday") {
@@ -535,16 +621,26 @@ export function createAutoPlayer(
           if (move.targetId === player.id) {
             score += 4; // Bonus for activating own layout (removes a card for free)
           }
+
+          // Scholar persona: massive bonus to activate Paydays globally once salary is upgraded!
+          if (isScholar && mySalary >= 2) {
+            score += 12;
+          }
+
           if (readinessScore < 0 && move.targetId !== player.id) {
             score -= 5 * layoutProgress; // Preserve layout if not ready for Phase 2
           }
         } else {
-          score = 3 - move.fee;
+          // Dynamic Life Card Utility Evaluation
+          score = _evaluateLifeCardUtility(move.card, player, move.fee, persona, engine);
         }
       } else if (move.type === "buy") {
         const totalCost = move.cost + move.fee;
-        // Mild liquidity penalty (Assurance already penalizes money spent)
+        // Liquidity penalty + Access Fee cost penalty (paying access fee transfers cash to opponent and raises own fee)
         score = -(totalCost * (isHoarder ? 1.5 : 0.5));
+        if (move.fee > 0) {
+          score -= move.fee * (isConservative ? 2.0 : 1.0);
+        }
 
         const isDoc = move.card.type === "document";
         const isConn = move.card.type === "connection";
@@ -574,14 +670,22 @@ export function createAutoPlayer(
           score += (destTargets.c.penalty || 2) * 4;
         }
 
-        // Hoarding/Set completion bonus: reward completing or progressing sets
+        // Destination Target Capping: Reward single set completion, but penalize buying redundant cards
         if (isDoc && destTargets?.d?.setSize > 0) {
           const setSize = destTargets.d.setSize;
-          if ((d + 1) % setSize === 0) score += (destTargets.d.reward || 2) * 2;
+          if (d < setSize && d + 1 === setSize) {
+            score += (destTargets.d.reward || 2) * 2;
+          } else if (d >= setSize) {
+            score -= 4; // Capping penalty: redundant document gives no additional Assurance
+          }
         }
         if (isConn && destTargets?.c?.setSize > 0) {
           const setSize = destTargets.c.setSize;
-          if ((c + 1) % setSize === 0) score += (destTargets.c.reward || 2) * 2;
+          if (c < setSize && c + 1 === setSize) {
+            score += (destTargets.c.reward || 2) * 2;
+          } else if (c >= setSize) {
+            score -= 4; // Capping penalty: redundant connection gives no additional Assurance
+          }
         }
 
         // Extra value if this doc enables buying a passport/ticket
@@ -644,22 +748,30 @@ export function createAutoPlayer(
         if (isSaboteur) score += 20;
         if (isConservative) return -100; // Never steals — prefers buyPool
       } else if (move.type === "applyCollege") {
-        // Conservative applies to college more eagerly — lower reserve threshold
         const maxTuition = (player.startingFund || 6) + 6;
-        const reserveNeeded = isConservative
+        const reserveNeeded = (isConservative || isScholar)
           ? maxTuition
           : maxTuition + Math.ceil(8 / playerCount);
 
         if (player.money < reserveNeeded) {
           score = -100; // Do not apply if financial risk is high
-        } else if (estimatedTurnsRemaining < (isConservative ? 4 : 6)) {
-          score = -20; // Not enough turns remaining for salary returns to materialize
         } else {
-          // Scale early-game application score by remaining layout progress and player count factor
-          const earlyBonus = (1 - layoutProgress) * (isConservative ? 10 : 6);
-          const countFactor = 1 + 2 / playerCount;
-          score = earlyBonus * countFactor;
-          if (currentAssurance < 6) score += isConservative ? 5 : 2;
+          // Dynamic College ROI calculation based on remaining deck size and estimated paydays
+          const totalPaydaysInDeck = playerCount * 4;
+          const expectedPaydaysRemaining = Math.max(1, totalPaydaysInDeck * (1 - layoutProgress));
+          const nextRaise = player.payRaiseSlotsFilled === 0 ? 1 : 3;
+          const roiFinancial = nextRaise * expectedPaydaysRemaining - maxTuition;
+          const roiAssurance = 8; // Graduation gives +2 Assurance (~8 pts)
+          const totalROI = roiFinancial + roiAssurance;
+
+          if (totalROI < 0 && estimatedTurnsRemaining < 4) {
+            score = -20; // Not enough turns/paydays remaining for returns to materialize
+          } else {
+            const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isConservative ? 10 : 6);
+            const countFactor = 1 + 2 / playerCount;
+            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : 0.5);
+            if (currentAssurance < 6) score += (isScholar || isConservative) ? 5 : 2;
+          }
         }
       } else if (move.type === "discard") {
         // Conservative never discards from an opponent's layout
@@ -694,7 +806,8 @@ export function createAutoPlayer(
                 denialBonus = 4;
               } else if (
                 oppRules.setSize > 0 &&
-                (oppCurrent + 1) % oppRules.setSize === 0
+                oppCurrent < oppRules.setSize &&
+                (oppCurrent + 1) === oppRules.setSize
               ) {
                 denialBonus = 3;
               } else {
@@ -967,41 +1080,38 @@ export function createAutoPlayer(
       return;
     }
 
-    // May Keep: keep if it has a useful ongoing effect
+    const activePersona = (engine.pendingChoice && personas[engine.pendingChoice.playerIdx]) || difficulty;
+    const isScholar = activePersona === 'scholar';
+    const isHoarder = activePersona === 'hoarder';
+    const isSaboteur = activePersona === 'saboteur';
+    const isConservative = activePersona === 'conservative';
+    const isRusher = activePersona === 'rusher';
+
+    // May Keep: keep if it has a useful ongoing effect for this persona/state
     if (id === "may-keep-choice") {
-      engine.resolveChoice("keep");
-      return;
-    }
+      const cardTitle = engine.pendingChoice.title || "";
+      const player = engine.players[engine.pendingChoice.playerIdx];
+      let keepValue = true;
 
-    // FOMO: skip trading destinations
-    if (id === "fomo") {
-      engine.resolveChoice("skip");
-      return;
-    }
+      if (cardTitle.includes("Fancy Clothes")) {
+        const dest = DESTINATIONS.find((d) => d.name === player?.destination?.name);
+        const setSize = dest?.targets?.d?.setSize || 4;
+        if (player && player.stash.documents.length >= setSize && !isHoarder) {
+          keepValue = false; // Take $3 cash if doc set is already capped
+        }
+      } else if (cardTitle.includes("Stellar Reputation")) {
+        const dest = DESTINATIONS.find((d) => d.name === player?.destination?.name);
+        const setSize = dest?.targets?.c?.setSize || 3;
+        if (player && player.stash.connections.length >= setSize && !isHoarder) {
+          keepValue = false; // Take $3 cash if conn set is already capped
+        }
+      } else if (cardTitle.includes("Insider")) {
+        if (isConservative && player && player.money < 3) {
+          keepValue = false;
+        }
+      }
 
-    // Mental Fog: don't discard life cards
-    if (id === "mental-fog") {
-      engine.resolveChoice("skip");
-      return;
-    }
-
-    // For money vs. card choices: take money
-    if (opts.some((o) => o.value === "money")) {
-      engine.resolveChoice("money");
-      return;
-    }
-
-    // Trousers: lose money rather than documents
-    if (id === "trousers") {
-      engine.resolveChoice("money");
-      return;
-    }
-
-    // Suspect: lose connection if available
-    if (id === "suspect-penalty") {
-      engine.resolveChoice(
-        opts.some((o) => o.value === "conn") ? "conn" : "doc",
-      );
+      engine.resolveChoice(keepValue ? "keep" : "money");
       return;
     }
 
@@ -1016,23 +1126,25 @@ export function createAutoPlayer(
             (engine.players[parseInt(a.value)]?.money || 0),
         );
       } else if (title.includes("Social Butterfly")) {
-        sortedOpts.sort(
-          (a, b) =>
-            (engine.players[parseInt(b.value)]?.stash.connections.length || 0) -
-              (engine.players[parseInt(a.value)]?.stash.connections.length ||
-                0) ||
-            (engine.players[parseInt(b.value)]?.money || 0) -
-              (engine.players[parseInt(a.value)]?.money || 0),
-        );
+        sortedOpts.sort((a, b) => {
+          const pA = engine.players[parseInt(a.value)];
+          const pB = engine.players[parseInt(b.value)];
+          if (isSaboteur) {
+            return (pB?.stash.connections.length || 0) - (pA?.stash.connections.length || 0);
+          }
+          return (pB?.stash.connections.length || 0) - (pA?.stash.connections.length || 0) ||
+                 (pB?.money || 0) - (pA?.money || 0);
+        });
       } else if (title.includes("Lost & Found")) {
-        sortedOpts.sort(
-          (a, b) =>
-            (engine.players[parseInt(b.value)]?.stash.documents.length || 0) -
-              (engine.players[parseInt(a.value)]?.stash.documents.length ||
-                0) ||
-            (engine.players[parseInt(b.value)]?.money || 0) -
-              (engine.players[parseInt(a.value)]?.money || 0),
-        );
+        sortedOpts.sort((a, b) => {
+          const pA = engine.players[parseInt(a.value)];
+          const pB = engine.players[parseInt(b.value)];
+          if (isSaboteur) {
+            return (pB?.stash.documents.length || 0) - (pA?.stash.documents.length || 0);
+          }
+          return (pB?.stash.documents.length || 0) - (pA?.stash.documents.length || 0) ||
+                 (pB?.money || 0) - (pA?.money || 0);
+        });
       } else {
         sortedOpts.sort(
           (a, b) =>
@@ -1153,7 +1265,7 @@ export function createAutoPlayer(
     let didSell = false;
 
     const currentPersona = personas[engine.currentPlayerIdx] || difficulty;
-    const isHeuristicPersona = ["expert", "rusher", "hoarder", "saboteur", "conservative"].includes(currentPersona);
+    const isHeuristicPersona = ["expert", "rusher", "hoarder", "saboteur", "conservative", "scholar"].includes(currentPersona);
 
     if (isHeuristicPersona) {
       // 1. Evaluate actions WITHOUT selling
