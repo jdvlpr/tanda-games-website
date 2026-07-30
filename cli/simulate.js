@@ -13,11 +13,13 @@ const { values } = parseArgs({
     inverse: { type: 'boolean', short: 'i', default: false }, 
     output:  { type: 'string',  short: 'o', default: '' },
     verbose: { type: 'boolean', short: 'v', default: false },
+    showAll: { type: 'boolean', short: 'a', default: false },
   },
 });
 
 const NUM_GAMES  = parseInt(values.games, 10);
 const verbose    = values.verbose;
+const showAll    = values.showAll;
 
 const fixedPersonasArray = values.personas ? values.personas.split(',') : [];
 
@@ -353,7 +355,7 @@ async function run() {
     `Which bot personalities or strategies secure the most wins.`, 
     personaHealth.message
   );
-  if (!personaHealth.ok) {
+  if (!personaHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const sorted = Object.entries(data.winsByPersona).sort((a, b) => b[1] - a[1]);
@@ -371,7 +373,7 @@ async function run() {
     `How starting nationalities impact the likelihood of winning.`, 
     natHealth.message
   );
-  if (!natHealth.ok) {
+  if (!natHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const sorted = Object.entries(data.winsByNationality).sort((a, b) => b[1] - a[1]);
@@ -389,7 +391,7 @@ async function run() {
     `Which final destinations are associated with the most wins.`, 
     destHealth.message
   );
-  if (!destHealth.ok) {
+  if (!destHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const sorted = Object.entries(data.winsByDestination).sort((a, b) => b[1] - a[1]);
@@ -407,7 +409,7 @@ async function run() {
     `The impact of college graduations and pay raises on securing a win.`,
     payRaiseHealth.message
   ); 
-  if (!payRaiseHealth.ok || verbose) {
+  if (!payRaiseHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       for (let r = 0; r <= 2; r++) {
@@ -425,7 +427,7 @@ async function run() {
     `Checks for first-player or late-player advantage based on starting seat.`, 
     seatHealth.message
   );
-  if (!seatHealth.ok) {
+  if (!seatHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const maxSeat = Math.max(...Object.keys(data.winsByTurnOrder).map(Number));
@@ -472,7 +474,7 @@ async function run() {
     `Compares how much remaining Assurance the winner had versus the losing players.`,
     assuranceHealth.message
   ); 
-  if (!assuranceHealth.ok) {
+  if (!assuranceHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const avgWinAssur = (data.assurance.winnerTotal / data.games).toFixed(2);
@@ -501,7 +503,7 @@ async function run() {
     `When a pack is drafted into the game, how often the winner actually utilizes it.`, 
     packHealth.message
   );
-  if (!packHealth.ok) {
+  if (!packHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const packStats = [];
@@ -526,7 +528,7 @@ async function run() {
     `The most common two-card combinations found in the winner's final hand.`,
     synergyHealth.message
   );
-  if (!synergyHealth.ok) {
+  if (!synergyHealth.ok || showAll) {
     for (const { label, data } of reportSections) {
       console.log(`  ${label} (${data.games} games):`);
       const sorted = Object.entries(data.winnerCardPairs).sort((a, b) => b[1] - a[1]).slice(0, 5);

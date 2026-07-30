@@ -1120,7 +1120,8 @@ export default class EmigrationEngine {
   checkTicketPassportBonus(player) {
     if (!player.ticketPassportBonusClaimed) {
       if (player.stash.tickets >= 1 && player.stash.passports >= 1) {
-        player.assurance += 1;
+        const bonus = this.players.length > 4 ? 2 : 1;
+        player.assurance += bonus;
         player.ticketPassportBonusClaimed = true;
         this.log(`P${player.id}|TICKET_PASSPORT_BONUS|GAIN:1A`, "system");
         this.notifyToast("assurance", 
