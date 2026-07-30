@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import { copyRoomUrl } from "./useOnlineRoom.svelte.js";
   import { PACKS_LIST } from "./engine.svelte.js";
+  import { getRandomPersona } from "./autoplay.js";
 
   /**
    * Pre-game setup screen.
@@ -65,6 +66,13 @@
   );
 
   let activeSetup = $derived(playersSetup.slice(0, playerCount));
+
+  // Initialize empty bot slots with random personas so the UI shows them and the user can change them
+  for (let i = 0; i < 6; i++) {
+    if (!botPersonas[i]) {
+      botPersonas[i] = getRandomPersona();
+    }
+  }
 </script>
 
 <div class="max-w-lg mx-auto px-2">
@@ -149,7 +157,8 @@
               />
               <button
                 class="btn py-[5px] px-2 bg-blue-200 dark:bg-blue-800 rounded-l-none"
-                onclick={() => onjoinroom?.(joinRoomCodeInput)}>Join Game</button
+                onclick={() => onjoinroom?.(joinRoomCodeInput)}
+                >Join Game</button
               >
             </div>
           </div>
@@ -182,7 +191,9 @@
                   Copy Link
                 </button>
               </div>
-              <p class="text-xs opacity-60">Share this code with your friends!</p>
+              <p class="text-xs opacity-60">
+                Share this code with your friends!
+              </p>
             </div>
 
             <!-- Your Name -->
@@ -204,8 +215,7 @@
               <p class="text-sm font-bold flex justify-between items-center">
                 <span>Players in Room ({p2pPlayers.length}/6)</span>
                 {#if isHost && p2pPlayers.length < 6}
-                  <button class="btn-sm" onclick={onaddbot}
-                    >🤖 Add Robot</button
+                  <button class="btn-sm" onclick={onaddbot}>🤖 Add Robot</button
                   >
                 {/if}
               </p>
@@ -243,7 +253,6 @@
           </div>
         {/if}
       </div>
-
     {:else}
       <!-- Local play: player count + player names -->
       <label
@@ -260,14 +269,25 @@
       <div class="flex flex-col gap-4">
         {#each activeSetup as p, i}
           <div
-            class="flex flex-col gap-2 p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
+            class="flex flex-wrap gap-2 p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
           >
-            {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
-              <p class="text-sm opacity-70 text-left">Human</p>
-            {:else if gameType === "vscomputer" || gameType === "auto"}
-              <div class="flex justify-between items-center">
+            <div class="flex flex-col gap-2 flex-1">
+              {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
+                <p class="text-sm opacity-70 text-left">Human</p>
+              {:else if gameType === "vscomputer" || gameType === "auto"}
                 <p class="text-sm opacity-70 text-left">Robot</p>
-                <select class="bg-transparent text-sm border border-neutral-300 dark:border-neutral-700 rounded px-1" bind:value={botPersonas[i]}>
+              {/if}
+              <input
+                class="min-w-[200px]"
+                type="text"
+                bind:value={p.name}
+                placeholder="Player Name"
+              />
+            </div>
+            {#if (gameType === "vscomputer" && i !== 0) || gameType === "auto"}
+              <div class="w-fit flex flex-col gap-2 h-fit">
+                <p class="text-sm opacity-70 text-left">Skill</p>
+                <select class="w-fit" bind:value={botPersonas[i]}>
                   <option value="expert">Expert</option>
                   <option value="rusher">Rusher</option>
                   <option value="hoarder">Hoarder</option>
@@ -277,12 +297,6 @@
                 </select>
               </div>
             {/if}
-            <input
-              class="flex-1"
-              type="text"
-              bind:value={p.name}
-              placeholder="Player Name"
-            />
           </div>
         {/each}
       </div>
@@ -316,8 +330,7 @@
       {:else}
         <button
           class="btn w-full text-2xl bg-amber-200 dark:bg-amber-800"
-          onclick={() => onstart?.({ gameType })}
-          >Start Game</button
+          onclick={() => onstart?.({ gameType })}>Start Game</button
         >
       {/if}
     </div>

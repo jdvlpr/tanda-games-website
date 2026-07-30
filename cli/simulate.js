@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { parseArgs } from 'node:util';
 import { createStandardGameSetup } from '../src/components/emigration-emulator/gameSetup.js';
-import { createAutoPlayer } from '../src/components/emigration-emulator/autoplay.js';
+import { createAutoPlayer, BOT_PERSONAS } from '../src/components/emigration-emulator/autoplay.js';
 import { PACKS_LIST } from '../src/components/emigration-emulator/engine.svelte.js';
 
 const { values } = parseArgs({
@@ -19,8 +19,7 @@ const NUM_GAMES  = parseInt(values.games, 10);
 const NUM_PLAYERS = parseInt(values.players, 10);
 const verbose    = values.verbose;
 
-// Personas that use full heuristic scoring — the useful pool for balance testing
-const HEURISTIC_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conservative'];
+// Use BOT_PERSONAS from autoplay.js
 
 const fixedPersonasArray = values.personas ? values.personas.split(',') : [];
 // If --personas is supplied, fix personas for every game; otherwise randomise per game
@@ -31,7 +30,7 @@ const fixedPersonas = fixedPersonasArray.length > 0
 if (fixedPersonas) {
   console.log(`Personas (fixed):`, fixedPersonas);
 } else {
-  console.log(`Personas: random per player per game (pool: ${HEURISTIC_PERSONAS.join(', ')})`);
+  console.log(`Personas: random per player per game (pool: ${BOT_PERSONAS.join(', ')})`);
 }
 
 // --packs: comma-separated pack names (validated against PACKS_LIST), or random each game
@@ -70,7 +69,7 @@ async function run() {
     const botPersonas = fixedPersonas ?? Object.fromEntries(
       Array.from({ length: NUM_PLAYERS }, (_, i) => [
         i,
-        HEURISTIC_PERSONAS[Math.floor(Math.random() * HEURISTIC_PERSONAS.length)],
+        BOT_PERSONAS[Math.floor(Math.random() * BOT_PERSONAS.length)],
       ])
     );
 
@@ -107,7 +106,7 @@ async function run() {
       metrics.winsByPersona[persona] = (metrics.winsByPersona[persona] || 0) + 1;
 
       // Winner's life cards
-      const lifeCardNames = winner.stash.lifeCards.map(c => c.name);
+      const lifeCardNames = winner.stash.lifeCards.map(c => c.title);
       for (const name of lifeCardNames) {
         metrics.winnerLifeCards[name] = (metrics.winnerLifeCards[name] || 0) + 1;
       }

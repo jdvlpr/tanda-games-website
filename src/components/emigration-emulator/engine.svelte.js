@@ -1817,14 +1817,21 @@ export default class EmigrationEngine {
       _collegeFailed: this._collegeFailed,
       _graduateAttempted: this._graduateAttempted,
       _identicalTwinExtraTurn: this._identicalTwinExtraTurn,
-      logs: this.logs,
+      // logs are append-only; excluded to keep the serialized backup small.
+      // We store only the length so restoreBackup() can trim any entries
+      // written after the snapshot was taken.
+      _logsLength: this.logs.length,
     });
   }
 
   restoreBackup() {
     if (!this._backup) return false;
     const backup = JSON.parse(this._backup);
+    const logsLength = backup._logsLength;
+    delete backup._logsLength;
     Object.assign(this, backup);
+    // Trim any log entries added after the backup was created
+    if (logsLength !== undefined) this.logs.length = logsLength;
     this.pendingChoice = null;
     this._pendingResolve = null;
     this._backup = null;

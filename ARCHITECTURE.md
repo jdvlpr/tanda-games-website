@@ -50,3 +50,93 @@ Players (human or AI) take their turns by executing actions through the engine:
 - **Phase 1 (Preparation):** Players take turns acquiring resources, documents, and connections to prepare for the border crossing.
 - **Phase 2 (Crossing):** Triggers instantly when the center pool of tickets/passports is completely empty AND no face-up cards remain in any layout.
 - In Phase 2, players sequentially pick a security lane. Their `assurance` is calculated, and they cross if `assurance >= token value`.
+
+## CLI Simulation Tool
+
+**Entry point:** `cli/simulate.js`
+
+Run with Node directly — no build step required:
+
+```bash
+node cli/simulate.js [options]
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--games N` / `-g N` | `100` | Number of games to simulate |
+| `--players N` / `-p N` | `4` | Players per game |
+| `--personas a,b,...` | _(random)_ | Fix a comma-separated persona per player seat (e.g. `expert,rusher,hoarder,expert`) |
+| `--packs a,b,...` | _(random)_ | Fix which life card packs are in play each game |
+| `--output file.json` / `-o` | _(none)_ | Export full metrics JSON |
+| `--verbose` / `-v` | `false` | Log every engine action to stdout |
+
+**Output metrics** (console + optional JSON):
+- Win rate by persona
+- Average turns per game
+- Winner life card frequency
+- Wins by pack
+- Per-game winner snapshots (persona, assurance, money, docs, connections, life cards, turn count)
+
+**Performance:** ~6–10 ms per game after JIT warm-up. 1,000 games completes in ~27 s on a modern Mac.
+
+> **Note:** `createBackup()` in the engine excludes the `logs` array from serialisation (storing only the log length). This is intentional — it keeps the backup payload small and was the key optimisation that made the CLI fast. Do not add `logs` back to the backup without benchmarking first.
+
+---
+
+## Bot Personas
+
+All heuristic personas live in `src/components/emigration-emulator/autoplay.js` inside `_getBestHeuristicAction()`. Each persona is a scoring modifier on top of the shared move-evaluation framework — they all see the same candidate moves but weight them differently.
+
+The **pool of heuristic personas** used in CLI random simulation is defined in `simulate.js`:
+```js
+const HEURISTIC_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conservative'];
+```
+
+### `expert` (baseline)
+The balanced reference persona. Uses the full heuristic scorer with neutral weights.
+- Balances documents and connections toward destination requirements
+- Applies to college when financially safe and early enough for salary returns to pay off
+- Activates Payday only when net relative gain is positive
+- Discards from opponent layouts when it denies their set completions
+
+### `rusher`
+Prioritises getting ticket + passport as quickly as possible to trigger Phase 2 early, before opponents are ready.
+- Doubles the `buyPool` urgency score (`40` vs `20` base), so it acquires travel docs at almost any cost
+- Otherwise shares the expert scoring weights
+
+### `hoarder`
+Focuses on accumulating resources and denying opponents access to travel docs.
+- **Payday:** Multiplies the relative-advantage score by `6` (vs `3`) — very eager to activate when it pays well
+- **Buy:** Multiplies the assurance-gain reward by `10` (vs `5`) and liquidity penalty by `1.5` (vs `0.5`) — hoards cards aggressively
+- Opportunistically buys extra tickets/passports from the pool to deny opponents, even when it already has them
+- Earns reclaim fees later when opponents are forced to buy back
+
+### `saboteur`
+Focuses on disrupting opponents rather than its own optimisation.
+- Adds `+20` flat score to all steal moves, making stealing nearly always the top choice
+- Scores opponent discard moves at `3×` the normal denial bonus — specifically targets cards that would complete an opponent's set
+- Otherwise uses expert weights for self-advancement
+
+### `conservative`
+Risk-averse and self-contained — avoids any action that directly benefits or involves other players.
+- **Never steals** (returns `-100` for all steal moves)
+- **Never discards from an opponent's layout** (returns `-100`)
+- **Only activates its own Payday** card (refuses to trigger Payday on opponents' layouts, avoiding the $1 stipend gift)
+- Applies to college more eagerly — lower money reserve threshold (`maxTuition` only, vs `maxTuition + ceil(8/playerCount)`)
+- Larger college `earlyBonus` multiplier (`10` vs `6`)
+
+### `easy` / `random`
+Non-heuristic personas — skip the scorer entirely and pick randomly from available valid moves. Useful as a baseline or for stress-testing the engine against weaker opposition.
+
+### `normal`
+Falls back to a priority-ordered ruleset (ticket → passport → payday → buy → life activate → college → discard) with a 30% chance of choosing randomly instead. Used as an intermediate difficulty in the interactive solo mode.
+
+---
+
+### Adding a New Persona
+
+1. Add the name to `HEURISTIC_PERSONAS` in `cli/simulate.js` (if it should appear in random CLI runs)
+2. Add `isMyPersona = persona === 'myPersona'` flags inside `evaluateScore()` in `autoplay.js`
+3. Adjust score multipliers or add early-returns (`return -100`) for move types the persona should avoid
+4. Document it in the table above
+

@@ -5,7 +5,7 @@
   import { multiplayer } from "../../stores/multiplayer.svelte.js";
   import { toast } from "../../stores/toast.svelte";
   import ActionPanel from "./ActionPanel.svelte";
-  import { createAutoPlayer } from "./autoplay.js";
+  import { createAutoPlayer, getRandomPersona } from "./autoplay.js";
   import CardActionPopover from "./CardActionPopover.svelte";
   import DiscardPile from "./DiscardPile.svelte";
   import EmulatorHeader from "./EmulatorHeader.svelte";
@@ -64,9 +64,8 @@
   let localSelectedPacks = $state(getRandomPacks(defaultPlayerCount));
   let botPersonas = $state({});
 
-  // Heuristic personas available for random assignment
-  const HEURISTIC_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conservative'];
-
+  // Bot personas available for random assignment are now defined in autoplay.js
+  
   /**
    * Returns a copy of botPersonas with any unset bot slot filled with a random persona.
    * Explicit SetupScreen selections are always preserved.
@@ -75,7 +74,7 @@
     const resolved = { ...botPersonas };
     for (const idx of botIndices) {
       if (!resolved[idx]) {
-        resolved[idx] = HEURISTIC_PERSONAS[Math.floor(Math.random() * HEURISTIC_PERSONAS.length)];
+        resolved[idx] = getRandomPersona();
       }
     }
     return resolved;

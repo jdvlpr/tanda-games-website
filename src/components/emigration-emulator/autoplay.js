@@ -5,6 +5,19 @@
 
 import { DESTINATIONS } from "./engine.svelte.js";
 
+export const BOT_PERSONAS = [
+  "expert",
+  "rusher",
+  "hoarder",
+  "saboteur",
+  "conservative",
+  "easy",
+];
+
+export function getRandomPersona() {
+  return BOT_PERSONAS[Math.floor(Math.random() * BOT_PERSONAS.length)];
+}
+
 /**
  * Create an AI player that can play the game automatically.
  * @param {import('./engine.svelte.js').default} engine

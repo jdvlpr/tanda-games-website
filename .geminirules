@@ -4,6 +4,7 @@
 - Core Logic: `src/components/emigration-emulator/engine.svelte.js` (Pure ES6 Module, 0 DOM dependencies)
 - UI: Svelte (`src/components/emigration-emulator/EmigrationEmulator.svelte`)
 - AI Autoplay: `src/components/emigration-emulator/autoplay.js`
+- CLI Simulation: `cli/simulate.js` — run `node cli/simulate.js --games N` to batch-simulate games for balance testing
 
 # Critical Architecture Rules
 
@@ -13,3 +14,6 @@
 4. Svelte components must NEVER mutate game state directly. They must only call `engine.executeRequiredAction()`, `engine.executeOptionalAction()`, or `engine.resolveChoice()`.
 5. AI actions in `src/components/emigration-emulator/autoplay.js` must adhere to the exact constraints according to the rules from the authoritative `game_specification.md` file.
 6. If an architectural change is made, update `ARCHITECTURE.md`, and if the user specifically asks to modify, add, or remove a rule, make sure it gets updated in the emulator as well as in the `src/components/emigration-emulator/game_specification.md` file.
+7. The canonical reference for bot personas (what each focuses on, scoring weights, behaviours) is the **Bot Personas** section in `ARCHITECTURE.md`. When adding or modifying a persona in `autoplay.js`, update that section too.
+8. `createBackup()` in the engine deliberately excludes `this.logs` from serialisation (it stores only `_logsLength`). This is a performance-critical optimisation for the CLI — do not revert it without benchmarking.
+
