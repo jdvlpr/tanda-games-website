@@ -557,7 +557,14 @@ export function createAutoPlayer(
           break;
         }
         case "Insider": {
-          utility += (isScholar || isHoarder) ? 10 : 5;
+          const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
+          const setSize = dest?.targets?.d?.setSize || 4;
+          const needsDocs = player.stash.documents.length < setSize;
+          if (needsDocs && !isHoarder && !isScholar) {
+            utility += 2;
+          } else {
+            utility += (isScholar || isHoarder) ? 10 : 5;
+          }
           break;
         }
         case "Salvage": {
@@ -754,7 +761,7 @@ export function createAutoPlayer(
           // else fall through: critical-need steal is permitted
         }
       } else if (move.type === "applyCollege") {
-        const maxTuition = (player.startingFund || 6) + 6;
+        const maxTuition = (player.startingMoney || 6) + 6;
         const reserveNeeded = (isConservative || isScholar)
           ? maxTuition
           : maxTuition + Math.ceil(8 / playerCount);
@@ -1112,7 +1119,12 @@ export function createAutoPlayer(
           keepValue = false; // Take $3 cash if conn set is already capped
         }
       } else if (cardTitle.includes("Insider")) {
-        if (isConservative && player && player.money < 3) {
+        const dest = DESTINATIONS.find((d) => d.name === player?.destination?.name);
+        const setSize = dest?.targets?.d?.setSize || 4;
+        const needsDocs = player && player.stash.documents.length < setSize;
+        if (needsDocs && !isHoarder && !isScholar) {
+          keepValue = false;
+        } else if (isConservative && player && player.money < 3) {
           keepValue = false;
         }
       }

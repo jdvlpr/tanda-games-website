@@ -66,82 +66,96 @@ export const NATIONALITY_TO_COUNTRY = {
 };
 
 export const NATIONALITIES = [
-  { name: "Bosnian", fund: 2, countryCode: "ba" },
-  { name: "Chinese", fund: 6, countryCode: "cn" },
-  { name: "Congolese", fund: 2, countryCode: "cd" },
-  { name: "French", fund: 5, countryCode: "fr" },
-  { name: "Russian", fund: 5, countryCode: "ru" },
-  { name: "Senegalese", fund: 3, countryCode: "sn" },
-  { name: "Swiss", fund: 4, countryCode: "ch" },
-  { name: "English", fund: 5, countryCode: "gb-eng" },
-  { name: "American", fund: 6, countryCode: "us" },
+  { name: "Bosnian", collegeFund: 4, startingMoney: 2, countryCode: "ba" },
+  { name: "Congolese", collegeFund: 4, startingMoney: 2, countryCode: "cd" },
+  { name: "Senegalese", collegeFund: 4, startingMoney: 2, countryCode: "sn" },
+  { name: "Swiss", collegeFund: 6, startingMoney: 6, countryCode: "ch" },
+  { name: "French", collegeFund: 6, startingMoney: 6, countryCode: "fr" },
+  { name: "Russian", collegeFund: 6, startingMoney: 6, countryCode: "ru" },
+  { name: "English", collegeFund: 8, startingMoney: 10, countryCode: "gb-eng" },
+  { name: "Chinese", collegeFund: 8, startingMoney: 10, countryCode: "cn" },
+  { name: "American", collegeFund: 8, startingMoney: 10, countryCode: "us" },
 ];
 
 export const DESTINATIONS = [
-  "Bosnia and Herzegovina",
-  "China",
-  "Democratic Republic of Congo",
-  "France",
-  "Russia",
-  "Senegal",
-  "Switzerland",
-  "England",
-  "United States of America",
-].map((name, i) => {
-  const allTargets = [
-    {
-      m: { setSize: 6, reward: 2 },
+  {
+    name: "Bosnia and Herzegovina",
+    targets: {
+      m: { setSize: 7, reward: 2, minRequired: 3, penalty: 1},
       d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 6 },
     },
-    {
+  },
+  {
+    name: "China",
+    targets: {
       m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 4, reward: 5 },
     },
-    {
-      m: { setSize: 6, reward: 2 },
+  },
+  {
+    name: "Democratic Republic of Congo",
+    targets: {
+      m: { setSize: 7, reward: 2, minRequired: 2, penalty: 2},
       d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 6 },
     },
-    {
+  },
+  {
+    name: "France",
+    targets: {
       m: { setSize: 8, reward: 2, minRequired: 3, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
     },
-    {
+  },
+  {
+    name: "Russia",
+    targets: {
       m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
     },
-    {
+  },
+  {
+    name: "Senegal",
+    targets: {
       m: { setSize: 7, reward: 2 },
       d: { setSize: 4, reward: 2, minRequired: 3, penalty: 3 },
       c: { setSize: 3, reward: 5 },
     },
-    {
+  },
+  {
+    name: "Switzerland",
+    targets: {
       m: { setSize: 7, reward: 2, minRequired: 2, penalty: 1 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
     },
-    {
+  },
+  {
+    name: "England",
+    targets: {
       m: { setSize: 10, reward: 3, minRequired: 4, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 3, reward: 4 },
     },
-    {
+  },
+  {
+    name: "United States of America",
+    targets: {
       m: { setSize: 10, reward: 3, minRequired: 5, penalty: 2 },
       d: { setSize: 4, reward: 2, minRequired: 2, penalty: 3 },
       c: { setSize: 4, reward: 5 },
     },
-  ];
-  const targets = allTargets[i];
+  },
+].map((dest, i) => {
   return {
-    name,
+    ...dest,
     countryCode: NATIONALITIES[i].countryCode,
     nationality: NATIONALITIES[i].name,
-    targets,
-    check: calculateAssurance(targets),
+    check: calculateAssurance(dest.targets),
   };
 });
 
@@ -428,7 +442,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Gain $1. Keep this card in your stash and whenever another player discards a Document or Connection, gain $1.",
+      "Gain $1. Keep this card in your stash and whenever another player discards a Document, gain $1.",
   },
   {
     title: "Blacklisted",
@@ -437,7 +451,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Lose $1. Keep this card in your stash and if you discard a Document or Connection, lose $1.",
+      "Lose $1. Keep this card in your stash and if you discard Connection, lose $1.",
   },
   {
     title: "Trousers Fall Down",
@@ -538,7 +552,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "May Keep",
     type: "life",
     description:
-      "Gain $3 or keep this card in your stash and on Paydays gain $1.",
+      "Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.",
   },
   {
     title: "Philanthropy",
@@ -624,7 +638,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Keep this card in your stash. Place $1 from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
+      "Keep this card in your stash. Place $1 from bank on this card (max 4). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
   },
   {
     title: "Penalty",
@@ -700,7 +714,7 @@ export const LAYOUT_COVERS = {
 };
 
 /** Pay raise amounts for the 2 career slots. */
-export const SALARY_RAISES = [1, 2];
+export const SALARY_RAISES = [3, 2];
 
 /** Maximum number of pay raise slots. */
 export const MAX_PAY_RAISES = 2;
@@ -896,15 +910,15 @@ export default class EmigrationEngine {
         name: setup.name,
         nationality: nat,
         destination: dest,
-        money: nat.fund,
+        money: nat.startingMoney,
         salary: 1,
         payRaises: 0,
         inCollege: false,
         accessFee: 1,
         assurance: 0,
         skipNextTurn: false,
-        collegeFund: nat.fund,
-        startingFund: nat.fund,
+        collegeFund: nat.collegeFund,
+        startingMoney: nat.startingMoney,
         ticketPassportBonusClaimed: false,
         crossedSuccessfully: null,
         stash: {
@@ -1002,9 +1016,10 @@ export default class EmigrationEngine {
     if (!isDiscardAction) return;
     // Only Documents and Connections trigger Salvage/Blacklisted.
     if (card.type !== "document" && card.type !== "connection") return;
-    // Salvage: other players gain $1
+    // Salvage: other player gain $1
     for (const p of this.players) {
       if (
+        card.type === 'document' &&
         p.id !== discardingPlayer.id &&
         p.stash.lifeCards.some((lc) => lc.title === "Salvage")
       ) {
@@ -1015,7 +1030,7 @@ export default class EmigrationEngine {
     }
     // Blacklisted: discarder loses $1
     if (
-      discardingPlayer.stash.lifeCards.some((lc) => lc.title === "Blacklisted")
+      card.type === "connection" && discardingPlayer.stash.lifeCards.some((lc) => lc.title === "Blacklisted")
     ) {
       discardingPlayer.money = Math.max(0, discardingPlayer.money - 1);
       this.log(`P${discardingPlayer.id}|BLACKLISTED|LOSS:1`, "system");
@@ -1122,22 +1137,28 @@ export default class EmigrationEngine {
 
   // ─── Cost Helpers ────────────────────────────────────────────────────
 
-  /** Get the effective cost of a card considering stash discounts. */
+  /** Get the effective cost of a card considering stash discounts and penalties. */
   getEffectiveCost(player, card) {
     let cost = card.cost || 0;
     if (
       card.type === "document" &&
       player.stash.lifeCards.some((lc) => lc.title === "Fancy Clothes")
     ) {
-      cost = Math.max(0, cost - 1);
+      cost -= 1;
+    }
+    if (
+      card.type === "document" &&
+      player.stash.lifeCards.some((lc) => lc.title === "Insider")
+    ) {
+      cost += 1;
     }
     if (
       card.type === "connection" &&
       player.stash.lifeCards.some((lc) => lc.title === "Stellar Reputation")
     ) {
-      cost = Math.max(0, cost - 1);
+      cost -= 1;
     }
-    return cost;
+    return Math.max(0, cost);
   }
 
   // ─── Forfeit / Availability Check ────────────────────────────────────
@@ -1866,7 +1887,7 @@ export default class EmigrationEngine {
         const roll = this.rollD6();
         if (roll <= 3) {
           player.inCollege = false;
-          player.assurance += 2;
+          player.assurance += player.payRaises === 0 ? 2 : 1;
           const raiseAmount = SALARY_RAISES[player.payRaises];
           player.salary += raiseAmount;
           player.payRaises++;
@@ -2084,7 +2105,7 @@ export default class EmigrationEngine {
     for (const { holder: p, idx: frIdx } of frontrunnerPasses) {
       const fr = p.stash.lifeCards[frIdx];
       if (!fr.money) fr.money = 0;
-      if (fr.money < 5) {
+      if (fr.money < 3) {
         fr.money += 1;
         this.log(`P${p.id}|FRONTRUNNER_ADD:1|TOTAL:${fr.money}`, "system");
       }
@@ -2211,7 +2232,7 @@ export default class EmigrationEngine {
       case "Insider":
         return {
           title: "Choose how to resolve Insider",
-          keepText: "Keep: +$1 on future Paydays",
+          keepText: "Keep: all documents cost +$1, +$1 on Paydays",
           immediateText: "Discard: gain $3",
         };
       case "Stellar Reputation":
@@ -3116,7 +3137,7 @@ export default class EmigrationEngine {
           "Boost: choose player (gain half their Nationality fund)",
           (targetId) => {
             const target = this.players[targetId];
-            const amt = Math.floor(target.startingFund / 2);
+            const amt = Math.floor(target.startingMoney / 2);
             player.money += amt;
             this.log(
               `P${player.id}|ACT:Boost|GAIN:${amt}|FROM_NAT_STARTING:P${targetId}`,
@@ -3184,7 +3205,7 @@ export default class EmigrationEngine {
       id: "select-player",
       title,
       options: opponents.map((p) => ({
-        text: `${p.name} ($${p.money}, ${p.stash.documents.length} Documents, ${p.stash.connections.length} Connections, $${p.startingFund} Starting Money)`,
+        text: `${p.name} ($${p.money}, ${p.stash.documents.length} Documents, ${p.stash.connections.length} Connections, $${p.startingMoney} Starting Money)`,
         value: String(p.id),
       })),
       resolve: (val) => callback(parseInt(val)),
@@ -3680,13 +3701,13 @@ export function runTests() {
 
   try {
     assert(SALARY_RAISES.length === 2, "2 pay raise slots");
-    assert(SALARY_RAISES[0] === 1, "First raise = +$1");
+    assert(SALARY_RAISES[0] === 2, "First raise = +$2");
     assert(SALARY_RAISES[1] === 2, "Second raise = +$2");
     let salary = 1;
     salary += SALARY_RAISES[0];
-    assert(salary === 2, "After 1st raise: salary = $2");
+    assert(salary === 3, "After 1st raise: salary = $3");
     salary += SALARY_RAISES[1];
-    assert(salary === 4, "After 2nd raise: salary = $4");
+    assert(salary === 5, "After 2nd raise: salary = $5");
   } catch (e) {
     assert(false, `Pay raise error: ${e.message}`);
   }
@@ -3862,6 +3883,16 @@ export function runTests() {
     assert(
       discountCost === 1,
       "Kept Stellar Reputation reduces connection purchase cost by $1",
+    );
+
+    keeper.stash.lifeCards.push({ title: "Insider", type: "life" });
+    const insiderDocCost = eng.getEffectiveCost(keeper, {
+      cost: 2,
+      type: "document",
+    });
+    assert(
+      insiderDocCost === 3,
+      "Kept Insider increases document purchase cost by $1",
     );
 
     const fogger = eng.players[0];

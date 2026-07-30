@@ -83,13 +83,13 @@ Each Career Card has **2 Pay Raise Slots**:
 
 | Slot | Raise Amount | Resulting Salary |
 | :--: | :----------: | :--------------: |
-|  1   |     +$1      |        $2        |
-|  2   |     +$2      |        $4        |
+|  1   |     +$2      |        $3        |
+|  2   |     +$2      |        $5        |
 
 - All players start with a base salary of **$1**.
 - Graduating from college fills the next open slot, permanently increasing salary.
 - Once both slots are filled, the player's career is **maxed** and they may not apply for college again.
-- Total maximum salary is **$4** (1 base + 1 first raise + 2 second raise).
+- Total maximum salary is **$5** (1 base + 2 first raise + 2 second raise).
 
 ---
 
@@ -214,7 +214,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
-1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance, and fill an open Pay Raise slot with $1 (permanently increasing salary). Fail results: player remains in college.
+1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 1 Assurance if it's the first time you graduate, or gain 1 Assurance if it's the second time you graduate, and also fill the text open Pay Raise slot permanently increasing salary by +$2 for each time you graduate. Fail results: player remains in college.
 2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $2 from the bank. You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
 
 #### Required Actions (Must Choose Exactly One):
@@ -258,8 +258,8 @@ Life Cards have three keep types:
 | **High Society** | Identical Twin               | `duality`          |  Instant  | Gain $1 and take another turn.                                                                                                                                                       |
 | **Downtown**     | Reward                       | `trophy`           |  Instant  | Gain $1 and take $1 from every other player.                                                                                                                                         |
 | **Downtown**     | Suspect                      | `crime-scene-tape` |  Instant  | Lose $1 and lose 1 Connection or 1 Document.                                                                                                                                         |
-| **Downtown**     | Salvage                      | `ancient-ruins`    | Must Keep | Gain $1. Keep this card in your stash and whenever another player discards a Document or Connection, gain $1.                                                                        |
-| **Downtown**     | Blacklisted                  | `spy`              | Must Keep | Lose $1. Keep this card in your stash and if you discard a Document or Connection, lose $1.                                                                                          |
+| **Downtown**     | Salvage                      | `ancient-ruins`    | Must Keep | Gain $1. Keep this card in your stash and whenever another player discards a Document gain $1.                                                                        |
+| **Downtown**     | Blacklisted                  | `spy`              | Must Keep | Lose $1. Keep this card in your stash and if you discard a Connection, lose $1.                                                                                          |
 | **Emergency**    | Trousers Fall Down           | `trousers`         |  Instant  | Lose $3 or lose 1 Document.                                                                                                                                                          |
 | **Emergency**    | Keep Calm                    | `cement-shoes`     | Must Keep | Gain $1 and keep this card in your stash. You may discard a Life Card instead of taking it, then discard this card.                                                                  |
 | **Emergency**    | Life Coach                   | `medallist`        |  Instant  | Take 1 Assurance.                                                                                                                                                                    |
@@ -270,7 +270,7 @@ Life Cards have three keep types:
 | **Vacation**     | Lost & Found                 | `backpack`         |  Instant  | Take 1 Document or $2 from another player.                                                                                                                                           |
 | **News**         | Pandemic / Economic Stimulus | `parmecia`         |  Instant  | 1st: Everyone loses a random amount of Money. 2nd: Everyone gains a random amount of Money.                                                                                          |
 | **News**         | Mental Fog                   | `dread`            |  Instant  | Lose $1 and you may discard a Life Card from any player’s Layout or Stash.                                                                                                           |
-| **News**         | Insider                      | `read`             | May Keep  | Gain $3 or keep this card in your stash and on Paydays gain $1.                                                                                                                      |
+| **News**         | Insider                      | `read`             | May Keep  | Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.                                                                                             |
 | **Charity**      | Philanthropy                 | `wallet`           |  Instant  | Lose $1 and starting with the player to your left, give $1 to every other player.                                                                                                    |
 | **Charity**      | Bailout                      | `receive-money`    |  Instant  | Gain $1 and gain $1 for player(s) with the least Money.                                                                                                                              |
 | **Charity**      | Share                        | `present`          |  Instant  | Distribute half your Money (round down) to other players.                                                                                                                            |

@@ -165,9 +165,8 @@
           class="flex gap-1 items-center justify-center opacity-70"
           title="{player.name}'s college tuition (plus a die roll amount of Money, and potentially discounted based on the die roll)"
         >
-          <span class="text-xs"
-            >${player.collegeFund} College Fund / Starting Money</span
-          >
+          <span class="text-xs">${player.startingMoney} Starting Money</span>
+          <span class="text-xs">${player.collegeFund} College Fund</span>
           <!-- <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -210,7 +209,7 @@
               class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >=
                 1 && 'border-solid bg-green-100 dark:bg-green-900'}"
             >
-              +$1
+              +$2
             </div>
             <div
               class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >=

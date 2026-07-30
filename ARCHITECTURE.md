@@ -135,7 +135,7 @@ Risk-averse and self-contained — avoids hostile actions and preserves cash.
 ### `scholar` (Career Engine Builder) [NEW]
 Dedicated career engine persona.
 - High priority on early College enrollment (`applyCollege` score boost).
-- Once graduated ($2 \rightarrow $5 salary), aggressively activates Paydays globally on **any** layout (own or opponent's) to collect $5 salary payouts ($5 for self vs $1 stipend for opponents).
+- Once graduated ($1 \rightarrow $5 salary), aggressively activates Paydays globally on **any** layout (own or opponent's) to collect $5 salary payouts ($5 for self vs $1 stipend for opponents).
 - Prefers keeping Payday boosters like *Insider*.
 
 ### `easy` / `random`

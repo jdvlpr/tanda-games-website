@@ -1,10 +1,15 @@
-//  pending (in emulator but not in print & play): {
+//  pending (in emulator but not yet in print & play): {
 //     version: "0.1.2",
 //     date: "July 30, 2026",
 //     items: [
 //       "Rule change: If a player Forfeits their turn, they gain $1
-//       "Destination changes: Bosnia, DRC, Senegal — document penalty threshold raised from < 2 → −2 to < 3 → −3
-//       "Rule change: SALARY_RAISES — changed from [1, 3] to [1, 2]. Max salary is now 4 instead of 5
+//       "Rule change: SALARY_RAISES — changed from [1, 3] to [3, 2].
+//       "Rule change: Graduation — First time is +3 Assurance, second time is +2 Assurance
+//       "Life Card change: Insider — Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.
+//       "Life Card change: Salvage - Gain $1. Keep this card in your stash and whenever another player discards a Document gain $1.                                                                        |
+//       "Life Card change: Blacklisted - Lose $1. Keep this card in your stash and if you discard a Connection, lose $1.     
+//       "Life Card change: Frontrunner - Max $3 instead of max $5    
+//       "Destination changes: Bosnia, DRC, Senegal ' others — document penalty threshold raised from < 2 → −2 to < 3 → −3
 //     ],
 //   },
 
