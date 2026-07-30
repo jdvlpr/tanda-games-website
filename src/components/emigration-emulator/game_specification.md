@@ -83,7 +83,7 @@ Each Career Card has **2 Pay Raise Slots**:
 
 | Slot | Raise Amount | Resulting Salary |
 | :--: | :----------: | :--------------: |
-|  1   |     +$2      |        $3        |
+|  1   |     +$3      |        $4        |
 |  2   |     +$2      |        $5        |
 
 - All players start with a base salary of **$1**.
@@ -215,7 +215,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
 1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance if it's the first time you graduate, or gain 1 Assurance if it's the second time you graduate, and also fill the text open Pay Raise slot permanently increasing salary by +$3 and then +2 (respectively for each time you graduate). Fail results: player remains in college.
-2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $2 from the bank. You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
+2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
 
 #### Required Actions (Must Choose Exactly One):
 
@@ -231,7 +231,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** $2 plus your Access Fee.
 5. **Discard**: Place a Document or Connection into the Discard Pile and collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). This can target a card from your own own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent). You may not discard Paydays or Life Cards, only Documents or Connections.
 6. **Apply for College**: If you have an open pay raise slot, roll a D6.
-   - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). (College Funds is the same as the Starting Fund of a player's Nationality card). A player must be able to afford minimum tuition in order to take the Apply for College action.
+   - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). A player must be able to afford minimum tuition in order to take the Apply for College action.
    - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay $1 to the bank and take a different required action.
 
 ### 4.3 End of Phase 1
@@ -280,7 +280,7 @@ Life Cards have three keep types:
 | **Trade**        | Boost                        | `refinery`         |  Instant  | Gain half the Money tokens of any player’s Starting Money (round down).                                                                                                              |
 | **Trade**        | Persuasion                   | `convince`         | Must Keep | Gain $1 and keep this card in your stash. When someone would activate, buy, or discard a card from your Layout, you may offer this instead. If declined, they pay double Access Fee. |
 | **Sports**       | Underdog                     | `giant`            | Must Keep | Lose $1 and keep this card in your stash. When a Life Card enters your Stash, pass this card to the player on your left. Lose $1 after Phase 1.                                      |
-| **Sports**       | Frontrunner                  | `laurels-trophy`   | Must Keep | Keep this card in your stash. Place $1 from bank on this card (max 5). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
+| **Sports**       | Frontrunner                  | `laurels-trophy`   | Must Keep | Keep this card in your stash. Place $1 from bank on this card (max 3). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.                           |
 | **Sports**       | Penalty                      | `whistle`          | Must Keep | Lose $1 and keep this card in your stash. After a Document enters your Stash, pass this card to the player on your left.                                                             |
 | **Sports**       | Star Power                   | `podium-winner`    | Must Keep | Gain $1 and keep this card in your stash. After a Connection enters any other player’s Stash, give them this card.                                                                   |
 

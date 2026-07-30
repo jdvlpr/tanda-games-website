@@ -638,7 +638,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Must Keep",
     type: "life",
     description:
-      "Keep this card in your stash. Place $1 from bank on this card (max 4). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
+      "Keep this card in your stash. Place $1 from bank on this card (max 3). On Paydays, pass this left. Money stays on this and can only be used after Phase 1.",
   },
   {
     title: "Penalty",
@@ -1926,10 +1926,11 @@ export default class EmigrationEngine {
         }
         const [sold] = arr.splice(stashIdx, 1);
         this.discardPile.push(sold);
-        player.money += 2;
-        this.log(`P${player.id}|SELL:${sold.name}|GAIN:2`, "action");
+        const payout = this.players.length < 4 ? 3 : 2;
+        player.money += payout;
+        this.log(`P${player.id}|SELL:${sold.name}|GAIN:${payout}`, "action");
         this.notifyToast("warning", 
-          `${player.name} sells ${sold.type.charAt(0).toUpperCase() + sold.type.slice(1)} for $2`,
+          `${player.name} sells ${sold.type.charAt(0).toUpperCase() + sold.type.slice(1)} for $${payout}`,
         );
         this._onCardDiscarded(player, sold);
         this._notify();
@@ -3513,7 +3514,7 @@ export default class EmigrationEngine {
     this._payAccessFee(player, target, fee);
     const [removed] = target.layout.splice(slotIdx, 1, null);
     this.discardPile.push(removed.card);
-    const payout = this.players.length <= 3 ? 3 : 2;
+    const payout = this.players.length < 4 ? 3 : 2;
     player.money += payout;
     this.log(
       `P${player.id}|DISC:${removed.card.name}|FROM:P${target.id}|GAIN:${payout}`,

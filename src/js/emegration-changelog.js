@@ -4,7 +4,7 @@
 //     items: [
 //       "Rule change: If a player Forfeits their turn, they gain $1
 //       "Rule change: SALARY_RAISES — changed from [1, 3] to [3, 2].
-//       "Rule change: Graduation — First time is +3 Assurance, second time is +2 Assurance
+//       "Rule change: Graduation — First time is +2 Assurance, second time is +1 Assurance
 //       "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.
 //       "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.
 //       "Life Card change: Insider — Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.
