@@ -2140,7 +2140,7 @@ export default class EmigrationEngine {
 
   // ── Persuasion Handler ────────────────────────────────────────────────
 
-  _handlePersuasion(player, target, slotIdx, baseFee, callback) {
+  _handlePersuasion(player, target, slotIdx, baseFee, callback, extraCost = 0) {
     // Step 1: Ask the layout OWNER (target) if they want to offer Persuasion.
     // playerIdx is set to target.id so the UI / AI loop knows this interrupt
     // belongs to target, not to the acting player.
@@ -2161,7 +2161,7 @@ export default class EmigrationEngine {
         }
         // Step 2: Ask the ACTING player (player) if they accept.
         // playerIdx is set to player.id so the UI knows to show this to them.
-        const canAffordDouble = player.money >= doubleFee;
+        const canAffordDouble = player.money >= doubleFee + extraCost;
         const promptBuyer = () => {
           this._setPendingChoice({
             id: "persuasion-accept",
@@ -2175,6 +2175,7 @@ export default class EmigrationEngine {
                 slotIdx,
                 baseFee,
                 callback,
+                extraCost,
               ),
             options: [
               {
@@ -2222,7 +2223,7 @@ export default class EmigrationEngine {
                   "action",
                 );
                 this.notifyToast("life", 
-                  `${player.nam} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
+                  `${player.name} rejects Persuasion from ${target.name}, pays ${doubleFee} Access Fee`,
                 );
                 callback(doubleFee);
               }
@@ -3270,7 +3271,7 @@ export default class EmigrationEngine {
     ) {
       this._handlePersuasion(player, target, slotIdx, fee, (actualFee) => {
         this._finishBuy(player, target, slotIdx, cost, actualFee);
-      });
+      }, cost);
       return;
     }
 

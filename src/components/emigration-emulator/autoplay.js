@@ -1081,12 +1081,10 @@ export function createAutoPlayer(
       return;
     }
 
-    // Persuasion accept: if AI has money for double fee, decline to get the original card; else accept
+    // Persuasion accept: decline to get the original card if the engine says it's affordable; else accept
     if (id === "persuasion-accept") {
-      const activeP = engine.players[engine.currentPlayerIdx];
-      const baseFee = activeP?.accessFee || 1;
-      const doubleFee = baseFee * 2;
-      if (activeP && activeP.money >= doubleFee) {
+      const declineOption = engine.pendingChoice.options.find(o => o.value === "decline");
+      if (declineOption && !declineOption.disabled) {
         engine.resolveChoice("decline");
       } else {
         engine.resolveChoice("accept");
