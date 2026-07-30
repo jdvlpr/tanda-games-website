@@ -75,7 +75,8 @@ node cli/simulate.js [options]
 - Average turns per game
 - Winner life card frequency
 - Wins by pack
-- Per-game winner snapshots (persona, assurance, money, docs, connections, life cards, turn count)
+- Win rate by pay raise status (college graduations: 0, 1, or 2)
+- Per-game winner snapshots (persona, assurance, money, payRaises, docs, connections, life cards, turn count)
 
 **Performance:** ~6–10 ms per game after JIT warm-up. 1,000 games completes in ~27 s on a modern Mac.
 

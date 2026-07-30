@@ -51,6 +51,7 @@ const metrics = {
   winsByPersonaByPlayerCount: {},
   winsByNationality: {},
   winsByDestination: {},
+  winsByPayRaise: {},
   winnerLifeCards: {},
   winsByPack: {},
   totalTurns: 0,
@@ -120,6 +121,9 @@ async function run() {
       metrics.winsByNationality[nationality] = (metrics.winsByNationality[nationality] || 0) + 1;
       metrics.winsByDestination[destination] = (metrics.winsByDestination[destination] || 0) + 1;
 
+      const payRaises = winner.payRaises ?? 0;
+      metrics.winsByPayRaise[payRaises] = (metrics.winsByPayRaise[payRaises] || 0) + 1;
+
       const lifeCardNames = winner.stash.lifeCards.map(c => c.title);
       for (const name of lifeCardNames) {
         metrics.winnerLifeCards[name] = (metrics.winnerLifeCards[name] || 0) + 1;
@@ -140,6 +144,7 @@ async function run() {
         packs: usedPacks,
         assurance: winner.assurance,
         money: winner.money,
+        payRaises,
         docs: winner.stash.documents.length,
         connections: winner.stash.connections.length,
         lifeCards: lifeCardNames,
@@ -196,6 +201,17 @@ async function run() {
     console.log(`  ${dest}: ${((wins / NUM_GAMES) * 100).toFixed(1)}% (${wins} wins)`);
   }
 
+  console.log(`\nWin Rate by Pay Raise Status (College Graduations):`);
+  const payRaiseLabels = {
+    0: '0 pay raises (0 college graduations)',
+    1: '1 pay raise  (1 college graduation)',
+    2: '2 pay raises (2 college graduations)',
+  };
+  for (let r = 0; r <= 2; r++) {
+    const wins = metrics.winsByPayRaise[r] || 0;
+    console.log(`  ${payRaiseLabels[r]}: ${((wins / NUM_GAMES) * 100).toFixed(1)}% (${wins} wins)`);
+  }
+
   console.log(`\nWinner Life Cards (by frequency):`);
   const sortedLifeCards = Object.entries(metrics.winnerLifeCards).sort((a, b) => b[1] - a[1]);
   for (const [name, count] of sortedLifeCards) {
@@ -207,6 +223,11 @@ async function run() {
     metrics.winsByPersona = Object.fromEntries(overallSorted);
     metrics.winsByNationality = Object.fromEntries(sortedNationalities);
     metrics.winsByDestination = Object.fromEntries(sortedDestinations);
+    metrics.winsByPayRaise = {
+      "0": metrics.winsByPayRaise[0] || 0,
+      "1": metrics.winsByPayRaise[1] || 0,
+      "2": metrics.winsByPayRaise[2] || 0,
+    };
     metrics.winnerLifeCards = Object.fromEntries(sortedLifeCards);
     metrics.winsByPack = Object.fromEntries(Object.entries(metrics.winsByPack).sort((a, b) => b[1] - a[1]));
     
