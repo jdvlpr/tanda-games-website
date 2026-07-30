@@ -1957,6 +1957,7 @@ export default class EmigrationEngine {
   // ── Activate ──────────────────────────────────────────────────────────
 
   _doActivate(player, { targetPlayerIdx, slotIdx }) {
+
     const target = this.players[targetPlayerIdx];
     const slot = target.layout[slotIdx];
     if (!slot || !this.isCardAvailable(target, slotIdx)) {

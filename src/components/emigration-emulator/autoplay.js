@@ -218,11 +218,67 @@ export function createAutoPlayer(
     }
 
     // Fallback
-    for (const a of actions) {
-      if (!a.optional && a.enabled) {
-        return { type: a.type, params: {} };
+    // If standard logic fails to pick a move, generate all possible valid moves 
+    // and pick one to ensure we have valid parameters (prevents params: {} crashes).
+    const validMoves = [];
+    if (enabled("activate")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        if (player.money >= fee) {
+          for (let i = 0; i < 14; i++) {
+            if (engine.isCardAvailable(p, i)) {
+              const type = p.layout[i].card.type;
+              if (type === "payday" || type === "life") validMoves.push({ type: "activate", params: { targetPlayerIdx: p.id, slotIdx: i } });
+            }
+          }
+        }
       }
     }
+    if (enabled("buy")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        for (let i = 0; i < 14; i++) {
+          if (engine.isCardAvailable(p, i)) {
+            const card = p.layout[i].card;
+            if ((card.type === "document" || card.type === "connection") && player.money >= engine.getEffectiveCost(player, card) + fee) {
+              validMoves.push({ type: "buy", params: { targetPlayerIdx: p.id, slotIdx: i } });
+            }
+          }
+        }
+      }
+    }
+    if (enabled("buyPool")) {
+      if (player.money >= 2 && engine.publicServices.tickets > 0 && player.stash.connections.length >= 1) validMoves.push({ type: "buyPool", params: { cardType: "ticket" } });
+      if (player.money >= 2 && engine.publicServices.passports > 0 && player.stash.documents.length >= 1) validMoves.push({ type: "buyPool", params: { cardType: "passport" } });
+    }
+    if (enabled("discard")) {
+      for (const p of engine.players) {
+        const fee = p.id === player.id ? 0 : player.accessFee;
+        if (player.money >= fee) {
+          for (let i = 0; i < 14; i++) {
+            if (engine.isCardAvailable(p, i)) {
+              const type = p.layout[i].card.type;
+              if (type === "document" || type === "connection") validMoves.push({ type: "discard", params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i } });
+            }
+          }
+        }
+      }
+    }
+    if (enabled("reclaim")) {
+      const rt = _findReclaimTarget(player);
+      if (rt) validMoves.push({ type: "reclaim", params: rt });
+    }
+    if (enabled("steal")) {
+      if (player.stash.connections.length >= 1 && engine.publicServices.tickets > 0) validMoves.push({ type: "steal", params: { cardType: "ticket" } });
+      if (player.stash.documents.length >= 1 && engine.publicServices.passports > 0) validMoves.push({ type: "steal", params: { cardType: "passport" } });
+    }
+    if (enabled("applyCollege")) validMoves.push({ type: "applyCollege", params: {} });
+    if (enabled("forfeit")) validMoves.push({ type: "forfeit", params: {} });
+
+    if (validMoves.length > 0) {
+      return validMoves[Math.floor(Math.random() * validMoves.length)];
+    }
+
     return null;
   }
 
