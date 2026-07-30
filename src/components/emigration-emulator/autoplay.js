@@ -606,7 +606,7 @@ export function createAutoPlayer(
           const mySalary = player.salary;
           const netGain = mySalary - move.fee;
           const opponentsCount = Math.max(1, playerCount - 1);
-          const totalOpponentStipends = opponentsCount * 1;
+          const totalOpponentStipends = Math.min(2, Math.max(0, playerCount - 1)) * 1;
           const totalOpponentGain =
             (move.targetId === player.id ? 0 : move.fee) +
             totalOpponentStipends;
@@ -764,7 +764,7 @@ export function createAutoPlayer(
         const maxTuition = (player.startingMoney || 6) + 6;
         const reserveNeeded = (isConservative || isScholar)
           ? maxTuition
-          : maxTuition + Math.ceil(8 / playerCount);
+          : maxTuition + 1;
 
         if (player.money < reserveNeeded) {
           score = -100; // Do not apply if financial risk is high

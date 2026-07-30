@@ -1004,6 +1004,12 @@ export default class EmigrationEngine {
     ];
   }
 
+  getRightPlayer(player) {
+    return this.players[
+      (player.id - 1 + this.players.length) % this.players.length
+    ];
+  }
+
   // ─── Hooks ───────────────────────────────────────────────────────────
 
   /**
@@ -2078,9 +2084,20 @@ export default class EmigrationEngine {
   }
 
   _resolvePayday(activator) {
+    const adjacentIds = new Set();
+    if (activator) {
+      adjacentIds.add(this.getLeftPlayer(activator).id);
+      adjacentIds.add(this.getRightPlayer(activator).id);
+    }
+
     const salaries = this.players.map((p) => {
       if (p.inCollege) return 0;
-      let payout = activator && p.id === activator.id ? p.salary : 1;
+      let payout = 0;
+      if (activator && p.id === activator.id) {
+        payout = p.salary;
+      } else if (adjacentIds.has(p.id)) {
+        payout = 1;
+      }
       if (p.stash.lifeCards.some((lc) => lc.title === "Insider")) payout += 1;
       if (p.stash.lifeCards.some((lc) => lc.title === "Pay Cut"))
         payout = Math.max(0, payout - 1);
