@@ -49,6 +49,8 @@ const metrics = {
   turnsByPlayerCount: {},
   winsByPersona: {},
   winsByPersonaByPlayerCount: {},
+  winsByNationality: {},
+  winsByDestination: {},
   winnerLifeCards: {},
   winsByPack: {},
   totalTurns: 0,
@@ -111,6 +113,13 @@ async function run() {
       }
       metrics.winsByPersonaByPlayerCount[numPlayers][persona] = (metrics.winsByPersonaByPlayerCount[numPlayers][persona] || 0) + 1;
 
+      const nationality = winner.nationality.name;
+      const startingMoney = winner.startingFund;
+      const destination = winner.destination.name;
+
+      metrics.winsByNationality[nationality] = (metrics.winsByNationality[nationality] || 0) + 1;
+      metrics.winsByDestination[destination] = (metrics.winsByDestination[destination] || 0) + 1;
+
       const lifeCardNames = winner.stash.lifeCards.map(c => c.title);
       for (const name of lifeCardNames) {
         metrics.winnerLifeCards[name] = (metrics.winnerLifeCards[name] || 0) + 1;
@@ -125,6 +134,9 @@ async function run() {
         players: numPlayers,
         name: winnerName,
         persona,
+        nationality,
+        startingMoney,
+        destination,
         packs: usedPacks,
         assurance: winner.assurance,
         money: winner.money,
@@ -172,6 +184,18 @@ async function run() {
     console.log(`  ${count} Players: ${avgTurnsPerPlayer.toFixed(1)} turns/player (${avgTurnsPerGame.toFixed(1)} total turns per game)`);
   }
 
+  const sortedNationalities = Object.entries(metrics.winsByNationality).sort((a, b) => b[1] - a[1]);
+  console.log(`\nWin Rate by Starting Nationality (includes starting $):`);
+  for (const [nat, wins] of sortedNationalities) {
+    console.log(`  ${nat}: ${((wins / NUM_GAMES) * 100).toFixed(1)}% (${wins} wins)`);
+  }
+
+  const sortedDestinations = Object.entries(metrics.winsByDestination).sort((a, b) => b[1] - a[1]);
+  console.log(`\nWin Rate by Destination:`);
+  for (const [dest, wins] of sortedDestinations) {
+    console.log(`  ${dest}: ${((wins / NUM_GAMES) * 100).toFixed(1)}% (${wins} wins)`);
+  }
+
   console.log(`\nWinner Life Cards (by frequency):`);
   const sortedLifeCards = Object.entries(metrics.winnerLifeCards).sort((a, b) => b[1] - a[1]);
   for (const [name, count] of sortedLifeCards) {
@@ -181,6 +205,8 @@ async function run() {
   if (values.output) {
     // Sort keys in objects before writing to JSON
     metrics.winsByPersona = Object.fromEntries(overallSorted);
+    metrics.winsByNationality = Object.fromEntries(sortedNationalities);
+    metrics.winsByDestination = Object.fromEntries(sortedDestinations);
     metrics.winnerLifeCards = Object.fromEntries(sortedLifeCards);
     metrics.winsByPack = Object.fromEntries(Object.entries(metrics.winsByPack).sort((a, b) => b[1] - a[1]));
     
