@@ -590,6 +590,7 @@ export function createAutoPlayer(
     const evaluateScore = (move) => {
       let score = 0;
 
+      const isExpert = persona === 'expert';
       const isRusher = persona === 'rusher';
       const isHoarder = persona === 'hoarder';
       const isSaboteur = persona === 'saboteur';
@@ -617,6 +618,12 @@ export function createAutoPlayer(
 
           if (netGain <= 0 || relativeAdvantage < 0) return -100;
 
+          // Expert salary 1 payday rule: avoid activating payday at salary 1 unless cash is low
+          if (isExpert && mySalary === 1) {
+            if (move.targetId !== player.id) return -100;
+            if (player.money >= 3) return -10;
+          }
+
           // Value money gain via Assurance impact
           const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
           const assuranceAfter = getSmoothedAssurance(
@@ -626,14 +633,14 @@ export function createAutoPlayer(
           );
 
           // Rule 3: Exploiting Payday Asymmetry
-          score = relativeAdvantage * (isHoarder ? 6 : 3) + (assuranceAfter - assuranceNow) * 4;
+          score = relativeAdvantage * (isHoarder || isExpert ? 6 : 3) + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId === player.id) {
             score += 4; // Bonus for activating own layout (removes a card for free)
           }
 
-          // Scholar persona: massive bonus to activate Paydays globally once salary is upgraded!
-          if (isScholar && mySalary >= 2) {
-            score += 12;
+          // Scholar & Expert persona: bonus to activate Paydays once salary is upgraded!
+          if ((isScholar || isExpert) && mySalary >= 2) {
+            score += isExpert ? 15 : 12;
           }
 
           if (readinessScore < 0 && move.targetId !== player.id) {
@@ -648,7 +655,7 @@ export function createAutoPlayer(
         // Liquidity penalty + Access Fee cost penalty (paying access fee transfers cash to opponent and raises own fee)
         score = -(totalCost * (isHoarder ? 1.5 : 0.5));
         if (move.fee > 0) {
-          score -= move.fee * (isConservative ? 2.0 : 1.0);
+          score -= move.fee * (isConservative ? 2.0 : isExpert ? 2.5 : 1.0);
         }
 
         const isDoc = move.card.type === "document";
@@ -661,7 +668,12 @@ export function createAutoPlayer(
           c + (isConn ? 1 : 0),
         );
 
-        score += (assuranceAfter - assuranceNow) * (isHoarder ? 10 : 5);
+        score += (assuranceAfter - assuranceNow) * (isHoarder || isExpert ? 12 : 5);
+
+        // Prefer own layout for Expert (no access fee, uncovers cards)
+        if (isExpert && move.fee === 0) {
+          score += 6;
+        }
 
         // Penalty avoidance boost: high incentive to clear destination minRequired missing cards
         if (
@@ -669,31 +681,44 @@ export function createAutoPlayer(
           destTargets?.d?.minRequired !== undefined &&
           d < destTargets.d.minRequired
         ) {
-          score += (destTargets.d.penalty || 2) * 4;
+          score += (destTargets.d.penalty || 2) * (isExpert ? 8 : 4);
         }
         if (
           isConn &&
           destTargets?.c?.minRequired !== undefined &&
           c < destTargets.c.minRequired
         ) {
-          score += (destTargets.c.penalty || 2) * 4;
+          score += (destTargets.c.penalty || 2) * (isExpert ? 8 : 4);
         }
 
         // Destination Target Capping: Reward single set completion, but penalize buying redundant cards
         if (isDoc && destTargets?.d?.setSize > 0) {
           const setSize = destTargets.d.setSize;
           if (d < setSize && d + 1 === setSize) {
-            score += (destTargets.d.reward || 2) * 2;
+            score += (destTargets.d.reward || 2) * (isExpert ? 4 : 2);
           } else if (d >= setSize) {
-            score -= isHoarder ? 8 : 4; // Extra penalty for hoarder on redundant docs once set is capped
+            score -= (isHoarder || isExpert) ? 12 : 4; // Extra penalty for redundant docs once set is capped
           }
         }
         if (isConn && destTargets?.c?.setSize > 0) {
           const setSize = destTargets.c.setSize;
           if (c < setSize && c + 1 === setSize) {
-            score += (destTargets.c.reward || 2) * 2;
+            score += (destTargets.c.reward || 2) * (isExpert ? 5 : 2);
           } else if (c >= setSize) {
-            score -= isHoarder ? 8 : 4; // Extra penalty for hoarder on redundant conns once set is capped
+            score -= (isHoarder || isExpert) ? 12 : 4; // Extra penalty for redundant conns once set is capped
+          }
+        }
+
+        // Opponent set denial check for Expert
+        if (isExpert && move.targetId !== player.id) {
+          const targetPlayer = engine.players[move.targetId];
+          if (targetPlayer) {
+            const oppDest = DESTINATIONS.find((dest) => dest.name === targetPlayer.destination.name);
+            const oppSet = isDoc ? (oppDest?.targets?.d?.setSize || 4) : (oppDest?.targets?.c?.setSize || 3);
+            const oppCurrent = isDoc ? targetPlayer.stash.documents.length : targetPlayer.stash.connections.length;
+            if (oppCurrent + 1 === oppSet) {
+              score += 15; // Steal/buy to deny opponent set completion!
+            }
           }
         }
 
@@ -703,14 +728,14 @@ export function createAutoPlayer(
       } else if (move.type === "buyPool") {
         // Rule 1: Mandatory Ticket/Passport Safety Gate
         // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
-        let urgency = (isRusher ? 40 : 20) + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+        let urgency = (isRusher || isExpert ? 35 : 20) + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         const isTicket = move.params.cardType === "ticket";
         const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
 
         if (!hasDoc) {
           // Rusher safety check: if rusher has 0 docs AND 0 conns AND there are available face-up layout cards,
           // temper rusher pool urgency slightly so it picks up at least 1 set card first.
-          if (isRusher && d === 0 && c === 0 && faceUpLeft > 6) {
+          if ((isRusher || isExpert) && d === 0 && c === 0 && faceUpLeft > 6) {
             urgency = 15;
           }
           score = urgency;
@@ -773,8 +798,11 @@ export function createAutoPlayer(
         }
       } else if (move.type === "applyCollege") {
         const maxTuition = (player.startingMoney || 6) + 6;
+        const minTuition = Math.floor((player.collegeFund || 6) / 2) + 1;
         const reserveNeeded = (isConservative || isScholar)
           ? maxTuition
+          : isExpert
+          ? minTuition + 1
           : maxTuition + 1;
 
         if (player.money < reserveNeeded) {
@@ -794,10 +822,29 @@ export function createAutoPlayer(
           } else if (totalROI < 0 && estimatedTurnsRemaining < 4) {
             score = -20; // Not enough turns/paydays remaining for returns to materialize
           } else {
-            const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isConservative ? 10 : 6);
+            // For Expert: check if own layout has available needed set cards (docs/conns).
+            // If missing minRequired set cards and own layout has them available, prioritize buying cards over college!
+            const dMin = destTargets?.d?.minRequired || 0;
+            const cMin = destTargets?.c?.minRequired || 0;
+            const ownAvailableCards = engine.getAvailableLayoutCards(player.id)
+              .map(i => player.layout[i]?.card)
+              .filter(Boolean);
+            const hasNeededDocOnLayout = d < dMin && ownAvailableCards.some(c => c.type === "document");
+            const hasNeededConnOnLayout = c < cMin && ownAvailableCards.some(c => c.type === "connection");
+
+            let expertBonus = 6;
+            if (isExpert) {
+              if (hasNeededDocOnLayout || hasNeededConnOnLayout) {
+                expertBonus = 2; // Defer college to pick up available needed set card first!
+              } else {
+                expertBonus = 10;
+              }
+            }
+
+            const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isExpert ? expertBonus : isConservative ? 10 : 6);
             const countFactor = 1 + 2 / playerCount;
-            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : 0.5);
-            if (currentAssurance < 6) score += (isScholar || isConservative) ? 5 : 2;
+            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : isExpert ? 1.0 : 0.5);
+            if (currentAssurance < 6) score += (isScholar || isConservative || isExpert) ? 5 : 2;
           }
         }
       } else if (move.type === "discard") {
@@ -845,7 +892,7 @@ export function createAutoPlayer(
           }
 
           const disruptBonus = opponentFaceUp <= 3 ? 3 : 2;
-          score += (disruptBonus + denialBonus) * (isSaboteur ? 3 : 1);
+          score += (disruptBonus + denialBonus) * (isSaboteur ? 3 : isExpert ? 2.5 : 1);
 
           // Apply layout preservation penalty if self is not ready for Phase 2
           if (readinessScore < 0) {
@@ -853,6 +900,15 @@ export function createAutoPlayer(
           }
         } else {
           score -= 2;
+          if (isExpert) {
+            const card = move.card;
+            const isDoc = card?.type === "document";
+            const isConn = card?.type === "connection";
+            const dSet = destTargets?.d?.setSize || 4;
+            const cSet = destTargets?.c?.setSize || 3;
+            const isSurplus = (isDoc && d >= dSet) || (isConn && c >= cSet);
+            if (isSurplus) score += 10;
+          }
         }
       }
 
