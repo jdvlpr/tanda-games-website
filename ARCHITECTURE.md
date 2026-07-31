@@ -101,12 +101,13 @@ export const BOT_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conserv
 - **Dynamic College ROI:** Calculates expected salary returns dynamically: $(\text{newSalary} - \text{currentSalary}) \times (\text{Expected Paydays Left}) + \text{Assurance} - \text{Tuition}$ based on remaining deck cards.
 - **Dynamic Life Card Evaluation:** Evaluates Life Card utility dynamically (`_evaluateLifeCardUtility`) and resolves choices (`may-keep-choice`, `select-player`) based on persona preferences and current resource needs.
 
-### `expert` (Min-Maxer / Bargain Hunter baseline)
-The balanced reference persona.
-- Balances documents and connections strictly toward destination requirements, capping purchases when thresholds are met.
-- Evaluates Life Cards dynamically (keeps *Fancy Clothes* / *Stellar Reputation* if missing resources, converts to $3 cash if capped).
-- Applies to college when ROI and financial reserve are positive.
-- Discards from opponent layouts when it denies their set completion.
+### `expert` (Min-Maxer / Optimal Heuristic Leader)
+The optimized reference persona designed for peak performance across all player counts (2–6 players).
+- **Priority Set Fulfillment:** Prioritizes clearing `minRequired` thresholds for Documents and Connections to eliminate catastrophic -3 Assurance penalties, and completes set thresholds (`setSize`) to capture maximum Assurance rewards (+2 for docs, +4 to +6 for conns). Penalizes redundant purchases once sets are capped.
+- **Travel Document Locking:** Immediately acquires Ticket and Passport once 1 Connection and 1 Document are secured, locking in the one-time Ticket+Passport Assurance bonus (+2 to +6 Assurance) and guaranteeing border crossing capability.
+- **Gated College Engine:** Evaluates early college enrollment dynamically based on ROI and tuition reserves, but intelligently defers college if own layout contains available needed set cards to prevent opponents from stripping the layout during exam turns.
+- **Payday Asymmetry:** Avoids activating Payday at base salary ($1) to avoid subsidizing opponents, but aggressively spams Paydays globally once graduated ($4/$5 salary) to capture a +$3 net relative cash advantage per activation.
+- **Layout & Disruption Efficiency:** Heavily prefers own-layout purchases ($0 access fee) and opportunistically buys or discards from opponent layouts to deny opponents single-set completion rewards.
 
 ### `rusher` (High Roller)
 Prioritises getting ticket + passport as quickly as possible to trigger Phase 2 early, before opponents are ready.

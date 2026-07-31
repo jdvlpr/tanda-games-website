@@ -508,7 +508,7 @@ export function createAutoPlayer(
 
     const _evaluateLifeCardUtility = (card, player, fee, persona, engine) => {
       let utility = 3 - fee;
-
+      const isExpert = persona === "expert";
       const isScholar = persona === "scholar";
       const isHoarder = persona === "hoarder";
       const isSaboteur = persona === "saboteur";
@@ -521,38 +521,49 @@ export function createAutoPlayer(
         case "VIP": {
           const maxMoney = Math.max(...engine.players.map((p) => p.money));
           const gain = Math.floor(maxMoney / 2);
-          utility += gain * 1.5;
+          utility += gain * (isExpert ? 2.0 : 1.5);
           break;
         }
         case "Identical Twin": {
-          utility += 15;
+          utility += isExpert ? 18 : 15;
+          break;
+        }
+        case "Life Coach": {
+          utility += isExpert ? 14 : 10;
+          break;
+        }
+        case "Swap Wallets": {
+          const otherMaxMoney = Math.max(...engine.players.filter(p => p.id !== player.id).map(p => p.money));
+          if (otherMaxMoney > player.money + 2) {
+            utility += (otherMaxMoney - player.money) * (isExpert ? 2.0 : 1.2);
+          }
           break;
         }
         case "Social Butterfly": {
           const richOpponent = engine.players.some(
             (p) => p.id !== player.id && (p.money >= 3 || p.stash.connections.length > 0)
           );
-          if (richOpponent) utility += isSaboteur ? 8 : 5;
+          if (richOpponent) utility += (isSaboteur || isExpert) ? 9 : 5;
           break;
         }
         case "Lost & Found": {
           const docOpponent = engine.players.some(
             (p) => p.id !== player.id && (p.stash.documents.length > 0 || p.money >= 2)
           );
-          if (docOpponent) utility += isSaboteur ? 8 : 5;
+          if (docOpponent) utility += (isSaboteur || isExpert) ? 9 : 5;
           break;
         }
         case "Fancy Clothes": {
           const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
           const setSize = dest?.targets?.d?.setSize || 4;
-          if (player.stash.documents.length < setSize) utility += 6;
+          if (player.stash.documents.length < setSize) utility += isExpert ? 8 : 6;
           else utility += 2;
           break;
         }
         case "Stellar Reputation": {
           const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
           const setSize = dest?.targets?.c?.setSize || 3;
-          if (player.stash.connections.length < setSize) utility += 6;
+          if (player.stash.connections.length < setSize) utility += isExpert ? 8 : 6;
           else utility += 2;
           break;
         }
@@ -560,15 +571,15 @@ export function createAutoPlayer(
           const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
           const setSize = dest?.targets?.d?.setSize || 4;
           const needsDocs = player.stash.documents.length < setSize;
-          if (needsDocs && !isHoarder && !isScholar) {
+          if (needsDocs && !isHoarder && !isScholar && !isExpert) {
             utility += 2;
           } else {
-            utility += (isScholar || isHoarder) ? 10 : 5;
+            utility += (isScholar || isHoarder || isExpert) ? 10 : 5;
           }
           break;
         }
         case "Salvage": {
-          utility += isHoarder ? 7 : 4;
+          utility += (isHoarder || isExpert) ? 7 : 4;
           break;
         }
         case "Tariffs": {
@@ -576,7 +587,7 @@ export function createAutoPlayer(
           break;
         }
         case "Productivity": {
-          utility += (persona === "expert" || isRusher) ? 6 : 3;
+          utility += (isExpert || isRusher) ? 7 : 3;
           break;
         }
         default:
@@ -633,14 +644,16 @@ export function createAutoPlayer(
           );
 
           // Rule 3: Exploiting Payday Asymmetry
-          score = relativeAdvantage * (isHoarder || isExpert ? 6 : 3) + (assuranceAfter - assuranceNow) * 4;
+          // Expert scales payday value with playerCount: in 5P/6P games, relative advantage matters more
+          const payMultiplier = isExpert ? (4 + playerCount) : (isHoarder ? 6 : 3);
+          score = relativeAdvantage * payMultiplier + (assuranceAfter - assuranceNow) * 4;
           if (move.targetId === player.id) {
             score += 4; // Bonus for activating own layout (removes a card for free)
           }
 
           // Scholar & Expert persona: bonus to activate Paydays once salary is upgraded!
           if ((isScholar || isExpert) && mySalary >= 2) {
-            score += isExpert ? 15 : 12;
+            score += isExpert ? (15 + playerCount) : 12;
           }
 
           if (readinessScore < 0 && move.targetId !== player.id) {
@@ -654,12 +667,28 @@ export function createAutoPlayer(
         const totalCost = move.cost + move.fee;
         // Liquidity penalty + Access Fee cost penalty (paying access fee transfers cash to opponent and raises own fee)
         score = -(totalCost * (isHoarder ? 1.5 : 0.5));
-        if (move.fee > 0) {
-          score -= move.fee * (isConservative ? 2.0 : isExpert ? 2.5 : 1.0);
-        }
 
         const isDoc = move.card.type === "document";
         const isConn = move.card.type === "connection";
+
+        if (move.fee > 0 && isExpert) {
+          // Context-aware fee penalty for expert: lower penalty if strategically motivated
+          const ownNeedsDoc = isDoc && destTargets?.d?.minRequired !== undefined && d < destTargets.d.minRequired;
+          const ownNeedsConn = isConn && destTargets?.c?.minRequired !== undefined && c < destTargets.c.minRequired;
+          const targetPlayer = engine.players[move.targetId];
+          const oppDest = targetPlayer ? DESTINATIONS.find((dest) => dest.name === targetPlayer.destination.name) : null;
+          const oppSet = isDoc ? (oppDest?.targets?.d?.setSize || 4) : (oppDest?.targets?.c?.setSize || 3);
+          const oppCurrent = targetPlayer ? (isDoc ? targetPlayer.stash.documents.length : targetPlayer.stash.connections.length) : 0;
+          const isDenialBuy = oppCurrent + 1 >= oppSet;
+
+          if (ownNeedsDoc || ownNeedsConn || isDenialBuy) {
+            score -= move.fee * 1.0; // Reduced penalty: strategically worth paying
+          } else {
+            score -= move.fee * 2.0; // Standard penalty: prefer own layout
+          }
+        } else if (move.fee > 0) {
+          score -= move.fee * (isConservative ? 2.0 : 1.0);
+        }
 
         const assuranceNow = getSmoothedAssurance(m + frMoney, d, c);
         const assuranceAfter = getSmoothedAssurance(
@@ -725,6 +754,11 @@ export function createAutoPlayer(
         // Extra value if this doc enables buying a passport/ticket
         if (isDoc && pPassports < 1 && d === 0) score += 15;
         if (isConn && pTickets < 1 && c === 0) score += 15;
+
+        // In 6P: extra denial bonus for buying from opponent's layout to prevent set completion in a crowded field
+        if (isExpert && move.fee > 0 && playerCount >= 5) {
+          score += 3; // Crowd-denial: buying from opponent slows multiple rivals simultaneously
+        }
       } else if (move.type === "buyPool") {
         // Rule 1: Mandatory Ticket/Passport Safety Gate
         // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
@@ -833,17 +867,22 @@ export function createAutoPlayer(
             const hasNeededConnOnLayout = c < cMin && ownAvailableCards.some(c => c.type === "connection");
 
             let expertBonus = 6;
+            let expertROIMultiplier = 1.0;
             if (isExpert) {
               if (hasNeededDocOnLayout || hasNeededConnOnLayout) {
                 expertBonus = 2; // Defer college to pick up available needed set card first!
+                expertROIMultiplier = 0.5;
               } else {
-                expertBonus = 10;
+                // Expert scales college aggression with playerCount (more paydays = more value)
+                // Cap at 14 (same as scholar) to avoid over-investing in 6P
+                expertBonus = Math.min(14, 10 + playerCount - 2); // 10 in 2P, capped at 14 for 5P+
+                expertROIMultiplier = Math.min(1.4, 1.0 + (playerCount - 2) * 0.1); // 1.0 in 2P, 1.4 cap in 6P
               }
             }
 
             const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isExpert ? expertBonus : isConservative ? 10 : 6);
             const countFactor = 1 + 2 / playerCount;
-            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : isExpert ? 1.0 : 0.5);
+            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : isExpert ? expertROIMultiplier : 0.5);
             if (currentAssurance < 6) score += (isScholar || isConservative || isExpert) ? 5 : 2;
           }
         }
@@ -892,7 +931,9 @@ export function createAutoPlayer(
           }
 
           const disruptBonus = opponentFaceUp <= 3 ? 3 : 2;
-          score += (disruptBonus + denialBonus) * (isSaboteur ? 3 : isExpert ? 2.5 : 1);
+          // Expert denial scales with playerCount: in 6P there are more opponents to deny
+          const expertDisruptMult = isExpert ? (2 + playerCount * 0.25) : (isSaboteur ? 3 : 1);
+          score += (disruptBonus + denialBonus) * expertDisruptMult;
 
           // Apply layout preservation penalty if self is not ready for Phase 2
           if (readinessScore < 0) {
@@ -1163,6 +1204,7 @@ export function createAutoPlayer(
     }
 
     const activePersona = (engine.pendingChoice && personas[engine.pendingChoice.playerIdx]) || difficulty;
+    const isExpert = activePersona === 'expert';
     const isScholar = activePersona === 'scholar';
     const isHoarder = activePersona === 'hoarder';
     const isSaboteur = activePersona === 'saboteur';
@@ -1191,7 +1233,7 @@ export function createAutoPlayer(
         const dest = DESTINATIONS.find((d) => d.name === player?.destination?.name);
         const setSize = dest?.targets?.d?.setSize || 4;
         const needsDocs = player && player.stash.documents.length < setSize;
-        if (needsDocs && !isHoarder && !isScholar) {
+        if (needsDocs && !isHoarder && !isScholar && !isExpert) {
           keepValue = false;
         } else if (isConservative && player && player.money < 3) {
           keepValue = false;
@@ -1367,13 +1409,19 @@ export function createAutoPlayer(
       let bestMoveWithSell = null;
 
       const trySell = (type, list) => {
-        if (list.length > 0) {
+        const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
+        const setSize = type === "document" ? (dest?.targets?.d?.setSize || 4) : (dest?.targets?.c?.setSize || 3);
+        const minReq = type === "document" ? (dest?.targets?.d?.minRequired || 0) : (dest?.targets?.c?.minRequired || 0);
+
+        // Only sell if holding surplus cards beyond set requirement or min required
+        if (list.length > Math.max(1, minReq)) {
           const idx = list.reduce(
             (best, c, i) => (c.cost < list[best].cost ? i : best),
             0,
           );
           const item = list.splice(idx, 1)[0];
-          player.money += 2;
+          const sellPayout = engine.players.length < 4 ? 3 : 2;
+          player.money += sellPayout;
 
           const simActions = engine.getValidActions(player);
           const simBest = _getBestHeuristicAction(player, simActions, currentPersona);
@@ -1384,7 +1432,7 @@ export function createAutoPlayer(
             stashIdxToSell = idx;
           }
 
-          player.money -= 2;
+          player.money -= sellPayout;
           list.splice(idx, 0, item); // restore
         }
       };
