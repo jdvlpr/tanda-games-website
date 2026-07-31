@@ -714,7 +714,7 @@ export const LAYOUT_COVERS = {
 };
 
 /** Pay raise amounts for the 2 career slots. */
-export const SALARY_RAISES = [2, 2];
+export const SALARY_RAISES = [3, 2];
 
 // ─── Engine Class ────────────────────────────────────────────────────────────
 
