@@ -714,10 +714,7 @@ export const LAYOUT_COVERS = {
 };
 
 /** Pay raise amounts for the 2 career slots. */
-export const SALARY_RAISES = [3, 2];
-
-/** Maximum number of pay raise slots. */
-export const MAX_PAY_RAISES = 2;
+export const SALARY_RAISES = [2, 2];
 
 // ─── Engine Class ────────────────────────────────────────────────────────────
 
@@ -1120,7 +1117,7 @@ export default class EmigrationEngine {
   checkTicketPassportBonus(player) {
     if (!player.ticketPassportBonusClaimed) {
       if (player.stash.tickets >= 1 && player.stash.passports >= 1) {
-        const bonus = this.players.length > 4 ? 2 : 1;
+        const bonus = 2 + (6 - this.players.length);
         player.assurance += bonus;
         player.ticketPassportBonusClaimed = true;
         this.log(`P${player.id}|TICKET_PASSPORT_BONUS|GAIN:1A`, "system");
@@ -1249,7 +1246,7 @@ export default class EmigrationEngine {
     // Apply for College
     if (
       !this._collegeFailed &&
-      player.payRaises < MAX_PAY_RAISES &&
+      player.payRaises < SALARY_RAISES.length &&
       !player.inCollege
     ) {
       const minTuition = Math.floor(player.collegeFund / 2) + 1;
@@ -1402,7 +1399,7 @@ export default class EmigrationEngine {
     });
 
     let canApply = false;
-    if (!this._collegeFailed && p.payRaises < MAX_PAY_RAISES && !p.inCollege) {
+    if (!this._collegeFailed && p.payRaises < SALARY_RAISES.length && !p.inCollege) {
       const minTuition = Math.floor(p.collegeFund / 2) + 1;
       if (p.money >= minTuition) canApply = true;
     }
@@ -3547,7 +3544,7 @@ export default class EmigrationEngine {
   // ── Apply for College ─────────────────────────────────────────────────
 
   _doApplyCollege(player) {
-    if (player.payRaises >= MAX_PAY_RAISES) {
+    if (player.payRaises >= SALARY_RAISES.length) {
       this.log("ERR|MAX_RAISES", "error");
       return;
     }
