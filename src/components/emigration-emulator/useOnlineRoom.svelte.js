@@ -252,7 +252,7 @@ export function useOnlineRoom({ onRemoteAction, onSyncState, onGameStart } = {})
     }
   }
 
-  function addBot() {
+  function addBot(persona = "expert") {
     const botName = `🤖 Robot ${p2pPlayers.length + 1}`;
     p2pPlayers = [
       ...p2pPlayers,
@@ -261,10 +261,23 @@ export function useOnlineRoom({ onRemoteAction, onSyncState, onGameStart } = {})
         name: botName,
         isHost: false,
         isBot: true,
+        persona: persona || "expert",
       },
     ];
+    
     selectedPacks = getRandomPacks(p2pPlayers.length);
     multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+  }
+
+  function updateBotPersona(idx, persona) {
+    if (p2pPlayers[idx] && p2pPlayers[idx].isBot) {
+      const updated = [...p2pPlayers];
+      updated[idx] = { ...updated[idx], persona };
+      p2pPlayers = updated;
+      if (multiplayer.isHost) {
+        multiplayer.broadcastSetupState(p2pPlayers, selectedPacks);
+      }
+    }
   }
 
   function removeBot(idx) {
@@ -305,6 +318,7 @@ export function useOnlineRoom({ onRemoteAction, onSyncState, onGameStart } = {})
     exitRoom,
     updateLocalPlayerName,
     addBot,
+    updateBotPersona,
     removeBot,
     togglePack,
     broadcastGameStart,

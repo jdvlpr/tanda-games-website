@@ -22,7 +22,8 @@ Most log entries follow this structure:
 
 | Log Signature                                                              | Description                                      | Agent Action                                                                                                            |
 | :------------------------------------------------------------------------- | :----------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
-| `INIT\|P{id}\|NAT:{nat}\|DEST:{dest}\|${money}\|FACEUP:[{idx}:{name},...]` | Player setup data.                               | Initialize player `id` with starting `money`, nationality `nat`, and layout containing `FACEUP` cards at exact indices. |
+| `INIT\|SETUP\|P0: {persona0} ({nat0} -> {dest0}), ...` | Global setup summary log. | Extract initial player personas and setup summary. |
+| `INIT\|P{id}\|PERSONA:{persona}\|NAT:{nat}\|DEST:{dest}\|${money}\|FACEUP:[{idx}:{name},...]` | Player setup data. | Initialize player `id` with bot persona (or `human`), starting `money`, nationality `nat`, and layout containing `FACEUP` cards at exact indices. |
 | `T{n}\|PAYDAY\|SALARIES:[{s0},{s1},...]`                                   | Global payday event.                             | Iterate over all players (0 to N). Add `sX` to Player X's money.                                                        |
 | `{PREFIX}\|P{id}\|ACT:{cardName}\|DELTA:[{d0},{d1},...]`                   | Global life card effect (e.g., Pandemic, Share). | Apply the integer `dX` to Player X's money. Positive is a gain, negative is a loss.                                     |
 | `ALL_FORFEIT\|GAIN:1`                                                      | Gridlock resolution.                             | Add +$1 to all players.                                                                                                 |

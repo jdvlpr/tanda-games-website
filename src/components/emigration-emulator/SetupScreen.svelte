@@ -38,7 +38,7 @@
     showRobotMode = false,
     playersSetup = $bindable([]),
     playerCount = $bindable(4),
-    botPersonas = $bindable({}),
+    botPersonas = $bindable([]),
     localSelectedPacks = $bindable([]),
     toast,
     currentRoomCode = "",
@@ -52,6 +52,7 @@
     onexitroom = null,
     onaddbot = null,
     onremovebot = null,
+    onupdatebotpersona = null,
     ontogglelocalpack = null,
     ontoggleonlinepack = null,
     onupdatename = null,
@@ -215,17 +216,49 @@
               <p class="text-sm font-bold flex justify-between items-center">
                 <span>Players in Room ({p2pPlayers.length}/6)</span>
                 {#if isHost && p2pPlayers.length < 6}
-                  <button class="btn-sm" onclick={onaddbot}>🤖 Add Robot</button
+                  <button
+                    class="btn-sm"
+                    onclick={() => {
+                      onaddbot();
+                    }}>🤖 Add Robot</button
                   >
                 {/if}
               </p>
-              <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col gap-2">
                 {#each p2pPlayers as p, i}
                   <div
-                    class="p-2 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center"
+                    class="p-2 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex justify-between items-center gap-2"
                   >
-                    <span class="font-bold">{p.name || "Anonymous"}</span>
-                    <div class="flex items-center gap-1">
+                    <div
+                      class="flex flex-col items-start gap-0.5 min-w-0 flex-1"
+                    >
+                      <span class="font-bold truncate w-full text-left"
+                        >{p.name || "Anonymous"}</span
+                      >
+                      {#if p.isBot}
+                        {#if isHost}
+                          <select
+                            id="bot-persona-p2p-{i}"
+                            class=""
+                            value={p.persona || "expert"}
+                            onchange={(e) =>
+                              onupdatebotpersona?.(i, e.target.value)}
+                          >
+                            {#each BOT_PERSONAS as persona}
+                              <option value={persona}
+                                >{persona.charAt(0).toUpperCase() +
+                                  persona.slice(1)}</option
+                              >
+                            {/each}
+                          </select>
+                        {:else}
+                          <span class="text-[10px] text-neutral-500 capitalize"
+                            >Persona: {p.persona || "expert"}</span
+                          >
+                        {/if}
+                      {/if}
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
                       {#if p.isHost}
                         <span
                           class="text-[10px] uppercase bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-200 px-1 py-0.5 rounded"
@@ -271,7 +304,7 @@
           <div
             class="flex flex-wrap gap-2 p-2 rounded-2xl bg-neutral-100 dark:bg-neutral-900 shadow-md border border-neutral-200 dark:border-neutral-800"
           >
-            <div class="flex flex-col gap-2 flex-1">
+            <div class="flex flex-col gap-1 flex-1">
               {#if (gameType === "vscomputer" && i === 0) || (gameType !== "vscomputer" && gameType !== "auto")}
                 <p class="text-sm opacity-70 text-left">Human</p>
               {:else if gameType === "vscomputer" || gameType === "auto"}
@@ -285,9 +318,15 @@
               />
             </div>
             {#if (gameType === "vscomputer" && i !== 0) || gameType === "auto"}
-              <div class="w-fit flex flex-col gap-2 h-fit">
-                <p class="text-sm opacity-70 text-left">Skill</p>
-                <select class="w-fit" bind:value={botPersonas[i]}>
+              <div class="w-fit flex flex-col gap-1 h-fit">
+                <label for="persona-{i}" class="text-sm opacity-70 text-left"
+                  >Skill</label
+                >
+                <select
+                  id="persona-{i}"
+                  class="w-fit"
+                  bind:value={botPersonas[i]}
+                >
                   {#each BOT_PERSONAS as persona}
                     <option value={persona}
                       >{persona.charAt(0).toUpperCase() +

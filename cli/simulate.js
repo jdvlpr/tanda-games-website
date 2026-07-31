@@ -139,6 +139,7 @@ async function run() {
       mode: 'competitive',
       selectedPacks: currentSelectedPacks,
       excludedPacks: values.inverse ? inputPacks : [],
+      personas: botPersonas,
       onLog: (entry) => {
         if (verbose && entry.type !== 'toast') {
           console.log(`[Game ${g}] ${entry.msg}`);

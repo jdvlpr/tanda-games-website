@@ -2,7 +2,10 @@
   import Icon from "@iconify/svelte";
   import { changelog } from "../../js/emegration-changelog.js";
   import { playPaydaySound } from "../../js/utils.svelte.js";
-  import { multiplayer } from "../../stores/multiplayer.svelte.js";
+  import {
+    getRoomCodeFromUrl,
+    multiplayer,
+  } from "../../stores/multiplayer.svelte.js";
   import { toast } from "../../stores/toast.svelte";
   import ActionPanel from "./ActionPanel.svelte";
   import { createAutoPlayer, getRandomPersona } from "./autoplay.js";
@@ -64,7 +67,7 @@
   let mode = $state(defaultMode);
   let playerCount = $state(defaultPlayerCount);
   let localSelectedPacks = $state(getRandomPacks(defaultPlayerCount));
-  let botPersonas = $state({});
+  let botPersonas = $state([]);
 
   // Bot personas available for random assignment are now defined in autoplay.js
 
@@ -90,7 +93,9 @@
   let snapshot = $state(null); // reactive copy of engine state
   let pendingChoice = $state(null);
   let autoplay = $state(null);
-  let gameType = $state("vscomputer");
+  const initialRoomCode =
+    typeof window !== "undefined" ? getRoomCodeFromUrl() : null;
+  let gameType = $state(initialRoomCode ? "online" : "vscomputer");
 
   // Solo vs AI State
   let aiPlayer = $state(null);
@@ -200,6 +205,12 @@
   let currentRoomCode = $derived(room.currentRoomCode);
   let p2pPlayers = $derived(room.p2pPlayers);
   let myP2PPlayerIdx = $derived(room.myP2PPlayerIdx);
+
+  $effect(() => {
+    if (currentRoomCode) {
+      gameType = "online";
+    }
+  });
 
   let activeSelectedPacks = $derived(
     gameType === "online" ? room.selectedPacks : localSelectedPacks,
@@ -580,7 +591,12 @@
         (d) => d.name !== matchingCountry,
       );
       const [destObj] = availableDests.splice(destIndex, 1);
-      return { name: p.name, nationality: nat, destination: destObj };
+      return {
+        name: p.name,
+        nationality: nat,
+        destination: destObj,
+        persona: p.isBot ? p.persona || botPersonas[i] || "expert" : "human",
+      };
     });
 
     engine = createStandardGameSetup({
@@ -624,7 +640,12 @@
       .map((p, i) => (p.isBot ? i : -1))
       .filter((i) => i !== -1);
     if (activeBotIndices.length > 0) {
-      const resolvedPersonas = resolvePersonas(activeBotIndices);
+      const resolvedPersonas = {};
+      p2pPlayers.forEach((p, i) => {
+        if (p.isBot) {
+          resolvedPersonas[i] = p.persona || botPersonas[i] || "expert";
+        }
+      });
       aiPlayer = createAutoPlayer(createBotEngine(engine), "expert", {
         botIndices: activeBotIndices,
         personas: resolvedPersonas,
@@ -642,6 +663,14 @@
     const availableDests = shuffleArray([...DESTINATIONS]);
 
     const activeSetup = playersSetup.slice(0, playerCount);
+    const activeBotIndicesForGame =
+      requestedGameType === "auto"
+        ? Array.from({ length: playerCount }, (_, i) => i)
+        : requestedGameType === "vscomputer"
+          ? Array.from({ length: playerCount - 1 }, (_, i) => i + 1)
+          : [];
+    const resolvedPersonas = resolvePersonas(activeBotIndicesForGame);
+
     const finalPlayers = activeSetup.map((p, i) => {
       const nat = shuffledNats[i];
       const matchingCountry = NATIONALITY_TO_COUNTRY[nat.name];
@@ -649,7 +678,16 @@
         (d) => d.name !== matchingCountry,
       );
       const [destObj] = availableDests.splice(destIndex, 1);
-      return { name: p.name, nationality: nat, destination: destObj };
+
+      let persona = "human";
+      if (requestedGameType === "vscomputer") {
+        persona =
+          i === 0 ? "human" : resolvedPersonas[i] || botPersonas[i] || "expert";
+      } else if (requestedGameType === "auto") {
+        persona = resolvedPersonas[i] || botPersonas[i] || "expert";
+      }
+
+      return { name: p.name, nationality: nat, destination: destObj, persona };
     });
 
     engine = createStandardGameSetup({
@@ -918,6 +956,7 @@
       onjoinroom={room.joinRoom}
       onexitroom={room.exitRoom}
       onaddbot={room.addBot}
+      onupdatebotpersona={room.updateBotPersona}
       onremovebot={room.removeBot}
       ontogglelocalpack={(pack) => {
         if (localSelectedPacks.includes(pack)) {

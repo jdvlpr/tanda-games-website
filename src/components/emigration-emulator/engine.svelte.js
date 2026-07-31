@@ -755,7 +755,7 @@ export default class EmigrationEngine {
     this.players = [];
     this.publicServices = { tickets: 0, passports: 0 };
     this.securityLanes = [];
-    this.discardPile = [];
+    this.discardPile = $state([]);
     this.logs = [];
     this.turnNumber = 1;
     this.consecutiveForfeits = 0;
@@ -907,6 +907,7 @@ export default class EmigrationEngine {
         name: setup.name,
         nationality: nat,
         destination: dest,
+        persona: setup.persona ?? null,
         money: nat.startingMoney,
         salary: 1,
         payRaises: 0,
@@ -937,7 +938,17 @@ export default class EmigrationEngine {
       }
 
       this.players.push(player);
+    });
 
+    const playerDetails = this.players
+      .map(
+        (p) =>
+          `P${p.id}: ${p.persona ?? "human"} (${p.nationality.name} -> ${p.destination.name})`,
+      )
+      .join(", ");
+    this.log(`INIT|SETUP|${playerDetails}`, "system");
+
+    this.players.forEach((player) => {
       const faceUpCards = [];
       [4, 5, 6, 11, 12, 13].forEach((idx) => {
         if (player.layout[idx]) {
@@ -946,8 +957,9 @@ export default class EmigrationEngine {
           faceUpCards.push(`${idx}:${name}`);
         }
       });
+      const personaStr = player.persona ? `|PERSONA:${player.persona}` : "";
       this.log(
-        `INIT|P${player.id}|NAT:${player.nationality.name}|DEST:${player.destination.name}|$${player.money}|FACEUP:[${faceUpCards.join(",")}]`,
+        `INIT|P${player.id}${personaStr}|NAT:${player.nationality.name}|DEST:${player.destination.name}|$${player.money}|FACEUP:[${faceUpCards.join(",")}]`,
         "system",
       );
     });
