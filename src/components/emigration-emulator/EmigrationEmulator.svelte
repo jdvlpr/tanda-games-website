@@ -1070,13 +1070,13 @@
     />
 
     <Modal
-      choice={pendingChoice}
+      choice={isMyTurn ? pendingChoice : null}
       onresolve={handleModalResolve}
       oncancel={() => {
-        if (engine) engine.cancelPendingChoice();
+        if (engine && isMyTurn) engine.cancelPendingChoice();
       }}
       onback={() => {
-        if (engine) engine.stepBackChoice();
+        if (engine && isMyTurn) engine.stepBackChoice();
       }}
     />
 

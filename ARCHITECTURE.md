@@ -30,6 +30,8 @@ When an action requires a user decision (e.g., choosing a player to steal from, 
 4. The UI calls `engine.resolveChoice(value)`.
 5. The engine executes the callback and resumes the action logic.
 
+> **See also:** [`src/components/emigration-emulator/CHOICES.md`](src/components/emigration-emulator/CHOICES.md) for a full reference on the choice system, P2P behaviour, and a step-by-step guide to adding new interactive life cards.
+
 ## Actions Flow
 
 Players (human or AI) take their turns by executing actions through the engine:
