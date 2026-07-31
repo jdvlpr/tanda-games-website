@@ -543,7 +543,7 @@ export const LIFE_CARD_DEFINITIONS = Object.freeze([
     keep: "Instant",
     type: "life",
     description:
-      "Lose $1 and you may discard a Life Card from any player’s Layout or Stash.",
+      "Lose $1 and you may discard an available Life Card from any player’s Layout or from any player’s Stash.",
   },
   {
     title: "Insider",
@@ -2986,9 +2986,11 @@ export default class EmigrationEngine {
               card,
             });
           });
-          for (let i = 0; i < 14; i++) {
-            const slot = owner.layout[i];
-            if (slot && slot.card?.type === "life" && slot.faceUp) {
+          const ownerLayout = owner.layout;
+          for (let i = 0; i < ownerLayout.length; i++) {
+            const slot = ownerLayout[i];
+            const isAvailable = this.isCardAvailable(owner, i);
+            if (slot && slot.card?.type === "life" && isAvailable) {
               candidates.push({
                 owner,
                 source: "layout",
@@ -3002,7 +3004,7 @@ export default class EmigrationEngine {
         if (candidates.length > 0) {
           this._setPendingChoice({
             id: "mental-fog",
-            title: "Mental Fog: discard a kept Life Card? (optional)",
+            title: "Mental Fog: discard a Life Card? (optional)",
             options: [
               { text: "Skip — don't discard", value: "skip" },
               ...candidates.map((candidate, i) => ({

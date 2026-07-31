@@ -600,11 +600,13 @@ export function createAutoPlayer(
         if (move.card.type === "payday") {
           // Rule 2: Never activate Payday while in college (salary is 0 Money)
           if (player.inCollege) return -100;
-          // Conservative: only activate own Payday (avoids giving stipends to opponents)
-          if (isConservative && move.targetId !== player.id) return -100;
 
           const mySalary = player.salary;
           const netGain = mySalary - move.fee;
+
+          // Conservative: only activate own Payday unless net gain after access fee is high ($4+)
+          if (isConservative && move.targetId !== player.id && netGain < 4) return -100;
+
           const opponentsCount = Math.max(1, playerCount - 1);
           const totalOpponentStipends = Math.min(2, Math.max(0, playerCount - 1)) * 1;
           const totalOpponentGain =
@@ -683,7 +685,7 @@ export function createAutoPlayer(
           if (d < setSize && d + 1 === setSize) {
             score += (destTargets.d.reward || 2) * 2;
           } else if (d >= setSize) {
-            score -= 4; // Capping penalty: redundant document gives no additional Assurance
+            score -= isHoarder ? 8 : 4; // Extra penalty for hoarder on redundant docs once set is capped
           }
         }
         if (isConn && destTargets?.c?.setSize > 0) {
@@ -691,7 +693,7 @@ export function createAutoPlayer(
           if (c < setSize && c + 1 === setSize) {
             score += (destTargets.c.reward || 2) * 2;
           } else if (c >= setSize) {
-            score -= 4; // Capping penalty: redundant connection gives no additional Assurance
+            score -= isHoarder ? 8 : 4; // Extra penalty for hoarder on redundant conns once set is capped
           }
         }
 
@@ -701,11 +703,16 @@ export function createAutoPlayer(
       } else if (move.type === "buyPool") {
         // Rule 1: Mandatory Ticket/Passport Safety Gate
         // Exponential urgency as layout cards dwindle to guarantee Ticket & Passport before Phase 2
-        const urgency = (isRusher ? 40 : 20) + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
+        let urgency = (isRusher ? 40 : 20) + Math.pow(Math.max(0, 14 - faceUpLeft), 1.5) * 1.5;
         const isTicket = move.params.cardType === "ticket";
         const hasDoc = isTicket ? pTickets >= 1 : pPassports >= 1;
 
         if (!hasDoc) {
+          // Rusher safety check: if rusher has 0 docs AND 0 conns AND there are available face-up layout cards,
+          // temper rusher pool urgency slightly so it picks up at least 1 set card first.
+          if (isRusher && d === 0 && c === 0 && faceUpLeft > 6) {
+            urgency = 15;
+          }
           score = urgency;
         } else {
           // Hoarding buy: if AI has money ($4+) and opponents still need this doc type, buy to hoard!
@@ -752,7 +759,11 @@ export function createAutoPlayer(
         } else {
           score = -10;
         }
-        if (isSaboteur) score += 10 + playerCount * 2;
+        if (isSaboteur) {
+          // Baseline self-check: if saboteur has no documents and no connections, don't over-prioritize disruption over self-advancement
+          const hasBaseline = (d > 0 || c > 0);
+          score += (hasBaseline ? (10 + playerCount * 2) : 3);
+        }
         if (isConservative) {
           // Allow steal only when critically short: no ticket/passport AND can't afford buyPool
           const isTicket = move.params.cardType === "ticket";
@@ -777,7 +788,10 @@ export function createAutoPlayer(
           const roiAssurance = 8; // Graduation gives +2 Assurance (~8 pts)
           const totalROI = roiFinancial + roiAssurance;
 
-          if (totalROI < 0 && estimatedTurnsRemaining < 4) {
+          // Late-game cutoff: Scholar & others stop applying when game is ending (faceUpLeft <= 8 or estimatedTurnsRemaining < 3)
+          if (faceUpLeft <= 8 || estimatedTurnsRemaining < 3) {
+            score = -30;
+          } else if (totalROI < 0 && estimatedTurnsRemaining < 4) {
             score = -20; // Not enough turns/paydays remaining for returns to materialize
           } else {
             const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isConservative ? 10 : 6);

@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import { parseArgs } from 'node:util';
 import { createStandardGameSetup } from '../src/components/emigration-emulator/gameSetup.js';
 import { createAutoPlayer, BOT_PERSONAS } from '../src/components/emigration-emulator/autoplay.js';
-import { PACKS_LIST } from '../src/components/emigration-emulator/engine.svelte.js';
+import { PACKS_LIST, LIFE_CARD_DEFINITIONS } from '../src/components/emigration-emulator/engine.svelte.js';
+
+const cardToPackMap = new Map();
+LIFE_CARD_DEFINITIONS.forEach(def => {
+  cardToPackMap.set(def.title, def.pack);
+});
 
 const { values } = parseArgs({
   options: {
@@ -69,6 +74,7 @@ const createMetricsSandbox = () => ({
   winsByTurnOrder: {},
   winsByCrossed: { "true": 0, "false": 0 },
   winnerLifeCards: {},
+  totalCardPlays: {},
   winnerCardPairs: {},
   winnerMoneyDelta: { totalDelta: 0, maxDelta: null, minDelta: null },
   runnerUpGap: { totalGap: 0 },
@@ -140,6 +146,17 @@ async function run() {
       }
     });
 
+    engine.players.forEach((p, i) => {
+      p.persona = botPersonas[i];
+    });
+
+    if (verbose) {
+      const playerDetails = engine.players.map((p, i) =>
+        `P${i}: ${p.persona} (${p.nationality.name} -> ${p.destination.name})`
+      ).join(', ');
+      console.log(`\n--- [Game ${g}] Setup: ${playerDetails} ---`);
+    }
+
     const autoplay = createAutoPlayer(engine, 'expert', {
       botIndices: engine.players.map((_, i) => i),
       personas: botPersonas
@@ -148,6 +165,31 @@ async function run() {
     await autoplay.playFullGame(0);
 
     const usedPacks = engine.selectedPacks ?? [];
+
+    const cardsPlayedByPlayer = Array.from({ length: numPlayers }, () => new Set());
+    for (const entry of (engine.logs || [])) {
+      if (!entry || !entry.msg) continue;
+
+      const actMatch = entry.msg.match(/P(\d+)\|ACT:([^|]+)/);
+      if (actMatch) {
+        const pIdx = parseInt(actMatch[1], 10);
+        const title = actMatch[2].trim();
+        if (cardToPackMap.has(title) && pIdx >= 0 && pIdx < numPlayers) {
+          const pack = cardToPackMap.get(title);
+          cardsPlayedByPlayer[pIdx].add(`${pack} - ${title}`);
+        }
+      }
+
+      const replayMatch = entry.msg.match(/P(\d+).*?REPLAY:([^|]+)/);
+      if (replayMatch) {
+        const pIdx = parseInt(replayMatch[1], 10);
+        const title = replayMatch[2].trim();
+        if (cardToPackMap.has(title) && pIdx >= 0 && pIdx < numPlayers) {
+          const pack = cardToPackMap.get(title);
+          cardsPlayedByPlayer[pIdx].add(`${pack} - ${title}`);
+        }
+      }
+    }
 
     if (engine.gameResult && engine.gameResult.winner) {
       const winnerName = engine.gameResult.winner;
@@ -162,8 +204,22 @@ async function run() {
       const destination = winner.destination.name;
       const payRaises = winner.payRaises ?? 0;
       
-      const lifeCardNames = winner.stash.lifeCards.map(c => c.pack + ' - ' + c.title);
-      const sortedCards = [...lifeCardNames].sort();
+      for (let p = 0; p < numPlayers; p++) {
+        for (const fullName of cardsPlayedByPlayer[p]) {
+          pcMetrics.totalCardPlays[fullName] = (pcMetrics.totalCardPlays[fullName] || 0) + 1;
+          overallMetrics.totalCardPlays[fullName] = (overallMetrics.totalCardPlays[fullName] || 0) + 1;
+        }
+      }
+
+      const winnerPlayedCardsSet = cardsPlayedByPlayer[winnerIdx] || new Set();
+      const winnerLifeCardNames = Array.from(winnerPlayedCardsSet);
+      const sortedCards = [...winnerLifeCardNames].sort();
+
+      const winnerPacksPlayed = new Set();
+      for (const name of winnerLifeCardNames) {
+        const packName = name.split(' - ')[0];
+        winnerPacksPlayed.add(packName);
+      }
 
       const moneyDelta = winner.money - startingMoney;
       const secondPlaceMoney = otherPlayers.length > 0 ? Math.max(...otherPlayers.map(p => p.money)) : 0;
@@ -174,8 +230,6 @@ async function run() {
       
       const winnerAssurance = winner.assurance || 0;
       const loserAssuranceTotal = otherPlayers.reduce((sum, p) => sum + (p.assurance || 0), 0);
-      
-      const packsInWinnerStash = new Set(winner.stash.lifeCards.map(c => c.pack));
 
       [overallMetrics, pcMetrics].forEach(target => {
         target.winsByPersona[persona] = (target.winsByPersona[persona] || 0) + 1;
@@ -202,7 +256,7 @@ async function run() {
         target.assurance.loserTotal += loserAssuranceTotal;
         target.assurance.loserCount += otherPlayers.length;
 
-        for (const name of lifeCardNames) {
+        for (const name of winnerLifeCardNames) {
           target.winnerLifeCards[name] = (target.winnerLifeCards[name] || 0) + 1;
         }
 
@@ -215,7 +269,7 @@ async function run() {
 
         for (const pack of usedPacks) {
           target.packInclusions[pack] = (target.packInclusions[pack] || 0) + 1;
-          if (packsInWinnerStash.has(pack)) {
+          if (winnerPacksPlayed.has(pack)) {
             target.winsByPack[pack] = (target.winsByPack[pack] || 0) + 1;
           }
         }
@@ -235,7 +289,7 @@ async function run() {
         payRaises,
         docs: docsCount,
         connections: connCount,
-        lifeCards: lifeCardNames,
+        lifeCardsPlayed: winnerLifeCardNames,
         crossed: winner.crossedSuccessfully,
         turns: engine.turnNumber,
       });
@@ -496,11 +550,11 @@ async function run() {
   }
   console.log();
 
-  // --- 10. PACK WIN-RATE PROPORTION ---
+  // --- 10. PACK UTILIZATION WIN RATE ---
   const packHealth = analyzeCategoryHealth('packInclusions', 'pack', 25)
   printHeader(
-    `PACK WIN-RATE PROPORTION (Wins / Drafts)`, 
-    `When a pack is drafted into the game, how often the winner actually utilizes it.`, 
+    `PACK UTILIZATION WIN RATE (Wins / Drafts)`, 
+    `When a pack is drafted into the game, how often the winner actually plays a card from it.`, 
     packHealth.message
   );
   if (!packHealth.ok || showAll) {
@@ -524,8 +578,8 @@ async function run() {
   // --- 11. TOP 5 CARD SYNERGIES ---
   const synergyHealth = analyzeCategoryHealth('winnerCardPairs', 'synergy', 15);
   printHeader(
-    `TOP 5 WINNER CARD SYNERGIES (PAIRS)`, 
-    `The most common two-card combinations found in the winner's final hand.`,
+    `TOP 5 WINNER CARD SYNERGIES (PAIRS PLAYED)`, 
+    `The most common two-card combinations played by the winner during the game.`,
     synergyHealth.message
   );
   if (!synergyHealth.ok || showAll) {
@@ -539,16 +593,31 @@ async function run() {
     console.log();
   }
 
-  // --- 12. TOP 5 LIFE CARDS ---
+  // --- 12. TOP 5 LIFE CARDS BY WIN RATE WHEN PLAYED ---
   printHeader(
-    `TOP 5 WINNER LIFE CARDS`, 
-    `The individual Life Cards that appear most frequently in winning stashes.`
+    `TOP 5 LIFE CARDS BY WIN RATE WHEN PLAYED`, 
+    `The individual Life Cards with the highest win rate when played by players during the game.`
   );
   for (const { label, data } of reportSections) {
     console.log(`  ${label} (${data.games} games):`);
-    const sorted = Object.entries(data.winnerLifeCards).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const sorted = Object.entries(data.winnerLifeCards).sort((a, b) => {
+      const aWinner = a[1];
+      const bWinner = b[1];
+      const aTotal = data.totalCardPlays[a[0]] || aWinner;
+      const bTotal = data.totalCardPlays[b[0]] || bWinner;
+      const aRate = aTotal > 0 ? aWinner / aTotal : 0;
+      const bRate = bTotal > 0 ? bWinner / bTotal : 0;
+
+      if (bRate !== aRate) return bRate - aRate;
+      if (bWinner !== aWinner) return bWinner - aWinner;
+      if (bTotal !== aTotal) return bTotal - aTotal;
+      return a[0].localeCompare(b[0]);
+    }).slice(0, 5);
+
     for (const [key, val] of sorted) {
-      console.log(`    - "${key}": ${val} times (${((val / data.games) * 100).toFixed(1)}%)`);
+      const totalPlays = data.totalCardPlays[key] || val;
+      const winRate = totalPlays > 0 ? ((val / totalPlays) * 100).toFixed(1) : '0.0';
+      console.log(`    - "${key}": ${winRate}% win rate (${val} wins / ${totalPlays} total plays)`);
     }
   }
   console.log();
@@ -557,9 +626,9 @@ async function run() {
   // --- EXPORT JSON CLEANUP ---
   if (values.output) {
     const cleanSandboxForExport = (sandbox) => {
-      sandbox.winsByPersona = Object.fromEntries(Object.entries(sandbox.winsByPersona).sort((a, b) => b[1] - a[1]));
-      sandbox.winsByNationality = Object.fromEntries(Object.entries(sandbox.winsByNationality).sort((a, b) => b[1] - a[1]));
-      sandbox.winsByDestination = Object.fromEntries(Object.entries(sandbox.winsByDestination).sort((a, b) => b[1] - a[1]));
+      sandbox.winsByPersona = Object.fromEntries(Object.entries(sandbox.winsByPersona).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
+      sandbox.winsByNationality = Object.fromEntries(Object.entries(sandbox.winsByNationality).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
+      sandbox.winsByDestination = Object.fromEntries(Object.entries(sandbox.winsByDestination).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
       
       const packRates = {};
       for (const pack of Object.keys(sandbox.packInclusions)) {
@@ -572,14 +641,33 @@ async function run() {
         };
       }
       sandbox.packWinRates = Object.fromEntries(
-        Object.entries(packRates).sort((a, b) => b[1].winRatePercent - a[1].winRatePercent)
+        Object.entries(packRates).sort((a, b) => b[1].winRatePercent !== a[1].winRatePercent ? b[1].winRatePercent - a[1].winRatePercent : a[0].localeCompare(b[0]))
       );
       
       delete sandbox.packInclusions;
       delete sandbox.winsByPack;
 
-      sandbox.winnerLifeCards = Object.fromEntries(Object.entries(sandbox.winnerLifeCards).sort((a, b) => b[1] - a[1]));
-      sandbox.winnerCardPairs = Object.fromEntries(Object.entries(sandbox.winnerCardPairs).sort((a, b) => b[1] - a[1]));
+      const cardStats = {};
+      for (const [card, winnerPlays] of Object.entries(sandbox.winnerLifeCards)) {
+        const totalPlays = sandbox.totalCardPlays[card] || winnerPlays;
+        cardStats[card] = {
+          winnerPlays,
+          totalPlays,
+          winRatePercent: totalPlays > 0 ? parseFloat(((winnerPlays / totalPlays) * 100).toFixed(2)) : 0
+        };
+      }
+      sandbox.winnerPlayedLifeCardStats = Object.fromEntries(
+        Object.entries(cardStats).sort((a, b) => {
+          if (b[1].winRatePercent !== a[1].winRatePercent) return b[1].winRatePercent - a[1].winRatePercent;
+          if (b[1].winnerPlays !== a[1].winnerPlays) return b[1].winnerPlays - a[1].winnerPlays;
+          if (b[1].totalPlays !== a[1].totalPlays) return b[1].totalPlays - a[1].totalPlays;
+          return a[0].localeCompare(b[0]);
+        })
+      );
+
+      sandbox.winnerLifeCards = Object.fromEntries(Object.entries(sandbox.winnerLifeCards).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
+      sandbox.totalCardPlays = Object.fromEntries(Object.entries(sandbox.totalCardPlays).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
+      sandbox.winnerCardPairs = Object.fromEntries(Object.entries(sandbox.winnerCardPairs).sort((a, b) => b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])));
       
       sandbox.winnerMoneyDelta.averageDelta = parseFloat((sandbox.winnerMoneyDelta.totalDelta / sandbox.games).toFixed(2));
       sandbox.runnerUpGap.averageGap = parseFloat((sandbox.runnerUpGap.totalGap / sandbox.games).toFixed(2));

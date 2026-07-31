@@ -207,16 +207,14 @@
           <span class="text-xs">Salary</span>
           <div class="flex gap-2 items-center">
             <div
-              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >=
-                SALARY_RAISES[0] &&
-                'border-solid bg-green-100 dark:bg-green-900'}"
+              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises ===
+                1 && 'border-solid bg-green-100 dark:bg-green-900'}"
             >
               +${SALARY_RAISES[0]}
             </div>
             <div
-              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises >=
-                SALARY_RAISES[1] &&
-                'border-solid bg-green-100 dark:bg-green-900'}"
+              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises ===
+                2 && 'border-solid bg-green-100 dark:bg-green-900'}"
             >
               +${SALARY_RAISES[1]}
             </div>

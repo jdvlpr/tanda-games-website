@@ -75,10 +75,10 @@ node cli/simulate.js [options]
 **Output metrics** (console + optional JSON):
 - Win rate by persona
 - Average turns per game
-- Winner life card frequency
-- Wins by pack
+- Winner life card played frequency (and win rate when played)
+- Wins by pack (pack utilization by winner)
 - Win rate by pay raise status (college graduations: 0, 1, or 2)
-- Per-game winner snapshots (persona, assurance, money, payRaises, docs, connections, life cards, turn count)
+- Per-game winner snapshots (persona, assurance, money, payRaises, docs, connections, life cards played, turn count)
 
 **Performance:** ~6–10 ms per game after JIT warm-up. 1,000 games completes in ~27 s on a modern Mac.
 
@@ -110,8 +110,8 @@ The balanced reference persona.
 
 ### `rusher` (High Roller)
 Prioritises getting ticket + passport as quickly as possible to trigger Phase 2 early, before opponents are ready.
-- Doubles the `buyPool` urgency score (`40` vs `20` base), acquiring travel docs at almost any cost.
-- Accepts lower Assurance thresholds for crossing.
+- Doubles the `buyPool` urgency score (`40` vs `20` base), acquiring travel docs at high speed.
+- **Resource Safety Gate:** Tempers pool urgency if holding 0 documents and 0 connections early in the game, ensuring it acquires at least 1 baseline set card so it can pass security lane checks.
 
 ### `hoarder` (Gatekeeper / Resource Accumulator)
 Focuses on accumulating resources, passive income, and denying travel docs.
@@ -119,24 +119,27 @@ Focuses on accumulating resources, passive income, and denying travel docs.
 - **Buy:** Multiplies assurance-gain reward by `10` (vs `5`) and liquidity penalty by `1.5` (vs `0.5`).
 - Opportunistically buys extra tickets/passports from the pool to deny opponents and earn reclaim fees ($2 + \text{opponent Access Fee}$).
 - Prefers keeping passive income Life Cards (*Insider*, *Salvage*).
+- **Strict Capping Penalty:** Penalizes redundant document/connection buys once destination single-set requirements are capped to hoard raw cash for Phase 2 trading.
 
 ### `saboteur` (Aggressive Disruptor)
 Focuses on disrupting opponents rather than pure self-optimization.
 - Adds `+20` flat score to all steal moves.
 - Target-aware set denial: discards cards from opponent layouts that would complete an opponent's set requirement ($3\times$ bonus).
 - In interactive Life Card choices (e.g. *Social Butterfly*, *Lost & Found*), aggressively steals from the opponent with the highest resources to deny their set.
+- **Self-Advancement Check:** Reduces disruption bonus if holding 0 documents and 0 connections, ensuring it establishes a minimal set before engaging in pure sabotage.
 
 ### `conservative` (Risk-Averse Saver)
 Risk-averse and self-contained — avoids hostile actions and preserves cash.
 - **Never steals** (returns `-100`).
 - **Never discards from an opponent's layout** (returns `-100`).
-- **Only activates its own Payday** card (refuses to trigger Payday on opponents' layouts).
+- **Selective Opponent Payday:** Prefers own layout Payday, but will activate opponent layout Payday if net cash yield after access fee is high ($\ge \$4$).
 - Applies to college only when financial reserve is high.
 - In interactive choices, prefers taking bank cash options over taking from opponents.
 
-### `scholar` (Career Engine Builder) [NEW]
+### `scholar` (Career Engine Builder)
 Dedicated career engine persona.
 - High priority on early College enrollment (`applyCollege` score boost).
+- **Late-Game Cutoff:** Stops applying for college when remaining face-up layout cards drop below 8 or estimated turns remaining drop below 3, shifting priority to set completion.
 - Once graduated ($1 \rightarrow $5 salary), aggressively activates Paydays globally on **any** layout (own or opponent's) to collect $5 salary payouts ($5 for self vs $1 stipend for opponents).
 - Prefers keeping Payday boosters like *Insider*.
 
