@@ -226,7 +226,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
    - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.
    - **Ticket**: Costs $2. Must have at least 1 Connection in your stash.
    - **Passport**: Costs $2. Must have at least 1 Document in your stash.
-   - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 1 Assurance.
+   - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 2 Assurance (for a 2 or 3 player game) or 1 Assurance (for a 4+ player game).
 3. **Steal** (marked with a skip-turn icon): Take a Ticket (requires at least 1 Connection in your Stash) or Passport (requires at least 1 Document in your Stash) from the Public Services pool **for free**. You **skip your next turn** as a penalty.
 4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** $2 plus your Access Fee.
 5. **Discard**: Place a Document or Connection into the Discard Pile and collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). This can target a card from your own own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent). You may not discard Paydays or Life Cards, only Documents or Connections.

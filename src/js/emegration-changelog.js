@@ -8,7 +8,7 @@ export const pendingChanges =  {
       "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.",
       "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",
       "Rule change: Selling a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",
-      "Rule change: Ticket + Passport bonus is 1 + (6 - Number of Players)",
+      "Rule change: Ticket + Passport bonus is +2 Assurance (for 2 and 3 player games) and +1 Assurance (for 4+ players)",
       "Destination changes: multiple thresholds updated",
       "Nationality changes: multiple starting moneys",
       "Life Card change: Insider — Gain $3 or keep this card in your stash, all documents cost +$1, and on Paydays gain $1.",
