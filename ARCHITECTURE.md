@@ -37,7 +37,7 @@ When an action requires a user decision (e.g., choosing a player to steal from, 
 Players (human or AI) take their turns by executing actions through the engine:
 
 - **Optional Actions:** Can be performed before a required action and do _not_ end the turn (e.g., `sell` a card from the stash for $2).
-- **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card, `activate` a card [activating Payday awards full salary to the activator and a $1 stipend to non-activators], `discard` a card from a layout). If a player **cannot** perform any Required Action, they **forfeit** their turn and take **$1 from the bank**.
+- **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card [Documents cost base $4, reduced by $1 per Document in stash], `activate` a card [activating Payday awards full salary to the activator and a $1 stipend to non-activators], `discard` a card from a layout). If a player **cannot** perform any Required Action, they **forfeit** their turn and take **$1 from the bank**.
 - **Stash vs Layout:** Cards in a player's hand are their "Stash". Cards on the board are their "Layout". You `sell` from a Stash (optional), but you `discard` from a Layout (required).
 
 ## Layout Structure (DAG)

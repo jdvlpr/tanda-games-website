@@ -162,55 +162,55 @@ export const DESTINATIONS = [
 export const DOCUMENTS_CATALOG = [
   {
     name: "Write Last Will and Testament",
-    cost: 2,
+    cost: 4,
     icon: "tombstone",
     type: "document",
   },
   {
     name: "Certificate of Excellence",
-    cost: 2,
+    cost: 4,
     icon: "diploma",
     type: "document",
   },
-  { name: "Checklist", cost: 2, icon: "checklist", type: "document" },
+  { name: "Checklist", cost: 4, icon: "checklist", type: "document" },
   {
     name: "Copy of Birth Certificate",
-    cost: 2,
+    cost: 4,
     icon: "stork-delivery",
     type: "document",
   },
-  { name: "Notebook", cost: 2, icon: "notebook", type: "document" },
+  { name: "Notebook", cost: 4, icon: "notebook", type: "document" },
   {
     name: "Subscribe to Travel Updates",
-    cost: 2,
+    cost: 4,
     icon: "rss",
     type: "document",
   },
-  { name: "Travel Brochure", cost: 2, icon: "open-book", type: "document" },
-  { name: "Physical Exam", cost: 3, icon: "stethoscope", type: "document" },
+  { name: "Travel Brochure", cost: 4, icon: "open-book", type: "document" },
+  { name: "Physical Exam", cost: 4, icon: "stethoscope", type: "document" },
   {
     name: "Vaccination Record",
-    cost: 3,
+    cost: 4,
     icon: "miracle-medecine",
     type: "document",
   },
-  { name: "Personality Test", cost: 3, icon: "skills", type: "document" },
-  { name: "Travel Wallet", cost: 3, icon: "wallet", type: "document" },
+  { name: "Personality Test", cost: 4, icon: "skills", type: "document" },
+  { name: "Travel Wallet", cost: 4, icon: "wallet", type: "document" },
   {
     name: "Attend Security Training",
-    cost: 3,
+    cost: 4,
     icon: "padlock",
     type: "document",
   },
   {
     name: "Residence Address in Destination",
-    cost: 3,
+    cost: 4,
     icon: "treasure-map",
     type: "document",
   },
   {
     name: "Letter of Recommendation",
-    cost: 3,
+    cost: 4,
     icon: "thumb-up",
     type: "document",
   },
@@ -1148,6 +1148,9 @@ export default class EmigrationEngine {
   /** Get the effective cost of a card considering stash discounts and penalties. */
   getEffectiveCost(player, card) {
     let cost = card.cost || 0;
+    if (card.type === "document") {
+      cost -= player.stash.documents.length;
+    }
     if (
       card.type === "document" &&
       player.stash.lifeCards.some((lc) => lc.title === "Fancy Clothes")
@@ -3593,8 +3596,8 @@ export function runTests() {
     const bosnia = DESTINATIONS.find(
       (d) => d.name === "Bosnia and Herzegovina",
     );
-    assert(bosnia.check(6, 4, 3) === 10, "Bosnia: m=6,d=4,c=3 → +10");
-    assert(bosnia.check(5, 1, 2) === -2, "Bosnia: m=5,d=1,c=2 → -2");
+    assert(bosnia.check(7, 4, 3) === 10, "Bosnia: m=6,d=4,c=3 → +10");
+    assert(bosnia.check(5, 1, 2) === -3, "Bosnia: m=5,d=1,c=2 → -2");
     const usa = DESTINATIONS.find((d) => d.name === "United States of America");
     assert(usa.check(10, 4, 4) === 10, "USA: m=10,d=4,c=4 → +10");
     assert(usa.check(4, 1, 0) === -5, "USA: m=4,d=1,c=0 → -5");
@@ -3652,10 +3655,11 @@ export function runTests() {
       !eng.canPerformAnyRequiredAction(p),
       "Forfeit detected: no money, no cards",
     );
+    eng.players[1].layout[11] = { card: { name: "Coffee with Airport Employee", cost: 2, type: "connection" }, faceUp: true, index: 11 };
     p.money = 2;
     assert(
       eng.canPerformAnyRequiredAction(p),
-      "Can still perform required actions with $2",
+      "Can still perform required actions with $2 when card is available",
     );
   } catch (e) {
     assert(false, `Forfeit detection error: ${e.message}`);
@@ -3775,13 +3779,29 @@ export function runTests() {
       "Kept Stellar Reputation reduces connection purchase cost by $1",
     );
 
+    // Document cost reduction per document in stash
+    const docP = eng.players[0];
+    docP.stash.documents = [];
+    docP.stash.lifeCards = [];
+    const testDocCard = { name: "Test Doc", cost: 4, type: "document" };
+    assert(eng.getEffectiveCost(docP, testDocCard) === 4, "Document costs $4 with 0 docs in stash");
+    docP.stash.documents.push({ name: "Doc1", type: "document" });
+    assert(eng.getEffectiveCost(docP, testDocCard) === 3, "Document costs $3 with 1 doc in stash");
+    docP.stash.documents.push({ name: "Doc2", type: "document" });
+    assert(eng.getEffectiveCost(docP, testDocCard) === 2, "Document costs $2 with 2 docs in stash");
+    docP.stash.documents.push({ name: "Doc3", type: "document" });
+    assert(eng.getEffectiveCost(docP, testDocCard) === 1, "Document costs $1 with 3 docs in stash");
+    docP.stash.documents.push({ name: "Doc4", type: "document" });
+    assert(eng.getEffectiveCost(docP, testDocCard) === 0, "Document costs $0 with 4 docs in stash");
+
+    keeper.stash.documents = [];
     keeper.stash.lifeCards.push({ title: "Insider", type: "life" });
     const insiderDocCost = eng.getEffectiveCost(keeper, {
-      cost: 2,
+      cost: 4,
       type: "document",
     });
     assert(
-      insiderDocCost === 3,
+      insiderDocCost === 5,
       "Kept Insider increases document purchase cost by $1",
     );
 
@@ -3884,7 +3904,7 @@ export function runTests() {
         "Persuasion skip: game still in preparation",
       );
       assert(
-        actor.money === actorMoneyBefore + 2 - feeBeforeSkip,
+        actor.money === actorMoneyBefore + 3 - feeBeforeSkip,
         "Persuasion skip: actor gains $2 from discard minus normal access fee",
       );
       assert(
@@ -3979,7 +3999,7 @@ export function runTests() {
       eng.resolveChoice("decline"); // actor declines
 
       assert(
-        actor.money === actorMoneyBefore + 2 - baseFee * 2,
+        actor.money === actorMoneyBefore + 3 - baseFee * 2,
         "Persuasion decline: actor pays double access fee and still gains $2 from discard",
       );
       assert(

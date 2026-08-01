@@ -136,7 +136,7 @@ Security Lanes have 3 tokens stacked face-down. The tokens in each lane's pool a
 
 ### 3.4 Documents & Connections Catalogue
 
-All standard Documents and Connections cost either $2, $3, or $4:
+All standard Documents cost $4 base price (each Document in a player's Stash reduces the cost of buying subsequent Documents by $1, down to a minimum of $0). Connections cost $2, $3, or $4:
 
 | Documents (Cost)                      | Icon               | Connections (Cost)                           | Icon               |
 | :------------------------------------ | :----------------- | :------------------------------------------- | :----------------- |
@@ -214,7 +214,8 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
    - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at $1). The players to their immediate left and right receive a flat stipend of $1 from the bank. Put the Payday card in the discard pile.
    - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
 2. **Buy card**:
-   - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.
+   - **Document**: Base cost $4, minus $1 for each Document already in your Stash (minimum $0), plus any Life Card discounts/penalties and opponent Access Fee. Place it in your Stash.
+   - **Connection**: Pay the listed cost (modified by any Life Card discounts) plus any opponent Access Fee. Place it in your Stash.
    - **Ticket**: Costs $2. Must have at least 1 Connection in your stash.
    - **Passport**: Costs $2. Must have at least 1 Document in your stash.
    - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 2 Assurance (for a 2 or 3 player game) or 1 Assurance (for a 4+ player game).
