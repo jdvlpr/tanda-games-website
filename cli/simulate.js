@@ -70,7 +70,6 @@ const createMetricsSandbox = () => ({
   winsByPersona: {},
   winsByNationality: {},
   winsByDestination: {},
-  winsByPayRaise: { "0": 0, "1": 0, "2": 0 },
   winsByTurnOrder: {},
   winsByCrossed: { "true": 0, "false": 0 },
   winnerLifeCards: {},
@@ -203,7 +202,6 @@ async function run() {
       const nationality = winner.nationality.name;
       const startingMoney = winner.startingMoney;
       const destination = winner.destination.name;
-      const payRaises = winner.payRaises ?? 0;
       
       for (let p = 0; p < numPlayers; p++) {
         for (const fullName of cardsPlayedByPlayer[p]) {
@@ -236,7 +234,6 @@ async function run() {
         target.winsByPersona[persona] = (target.winsByPersona[persona] || 0) + 1;
         target.winsByNationality[nationality] = (target.winsByNationality[nationality] || 0) + 1;
         target.winsByDestination[destination] = (target.winsByDestination[destination] || 0) + 1;
-        target.winsByPayRaise[payRaises] = (target.winsByPayRaise[payRaises] || 0) + 1;
         target.winsByTurnOrder[winnerIdx] = (target.winsByTurnOrder[winnerIdx] || 0) + 1;
         target.winsByCrossed[winner.crossedSuccessfully] = (target.winsByCrossed[winner.crossedSuccessfully] || 0) + 1;
         
@@ -287,7 +284,6 @@ async function run() {
         packs: usedPacks,
         assurance: winner.assurance,
         money: winner.money,
-        payRaises,
         docs: docsCount,
         connections: connCount,
         lifeCardsPlayed: winnerLifeCardNames,
@@ -452,24 +448,6 @@ async function run() {
       const sorted = Object.entries(data.winsByDestination).sort((a, b) => b[1] - a[1]);
       for (const [key, val] of sorted) {
         console.log(`    - ${key}: ${val} times (${((val / data.games) * 100).toFixed(1)}%)`);
-      }
-    }
-    console.log();
-  }
-
-  // --- 4. WIN RATE BY PAY RAISES ---
-  const payRaiseHealth = analyzeCategoryHealth('winsByPayRaise', 'spread', 45);
-  printHeader(
-    `WIN RATE BY PAY RAISES`, 
-    `The impact of college graduations and pay raises on securing a win.`,
-    payRaiseHealth.message
-  ); 
-  if (!payRaiseHealth.ok || showAll) {
-    for (const { label, data } of reportSections) {
-      console.log(`  ${label} (${data.games} games):`);
-      for (let r = 0; r <= 2; r++) {
-        const val = data.winsByPayRaise[String(r)] || 0;
-        console.log(`    - ${r} Raises: ${val} times (${((val / data.games) * 100).toFixed(1)}%)`);
       }
     }
     console.log();

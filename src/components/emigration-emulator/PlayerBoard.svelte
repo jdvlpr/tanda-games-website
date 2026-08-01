@@ -1,7 +1,6 @@
 <script>
   import Icon from "@iconify/svelte";
   import StashCard from "./StashCard.svelte";
-  import { SALARY_RAISES } from "./engine.svelte";
   let {
     engine,
     player,
@@ -164,10 +163,9 @@
         </p>
         <span
           class="flex gap-1 items-center justify-center opacity-70"
-          title="{player.name}'s college tuition (plus a die roll amount of Money, and potentially discounted based on the die roll)"
+          title="{player.name}'s starting money"
         >
           <span class="text-xs">${player.startingMoney} Starting Money</span>
-          <span class="text-xs">${player.collegeFund} College Fund</span>
           <!-- <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
@@ -205,20 +203,6 @@
         >
           <span class="font-bold text-md">${player.salary}</span>
           <span class="text-xs">Salary</span>
-          <div class="flex gap-2 items-center">
-            <div
-              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises ===
-                1 && 'border-solid bg-green-100 dark:bg-green-900'}"
-            >
-              +${SALARY_RAISES[0]}
-            </div>
-            <div
-              class="size-7 rounded-full border border-dashed flex items-center justify-center text-xs {player.payRaises ===
-                2 && 'border-solid bg-green-100 dark:bg-green-900'}"
-            >
-              +${SALARY_RAISES[1]}
-            </div>
-          </div>
         </span>
 
         <span
@@ -232,13 +216,6 @@
       </div>
 
       <div class="flex flex-wrap gap-1 justify-center items-start">
-        {#if player.inCollege}
-          <span
-            class=" font-bold tracking-wide bg-amber-300 dark:bg-amber-700 px-2 py-1 rounded-2xl text-sm"
-            >In College</span
-          >
-        {/if}
-
         {#if player.crossedSuccessfully === true}
           <span
             class=" font-bold tracking-wide bg-emerald-500 text-white px-2 py-1 rounded-2xl text-sm"

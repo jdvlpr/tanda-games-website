@@ -74,22 +74,14 @@ Adjacent to each player's layout grid, there is a **Stash** area — open space 
 
 Below/beside the layout, each player also has:
 
-- Their **Nationality Card** (visible to all players, showing nationality and starting/college fund values).
+- Their **Nationality Card** (visible to all players, showing nationality and starting funds).
 - Their **Access Fee Card**, which is a sliding card that reveals increasing fee values (1 through $5). The card is positioned so that only the current fee is visible. When a player's Access Fee increases, they slide the card to reveal the next higher number.
 
-#### Career Card & Pay Raise Slots
+#### Career Card
 
-Each Career Card has **2 Pay Raise Slots**:
+Each player starts with a base salary of **$1**.
 
-| Slot | Raise Amount | Resulting Salary |
-| :--: | :----------: | :--------------: |
-|  1   |     +$3      |        $4        |
-|  2   |     +$2      |        $5        |
-
-- All players start with a base salary of **$1**.
-- Graduating from college fills the next open slot, permanently increasing salary.
-- Once both slots are filled, the player's career is **maxed** and they may not apply for college again.
-- Total maximum salary is **$5** (1 base + 2 first raise + 2 second raise).
+- Salary remains **$1** for the entire game.
 
 ---
 
@@ -97,19 +89,19 @@ Each Career Card has **2 Pay Raise Slots**:
 
 ### 3.1 Nationalities
 
-Nationality cards dictate the Starting Fund and College Fund.
+Nationality cards dictate the starting fund.
 
-| Nationality | Starting Fund  | College Fund |
-| :---------- | :------------: | :----------: |
-| Bosnian     |       $2       |      $4      |
-| Congolese   |       $2       |      $4      |
-| Senegalese  |       $2       |      $4      |
-| Swiss       |       $6       |      $6      |
-| French      |       $6       |      $6      |
-| Russian     |       $6       |      $6      |
-| English     |       $10      |      $8      |
-| Chinese     |       $10      |      $8      |
-| American    |       $10      |      $8      |
+| Nationality | Starting Fund |
+| :---------- | :-----------: |
+| Bosnian     |      $2       |
+| Congolese   |      $2       |
+| Senegalese  |      $2       |
+| Swiss       |      $6       |
+| French      |      $6       |
+| Russian     |      $6       |
+| English     |      $10      |
+| Chinese     |      $10      |
+| American    |      $10      |
 
 ### 3.2 Destinations
 
@@ -214,13 +206,12 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 
 #### Optional Actions (Zero or More, BEFORE the Required Action):
 
-1. **Graduate from College**: If currently in college, roll a D6. A roll of 1, 2, or 3 passes final exams. Pass results: exit college, gain 2 Assurance if it's the first time you graduate, or gain 1 Assurance if it's the second time you graduate, and also fill the text open Pay Raise slot permanently increasing salary by +$3 and then +2 (respectively for each time you graduate). Fail results: player remains in college.
-2. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
+1. **Sell**: Remove a Document or Connection from your own Stash and place it into the discard pile to collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). You may not Sell a card from another player's Stash, only your own. You may not Sell a Ticket, Passport, or Life card from your Stash, only a Document or Connection.
 
 #### Required Actions (Must Choose Exactly One):
 
 1. **Activate**: Remove a Payday or Life Card from any player's Layout (must be an available card).
-   - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at $1, increased by pay raise slots, paused if in college). The players to their immediate left and right receive a flat stipend of $1 from the bank (paused if in college). Put the Payday card in the discard pile.
+   - **Payday**: The player who activated the Payday collects their full current salary from the bank (salary starts at $1). The players to their immediate left and right receive a flat stipend of $1 from the bank. Put the Payday card in the discard pile.
    - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
 2. **Buy card**:
    - **Document / Connection**: Pay the listed cost (modified by any Life Card discounts in a player's Stash) plus any opponent Access Fee. Place it in your stash.
@@ -230,9 +221,6 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
 3. **Steal** (marked with a skip-turn icon): Take a Ticket (requires at least 1 Connection in your Stash) or Passport (requires at least 1 Document in your Stash) from the Public Services pool **for free**. You **skip your next turn** as a penalty.
 4. **Reclaim**: Take a Ticket or Passport from another player's Stash (only if they have more than one of that type). Instead of paying the bank, pay **the opponent** $2 plus your Access Fee.
 5. **Discard**: Place a Document or Connection into the Discard Pile and collect $3 from the bank (in a 2 or 3 player game) or $2 from the bank (in a 4+ player game). This can target a card from your own own Layout (no Access Fee), or an opponent's Layout (pay your Access Fee to the opponent). You may not discard Paydays or Life Cards, only Documents or Connections.
-6. **Apply for College**: If you have an open pay raise slot, roll a D6.
-   - **Financial Aid**: If the roll is 1,2, or 3, tuition costs \(\lfloor \text{College Funds} / 2 \rfloor + \text{roll}\). If 4,5,or 6, tuition costs \(\text{College Funds} + \text{roll}\). A player must be able to afford minimum tuition in order to take the Apply for College action.
-   - **Resolution**: If the player can afford tuition, pay it and place the career card upside down (in college). Salary payouts are paused. If they cannot afford it, pay $1 to the bank and take a different required action.
 
 ### 4.3 End of Phase 1
 Phase 1 ends when there are no more face-up cards left in any player's layout. Play continues into Phase 2 from the last player to take a turn in Phase 1. 

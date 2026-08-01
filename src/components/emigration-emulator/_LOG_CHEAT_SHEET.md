@@ -35,10 +35,6 @@ Most log entries follow this structure:
 
 | Log Signature                                                 | Description                                                                                                         |
 | :------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------ |
-| `P{id}\|GRAD\|ROLL:{r}\|RES:PASS\|SALARY_INC:{amt}`           | Passed College Graduation. Player is no longer in college. Base salary increases by `amt`.                          |
-| `P{id}\|GRAD\|ROLL:{r}\|RES:FAIL`                             | Failed Graduation. Remains in college.                                                                              |
-| `P{id}\|COLLEGE_APP\|ROLL:{r}\|TUITION:{t}\|RES:PASS`         | Passed College Application. Deduct `t` money. Player is now in college.                                             |
-| `P{id}\|COLLEGE_APP\|ROLL:{r}\|TUITION:{t}\|RES:FAIL`         | Failed Application (cannot afford). Deduct $1 penalty.                                                              |
 | `P{id}\|BUY:{cardName}\|FROM:P{ownerId}\|COST:{c}`            | Bought a Layout Card. Deduct `c` from `P{id}`. Add card to `P{id}`'s stash.                                         |
 | `P{id}\|BUY_POOL:{Ticket/Passport}\|COST:2`                   | Bought from public pool. Deduct $2. Add doc to stash. Pool count -1.                                                |
 | `P{id}\|STEAL:{Ticket/Passport}\|SKIP_NEXT`                   | Stole from pool. Add doc to stash. Flag `P{id}` to skip their next turn. Pool count -1.                             |

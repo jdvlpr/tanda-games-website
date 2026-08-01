@@ -3,8 +3,6 @@ export const pendingChanges =  {
     date: "July 30, 2026",
     items: [
       "Rule change: If a player Forfeits their turn, they gain $1",
-      "Rule change: SALARY_RAISES — changed from [1, 3] to [3, 2].",
-      "Rule change: Graduation — changed from [2, 2] to [2, 1] Assurance",
       "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.",
       "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",
       "Rule change: Selling a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",

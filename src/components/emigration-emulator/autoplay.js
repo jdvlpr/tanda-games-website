@@ -99,9 +99,6 @@ export function createAutoPlayer(
         )
           possible.push({ type: "steal", params: { cardType: "passport" } });
       }
-      if (enabled("applyCollege")) {
-        possible.push({ type: "applyCollege", params: {} });
-      }
       if (enabled("discard")) {
         const dt = _findDiscardTarget(player);
         if (dt) possible.push(dt);
@@ -215,11 +212,6 @@ export function createAutoPlayer(
       }
     }
 
-    // 5. Apply for College
-    if (enabled("applyCollege")) {
-      return { type: "applyCollege", params: {} };
-    }
-
     // 6. Discard
     if (enabled("discard")) {
       return _findDiscardTarget(player);
@@ -280,7 +272,6 @@ export function createAutoPlayer(
       if (player.stash.connections.length >= 1 && engine.publicServices.tickets > 0) validMoves.push({ type: "steal", params: { cardType: "ticket" } });
       if (player.stash.documents.length >= 1 && engine.publicServices.passports > 0) validMoves.push({ type: "steal", params: { cardType: "passport" } });
     }
-    if (enabled("applyCollege")) validMoves.push({ type: "applyCollege", params: {} });
     if (enabled("forfeit")) validMoves.push({ type: "forfeit", params: {} });
 
     if (validMoves.length > 0) {
@@ -406,9 +397,6 @@ export function createAutoPlayer(
           isHoardingMove: true,
         });
       }
-    }
-    if (enabled("applyCollege")) {
-      possibleMoves.push({ type: "applyCollege", params: {} });
     }
     if (enabled("discard")) {
       for (const p of engine.players) {
@@ -610,9 +598,6 @@ export function createAutoPlayer(
 
       if (move.type === "activate") {
         if (move.card.type === "payday") {
-          // Rule 2: Never activate Payday while in college (salary is 0 Money)
-          if (player.inCollege) return -100;
-
           const mySalary = player.salary;
           const netGain = mySalary - move.fee;
 
@@ -830,62 +815,6 @@ export function createAutoPlayer(
           if (alreadyHas || player.money >= 2) return -100;
           // else fall through: critical-need steal is permitted
         }
-      } else if (move.type === "applyCollege") {
-        const maxTuition = (player.startingMoney || 6) + 6;
-        const minTuition = Math.floor((player.collegeFund || 6) / 2) + 1;
-        const reserveNeeded = (isConservative || isScholar)
-          ? maxTuition
-          : isExpert
-          ? minTuition + 1
-          : maxTuition + 1;
-
-        if (player.money < reserveNeeded) {
-          score = -100; // Do not apply if financial risk is high
-        } else {
-          // Dynamic College ROI calculation based on remaining deck size and estimated paydays
-          const totalPaydaysInDeck = playerCount * 4;
-          const expectedPaydaysRemaining = Math.max(1, totalPaydaysInDeck * (1 - layoutProgress));
-          const nextRaise = player.payRaises === 0 ? 1 : 2;
-          const roiFinancial = nextRaise * expectedPaydaysRemaining - maxTuition;
-          const roiAssurance = 8; // Graduation gives +2 Assurance (~8 pts)
-          const totalROI = roiFinancial + roiAssurance;
-
-          // Late-game cutoff: Scholar & others stop applying when game is ending (faceUpLeft <= 8 or estimatedTurnsRemaining < 3)
-          if (faceUpLeft <= 8 || estimatedTurnsRemaining < 3) {
-            score = -30;
-          } else if (totalROI < 0 && estimatedTurnsRemaining < 4) {
-            score = -20; // Not enough turns/paydays remaining for returns to materialize
-          } else {
-            // For Expert: check if own layout has available needed set cards (docs/conns).
-            // If missing minRequired set cards and own layout has them available, prioritize buying cards over college!
-            const dMin = destTargets?.d?.minRequired || 0;
-            const cMin = destTargets?.c?.minRequired || 0;
-            const ownAvailableCards = engine.getAvailableLayoutCards(player.id)
-              .map(i => player.layout[i]?.card)
-              .filter(Boolean);
-            const hasNeededDocOnLayout = d < dMin && ownAvailableCards.some(c => c.type === "document");
-            const hasNeededConnOnLayout = c < cMin && ownAvailableCards.some(c => c.type === "connection");
-
-            let expertBonus = 6;
-            let expertROIMultiplier = 1.0;
-            if (isExpert) {
-              if (hasNeededDocOnLayout || hasNeededConnOnLayout) {
-                expertBonus = 2; // Defer college to pick up available needed set card first!
-                expertROIMultiplier = 0.5;
-              } else {
-                // Expert scales college aggression with playerCount (more paydays = more value)
-                // Cap at 14 (same as scholar) to avoid over-investing in 6P
-                expertBonus = Math.min(14, 10 + playerCount - 2); // 10 in 2P, capped at 14 for 5P+
-                expertROIMultiplier = Math.min(1.4, 1.0 + (playerCount - 2) * 0.1); // 1.0 in 2P, 1.4 cap in 6P
-              }
-            }
-
-            const earlyBonus = (1 - layoutProgress) * (isScholar ? 14 : isExpert ? expertBonus : isConservative ? 10 : 6);
-            const countFactor = 1 + 2 / playerCount;
-            score = earlyBonus * countFactor + totalROI * (isScholar ? 1.5 : isExpert ? expertROIMultiplier : 0.5);
-            if (currentAssurance < 6) score += (isScholar || isConservative || isExpert) ? 5 : 2;
-          }
-        }
       } else if (move.type === "discard") {
         // Conservative never discards from an opponent's layout
         if (isConservative && move.targetId !== player.id) return -100;
@@ -976,7 +905,7 @@ export function createAutoPlayer(
 
       // Prevent activating opponent's payday if it's a net relative loss
       if (cardType === "payday" && p.id !== player.id) {
-        const mySalary = player.inCollege ? 0 : player.salary;
+        const mySalary = player.salary;
         const netGain = mySalary - fee;
         const opponentsCount = Math.max(1, engine.players.length - 1);
         const totalOpponentGain = fee + opponentsCount; // fee + $1 stipend per opponent
@@ -1384,11 +1313,6 @@ export function createAutoPlayer(
     if (engine.phase !== "preparation") return engine.phase !== "game_over";
 
     const player = engine.players[engine.currentPlayerIdx];
-
-    // Optional: try to graduate if in college
-    if (player.inCollege) {
-      engine.executeOptionalAction("graduate");
-    }
 
     let action = null;
     let didSell = false;

@@ -118,7 +118,7 @@
 
       if (data.type === "GAME_ACTION") {
         const { actionType, params } = data.payload || {};
-        if (actionType === "graduate" || actionType === "sell") {
+        if (actionType === "sell") {
           engine.executeOptionalAction(actionType, params);
         } else if (actionType) {
           engine.executeRequiredAction(actionType, params);
@@ -536,7 +536,7 @@
       get(target, prop) {
         if (["executeRequiredAction", "executeOptionalAction"].includes(prop)) {
           return (actionType, params = {}) => {
-            if (["applyCollege", "graduate", "activate"].includes(actionType)) {
+            if (["activate"].includes(actionType)) {
               params.rolls = [
                 Math.floor(Math.random() * 6) + 1,
                 Math.floor(Math.random() * 6) + 1,
@@ -776,7 +776,7 @@
     // same toast. Without this, each client calls Math.random() independently
     // and can produce a different outcome (the P2P desync bug).
     // We provide a short queue of rolls just in case the action needs multiple.
-    if (["applyCollege", "graduate", "activate"].includes(actionType)) {
+    if (["activate"].includes(actionType)) {
       params.rolls = [
         Math.floor(Math.random() * 6) + 1,
         Math.floor(Math.random() * 6) + 1,
@@ -784,7 +784,7 @@
       ];
     }
 
-    if (actionType === "graduate" || actionType === "sell") {
+    if (actionType === "sell") {
       engine.executeOptionalAction(actionType, params);
     } else {
       engine.executeRequiredAction(actionType, params);

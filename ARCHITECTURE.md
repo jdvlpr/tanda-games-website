@@ -36,7 +36,7 @@ When an action requires a user decision (e.g., choosing a player to steal from, 
 
 Players (human or AI) take their turns by executing actions through the engine:
 
-- **Optional Actions:** Can be performed before a required action and do _not_ end the turn (e.g., `sell` a card from the stash for $2, `graduate`).
+- **Optional Actions:** Can be performed before a required action and do _not_ end the turn (e.g., `sell` a card from the stash for $2).
 - **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card, `activate` a card [activating Payday awards full salary to the activator and a $1 stipend to non-activators], `discard` a card from a layout). If a player **cannot** perform any Required Action, they **forfeit** their turn and take **$1 from the bank**.
 - **Stash vs Layout:** Cards in a player's hand are their "Stash". Cards on the board are their "Layout". You `sell` from a Stash (optional), but you `discard` from a Layout (required).
 
@@ -77,8 +77,8 @@ node cli/simulate.js [options]
 - Average turns per game
 - Winner life card played frequency (and win rate when played)
 - Wins by pack (pack utilization by winner)
-- Win rate by pay raise status (college graduations: 0, 1, or 2)
-- Per-game winner snapshots (persona, assurance, money, payRaises, docs, connections, life cards played, turn count)
+- Win rate by turn order and resource economy
+- Per-game winner snapshots (persona, assurance, money, docs, connections, life cards played, turn count)
 
 **Performance:** ~6–10 ms per game after JIT warm-up. 1,000 games completes in ~27 s on a modern Mac.
 
@@ -98,15 +98,13 @@ export const BOT_PERSONAS = ['expert', 'rusher', 'hoarder', 'saboteur', 'conserv
 ### Shared Heuristic Improvements
 - **Destination Target Capping:** Stops boosting document/connection acquisition once the destination's single-set requirement is met (since max 1 set per resource awards Assurance). Redundant card purchases are penalized.
 - **Access Fee Cost Valuation:** Correctly treats Access Fee as a cost penalty on the acting player. Taking from opponent layouts increases own Access Fee ($1 → $5), making future opponent-layout purchases more expensive.
-- **Dynamic College ROI:** Calculates expected salary returns dynamically: $(\text{newSalary} - \text{currentSalary}) \times (\text{Expected Paydays Left}) + \text{Assurance} - \text{Tuition}$ based on remaining deck cards.
 - **Dynamic Life Card Evaluation:** Evaluates Life Card utility dynamically (`_evaluateLifeCardUtility`) and resolves choices (`may-keep-choice`, `select-player`) based on persona preferences and current resource needs.
 
 ### `expert` (Min-Maxer / Optimal Heuristic Leader)
 The optimized reference persona designed for peak performance across all player counts (2–6 players).
 - **Priority Set Fulfillment:** Prioritizes clearing `minRequired` thresholds for Documents and Connections to eliminate catastrophic -3 Assurance penalties, and completes set thresholds (`setSize`) to capture maximum Assurance rewards (+2 for docs, +4 to +6 for conns). Penalizes redundant purchases once sets are capped.
 - **Travel Document Locking:** Immediately acquires Ticket and Passport once 1 Connection and 1 Document are secured, locking in the one-time Ticket+Passport Assurance bonus (+2 to +6 Assurance) and guaranteeing border crossing capability.
-- **Gated College Engine:** Evaluates early college enrollment dynamically based on ROI and tuition reserves, but intelligently defers college if own layout contains available needed set cards to prevent opponents from stripping the layout during exam turns.
-- **Payday Asymmetry:** Avoids activating Payday at base salary ($1) to avoid subsidizing opponents, but aggressively spams Paydays globally once graduated ($4/$5 salary) to capture a +$3 net relative cash advantage per activation.
+- **Payday Asymmetry:** Avoids activating Payday at base salary ($1) when it would be a poor relative trade, while still preferring own-layout activations that avoid fee costs.
 - **Layout & Disruption Efficiency:** Heavily prefers own-layout purchases ($0 access fee) and opportunistically buys or discards from opponent layouts to deny opponents single-set completion rewards.
 
 ### `rusher` (High Roller)
@@ -134,14 +132,12 @@ Risk-averse and self-contained — avoids hostile actions and preserves cash.
 - **Never steals** (returns `-100`).
 - **Never discards from an opponent's layout** (returns `-100`).
 - **Selective Opponent Payday:** Prefers own layout Payday, but will activate opponent layout Payday if net cash yield after access fee is high ($\ge \$4$).
-- Applies to college only when financial reserve is high.
+- Preserves cash and avoids expensive opponent-layout actions when reserves are low.
 - In interactive choices, prefers taking bank cash options over taking from opponents.
 
 ### `scholar` (Career Engine Builder)
 Dedicated career engine persona.
-- High priority on early College enrollment (`applyCollege` score boost).
-- **Late-Game Cutoff:** Stops applying for college when remaining face-up layout cards drop below 8 or estimated turns remaining drop below 3, shifting priority to set completion.
-- Once graduated ($1 \rightarrow $5 salary), aggressively activates Paydays globally on **any** layout (own or opponent's) to collect $5 salary payouts ($5 for self vs $1 stipend for opponents).
+- Focuses on strong early setup and efficient Payday timing.
 - Prefers keeping Payday boosters like *Insider*.
 
 ### `easy` / `random`

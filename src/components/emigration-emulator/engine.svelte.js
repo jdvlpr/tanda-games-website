@@ -66,15 +66,15 @@ export const NATIONALITY_TO_COUNTRY = {
 };
 
 export const NATIONALITIES = [
-  { name: "Bosnian", collegeFund: 4, startingMoney: 2, countryCode: "ba" },
-  { name: "Congolese", collegeFund: 4, startingMoney: 2, countryCode: "cd" },
-  { name: "Senegalese", collegeFund: 4, startingMoney: 2, countryCode: "sn" },
-  { name: "Swiss", collegeFund: 6, startingMoney: 6, countryCode: "ch" },
-  { name: "French", collegeFund: 6, startingMoney: 6, countryCode: "fr" },
-  { name: "Russian", collegeFund: 6, startingMoney: 6, countryCode: "ru" },
-  { name: "English", collegeFund: 8, startingMoney: 10, countryCode: "gb-eng" },
-  { name: "Chinese", collegeFund: 8, startingMoney: 10, countryCode: "cn" },
-  { name: "American", collegeFund: 8, startingMoney: 10, countryCode: "us" },
+  { name: "Bosnian", startingMoney: 2, countryCode: "ba" },
+  { name: "Congolese", startingMoney: 2, countryCode: "cd" },
+  { name: "Senegalese", startingMoney: 2, countryCode: "sn" },
+  { name: "Swiss", startingMoney: 6, countryCode: "ch" },
+  { name: "French", startingMoney: 6, countryCode: "fr" },
+  { name: "Russian", startingMoney: 6, countryCode: "ru" },
+  { name: "English", startingMoney: 10, countryCode: "gb-eng" },
+  { name: "Chinese", startingMoney: 10, countryCode: "cn" },
+  { name: "American", startingMoney: 10, countryCode: "us" },
 ];
 
 export const DESTINATIONS = [
@@ -713,9 +713,6 @@ export const LAYOUT_COVERS = {
   13: [],
 };
 
-/** Pay raise amounts for the 2 career slots. */
-export const SALARY_RAISES = [3, 2];
-
 // ─── Engine Class ────────────────────────────────────────────────────────────
 
 /**
@@ -762,8 +759,6 @@ export default class EmigrationEngine {
     this.pandemicStimulusCount = 0;
     this.activeCrossingIdx = 0;
     this.gameResult = null;
-    this._collegeFailed = false;
-    this._graduateAttempted = false;
     this._identicalTwinExtraTurn = false;
     this.p2pRollQueue = [];
 
@@ -910,12 +905,9 @@ export default class EmigrationEngine {
         persona: setup.persona ?? null,
         money: nat.startingMoney,
         salary: 1,
-        payRaises: 0,
-        inCollege: false,
         accessFee: 1,
         assurance: 0,
         skipNextTurn: false,
-        collegeFund: nat.collegeFund,
         startingMoney: nat.startingMoney,
         ticketPassportBonusClaimed: false,
         crossedSuccessfully: null,
@@ -1255,31 +1247,12 @@ export default class EmigrationEngine {
       }
     }
 
-    // Apply for College
-    if (
-      !this._collegeFailed &&
-      player.payRaises < SALARY_RAISES.length &&
-      !player.inCollege
-    ) {
-      const minTuition = Math.floor(player.collegeFund / 2) + 1;
-      if (player.money >= minTuition) return true;
-    }
-
     return false;
   }
 
   getValidActions(player) {
     const actions = [];
     const p = player || this.players[this.currentPlayerIdx];
-
-    // Optional: Graduate
-    actions.push({
-      type: "graduate",
-      label: "Graduate",
-      lucideIcon: 'graduation-cap',
-      optional: true,
-      enabled: p.inCollege && !this._graduateAttempted,
-    });
 
     const canSell =
       p.stash.documents.length > 0 || p.stash.connections.length > 0;
@@ -1410,19 +1383,6 @@ export default class EmigrationEngine {
       enabled: canDiscard,
     });
 
-    let canApply = false;
-    if (!this._collegeFailed && p.payRaises < SALARY_RAISES.length && !p.inCollege) {
-      const minTuition = Math.floor(p.collegeFund / 2) + 1;
-      if (p.money >= minTuition) canApply = true;
-    }
-    actions.push({
-      type: "applyCollege",
-      label: "Apply for College",
-      lucideIcon: 'notebook-pen',
-      optional: false,
-      enabled: canApply,
-    });
-
     const hasAnyRequired = actions.some((a) => !a.optional && a.enabled);
     if (!hasAnyRequired) {
       actions.push({
@@ -1452,8 +1412,6 @@ export default class EmigrationEngine {
       return;
     }
 
-    this._collegeFailed = false;
-    this._graduateAttempted = false;
     // Identical Twin extra turn: don't advance player index
     if (this._identicalTwinExtraTurn) {
       this._identicalTwinExtraTurn = false;
@@ -1855,8 +1813,6 @@ export default class EmigrationEngine {
       activeCrossingIdx: this.activeCrossingIdx,
       crossingOrder: this.crossingOrder,
       gameResult: this.gameResult,
-      _collegeFailed: this._collegeFailed,
-      _graduateAttempted: this._graduateAttempted,
       _identicalTwinExtraTurn: this._identicalTwinExtraTurn,
       // logs are append-only; excluded to keep the serialized backup small.
       // We store only the length so restoreBackup() can trim any entries
@@ -1895,31 +1851,6 @@ export default class EmigrationEngine {
     const player = this.players[this.currentPlayerIdx];
 
     switch (type) {
-      case "graduate": {
-        if (!player.inCollege) {
-          this.log(`ERR|NOT_IN_COLLEGE`, "error");
-          return;
-        }
-        const roll = this.rollD6();
-        if (roll <= 3) {
-          player.inCollege = false;
-          player.assurance += player.payRaises === 0 ? 2 : 1;
-          const raiseAmount = SALARY_RAISES[player.payRaises];
-          player.salary += raiseAmount;
-          player.payRaises++;
-          this.log(
-            `P${player.id}|GRAD|ROLL:${roll}|RES:PASS|SALARY_INC:${raiseAmount}`,
-            "action",
-          );
-          this.notifyToast("success", `${player.name} rolled ${roll} and graduated`);
-        } else {
-          this.log(`P${player.id}|GRAD|ROLL:${roll}|RES:FAIL`, "error");
-          this.notifyToast("error", `${player.name} rolled ${roll} and remains in college`);
-          this._graduateAttempted = true;
-        }
-        this._notify();
-        break;
-      }
       case "sell": {
         const { stashType, stashIdx } = params;
         if (!stashType || stashIdx === undefined) {
@@ -1953,10 +1884,6 @@ export default class EmigrationEngine {
 
   executeRequiredAction(type, params = {}) {
     if (this.phase !== "preparation" || this.pendingChoice) return;
-    if (this._collegeFailed && type === "applyCollege") {
-      this.log(`ERR|COLLEGE_FAIL_ONCE`, "error");
-      return;
-    }
     this.createBackup();
     if (params.rolls) this.p2pRollQueue = [...params.rolls];
     const player = this.players[this.currentPlayerIdx];
@@ -1974,8 +1901,6 @@ export default class EmigrationEngine {
         return this._doReclaim(player, params);
       case "discard":
         return this._doDiscard(player, params);
-      case "applyCollege":
-        return this._doApplyCollege(player);
       case "forfeit":
         player.money += 1;
         this.log(
@@ -2102,7 +2027,6 @@ export default class EmigrationEngine {
     }
 
     const salaries = this.players.map((p) => {
-      if (p.inCollege) return 0;
       let payout = 0;
       if (activator && p.id === activator.id) {
         payout = p.salary;
@@ -3553,62 +3477,6 @@ export default class EmigrationEngine {
     this.advanceTurn();
   }
 
-  // ── Apply for College ─────────────────────────────────────────────────
-
-  _doApplyCollege(player) {
-    if (player.payRaises >= SALARY_RAISES.length) {
-      this.log("ERR|MAX_RAISES", "error");
-      return;
-    }
-    if (player.inCollege) {
-      this.log("ERR|ALREADY_IN_COLLEGE", "error");
-      return;
-    }
-
-    const minTuition = Math.floor(player.collegeFund / 2) + 1;
-    if (player.money < minTuition) {
-      this.log(`ERR|NO_FUNDS_${minTuition}`, "error");
-      return;
-    }
-
-    const roll = this.rollD6();
-    let tuition;
-    if (roll <= 3) {
-      tuition = Math.floor(player.collegeFund / 2) + roll;
-    } else {
-      tuition = player.collegeFund + roll;
-    }
-
-    if (player.money >= tuition) {
-      player.money -= tuition;
-      player.inCollege = true;
-      this.log(
-        `P${player.id}|COLLEGE_APP|ROLL:${roll}|TUITION:${tuition}|RES:PASS`,
-        "action",
-      );
-      this.notifyToast("success", 
-        `${player.name} goes to college (rolls ${roll}, pays $${tuition})`,
-      );
-      this.advanceTurn();
-    } else {
-      player.money = Math.max(0, player.money - 1);
-      this._collegeFailed = true;
-      this.log(
-        `P${player.id}|COLLEGE_APP|ROLL:${roll}|TUITION:${tuition}|RES:FAIL`,
-        "error",
-      );
-      this.notifyToast("error", 
-        `${player.name} fails to go to college (rolls ${roll}, tuition is $${tuition})`,
-      );
-      if (!this.canPerformAnyRequiredAction(player)) {
-        this.log(`P${player.id}|FORFEIT_AUTO`, "system");
-        this.advanceTurn();
-      } else {
-        this._notify();
-      }
-    }
-  }
-
   // ─── Logging & Notifications ──────────────────────────────────────────
 
   _notify() {
@@ -3704,6 +3572,9 @@ export function runTests() {
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
     const p = eng.players[0];
+    const actions = eng.getValidActions(p);
+    assert(!actions.some((a) => ["applyCollege", "graduate"].includes(a.type)), "No removed actions are offered");
+    assert(p.salary === 1, "Salary stays at the base value");
     assert(!eng.isCardCovered(p, 11), "Card 11 (row 4) initially uncovered");
     assert(!eng.isCardCovered(p, 12), "Card 12 (row 4) initially uncovered");
     assert(!eng.isCardCovered(p, 13), "Card 13 (row 4) initially uncovered");
@@ -3729,19 +3600,6 @@ export function runTests() {
     assert(usa.check(4, 1, 0) === -5, "USA: m=4,d=1,c=0 → -5");
   } catch (e) {
     assert(false, `Destination calc error: ${e.message}`);
-  }
-
-  try {
-    assert(SALARY_RAISES.length === 2, "2 pay raise slots");
-    assert(SALARY_RAISES[0] === 2, "First raise = +$2");
-    assert(SALARY_RAISES[1] === 2, "Second raise = +$2");
-    let salary = 1;
-    salary += SALARY_RAISES[0];
-    assert(salary === 3, "After 1st raise: salary = $3");
-    salary += SALARY_RAISES[1];
-    assert(salary === 5, "After 2nd raise: salary = $5");
-  } catch (e) {
-    assert(false, `Pay raise error: ${e.message}`);
   }
 
   try {
@@ -3773,7 +3631,7 @@ export function runTests() {
     assert(Math.floor(2 / 2) + 3 === 4, "Bosnian aid tuition (roll 3) = $4");
     assert(2 + 4 === 6, "Bosnian full tuition (roll 4) = $6");
   } catch (e) {
-    assert(false, `College tuition error: ${e.message}`);
+    assert(false, `Salary baseline error: ${e.message}`);
   }
 
   try {
@@ -3797,7 +3655,7 @@ export function runTests() {
     p.money = 2;
     assert(
       eng.canPerformAnyRequiredAction(p),
-      "Can apply for college with $2 (Bosnian min tuition)",
+      "Can still perform required actions with $2",
     );
   } catch (e) {
     assert(false, `Forfeit detection error: ${e.message}`);
