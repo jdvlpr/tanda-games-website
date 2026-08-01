@@ -225,7 +225,7 @@ export function createAutoPlayer(
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
         if (player.money >= fee) {
-          for (let i = 0; i < 14; i++) {
+          for (let i = 0; i < p.layout.length; i++) {
             if (engine.isCardAvailable(p, i)) {
               const type = p.layout[i].card.type;
               if (type === "payday" || type === "life") validMoves.push({ type: "activate", params: { targetPlayerIdx: p.id, slotIdx: i } });
@@ -237,7 +237,7 @@ export function createAutoPlayer(
     if (enabled("buy")) {
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < p.layout.length; i++) {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if ((card.type === "document" || card.type === "connection") && player.money >= engine.getEffectiveCost(player, card) + fee) {
@@ -255,7 +255,7 @@ export function createAutoPlayer(
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
         if (player.money >= fee) {
-          for (let i = 0; i < 14; i++) {
+          for (let i = 0; i < p.layout.length; i++) {
             if (engine.isCardAvailable(p, i)) {
               const type = p.layout[i].card.type;
               if (type === "document" || type === "connection") validMoves.push({ type: "discard", params: { source: "layout", targetPlayerIdx: p.id, slotIdx: i } });
@@ -290,7 +290,7 @@ export function createAutoPlayer(
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
         if (player.money < fee) continue;
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < p.layout.length; i++) {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if (card.type === "payday" || card.type === "life") {
@@ -309,7 +309,7 @@ export function createAutoPlayer(
     if (enabled("buy")) {
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < p.layout.length; i++) {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if (card.type === "document" || card.type === "connection") {
@@ -402,7 +402,7 @@ export function createAutoPlayer(
       for (const p of engine.players) {
         const fee = p.id === player.id ? 0 : player.accessFee;
         if (player.money < fee) continue;
-        for (let i = 0; i < 14; i++) {
+        for (let i = 0; i < p.layout.length; i++) {
           if (engine.isCardAvailable(p, i)) {
             const card = p.layout[i].card;
             if (card.type === "document" || card.type === "connection") {
@@ -913,7 +913,7 @@ export function createAutoPlayer(
         if (netGain <= 0 || netGain - avgOpponentGain < 0) continue;
       }
 
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < p.layout.length; i++) {
         if (engine.isCardAvailable(p, i)) {
           const card = p.layout[i].card;
           if (card.type === cardType) {
@@ -940,7 +940,7 @@ export function createAutoPlayer(
 
     for (const p of engine.players) {
       const fee = p.id === player.id ? 0 : player.accessFee;
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < p.layout.length; i++) {
         if (engine.isCardAvailable(p, i)) {
           const card = p.layout[i].card;
           if (card.type === "document" || card.type === "connection") {
@@ -1054,7 +1054,7 @@ export function createAutoPlayer(
    */
   function _findDiscardTarget(player) {
     // Discard from own layout
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < player.layout.length; i++) {
       if (engine.isCardAvailable(player, i)) {
         const card = player.layout[i].card;
         if (card.type === "document" || card.type === "connection") {
@@ -1074,7 +1074,7 @@ export function createAutoPlayer(
     for (const p of engine.players) {
       if (p.id === player.id) continue;
       if (player.money < player.accessFee) continue;
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < p.layout.length; i++) {
         if (engine.isCardAvailable(p, i)) {
           const card = p.layout[i].card;
           if (card.type === "document" || card.type === "connection") {
@@ -1108,6 +1108,14 @@ export function createAutoPlayer(
 
     // Strategy-based resolution
     const id = choice.id || "";
+
+    if (id && id.startsWith("select-wave-cards")) {
+      const targetCount = choice.targetCount || 3;
+      const shuffled = [...opts].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, targetCount).map((o) => o.value);
+      engine.resolveChoice(selected);
+      return;
+    }
 
     // Keep Calm: don't use it (save for bad cards)
     if (id === "keep-calm-check") {

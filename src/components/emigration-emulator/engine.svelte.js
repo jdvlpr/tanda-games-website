@@ -761,6 +761,7 @@ export default class EmigrationEngine {
     this.gameResult = null;
     this._identicalTwinExtraTurn = false;
     this.p2pRollQueue = [];
+    this.layoutWave = 1;
 
     // Choice system
     this.pendingChoice = null;
@@ -913,6 +914,7 @@ export default class EmigrationEngine {
         startingMoney: nat.startingMoney,
         ticketPassportBonusClaimed: false,
         crossedSuccessfully: null,
+        hand: [],
         stash: {
           documents: [],
           connections: [],
@@ -920,15 +922,13 @@ export default class EmigrationEngine {
           passports: 0,
           lifeCards: [],
         },
-        layout: new Array(14).fill(null),
+        layout: [],
       };
 
-      // Deal 14 cards
+      // Deal 14 cards into hand
       for (let i = 0; i < 14; i++) {
         const card = mainDeck.pop();
-        // Rows 1 (0-3) and 3 (7-10) are face-down; Rows 2 (4-6) and 4 (11-13) are face-up
-        const faceDown = (i >= 0 && i <= 3) || (i >= 7 && i <= 10);
-        player.layout[i] = { card: { ...card }, faceUp: !faceDown, index: i };
+        player.hand.push({ ...card });
       }
 
       this.players.push(player);
@@ -941,6 +941,8 @@ export default class EmigrationEngine {
       )
       .join(", ");
     this.log(`INIT|SETUP|${playerDetails}`, "system");
+    this.layoutWave = 1;
+    this._startWaveSelection();
 
     this.players.forEach((player) => {
       const faceUpCards = [];
@@ -959,13 +961,104 @@ export default class EmigrationEngine {
     });
   }
 
+  // ─── Wave Layout Selection ───────────────────────────────────────────
+
+  _isPlayerLayoutEmpty(player) {
+    if (!player || !player.layout || player.layout.length === 0) return true;
+    return player.layout.every((slot) => !slot || slot.card === null || slot === null);
+  }
+
+  _isAllLayoutsEmpty() {
+    return this.players.every((p) => this._isPlayerLayoutEmpty(p));
+  }
+
+  _getWaveTargetCount() {
+    return (this.layoutWave === 1 || this.layoutWave === 3) ? 3 : 4;
+  }
+
+  _startWaveSelection() {
+    const targetPlayer = this.players.find((p) => this._isPlayerLayoutEmpty(p) && p.hand.length > 0);
+    if (targetPlayer) {
+      this._promptWaveSelection(targetPlayer.id);
+    }
+  }
+
+  _promptWaveSelection(playerIdx) {
+    const player = this.players[playerIdx];
+    if (!player) return;
+
+    const targetCount = this._getWaveTargetCount();
+
+    if (player.hand.length <= targetCount) {
+      const selected = player.hand.map((c) => c.id || c.name || c.title);
+      this._applyWaveSelection(player, selected, targetCount);
+      return;
+    }
+
+    this._setPendingChoice({
+      id: `select-wave-cards-p${player.id}`,
+      playerIdx: player.id,
+      title: `${player.name}: Select ${targetCount} cards from your hand for Wave ${this.layoutWave}`,
+      targetCount: targetCount,
+      options: player.hand.map((card, idx) => ({
+        text: `${card.name || card.title} (${card.type.charAt(0).toUpperCase() + card.type.slice(1)})`,
+        value: card.id || String(idx),
+        card: card,
+      })),
+      cancellable: false,
+      resolve: (selectedValues) => {
+        this._applyWaveSelection(player, selectedValues, targetCount);
+      },
+    });
+  }
+
+  _applyWaveSelection(player, selectedValues, targetCount) {
+    let vals = Array.isArray(selectedValues)
+      ? selectedValues
+      : String(selectedValues).split(",");
+
+    const selectedCards = [];
+    const remainingHand = [...player.hand];
+
+    for (const val of vals) {
+      const idx = remainingHand.findIndex(
+        (c, i) => c.id === val || String(i) === val || c.name === val || c.title === val,
+      );
+      if (idx !== -1) {
+        selectedCards.push(remainingHand.splice(idx, 1)[0]);
+      }
+      if (selectedCards.length >= targetCount) break;
+    }
+
+    while (selectedCards.length < targetCount && remainingHand.length > 0) {
+      selectedCards.push(remainingHand.pop());
+    }
+
+    player.hand = remainingHand;
+    player.layout = selectedCards.map((card, i) => ({
+      card,
+      faceUp: true,
+      index: i,
+    }));
+
+    const cardNames = selectedCards.map((c) => c.name || c.title).join(", ");
+    this.log(`P${player.id}|WAVE_${this.layoutWave}_LAYOUT:[${cardNames}]`, "action");
+    this.notifyToast("info", `${player.name} laid out ${targetCount} cards for Wave ${this.layoutWave}`);
+
+    const nextPlayer = this.players.find((p) => this._isPlayerLayoutEmpty(p) && p.hand.length > 0);
+    if (nextPlayer) {
+      this._promptWaveSelection(nextPlayer.id);
+    } else {
+      this.consecutiveForfeits = 0;
+      this._notify();
+    }
+  }
+
   // ─── Layout Coverage ─────────────────────────────────────────────────
 
   /** Check if a card at slotIdx is covered by any other card in the layout. */
   isCardCovered(player, slotIdx) {
-    const covers = LAYOUT_COVERS[slotIdx];
-    if (!covers) return false;
-    return covers.some((covIdx) => player.layout[covIdx] !== null);
+    return false;
   }
 
   /** Check if a card is available (face-up AND not covered). */
@@ -1475,9 +1568,22 @@ export default class EmigrationEngine {
       return;
     }
 
-    if (this.checkPhase2Trigger()) {
-      this.triggerPhase2();
-      return;
+    if (this._isAllLayoutsEmpty()) {
+      if (this.layoutWave < 4 && this.players.some((p) => p.hand.length > 0)) {
+        this.layoutWave++;
+        this.players.forEach((p) => {
+          p.layout = [];
+        });
+        this.log("WAVE_" + this.layoutWave + "_START", "system");
+        this.notifyToast("info", "Start Wave " + this.layoutWave);
+        this._startWaveSelection();
+        return;
+      }
+
+      if (this.checkPhase2Trigger()) {
+        this.triggerPhase2();
+        return;
+      }
     }
 
     // Identical Twin extra turn: don't advance player index
@@ -1509,14 +1615,11 @@ export default class EmigrationEngine {
   // ─── Phase 2 Trigger ─────────────────────────────────────────────────
 
   checkPhase2Trigger() {
-    // Phase 1 ends when every player's layout is completely empty,
-    // regardless of remaining tickets or passports in the public pool.
-    for (const p of this.players) {
-      for (let i = 0; i < 14; i++) {
-        if (p.layout[i] !== null) return false;
-      }
-    }
-    return true;
+    // Phase 1 ends when all 4 waves are complete (or no cards left in hand for any player)
+    // AND every player's layout is completely empty.
+    if (!this._isAllLayoutsEmpty()) return false;
+    const noCardsInHands = this.players.every((p) => p.hand.length === 0);
+    return this.layoutWave >= 4 || noCardsInHands;
   }
 
   // ─── Phase 2: Border Crossing ────────────────────────────────────────
@@ -1799,6 +1902,7 @@ export default class EmigrationEngine {
     this.pendingChoice = {
       id: choice.id || `choice-${Date.now()}`,
       title: choice.title,
+      targetCount: choice.targetCount,
       options: choice.options,
       cancellable: choice.cancellable !== false,
       canGoBack: !!choice.onBack,
@@ -1849,6 +1953,7 @@ export default class EmigrationEngine {
       activeCrossingIdx: this.activeCrossingIdx,
       crossingOrder: this.crossingOrder,
       gameResult: this.gameResult,
+      layoutWave: this.layoutWave,
       _identicalTwinExtraTurn: this._identicalTwinExtraTurn,
       // logs are append-only; excluded to keep the serialized backup small.
       // We store only the length so restoreBackup() can trim any entries
@@ -3530,6 +3635,7 @@ export default class EmigrationEngine {
         securityLanes: this.securityLanes,
         players: this.players,
         gameResult: this.gameResult,
+      layoutWave: this.layoutWave,
         logs: this.logs,
         activeCrossingIdx: this.activeCrossingIdx,
         crossingOrder: this.crossingOrder,
@@ -3561,6 +3667,7 @@ export default class EmigrationEngine {
     if (cleanSnap.securityLanes !== undefined)
       this.securityLanes = cleanSnap.securityLanes;
     if (cleanSnap.players !== undefined) this.players = cleanSnap.players;
+    if (cleanSnap.layoutWave !== undefined) this.layoutWave = cleanSnap.layoutWave;
     if (cleanSnap.gameResult !== undefined)
       this.gameResult = cleanSnap.gameResult;
     if (cleanSnap.logs !== undefined) this.logs = cleanSnap.logs;
@@ -3582,6 +3689,14 @@ export function runTests() {
     results.push({ pass: !!cond, description: desc });
   }
 
+  function resolveWaveChoices(eng) {
+    while (eng.pendingChoice && eng.pendingChoice.id && eng.pendingChoice.id.startsWith('select-wave-cards')) {
+      const targetCount = eng.pendingChoice.targetCount || 3;
+      const vals = eng.pendingChoice.options.slice(0, targetCount).map((o) => o.value);
+      eng.resolveChoice(vals);
+    }
+  }
+
   [2, 3, 4, 5, 6].forEach((P) => {
     try {
       const setup = Array.from({ length: P }, (_, i) => ({
@@ -3590,11 +3705,12 @@ export function runTests() {
         destination: DESTINATIONS[(i + 1) % DESTINATIONS.length],
       }));
       const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
       assert(eng.players.length === P, `[${P}P] Correct player count`);
       assert(eng.publicServices.tickets === P, `[${P}P] Tickets = ${P}`);
       assert(
-        eng.players[0].layout.filter((s) => s !== null).length === 14,
-        `[${P}P] 14 layout cards dealt`,
+        eng.players[0].hand.length + eng.players[0].layout.length === 14,
+        `[${P}P] 14 cards dealt (hand + wave 1 layout)`,
       );
     } catch (e) {
       assert(false, `[${P}P] Deck scaling error: ${e.message}`);
@@ -3607,20 +3723,21 @@ export function runTests() {
       { name: "B", nationality: {name: "French"}, destination: {name: "Russia"} },
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     const p = eng.players[0];
     const actions = eng.getValidActions(p);
     assert(!actions.some((a) => ["applyCollege", "graduate"].includes(a.type)), "No removed actions are offered");
     assert(p.salary === 1, "Salary stays at the base value");
-    assert(!eng.isCardCovered(p, 11), "Card 11 (row 4) initially uncovered");
-    assert(!eng.isCardCovered(p, 12), "Card 12 (row 4) initially uncovered");
-    assert(!eng.isCardCovered(p, 13), "Card 13 (row 4) initially uncovered");
-    assert(eng.isCardCovered(p, 7), "Card 7 (row 3) initially covered");
-    assert(eng.isCardCovered(p, 0), "Card 0 (row 1) initially covered");
-    p.layout[11] = null;
+    assert(p.layout.length === 3, "Wave 1 layout has 3 cards");
+    assert(p.hand.length === 11, "11 cards remain in hand during Wave 1");
+    
+    
+    
+    p.layout[0] = null;
     eng.uncoverLayout(p);
-    assert(!eng.isCardCovered(p, 7), "Card 7 uncovered after card 11 removed");
-    assert(p.layout[7]?.faceUp, "Card 7 flipped face-up");
-    assert(eng.isCardCovered(p, 8), "Card 8 still covered (card 12 present)");
+    assert(p.layout.length === 3, "Wave layout maintained");
+    
+    
   } catch (e) {
     assert(false, `Layout DAG error: ${e.message}`);
   }
@@ -3644,6 +3761,7 @@ export function runTests() {
       { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     eng.players[0].salary = 3;
     eng.players[1].salary = 5;
     const moneyA = eng.players[0].money;
@@ -3676,6 +3794,7 @@ export function runTests() {
       { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     const p = eng.players[0];
     p.money = 0;
     p.stash.documents = [];
@@ -3721,6 +3840,7 @@ export function runTests() {
       { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     assert(eng.securityLanes.length === 5, "5 security lanes");
     assert(eng.securityLanes[0].tokens.length === 3, "Lane 1 has 3 tokens");
     const l1sorted = [...eng.securityLanes[0].tokens].sort((a, b) => a - b);
@@ -3738,11 +3858,12 @@ export function runTests() {
       { name: "B", nationality: {name: "French",}, destination: {name:"Russia"}},
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     const actor = eng.players[1];
     const salvageOwner = eng.players[0];
 
     salvageOwner.stash.lifeCards.push({ title: "Salvage", type: "life" });
-    actor.layout[11] = {
+    actor.layout[0] = {
       card: {
         title: "Nostalgia",
         pack: "Vacation",
@@ -3754,7 +3875,7 @@ export function runTests() {
     };
     actor.money = 10;
     eng.currentPlayerIdx = 1;
-    eng.executeRequiredAction("activate", { targetPlayerIdx: 1, slotIdx: 11 });
+    eng.executeRequiredAction("activate", { targetPlayerIdx: 1, slotIdx: 0 });
     // Resolve any pendingChoice from Nostalgia (e.g. gain $2 option)
     if (eng.pendingChoice) eng.resolveChoice(eng.pendingChoice.options[0].value);
 
@@ -3765,23 +3886,25 @@ export function runTests() {
 
     // Salvage DOES trigger on a document discard (the DISCARD required action).
     const discardEng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(discardEng);
+    resolveWaveChoices(discardEng);
     const discardActor = discardEng.players[1];
     const discardSalvageOwner = discardEng.players[0];
     discardSalvageOwner.stash.lifeCards.push({ title: "Salvage", type: "life" });
-    discardActor.layout[11] = {
+    discardActor.layout[0] = {
       card: { title: "Work Permit", type: "document", cost: 2 },
       faceUp: true,
       index: 11,
     };
     discardEng.currentPlayerIdx = 1;
-    discardEng.executeRequiredAction("discard", { targetPlayerIdx: 1, slotIdx: 11 });
+    discardEng.executeRequiredAction("discard", { targetPlayerIdx: 1, slotIdx: 0 });
     assert(
       discardSalvageOwner.money === 3,
       "Salvage triggers when another player discards a Document",
     );
 
     const keeper = eng.players[0];
-    keeper.layout[13] = {
+    keeper.layout[0] = {
       card: {
         title: "Stellar Reputation",
         pack: "Friendship",
@@ -3792,7 +3915,7 @@ export function runTests() {
       index: 13,
     };
     eng.currentPlayerIdx = 0;
-    eng.executeRequiredAction("activate", { targetPlayerIdx: 0, slotIdx: 13 });
+    eng.executeRequiredAction("activate", { targetPlayerIdx: 0, slotIdx: 0 });
     assert(
       eng.pendingChoice?.id === "may-keep-choice",
       "May Keep life cards prompt for a keep/immediate choice",
@@ -3831,6 +3954,7 @@ export function runTests() {
         { name: "TradeP2", nationality: { name: "French" }, destination: { name: "France" } }
       ]
     });
+      resolveWaveChoices(tradeInEngine);
     const tp1 = tradeInEngine.players[0];
     // Bosnia targets: d setSize 4 reward 2; c setSize 3 reward 6
     assert(tp1.assurance === 0, "Player starts at 0 Assurance on track");
@@ -3874,7 +3998,7 @@ export function runTests() {
     );
 
     const fogger = eng.players[0];
-    fogger.layout[11] = {
+    fogger.layout[0] = {
       card: {
         title: "Mental Fog",
         pack: "News",
@@ -3885,14 +4009,14 @@ export function runTests() {
       index: 11,
     };
     const target = eng.players[1];
-    target.layout[13] = {
+    target.layout[1] = {
       card: { title: "Insider", pack: "News", keep: "May Keep", type: "life" },
       faceUp: true,
       index: 13,
     };
     target.stash.lifeCards.push({ title: "Stellar Reputation", type: "life" });
     eng.currentPlayerIdx = 0;
-    eng.executeRequiredAction("activate", { targetPlayerIdx: 0, slotIdx: 11 });
+    eng.executeRequiredAction("activate", { targetPlayerIdx: 0, slotIdx: 0 });
     assert(
       eng.pendingChoice?.options?.some(
         (opt) =>
@@ -3912,6 +4036,7 @@ export function runTests() {
       { name: "C", nationality: {name:"Chinese"}, destination: {name:"England"} },
     ];
     const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
     eng.currentPlayerIdx = 1; // Player 2 (index 1) was last to take turn in Phase 1
     eng.triggerPhase2();
     const snap = eng.getSnapshot();
@@ -3933,11 +4058,12 @@ export function runTests() {
     // ─── Scenario: layout owner skips the offer → action proceeds at normal fee
     {
       const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
       const actor = eng.players[0]; // P0 is the acting player
       const owner = eng.players[1]; // P1 owns the layout card + Persuasion
 
       owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
-      owner.layout[11] = {
+      owner.layout[0] = {
         card: { name: "Checklist", cost: 2, type: "document" },
         faceUp: true,
         index: 11,
@@ -3948,7 +4074,7 @@ export function runTests() {
       eng.executeRequiredAction("discard", {
         source: "layout",
         targetPlayerIdx: 1,
-        slotIdx: 11,
+        slotIdx: 0,
       });
 
       // Engine should have paused with a persuasion-offer prompt for the OWNER (P1)
@@ -3984,11 +4110,12 @@ export function runTests() {
     // ─── Scenario: owner offers → actor accepts → Persuasion transferred
     {
       const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
       const actor = eng.players[0];
       const owner = eng.players[1];
 
       owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
-      owner.layout[11] = {
+      owner.layout[0] = {
         card: { name: "Checklist", cost: 2, type: "document" },
         faceUp: true,
         index: 11,
@@ -3999,7 +4126,7 @@ export function runTests() {
       eng.executeRequiredAction("discard", {
         source: "layout",
         targetPlayerIdx: 1,
-        slotIdx: 11,
+        slotIdx: 0,
       });
 
       // Owner offers Persuasion
@@ -4041,11 +4168,12 @@ export function runTests() {
     // ─── Scenario: owner offers → actor declines → double fee, action continues
     {
       const eng = new EmigrationEngine({ mode: "competitive", players: setup });
+      resolveWaveChoices(eng);
       const actor = eng.players[0];
       const owner = eng.players[1];
 
       owner.stash.lifeCards.push({ title: "Persuasion", type: "life" });
-      owner.layout[11] = {
+      owner.layout[0] = {
         card: { name: "Checklist", cost: 2, type: "document" },
         faceUp: true,
         index: 11,
@@ -4060,7 +4188,7 @@ export function runTests() {
       eng.executeRequiredAction("discard", {
         source: "layout",
         targetPlayerIdx: 1,
-        slotIdx: 11,
+        slotIdx: 0,
       });
 
       eng.resolveChoice("offer"); // owner offers

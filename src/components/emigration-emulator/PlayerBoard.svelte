@@ -151,9 +151,16 @@
     <div class="flex flex-col gap-2 items-center justify-start">
       <!-- Player Header Info -->
       <div class="flex flex-col gap-1">
-        <p class={["text-2xl font-bold"]}>
-          {player.name}
-        </p>
+        <div class="flex items-center justify-center gap-2">
+          <p class={["text-2xl font-bold"]}>
+            {player.name}
+          </p>
+          {#if engine && engine.layoutWave}
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100">
+              Wave {engine.layoutWave}/4
+            </span>
+          {/if}
+        </div>
         <p
           class="flex gap-1 justify-center items-center text-md"
           title="{player.name}'s Nationality and (Starting Money)"
@@ -230,35 +237,12 @@
       </div>
     </div>
 
-    <!-- Card Layout (Row 1-4 Vertical Stacked Overlap) -->
+    <!-- Sub-phase Wave Card Layout -->
     {#if engine && engine.phase === "preparation"}
-      <div class={["mb-2", !isLayoutEmpty && "pb-18"]}>
-        <!-- Row 1 -->
-        <div class={["layout-row row-1", isRow1Empty && "h-0!"]}>
-          {@render cardSlot(0)}
-          {@render cardSlot(1)}
-          {@render cardSlot(2)}
-          {@render cardSlot(3)}
-        </div>
-        <!-- Row 2 -->
-        <div class={["layout-row row-2", isRow2Empty && "h-0!"]}>
-          {@render cardSlot(4)}
-          {@render cardSlot(5)}
-          {@render cardSlot(6)}
-        </div>
-        <!-- Row 3 -->
-        <div class={["layout-row row-3", isRow3Empty && "h-0!"]}>
-          {@render cardSlot(7)}
-          {@render cardSlot(8)}
-          {@render cardSlot(9)}
-          {@render cardSlot(10)}
-        </div>
-        <!-- Row 4 -->
-        <div class={["layout-row row-4", isRow4Empty && "h-0!"]}>
-          {@render cardSlot(11)}
-          {@render cardSlot(12)}
-          {@render cardSlot(13)}
-        </div>
+      <div class="flex justify-center items-center gap-2 my-3 min-h-[130px]">
+        {#each player.layout as slot, slotIdx}
+          {@render cardSlot(slotIdx)}
+        {/each}
       </div>
     {:else}
       <div
