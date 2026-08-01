@@ -103,7 +103,9 @@ Nationality cards dictate the starting fund.
 | Chinese     |      $10      |
 | American    |      $10      |
 
-### 3.2 Destinations
+### 3.2 Destinations & Assurance Track
+
+Players track their Assurance in real-time on an **Assurance Track** starting at 0. As soon as a player acquires enough Documents or Connections in Phase 1 to meet their Destination's set requirement (`setSize`), those cards are **immediately traded in** (discarded to the discard pile) and the Assurance reward is added directly to their position on the Assurance Track.
 
 Each Destination card outlines the specific requirements to earn or lose Assurance during Phase 2 (Crossing the Border). Players can earn a single Assurance reward per resource type by meeting or exceeding the set threshold (maximum 1 set per resource). Penalties for failing to meet minimum requirements apply only once.
 
@@ -136,31 +138,31 @@ Security Lanes have 3 tokens stacked face-down. The tokens in each lane's pool a
 
 ### 3.4 Documents & Connections Catalogue
 
-All standard Documents cost $4 base price (each Document in a player's Stash reduces the cost of buying subsequent Documents by $1, down to a minimum of $0). Connections cost $2, $3, or $4:
+All standard Documents and Connections cost $4 base price (each Document or Connection in a player's Stash reduces the cost of buying subsequent cards of that type by $1, down to a minimum of $0):
 
 | Documents (Cost)                      | Icon               | Connections (Cost)                           | Icon               |
 | :------------------------------------ | :----------------- | :------------------------------------------- | :----------------- |
-| Write Last Will and Testament ($2)    | `tombstone`        | Coffee with Airport Employee ($2)            | `coffee-mug`       |
-| Certificate of Excellence ($2)        | `diploma`          | Cookies for Neighbor from Destination ($2)   | `cookie`           |
-| Checklist ($2)                        | `checklist`        | Video Chat with Person from Destination ($2) | `video-conference` |
-| Copy of Birth Certificate ($2)        | `stork-delivery`   | Support Group Motivates You ($2)             | `cherish`          |
-| Notebook ($2)                         | `notebook`         | Learn Song from Your Destination ($2)        | `banjo`            |
-| Subscribe to Travel Updates ($2)      | `rss`              | Listen to the News ($2)                      | `newspaper`        |
-| Travel Brochure ($2)                  | `open-book`        | Friend moves to your Destination ($2)        | `hiking`           |
-| Physical Exam ($3)                    | `stethoscope`      | Language Classes ($3)                        | `conversation`     |
-| Vaccination Record ($3)               | `miracle-medecine` | Network Fair ($3)                            | `mesh-network`     |
-| Personality Test ($3)                 | `skills`           | Dinner with a Diplomat ($3)                  | `hot-meal`         |
-| Travel Wallet ($3)                    | `wallet`           | Become World Famous ($3)                     | `mona-lisa`        |
-| Attend Security Training ($3)         | `padlock`          | Learn from an Elder ($3)                     | `wisdom`           |
-| Residence Address in Destination ($3) | `treasure-map`     | Excellent Teamwork ($3)                      | `team-idea`        |
-| Letter of Recommendation ($3)         | `thumb-up`         | Endorsement from Royalty ($3)                | `coronation`       |
-| Letter of Invitation ($4)             | `envelope`         | Enter Luxury Travel Club ($4)                | `winged-scepter`   |
-| Background Check ($4)                 | `sherlock-holmes`  | Internship in Your Destination ($4)          | `light-backpack`   |
-| Employment Contract ($4)              | `journey`          | Get Engaged to a Native ($4)                 | `engagement-ring`  |
-| International Driving Permit ($4)     | `steering-wheel`   | Politician Approves You ($4)                 | `public-speaker`   |
-| Vehicle Registration Papers ($4)      | `race-car`         | Attend History Class ($4)                    | `read`             |
-| Pet Passport ($4)                     | `labrador-head`    | Travel Concierge ($4)                        | `top-hat`          |
-| Language Phrasebook ($4)              | `book-cover`       | Favorable Cultural Opinion ($4)              | `vote`             |
+| Write Last Will and Testament    | `tombstone`        | Coffee with Airport Employee            | `coffee-mug`       |
+| Certificate of Excellence        | `diploma`          | Cookies for Neighbor from Destination   | `cookie`           |
+| Checklist                        | `checklist`        | Video Chat with Person from Destination | `video-conference` |
+| Copy of Birth Certificate        | `stork-delivery`   | Support Group Motivates You             | `cherish`          |
+| Notebook                         | `notebook`         | Learn Song from Your Destination        | `banjo`            |
+| Subscribe to Travel Updates      | `rss`              | Listen to the News                      | `newspaper`        |
+| Travel Brochure                  | `open-book`        | Friend moves to your Destination        | `hiking`           |
+| Physical Exam                    | `stethoscope`      | Language Classes                        | `conversation`     |
+| Vaccination Record               | `miracle-medecine` | Network Fair                            | `mesh-network`     |
+| Personality Test                 | `skills`           | Dinner with a Diplomat                  | `hot-meal`         |
+| Travel Wallet                    | `wallet`           | Become World Famous                     | `mona-lisa`        |
+| Attend Security Training         | `padlock`          | Learn from an Elder                     | `wisdom`           |
+| Residence Address in Destination | `treasure-map`     | Excellent Teamwork                      | `team-idea`        |
+| Letter of Recommendation         | `thumb-up`         | Endorsement from Royalty                | `coronation`       |
+| Letter of Invitation             | `envelope`         | Enter Luxury Travel Club                | `winged-scepter`   |
+| Background Check                 | `sherlock-holmes`  | Internship in Your Destination          | `light-backpack`   |
+| Employment Contract              | `journey`          | Get Engaged to a Native                 | `engagement-ring`  |
+| International Driving Permit     | `steering-wheel`   | Politician Approves You                 | `public-speaker`   |
+| Vehicle Registration Papers      | `race-car`         | Attend History Class                    | `read`             |
+| Pet Passport                     | `labrador-head`    | Travel Concierge                        | `top-hat`          |
+| Language Phrasebook              | `book-cover`       | Favorable Cultural Opinion              | `vote`             |
 
 ---
 
@@ -215,7 +217,7 @@ On their turn, a player may perform **any number of Optional Actions BEFORE** re
    - **Life Card**: Resolve its immediate text or place it in the players Stash if it says to keep the card.
 2. **Buy card**:
    - **Document**: Base cost $4, minus $1 for each Document already in your Stash (minimum $0), plus any Life Card discounts/penalties and opponent Access Fee. Place it in your Stash.
-   - **Connection**: Pay the listed cost (modified by any Life Card discounts) plus any opponent Access Fee. Place it in your Stash.
+   - **Connection**: Base cost $4, minus $1 for each Connection already in your Stash (minimum $0), plus any Life Card discounts/penalties and opponent Access Fee. Place it in your Stash.
    - **Ticket**: Costs $2. Must have at least 1 Connection in your stash.
    - **Passport**: Costs $2. Must have at least 1 Document in your stash.
    - _Bonus_: If a player has at least one Ticket and one Passport in their stash, they immediately gain 2 Assurance (for a 2 or 3 player game) or 1 Assurance (for a 4+ player game).

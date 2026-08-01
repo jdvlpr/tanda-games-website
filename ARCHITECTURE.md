@@ -37,7 +37,7 @@ When an action requires a user decision (e.g., choosing a player to steal from, 
 Players (human or AI) take their turns by executing actions through the engine:
 
 - **Optional Actions:** Can be performed before a required action and do _not_ end the turn (e.g., `sell` a card from the stash for $2).
-- **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card [Documents cost base $4, reduced by $1 per Document in stash], `activate` a card [activating Payday awards full salary to the activator and a $1 stipend to non-activators], `discard` a card from a layout). If a player **cannot** perform any Required Action, they **forfeit** their turn and take **$1 from the bank**.
+- **Required Actions:** A player must perform exactly one per turn, which immediately ends the turn (e.g., `buy` a card [Documents and Connections cost base $4, reduced by $1 per card of that type in stash], `activate` a card [activating Payday awards full salary to the activator and a $1 stipend to non-activators], `discard` a card from a layout). If a player **cannot** perform any Required Action, they **forfeit** their turn and take **$1 from the bank**.
 - **Stash vs Layout:** Cards in a player's hand are their "Stash". Cards on the board are their "Layout". You `sell` from a Stash (optional), but you `discard` from a Layout (required).
 
 ## Layout Structure (DAG)
@@ -46,6 +46,11 @@ Players (human or AI) take their turns by executing actions through the engine:
 - Cards in Row 1 and Row 3 start face-down. Cards in Row 2 and Row 4 start face-up.
 - A card is "covered" if any card in a higher row overlaps it. The engine tracks this using `isCardCovered()`. A card cannot be targeted by an action if it is covered.
 - When an action removes a card from the layout (e.g. `buy`, `discard`), the `uncoverLayout()` method is called, which flips any newly uncovered face-down cards to face-up.
+
+## Real-Time Assurance Track & Immediate Set Trade-Ins
+
+- Players track their score on an **Assurance Track** starting at 0.
+- When a player acquires enough Documents or Connections in Phase 1 to fulfill their Destination set requirement, those cards are **immediately traded in** (discarded to `discardPile`) and the Assurance reward is added directly to `player.assurance`.
 
 ## Phases
 

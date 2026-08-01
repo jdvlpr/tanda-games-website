@@ -69,12 +69,12 @@ export const NATIONALITIES = [
   { name: "Bosnian", startingMoney: 2, countryCode: "ba" },
   { name: "Congolese", startingMoney: 2, countryCode: "cd" },
   { name: "Senegalese", startingMoney: 2, countryCode: "sn" },
-  { name: "Swiss", startingMoney: 6, countryCode: "ch" },
-  { name: "French", startingMoney: 6, countryCode: "fr" },
-  { name: "Russian", startingMoney: 6, countryCode: "ru" },
-  { name: "English", startingMoney: 10, countryCode: "gb-eng" },
-  { name: "Chinese", startingMoney: 10, countryCode: "cn" },
-  { name: "American", startingMoney: 10, countryCode: "us" },
+  { name: "Swiss", startingMoney: 2, countryCode: "ch" },
+  { name: "French", startingMoney: 2, countryCode: "fr" },
+  { name: "Russian", startingMoney: 2, countryCode: "ru" },
+  { name: "English", startingMoney: 2, countryCode: "gb-eng" },
+  { name: "Chinese", startingMoney: 2, countryCode: "cn" },
+  { name: "American", startingMoney: 2, countryCode: "us" },
 ];
 
 export const DESTINATIONS = [
@@ -246,75 +246,75 @@ export const DOCUMENTS_CATALOG = [
 export const CONNECTIONS_CATALOG = [
   {
     name: "Coffee with Airport Employee",
-    cost: 2,
+    cost: 4,
     icon: "coffee-mug",
     type: "connection",
   },
   {
     name: "Cookies for Neighbor from Destination",
-    cost: 2,
+    cost: 4,
     icon: "cookie",
     type: "connection",
   },
   {
     name: "Video Chat with Person from Destination",
-    cost: 2,
+    cost: 4,
     icon: "video-conference",
     type: "connection",
   },
   {
     name: "Support Group Motivates You",
-    cost: 2,
+    cost: 4,
     icon: "cherish",
     type: "connection",
   },
   {
     name: "Learn Song from Your Destination",
-    cost: 2,
+    cost: 4,
     icon: "banjo",
     type: "connection",
   },
   {
     name: "Listen to the News",
-    cost: 2,
+    cost: 4,
     icon: "newspaper",
     type: "connection",
   },
   {
     name: "Friend moves to your Destination",
-    cost: 2,
+    cost: 4,
     icon: "hiking",
     type: "connection",
   },
   {
     name: "Language Classes",
-    cost: 3,
+    cost: 4,
     icon: "conversation",
     type: "connection",
   },
-  { name: "Network Fair", cost: 3, icon: "mesh-network", type: "connection" },
+  { name: "Network Fair", cost: 4, icon: "mesh-network", type: "connection" },
   {
     name: "Dinner with a Diplomat",
-    cost: 3,
+    cost: 4,
     icon: "hot-meal",
     type: "connection",
   },
   {
     name: "Become World Famous",
-    cost: 3,
+    cost: 4,
     icon: "mona-lisa",
     type: "connection",
   },
-  { name: "Learn from an Elder", cost: 3, icon: "wisdom", type: "connection" },
+  { name: "Learn from an Elder", cost: 4, icon: "wisdom", type: "connection" },
   {
     name: "Excellent Teamwork",
-    cost: 3,
+    cost: 4,
     icon: "team-idea",
     type: "connection",
   },
   {
     name: "Endorsement from Royalty",
-    cost: 3,
+    cost: 4,
     icon: "coronation",
     type: "connection",
   },
@@ -907,6 +907,8 @@ export default class EmigrationEngine {
         salary: 1,
         accessFee: 1,
         assurance: 0,
+        docSetClaimed: false,
+        connSetClaimed: false,
         skipNextTurn: false,
         startingMoney: nat.startingMoney,
         ticketPassportBonusClaimed: false,
@@ -1047,6 +1049,64 @@ export default class EmigrationEngine {
     }
   }
 
+  /**
+   * Checks if player has completed a Document or Connection set for their Destination,
+   * immediately trades in the required cards, moves them to discardPile,
+   * and awards Assurance on the Assurance track.
+   */
+  _checkSetTradeIns(player) {
+    const dest = DESTINATIONS.find((d) => d.name === player.destination.name);
+    if (!dest || !dest.targets) return;
+
+    // 1. Documents Trade-In
+    if (!player.docSetClaimed && dest.targets.d && dest.targets.d.setSize > 0) {
+      const setSize = dest.targets.d.setSize;
+      if (player.stash.documents.length >= setSize) {
+        player.docSetClaimed = true;
+        const tradedDocs = player.stash.documents.splice(0, setSize);
+        for (const doc of tradedDocs) {
+          this.discardPile.push(doc);
+          this._onCardDiscarded(player, doc);
+        }
+        const reward = dest.targets.d.reward || 0;
+        player.assurance += reward;
+        this.log(
+          `P${player.id}|TRADE_IN:DOCS|GAINED_A:${reward}|TOTAL_A:${player.assurance}`,
+          "action",
+        );
+        this.notifyToast(
+          "assurance",
+          `${player.name} trades in ${setSize} Documents for +${reward} Assurance!`,
+          { indent: 1 },
+        );
+      }
+    }
+
+    // 2. Connections Trade-In
+    if (!player.connSetClaimed && dest.targets.c && dest.targets.c.setSize > 0) {
+      const setSize = dest.targets.c.setSize;
+      if (player.stash.connections.length >= setSize) {
+        player.connSetClaimed = true;
+        const tradedConns = player.stash.connections.splice(0, setSize);
+        for (const conn of tradedConns) {
+          this.discardPile.push(conn);
+          this._onCardDiscarded(player, conn);
+        }
+        const reward = dest.targets.c.reward || 0;
+        player.assurance += reward;
+        this.log(
+          `P${player.id}|TRADE_IN:CONNS|GAINED_A:${reward}|TOTAL_A:${player.assurance}`,
+          "action",
+        );
+        this.notifyToast(
+          "assurance",
+          `${player.name} trades in ${setSize} Connections for +${reward} Assurance!`,
+          { indent: 1 },
+        );
+      }
+    }
+  }
+
   /** Called when a player gains a document. Triggers Penalty pass. */
   _onPlayerGainDocument(player) {
     const idx = player.stash.lifeCards.findIndex(
@@ -1063,6 +1123,7 @@ export default class EmigrationEngine {
         { indent: 1 },
       );
     }
+    this._checkSetTradeIns(player);
   }
 
   /** Called when a player gains a connection. Triggers Star Power. */
@@ -1087,6 +1148,7 @@ export default class EmigrationEngine {
         }
       }
     }
+    this._checkSetTradeIns(player);
   }
 
   /**
@@ -1150,6 +1212,9 @@ export default class EmigrationEngine {
     let cost = card.cost || 0;
     if (card.type === "document") {
       cost -= player.stash.documents.length;
+    }
+    if (card.type === "connection") {
+      cost -= player.stash.connections.length;
     }
     if (
       card.type === "document" &&
@@ -1476,15 +1541,11 @@ export default class EmigrationEngine {
       );
       if (frCard && frCard.money) totalMoney += frCard.money;
 
-      const docs = player.stash.documents.length;
-      const conns = player.stash.connections.length;
+      const docsAcquired = player.stash.documents.length + (player.docSetClaimed ? (dest.targets?.d?.setSize || 0) : 0);
+      const connsAcquired = player.stash.connections.length + (player.connSetClaimed ? (dest.targets?.c?.setSize || 0) : 0);
 
-      let consumedMoney = 0,
-        consumedDocs = 0,
-        consumedConns = 0;
-      let mGain = 0,
-        dGain = 0,
-        cGain = 0;
+      let consumedMoney = 0;
+      let mGain = 0;
       let mPen = 0,
         dPen = 0,
         cPen = 0;
@@ -1503,34 +1564,24 @@ export default class EmigrationEngine {
           }
         }
         if (dest.targets.d) {
-          if (dest.targets.d.setSize > 0 && docs >= dest.targets.d.setSize) {
-            consumedDocs = dest.targets.d.setSize;
-            dGain = dest.targets.d.reward || 0;
-          }
           if (
             dest.targets.d.minRequired !== undefined &&
-            docs < dest.targets.d.minRequired
+            docsAcquired < dest.targets.d.minRequired
           ) {
             dPen = dest.targets.d.penalty || 0;
           }
         }
         if (dest.targets.c) {
-          if (dest.targets.c.setSize > 0 && conns >= dest.targets.c.setSize) {
-            consumedConns = dest.targets.c.setSize;
-            cGain = dest.targets.c.reward || 0;
-          }
           if (
             dest.targets.c.minRequired !== undefined &&
-            conns < dest.targets.c.minRequired
+            connsAcquired < dest.targets.c.minRequired
           ) {
             cPen = dest.targets.c.penalty || 0;
           }
         }
       }
 
-      const mod = dest.check
-        ? dest.check(totalMoney, docs, conns)
-        : mGain + dGain + cGain - mPen - dPen - cPen;
+      const mod = mGain - mPen - dPen - cPen;
       player.assurance += mod;
 
       if (consumedMoney > 0) {
@@ -1545,26 +1596,8 @@ export default class EmigrationEngine {
         }
       }
 
-      for (let i = 0; i < consumedDocs; i++) {
-        if (player.stash.documents.length > 0) {
-          const doc = player.stash.documents.pop();
-          this.discardPile.push(doc);
-          this._onCardDiscarded(player, doc);
-        }
-      }
-
-      for (let i = 0; i < consumedConns; i++) {
-        if (player.stash.connections.length > 0) {
-          const conn = player.stash.connections.pop();
-          this.discardPile.push(conn);
-          this._onCardDiscarded(player, conn);
-        }
-      }
-
       let tradeStr = `PHASE2|P${player.id}|TRADE`;
       if (consumedMoney > 0) tradeStr += `|$${consumedMoney}:+${mGain}A`;
-      if (consumedDocs > 0) tradeStr += `|${consumedDocs}D:+${dGain}A`;
-      if (consumedConns > 0) tradeStr += `|${consumedConns}C:+${cGain}A`;
       if (mPen > 0) tradeStr += `|PEN_M:-${mPen}A`;
       if (dPen > 0) tradeStr += `|PEN_D:-${dPen}A`;
       if (cPen > 0) tradeStr += `|PEN_C:-${cPen}A`;
@@ -3778,6 +3811,41 @@ export function runTests() {
       discountCost === 1,
       "Kept Stellar Reputation reduces connection purchase cost by $1",
     );
+
+    // Connection cost reduction per connection in stash
+    const connP = eng.players[0];
+    connP.stash.connections = [];
+    connP.stash.lifeCards = [];
+    const testConnCard = { name: "Test Conn", cost: 4, type: "connection" };
+    assert(eng.getEffectiveCost(connP, testConnCard) === 4, "Connection costs $4 with 0 conns in stash");
+    connP.stash.connections.push({ name: "Conn1", type: "connection" });
+    assert(eng.getEffectiveCost(connP, testConnCard) === 3, "Connection costs $3 with 1 conn in stash");
+    connP.stash.connections.push({ name: "Conn2", type: "connection" });
+    assert(eng.getEffectiveCost(connP, testConnCard) === 2, "Connection costs $2 with 2 conns in stash");
+
+    // Immediate set trade-in test
+    const tradeInEngine = new EmigrationEngine({
+      mode: "competitive",
+      players: [
+        { name: "TradeP1", nationality: { name: "Bosnian" }, destination: { name: "Bosnia and Herzegovina" } },
+        { name: "TradeP2", nationality: { name: "French" }, destination: { name: "France" } }
+      ]
+    });
+    const tp1 = tradeInEngine.players[0];
+    // Bosnia targets: d setSize 4 reward 2; c setSize 3 reward 6
+    assert(tp1.assurance === 0, "Player starts at 0 Assurance on track");
+    tp1.stash.documents.push({ name: "D1", type: "document" });
+    tradeInEngine._onPlayerGainDocument(tp1);
+    tp1.stash.documents.push({ name: "D2", type: "document" });
+    tradeInEngine._onPlayerGainDocument(tp1);
+    tp1.stash.documents.push({ name: "D3", type: "document" });
+    tradeInEngine._onPlayerGainDocument(tp1);
+    assert(tp1.stash.documents.length === 3, "3 documents in stash before set complete");
+    assert(tp1.assurance === 0, "0 Assurance before set complete");
+    tp1.stash.documents.push({ name: "D4", type: "document" });
+    tradeInEngine._onPlayerGainDocument(tp1);
+    assert(tp1.stash.documents.length === 0, "Documents consumed on immediate set trade-in");
+    assert(tp1.assurance === 2, "Assurance track moves up +2 immediately on document set trade-in");
 
     // Document cost reduction per document in stash
     const docP = eng.players[0];

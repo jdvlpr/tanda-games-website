@@ -2,6 +2,8 @@ export const pendingChanges =  {
     version: "0.1.2",
     date: "July 30, 2026",
     items: [
+      "Rule change: removed the college/graduate from college actions along with related pay raises.",
+      "Rule change: All documents and connections start at $4, and for each one a player buys, the next one costs $1 less.",
       "Rule change: If a player Forfeits their turn, they gain $1",
       "Rule change: Paydays only give the player(s) left and right of the player who activated it $1. The player who activates the Payday still gets their full salary.",
       "Rule change: Discarding a card in 2 or 3 players gives +$3. In 4+ players, it's still +$2.",
