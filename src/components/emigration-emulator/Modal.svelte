@@ -38,14 +38,20 @@
         <div class="flex flex-col gap-2 max-h-[50vh] overflow-y-auto mb-4">
           {#each choice.options as option}
             {@const isSelected = selectedValues.includes(option.value)}
+            {@const desc = option.description || option.card?.description}
             <button
               class="btn text-left justify-between flex items-center {isSelected ? 'bg-teal-600 text-white border-teal-500' : 'bg-neutral-100 dark:bg-neutral-700'}"
               disabled={option.disabled}
               onclick={() => toggleSelect(option.value)}
             >
-              <span>{option.text}</span>
+              <div class="flex flex-col text-left pr-2">
+                <span>{option.text}</span>
+                {#if desc}
+                  <span class="text-xs opacity-80 font-normal mt-0.5 line-clamp-2">{desc}</span>
+                {/if}
+              </div>
               {#if isSelected}
-                <span class="font-bold text-xs bg-teal-800 px-2 py-0.5 rounded-full">Selected</span>
+                <span class="font-bold text-xs bg-teal-800 text-white px-2 py-0.5 rounded-full shrink-0">Selected</span>
               {/if}
             </button>
           {/each}
@@ -61,12 +67,16 @@
       {:else}
         <div class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
           {#each choice.options as option}
+            {@const desc = option.description || option.card?.description}
             <button
-              class="btn"
+              class="btn text-left flex flex-col items-start"
               disabled={option.disabled}
               onclick={() => !option.disabled && handleResolve(option.value)}
             >
-              {option.text}
+              <span>{option.text}</span>
+              {#if desc}
+                <span class="text-xs opacity-80 font-normal mt-0.5 line-clamp-2">{desc}</span>
+              {/if}
             </button>
           {/each}
           {#if choice.canGoBack && onback}

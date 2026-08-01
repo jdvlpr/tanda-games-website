@@ -1004,6 +1004,7 @@ export default class EmigrationEngine {
         text: `${card.name || card.title} (${card.type.charAt(0).toUpperCase() + card.type.slice(1)})`,
         value: card.id || String(idx),
         card: card,
+        description: card.description || null,
       })),
       cancellable: false,
       resolve: (selectedValues) => {
@@ -3319,6 +3320,8 @@ export default class EmigrationEngine {
       options: arr.map((c, i) => ({
         text: c.name || c.title,
         value: String(i),
+        card: c,
+        description: c.description || null,
       })),
       resolve: (val) => callback(parseInt(val)),
     });
